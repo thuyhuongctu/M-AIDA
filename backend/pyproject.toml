@@ -32,7 +32,7 @@ dependencies = [
 test = ["pytest>=8.0"]
 
 [project.urls]
-Repository = "https://github.com/thuyhuongctu-cell/M-AIDA"
+Repository = "https://github.com/thuyhuongctu/M-AIDA"
 
 # The backend is a flat set of single-file modules (not a nested package).
 [tool.setuptools]

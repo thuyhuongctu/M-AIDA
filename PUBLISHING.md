@@ -6,7 +6,7 @@ capability behind the dissertation's meta-analysis (P6).
 
 **Current status (as of v7.1.1):**
 
-- Public repository: <https://github.com/thuyhuongctu-cell/M-AIDA>
+- Public repository: <https://github.com/thuyhuongctu/M-AIDA>
 - Latest release: **v7.1.1** (from `main`, vendor-neutral build)
 - Zenodo archive: concept DOI **[10.5281/zenodo.21282516](https://doi.org/10.5281/zenodo.21282516)** (all versions); version DOI **[10.5281/zenodo.21282517](https://doi.org/10.5281/zenodo.21282517)** (v7.1.1)
 
@@ -20,7 +20,7 @@ by people over time, not generated in one pass.
 ## Step 1: repository (done)
 
 The repository is live and public at
-<https://github.com/thuyhuongctu-cell/M-AIDA>. `CITATION.cff`
+<https://github.com/thuyhuongctu/M-AIDA>. `CITATION.cff`
 (`repository-code`) points to it. The default branch is `main`; the current
 release build is the vendor-neutral tree that resolves the LLM provider
 through a configurable Engine Adapter (`LLM_PROVIDER` / `LLM_API_KEY` /
