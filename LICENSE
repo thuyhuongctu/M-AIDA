@@ -1,0 +1,31 @@
+M-AIDA - Academic Source-Available License (v1.0)
+Copyright (c) 2026 Do Thuy Huong and Phan Anh Tu. All rights reserved.
+
+This software ("M-AIDA: Meta-Analysis Intelligent Data Assistant") and its source
+code are made publicly available on GitHub for transparency, citation, and academic
+verification. Copyright in the software subsists automatically under the law of
+Viet Nam and the Berne Convention from the moment of creation; formal registration
+with the Copyright Office of Viet Nam has not yet been filed.
+
+Permission is GRANTED, free of charge, to any person obtaining a copy of this
+software, to use, run, study, and reproduce it for non-commercial academic and
+research purposes, provided that:
+
+  1. The above copyright notice and this permission notice are retained in all
+     copies or substantial portions of the software; and
+  2. Any academic use that relies on the software cites it per CITATION.cff.
+
+Permission is NOT granted, without the prior written consent of the copyright
+holder, to: (a) use the software or substantial portions thereof for commercial
+purposes; or (b) redistribute modified versions as a competing product.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+
+----------------------------------------------------------------------
+NOTE FOR THE AUTHOR: this license keeps your rights (consistent with the COV
+copyright registration) while making the code citable and verifiable. If you
+prefer fully open reuse, replace this file with the MIT or Apache-2.0 license
+text and update CITATION.cff / .zenodo.json `license` accordingly.
+----------------------------------------------------------------------

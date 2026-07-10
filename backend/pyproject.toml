@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maida-backend"
+version = "7.0.0"
+description = "M-AIDA backend - LLM-assisted effect-size extraction with PI verification and immutable data lock for international-business meta-analysis (dissertation P6)."
+requires-python = ">=3.11"
+license = { text = "LicenseRef-MAIDA-Academic" }
+authors = [{ name = "Do Thuy Huong" }, { name = "Phan Anh Tu" }]
+keywords = ["meta-analysis", "effect-size extraction", "international business", "reproducible research"]
+
+# Runtime dependencies mirror backend/requirements.txt (pinned for reproducibility).
+dependencies = [
+  "fastapi==0.115.0",
+  "uvicorn[standard]==0.30.0",
+  "python-multipart==0.0.9",
+  "pydantic==2.7.0",
+  "pydantic-settings==2.3.0",
+  "httpx==0.27.0",
+  "python-dotenv==1.0.1",
+  "anthropic==0.31.0",
+  "PyMuPDF==1.24.5",
+  "notion-client==2.2.1",
+  "pandas==2.2.2",
+  "scipy==1.13.1",
+  "numpy==2.0.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[project.urls]
+Repository = "https://github.com/thuyhuongctu-cell/M-AIDA"
+
+# The backend is a flat set of single-file modules (not a nested package).
+[tool.setuptools]
+py-modules = ["extractor", "main", "models", "settings", "notion_sync"]
+
+[tool.pytest.ini_options]
+# Run `pytest` from the backend/ directory; pythonpath lets tests import the
+# top-level modules (extractor, models, ...) without an editable install.
+pythonpath = ["."]
+testpaths = ["tests"]

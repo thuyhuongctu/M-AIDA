@@ -1,0 +1,19 @@
+# Secrets - never commit real credentials
+.env
+backend/.env
+*.env
+!.env.example
+!backend/.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+/coverage
+/build
+.pytest_cache/
+*.egg-info/
