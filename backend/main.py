@@ -1,5 +1,5 @@
 """
-M-AIDA v7.0 - FastAPI application entry point.
+M-AIDA v7.1.1 - FastAPI application entry point.
 
 Routes
 ------
@@ -48,9 +48,9 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 app = FastAPI(
-    title="M-AIDA v7.0",
+    title="M-AIDA v7.1.1",
     description="Meta-Analysis Intelligent Data Assistant - I→P research pipeline",
-    version="7.0.0",
+    version="7.1.1",
 )
 
 settings = get_settings()
@@ -110,7 +110,7 @@ def health_check() -> dict[str, Any]:
     """Return service status and configuration flags."""
     return {
         "status": "ok",
-        "version": "7.0.0",
+        "version": "7.1.1",
         "study_count": len(_studies),
         "anthropic_configured": bool(settings.anthropic_api_key),
         "notion_configured": bool(

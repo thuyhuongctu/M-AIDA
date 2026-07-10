@@ -1,5 +1,5 @@
 /**
- * M-AIDA v7.0 API client.
+ * M-AIDA v7.1.1 API client.
  *
  * All routes proxied from the React dev server to the FastAPI backend
  * (default: http://localhost:8765).  Set VITE_API_URL in .env.local
