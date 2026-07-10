@@ -1,37 +1,51 @@
-# M-AIDA v7.1: Meta-Analysis Intelligent Data Assistant
-
-Developed at Can Tho University by Do Thuy Huong ([ORCID 0000-0002-7711-2487](https://orcid.org/0000-0002-7711-2487)) and Phan Anh Tu ([ORCID 0000-0003-0667-3137](https://orcid.org/0000-0003-0667-3137)).  
-Purpose-built for international-business meta-analysis: semi-automated effect-size extraction from academic PDFs with human-in-the-loop PI verification and immutable data lock.
+# M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21282516.svg)](https://doi.org/10.5281/zenodo.21282516)
 ![version](https://img.shields.io/badge/version-7.1.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2018%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-Academic%20Source--Available-lightgrey)
+
+Research software for meta-analysis: semi-automated effect-size extraction from
+academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop
+verification by the principal investigator, and an immutable data-lock workflow that
+exports a reproducible effect-size dataset for three-level meta-analytic regression.
+
+**Authors**
+
+- Do Thuy Huong ([ORCID 0000-0002-7711-2487](https://orcid.org/0000-0002-7711-2487)), PhD Candidate, School of Economics, Can Tho University.
+- Phan Anh Tu ([ORCID 0000-0003-0667-3137](https://orcid.org/0000-0003-0667-3137)), School of Economics, Can Tho University.
+
+Built to support the P6 (meta-analysis) component of the first author's doctoral
+dissertation on the internationalization-performance relationship.
 
 ## System Architecture
 
 ```text
 frontend (React 18, :3000)
-    └── calls ──→ backend (FastAPI, :8765)
-                     ├── extractor.py   provider-configurable LLM parsing
-                     ├── notion_sync.py Notion database sync
-                     └── models.py      Pydantic domain models
+    calls --> backend (FastAPI, :8765)
+                 |-- extractor.py    vendor-neutral LLM parsing
+                 |-- engines.py      provider adapter (LLM_PROVIDER / LLM_API_KEY / LLM_MODEL)
+                 |-- models.py       Pydantic domain models
+                 |-- notion_sync.py  optional Notion database sync
 ```
+
+The language model is reached through a configurable adapter. Set `LLM_PROVIDER`,
+`LLM_API_KEY` and `LLM_MODEL` to your own provider; the software is not tied to any
+single vendor.
 
 ## Quick Start
 
 ```bash
 # 1. Configure environment
 cp backend/.env.example backend/.env
-# Edit backend/.env: LLM_API_KEY, LLM_MODEL, NOTION_TOKEN, NOTION_DATABASE_ID
-# Backward-compatible provider-specific environment variables are also supported.
+# Edit backend/.env: LLM_PROVIDER, LLM_API_KEY, LLM_MODEL, NOTION_TOKEN, NOTION_DATABASE_ID
 
 # 2. Start with Docker Compose
 docker compose up
 
-# 3. Open browser
+# 3. Open the app
 open http://localhost:3000
 ```
 
-## Development & tests
+## Development and tests
 
 ```bash
 # Backend unit tests (effect-size conversions + confidence scheme)
@@ -46,68 +60,69 @@ npm run dev      # http://localhost:3000
 npm run build    # outputs to build/
 ```
 
-CI runs the backend test suite and the frontend Vite build on every change
-(`.github/workflows/maida-ci.yml`). The frontend was migrated from the
-deprecated Create-React-App (`react-scripts`) to **Vite** so it builds cleanly
-under React 19. Set `VITE_API_URL` (see `frontend/.env.example`) to point the
-client at a non-default backend URL.
+CI runs the backend test suite and the frontend Vite build on every change.
+Set `VITE_API_URL` (see `frontend/.env.example`) to point the client at a
+non-default backend URL.
 
 ## API Routes
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/extract` | Base64 PDF body to extracted effect size |
-| POST | `/api/extract/upload` | Multipart PDF upload to extracted effect size |
+| POST | `/api/extract` | Base64 PDF body to an extracted effect size |
+| POST | `/api/extract/upload` | Multipart PDF upload to an extracted effect size |
 | GET | `/api/studies` | List studies (filter: icrv, dpl, verified, locked) |
 | GET | `/api/studies/{id}` | Single study detail |
-| PATCH | `/api/studies/{id}/verify` | PI field overrides + approval |
+| PATCH | `/api/studies/{id}/verify` | PI field overrides and approval |
 | POST | `/api/studies/{id}/lock` | Irreversible PI data lock |
 | GET | `/api/studies/export/csv` | Export locked studies as CSV |
 | POST | `/api/notion/sync` | Push locked studies to Notion |
-| GET | `/api/health` | Health check + service configuration flags |
+| GET | `/api/health` | Health check and service configuration flags |
 
 ## Extraction Workflow
 
-1. **Parse**: PDF text extracted via MuPDF, segmented into statistical regions.
-2. **Identify**: a configurable LLM-provider adapter proposes the focal I-P coefficient (not interactions/controls); moderators ICRV/DPL/cDAI are left blank for PI assignment from lookup tables.
-3. **Convert**: hierarchy: direct *r* to *r* from *t* to *r*_partial from beta (Peterson & Brown, 2005).
-4. **Verify**: PI reviews each field; confidence < 0.70 is mandatory review.
-5. **Lock**: PI data lock is cryptographically timestamped and irreversible.
+1. **Parse**: PDF text is extracted with MuPDF and segmented into statistical regions.
+2. **Identify**: the LLM adapter proposes the focal internationalization-performance
+   coefficient (not interactions or controls). Moderators (ICRV, DPL, cDAI) are left
+   blank for the principal investigator to assign from external lookup tables.
+3. **Convert**: the canonical target is Pearson r. When only a derived statistic is
+   reported, r is computed from t using Cohen (1988), or from a standardized beta
+   using Peterson and Brown (2005). A three-level confidence score is attached.
+4. **Verify**: the principal investigator reviews each field; any record with
+   confidence below 0.70 is flagged for mandatory review.
+5. **Lock**: an approved record is permanently locked with a UTC timestamp and can no
+   longer be edited. Only locked records enter the analysis export.
 
 ## Citation
 
-If you use M-AIDA, please cite it (see `CITATION.cff`: GitHub renders a
-"Cite this repository" button):
+If you use M-AIDA, please cite it (GitHub renders a "Cite this repository" button
+from `CITATION.cff`):
 
-> Do, T. H., & Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.1.1)
+> Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.1.1)
 > [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21282516
 
----
+Zenodo mints two identifiers: the concept DOI `10.5281/zenodo.21282516` always
+resolves to the latest version, while the version DOI `10.5281/zenodo.21282517`
+pins release v7.1.1. Cite the concept DOI for the software in general and the
+version DOI for an exact reproducible build.
 
 ## Authorship, license, and research-integrity note
 
-**Authors / copyright:** Do Thuy Huong and Phan Anh Tu, College of Economics, Can Tho University.
-M-AIDA was developed by the authors to support effect-size extraction for Paper 6 of the doctoral
-dissertation. The source code is published openly on GitHub. A Vietnam Copyright Office (COV)
-software-copyright registration is being prepared but has not yet been filed; copyright nonetheless
-subsists automatically under Vietnamese law and the Berne Convention from the moment of creation.
+**Authors and copyright holders:** Do Thuy Huong and Phan Anh Tu, School of Economics,
+Can Tho University. Copyright subsists automatically under Vietnamese law and the Berne
+Convention from the moment of creation; a Copyright Office of Viet Nam registration is
+being prepared with Can Tho University as a co-owner under the university's
+intellectual-property regulations.
 
-**Role of computational assistance:** M-AIDA uses a configurable large-language-model provider only to
-*propose* candidate effect sizes and statistical conversions from study text. It is a
-**human-in-the-loop** tool: every proposed value must be independently verified, corrected if needed,
-and permanently locked by the Principal Investigator (`pi_locked`) before it enters the analysis
-database. The provider does not select studies, decide eligibility, run the meta-analysis, write
-interpretive content, or hold authorship/ownership over the software. Scientific responsibility remains
-with the named human authors.
+**Role of computational assistance:** M-AIDA uses a configurable language-model provider
+only to *propose* candidate effect sizes and statistical conversions from study text. It
+is a human-in-the-loop tool: every proposed value must be independently verified,
+corrected if needed, and permanently locked by the principal investigator before it
+enters the analysis database. The provider does not select studies, decide eligibility,
+run the meta-analysis, write interpretive content, or hold authorship or ownership over
+the software. Scientific responsibility remains with the named human authors.
 
-**Security:** copy `backend/.env.example` to `backend/.env` and supply your own keys; never commit a
-real `.env` (it is git-ignored).
-
-> Schema note (v7.0.1, 2026-06-10): the tool schema is aligned with the canonical P6 analysis
-> database: ICRV = Institutional Context Regime Variation (I/II/III/FR/MX, WGI Rule of Law);
-> cDAI = country Digital Adoption Index (0-1). ICRV, DPL, and cDAI are **PI-assigned from external
-> lookup tables during verification**; the LLM extracts only statistics, the data-year window, and
-> the two text-determinable classifications (DOI measure, performance measure).
+**Security:** copy `backend/.env.example` to `backend/.env` and supply your own keys;
+never commit a real `.env` (it is git-ignored).
 
 ## License
 
