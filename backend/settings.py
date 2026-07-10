@@ -38,7 +38,6 @@ class Settings(BaseSettings):
     anthropic_model: str = Field(
         default="", validation_alias=AliasChoices("ANTHROPIC_MODEL", "LLM_MODEL")
     )
-    anthropic_default_fable_model: str = ""
 
     notion_token: str = ""
     notion_database_id: str = ""
@@ -50,7 +49,7 @@ class Settings(BaseSettings):
     @property
     def resolved_model(self) -> str:
         """Return the configured model id, if one was supplied by the researcher."""
-        return self.anthropic_model or self.anthropic_default_fable_model
+        return self.anthropic_model
 
 
 _settings: Settings | None = None
