@@ -11,7 +11,7 @@ type: software
 version: "7.1.1"
 date-released: "2026-07-09"
 license: LicenseRef-MAIDA-Academic
-repository-code: "https://github.com/thuyhuongctu-cell/M-AIDA"
+repository-code: "https://github.com/thuyhuongctu/M-AIDA"
 doi: "10.5281/zenodo.21282516"
 identifiers:
   - type: doi
