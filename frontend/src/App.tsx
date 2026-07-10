@@ -1,5 +1,5 @@
 /**
- * M-AIDA v7.0 - Root application component.
+ * M-AIDA v7.1.1 - Root application component.
  *
  * Two-tab layout:
  *   1. Extract       - PDF upload and LLM extraction (ExtractionPanel)
@@ -34,7 +34,7 @@ export default function App() {
       <header className="app-header">
         <div className="header-brand">
           <h1 className="app-title">M-AIDA</h1>
-          <span className="app-version">v7.0</span>
+          <span className="app-version">v7.1.1</span>
         </div>
         <p className="app-subtitle">
           Meta-Analysis Intelligent Data Assistant - Internationalization &amp; Performance
@@ -93,7 +93,7 @@ export default function App() {
 
       <footer className="app-footer">
         <p>
-          M-AIDA v7.0 · PhD Dissertation Research Tool · Asia-Pacific I&rarr;P
+          M-AIDA v7.1.1 · PhD Dissertation Research Tool · Asia-Pacific I&rarr;P
           Meta-Analysis
         </p>
       </footer>

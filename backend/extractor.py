@@ -1,5 +1,5 @@
 """
-Statistical parameter extractor for M-AIDA v7.0.
+Statistical parameter extractor for M-AIDA v7.1.1.
 
 Uses a pluggable :class:`~engines.ExtractionEngine` (BYOK provider adapter) to
 locate and parse effect-size statistics from academic PDF text, then converts

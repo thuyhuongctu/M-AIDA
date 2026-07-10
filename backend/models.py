@@ -1,5 +1,5 @@
 """
-Pydantic data models for M-AIDA v7.0.
+Pydantic data models for M-AIDA v7.1.1.
 
 All models represent domain objects for the internationalization-performance
 meta-analysis pipeline: extracted effect sizes, verification decisions, and

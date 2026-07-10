@@ -1,5 +1,5 @@
 """
-Notion API synchronisation layer for M-AIDA v7.0.
+Notion API synchronisation layer for M-AIDA v7.1.1.
 
 Pushes PI-locked study records to a Notion database and retrieves existing
 entries.  The Notion database must be pre-configured with properties that match
