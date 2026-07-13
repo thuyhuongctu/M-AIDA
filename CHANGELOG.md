@@ -55,3 +55,21 @@ internal release line used during the doctoral meta-analysis (P6).
 
 > Version history reflects iterative, human-directed development; see the git
 > commit log for the full, dated trail.
+
+## Governance note - 2026-07-13
+
+- **[7.1.1] is declared the Registered Reference Release (frozen).** This is
+  the version deposited in the copyright-registration dossier filed through
+  Can Tho University and the version used in the dissertation (P6). No direct
+  changes may be made to the 7.1.1 source, architecture, features, or UI; see
+  `IP_REGISTER.md` for the full post-freeze rules and the 7.1.0/7.1.1
+  reconciliation note.
+- **Semantic Versioning rules from this point on:**
+  - `7.1.2+` (patch): bug fixes only; no new features, no architecture change.
+  - `7.2.0` (minor): new features that keep the current architecture and
+    purpose ("Meta-Analysis Intelligent Data Assistant"); developed on a
+    separate branch, never on the 7.1.1 release.
+  - `8.0.0` (major): substantial changes to architecture or scope.
+- Supplementary IP registration for any later version is considered only when
+  that version contains significant creative changes, and only after
+  consulting an intellectual-property specialist.

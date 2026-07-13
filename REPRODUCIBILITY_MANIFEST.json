@@ -1,0 +1,14 @@
+{
+  "_comment": "AI reproducibility manifest cho M-AIDA. Cac gia tri TO_BE_FILLED_AT_RUN duoc dien tai thoi diem chay tung dot trich xuat. Xem AI_USE_DISCLOSURE.md va VALIDATION_PROTOCOL.md.",
+  "software": "M-AIDA: Meta-Analysis Intelligent Data Assistant",
+  "version": "7.1.1",
+  "release_date": "2026-07-09",
+  "model_provider": "TO_BE_FILLED_AT_RUN",
+  "model_identifier": "TO_BE_FILLED_AT_RUN",
+  "prompt_version": "TO_BE_FILLED_AT_RUN",
+  "temperature": "TO_BE_FILLED_AT_RUN",
+  "extraction_date": "TO_BE_FILLED_AT_RUN",
+  "human_verifier": "TO_BE_FILLED_AT_RUN",
+  "lock_status": "TO_BE_FILLED_AT_RUN",
+  "analysis_software": "R + metafor (three-level meta-analysis, thuc hien ngoai pham vi M-AIDA)"
+}
