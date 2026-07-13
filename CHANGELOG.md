@@ -3,6 +3,11 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## [Unreleased]
+- Web: unified public web app (overview, method, positioning, forest plot,
+  interactive study atlas, in-browser demo tool) served via GitHub Pages at
+  https://thuyhuongctu.github.io/M-AIDA/ from the repository root and `docs/`.
+
 ## [7.1.1] - 2026-07-09
 - Documentation: revised public-facing wording to describe the extraction layer
   as a configurable LLM-provider adapter rather than a contribution from any
