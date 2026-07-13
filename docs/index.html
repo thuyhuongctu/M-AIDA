@@ -106,6 +106,9 @@
     color:var(--brand); font-size:0.95rem; line-height:1; padding:0; font-family:var(--mono);
   }
   .pill-btn:hover { border-color:var(--brand-line); }
+  .pill-btn[aria-pressed="true"]{background:var(--brand);color:var(--surface);border-color:var(--brand);}
+  :root:not([data-motion="off"]) #musicBtn[aria-pressed="true"]{animation:musicpulse 2.6s ease-in-out infinite;}
+  @keyframes musicpulse{0%,100%{box-shadow:0 0 0 0 rgba(14,76,90,.30);}50%{box-shadow:0 0 0 7px rgba(14,76,90,0);}}
   .lang { display:inline-flex; border:1px solid var(--line-2); border-radius:999px; overflow:hidden; background:var(--surface); }
   .lang button {
     border:0; cursor:pointer; font-family:var(--mono); font-size:0.7rem; letter-spacing:0.08em;
@@ -755,6 +758,7 @@ a{color:var(--brand);text-decoration:none;}
     </nav>
     <div class="hdr-right">
       <div class="motionsw" role="group" aria-label="Motion"><span class="ml" data-i18n data-en="Motion" data-vi="Hiệu ứng">Motion</span><span class="seg2"><button id="motionOn" aria-pressed="true">On</button><button id="motionOff" aria-pressed="false" data-i18n data-en="Off" data-vi="Tắt">Off</button></span></div>
+      <button class="pill-btn" id="musicBtn" aria-pressed="false" aria-label="Background music" title="Nhạc nền không lời / Background music">♪</button>
       <button class="pill-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">◑</button>
       <div class="lang" role="group" aria-label="Language">
         <button id="enBtn" aria-pressed="true">EN</button>
@@ -1916,5 +1920,82 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
 })();
 
 </script>
+
+<script>
+/* Background music: generative instrumental ambient, synthesized in the
+   browser (Web Audio API). Zero embedded audio assets; starts only on the
+   user's click, as autoplay policies require. */
+(function(){
+  var btn=document.getElementById('musicBtn'); if(!btn) return;
+  var ctx=null, master=null, timer=null, step=0, playing=false;
+  var CHORDS=[[57,60,64,67],[53,57,60,65],[48,52,55,60],[55,59,62,66]];
+  var PENTA=[57,60,62,64,67,69,72,74,76,79];
+  function hz(m){return 440*Math.pow(2,(m-69)/12);}
+  function boot(){
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC();
+    master=ctx.createGain(); master.gain.value=0;
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1400; lp.Q.value=0.5;
+    var dly=ctx.createDelay(1.5); dly.delayTime.value=0.42;
+    var fb=ctx.createGain(); fb.gain.value=0.32;
+    var wet=ctx.createGain(); wet.gain.value=0.22;
+    master.connect(lp); lp.connect(ctx.destination);
+    lp.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(wet); wet.connect(ctx.destination);
+    return true;
+  }
+  function pad(midis,t0,dur){
+    midis.forEach(function(m){
+      [ -5, 5 ].forEach(function(det){
+        var o=ctx.createOscillator(), g=ctx.createGain();
+        o.type='triangle'; o.frequency.value=hz(m); o.detune.value=det;
+        g.gain.setValueAtTime(0,t0);
+        g.gain.linearRampToValueAtTime(0.024,t0+2.4);
+        g.gain.setValueAtTime(0.024,t0+dur-2.6);
+        g.gain.linearRampToValueAtTime(0,t0+dur);
+        o.connect(g); g.connect(master); o.start(t0); o.stop(t0+dur+0.1);
+      });
+    });
+  }
+  function pluck(m,t0){
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.value=hz(m);
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(0.062,t0+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+1.7);
+    o.connect(g); g.connect(master); o.start(t0); o.stop(t0+1.9);
+  }
+  function bar(){
+    var t0=ctx.currentTime+0.05, DUR=8;
+    pad(CHORDS[step%CHORDS.length],t0,DUR+2.4);
+    for(var b=0;b<16;b++){
+      if(Math.random()<0.26){
+        pluck(PENTA[Math.floor(Math.random()*PENTA.length)], t0+b*(DUR/16)+Math.random()*0.06);
+      }
+    }
+    step++;
+    timer=setTimeout(bar,DUR*1000);
+  }
+  btn.addEventListener('click',function(){
+    if(!ctx && !boot()) return;
+    var now;
+    if(!playing){
+      if(ctx.resume) ctx.resume();
+      now=ctx.currentTime;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(master.gain.value,now);
+      master.gain.linearRampToValueAtTime(1,now+1.6);
+      playing=true; if(!timer) bar();
+    } else {
+      now=ctx.currentTime;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(master.gain.value,now);
+      master.gain.linearRampToValueAtTime(0,now+0.8);
+      playing=false; clearTimeout(timer); timer=null;
+    }
+    btn.setAttribute('aria-pressed',playing?'true':'false');
+  });
+})();
+</script>
+
 </body>
 </html>
