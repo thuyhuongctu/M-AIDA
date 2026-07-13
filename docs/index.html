@@ -1922,58 +1922,139 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
 </script>
 
 <script>
-/* Background music: generative instrumental ambient, synthesized in the
-   browser (Web Audio API). Zero embedded audio assets; starts only on the
-   user's click, as autoplay policies require. */
+/* Background music v2: a composed lo-fi loop synthesized live (Web Audio).
+   Fmaj7-Em7-Dm7-Cmaj7 at 76 BPM, hand-written melody phrases, Rhodes-like
+   keys, warm bass, soft drums, convolution reverb and a vinyl-crackle bed.
+   Zero embedded audio; starts only on the user's click. */
 (function(){
   var btn=document.getElementById('musicBtn'); if(!btn) return;
-  var ctx=null, master=null, timer=null, step=0, playing=false;
-  var CHORDS=[[57,60,64,67],[53,57,60,65],[48,52,55,60],[55,59,62,66]];
-  var PENTA=[57,60,62,64,67,69,72,74,76,79];
+  var ctx=null, master=null, verb=null, mel=null, melWet=null, keys=null, padBus=null, drums=null, vinyl=null;
+  var timer=null, cycle=0, playing=false;
+  var BPM=76, BEAT=60/BPM, BAR=BEAT*4, EIGHTH=BEAT/2, SWING=0.14*EIGHTH;
+  var CHORDS=[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]]; /* Fmaj7 Em7 Dm7 Cmaj7 */
+  var BASS=[41,40,38,36];
+  /* melody phrases: [eighth-slot, midi, eighths-held]; two 4-bar variations */
+  var PHRASES=[
+    [[0,69,2],[2,72,2],[4,76,3],[7,74,4],[11,71,2],[14,67,2],[16,69,2],[18,65,2],[20,62,3],[24,64,2],[26,67,2],[28,72,3],[31,71,1]],
+    [[0,76,3],[3,74,3],[6,72,2],[8,71,3],[12,74,3],[16,69,3],[20,65,2],[22,67,2],[24,64,4],[28,62,2],[30,64,2]]
+  ];
   function hz(m){return 440*Math.pow(2,(m-69)/12);}
+  function noiseBuf(sec,fn){
+    var n=Math.floor(ctx.sampleRate*sec), b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(var c=0;c<2;c++){var d=b.getChannelData(c);for(var i=0;i<n;i++)d[i]=fn(i,n);}
+    return b;
+  }
   function boot(){
     var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
     ctx=new AC();
-    master=ctx.createGain(); master.gain.value=0;
-    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1400; lp.Q.value=0.5;
-    var dly=ctx.createDelay(1.5); dly.delayTime.value=0.42;
-    var fb=ctx.createGain(); fb.gain.value=0.32;
-    var wet=ctx.createGain(); wet.gain.value=0.22;
-    master.connect(lp); lp.connect(ctx.destination);
-    lp.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(wet); wet.connect(ctx.destination);
+    master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
+    verb=ctx.createConvolver();
+    verb.buffer=noiseBuf(2.2,function(i,n){return (Math.random()*2-1)*Math.pow(1-i/n,2.8);});
+    var verbOut=ctx.createGain(); verbOut.gain.value=0.85; verb.connect(verbOut); verbOut.connect(master);
+    keys=ctx.createGain(); keys.gain.value=1; keys.connect(master);
+    mel=ctx.createGain(); mel.gain.value=1; mel.connect(master);
+    var send=ctx.createGain(); send.gain.value=0.30; mel.connect(send); send.connect(verb);
+    var ks=ctx.createGain(); ks.gain.value=0.16; keys.connect(ks); ks.connect(verb);
+    melWet=ctx.createDelay(2); melWet.delayTime.value=EIGHTH*3;
+    var fb=ctx.createGain(); fb.gain.value=0.28;
+    var dw=ctx.createGain(); dw.gain.value=0.14;
+    mel.connect(melWet); melWet.connect(fb); fb.connect(melWet); melWet.connect(dw); dw.connect(master);
+    padBus=ctx.createGain(); padBus.gain.value=1;
+    var plp=ctx.createBiquadFilter(); plp.type='lowpass'; plp.frequency.value=950; plp.Q.value=0.4;
+    padBus.connect(plp); plp.connect(master);
+    var ps=ctx.createGain(); ps.gain.value=0.20; plp.connect(ps); ps.connect(verb);
+    drums=ctx.createGain(); drums.gain.value=1; drums.connect(master);
+    /* vinyl bed: sparse clicks over a faint noise floor, looped */
+    var vb=noiseBuf(3.0,function(){return (Math.random()*2-1)*0.018;});
+    for(var c=0;c<2;c++){var d=vb.getChannelData(c);
+      for(var k=0;k<46;k++){var p=Math.floor(Math.random()*d.length);var a=(Math.random()*0.5+0.3);
+        for(var j=0;j<40 && p+j<d.length;j++){d[p+j]+=a*Math.exp(-j/6)*(Math.random()*2-1);}}}
+    var src=ctx.createBufferSource(); src.buffer=vb; src.loop=true;
+    var vlp=ctx.createBiquadFilter(); vlp.type='lowpass'; vlp.frequency.value=6500;
+    vinyl=ctx.createGain(); vinyl.gain.value=0.5;
+    src.connect(vlp); vlp.connect(vinyl); vinyl.connect(master); src.start();
     return true;
+  }
+  /* Rhodes-like key: sine + soft octave partial + slow tremolo */
+  function ep(m,t0,dur,vel,bus){
+    var g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(vel,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+Math.max(dur,0.9)+0.45);
+    var trem=ctx.createOscillator(), tg=ctx.createGain();
+    trem.frequency.value=4.6; tg.gain.value=vel*0.16; trem.connect(tg); tg.connect(g.gain);
+    var o1=ctx.createOscillator(); o1.type='sine'; o1.frequency.value=hz(m);
+    var o2=ctx.createOscillator(); o2.type='sine'; o2.frequency.value=hz(m)*2.001;
+    var g2=ctx.createGain(); g2.gain.value=0.28;
+    var o3=ctx.createOscillator(); o3.type='triangle'; o3.frequency.value=hz(m); o3.detune.value=6;
+    var g3=ctx.createGain(); g3.gain.value=0.18;
+    o1.connect(g); o2.connect(g2); g2.connect(g); o3.connect(g3); g3.connect(g);
+    g.connect(bus);
+    var tEnd=t0+Math.max(dur,0.9)+0.6;
+    o1.start(t0); o2.start(t0); o3.start(t0); trem.start(t0);
+    o1.stop(tEnd); o2.stop(tEnd); o3.stop(tEnd); trem.stop(tEnd);
+  }
+  function bass(m,t0,dur){
+    var o=ctx.createOscillator(); o.type='sine'; o.frequency.value=hz(m);
+    var o2=ctx.createOscillator(); o2.type='triangle'; o2.frequency.value=hz(m);
+    var g=ctx.createGain(), g2=ctx.createGain(); g2.gain.value=0.25;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(0.085,t0+0.05);
+    g.gain.setValueAtTime(0.085,t0+dur*0.6);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    o.start(t0); o2.start(t0); o.stop(t0+dur+0.1); o2.stop(t0+dur+0.1);
   }
   function pad(midis,t0,dur){
     midis.forEach(function(m){
-      [ -5, 5 ].forEach(function(det){
-        var o=ctx.createOscillator(), g=ctx.createGain();
-        o.type='triangle'; o.frequency.value=hz(m); o.detune.value=det;
+      [-6,6].forEach(function(det){
+        var o=ctx.createOscillator(); o.type='sawtooth'; o.frequency.value=hz(m); o.detune.value=det;
+        var g=ctx.createGain();
         g.gain.setValueAtTime(0,t0);
-        g.gain.linearRampToValueAtTime(0.024,t0+2.4);
-        g.gain.setValueAtTime(0.024,t0+dur-2.6);
+        g.gain.linearRampToValueAtTime(0.0085,t0+1.9);
+        g.gain.setValueAtTime(0.0085,t0+dur-2.0);
         g.gain.linearRampToValueAtTime(0,t0+dur);
-        o.connect(g); g.connect(master); o.start(t0); o.stop(t0+dur+0.1);
+        o.connect(g); g.connect(padBus); o.start(t0); o.stop(t0+dur+0.1);
       });
     });
   }
-  function pluck(m,t0){
+  function kick(t0){
     var o=ctx.createOscillator(), g=ctx.createGain();
-    o.type='sine'; o.frequency.value=hz(m);
-    g.gain.setValueAtTime(0.0001,t0);
-    g.gain.exponentialRampToValueAtTime(0.062,t0+0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001,t0+1.7);
-    o.connect(g); g.connect(master); o.start(t0); o.stop(t0+1.9);
+    o.frequency.setValueAtTime(115,t0);
+    o.frequency.exponentialRampToValueAtTime(46,t0+0.09);
+    g.gain.setValueAtTime(0.20,t0);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.22);
+    o.connect(g); g.connect(drums); o.start(t0); o.stop(t0+0.25);
   }
-  function bar(){
-    var t0=ctx.currentTime+0.05, DUR=8;
-    pad(CHORDS[step%CHORDS.length],t0,DUR+2.4);
-    for(var b=0;b<16;b++){
-      if(Math.random()<0.26){
-        pluck(PENTA[Math.floor(Math.random()*PENTA.length)], t0+b*(DUR/16)+Math.random()*0.06);
-      }
+  var hatBuf=null;
+  function hat(t0,vel){
+    if(!hatBuf) hatBuf=noiseBuf(0.06,function(i,n){return (Math.random()*2-1)*Math.pow(1-i/n,2);});
+    var src=ctx.createBufferSource(); src.buffer=hatBuf;
+    var hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=6800;
+    var g=ctx.createGain(); g.gain.value=vel;
+    src.connect(hp); hp.connect(g); g.connect(drums); src.start(t0);
+  }
+  function slotTime(t0,slot){return t0+slot*EIGHTH+(slot%2? SWING:0);}
+  function scheduleCycle(){
+    var t0=ctx.currentTime+0.08;
+    for(var b=0;b<4;b++){
+      var bt=t0+b*BAR;
+      pad(CHORDS[b],bt,BAR+1.6);
+      bass(BASS[b],bt,BAR*0.96);
+      /* soft comp chord on the and-of-2 */
+      if(Math.random()<0.75){CHORDS[b].slice(1).forEach(function(m){ep(m,bt+BEAT*1.5+Math.random()*0.02,BEAT,0.028,keys);});}
+      kick(bt); if(Math.random()<0.8) kick(bt+BEAT*2);
+      hat(bt+BEAT,0.014); hat(bt+BEAT*3,Math.random()<0.5?0.018:0.011);
+      if(Math.random()<0.35) hat(bt+BEAT*3.5,0.008);
     }
-    step++;
-    timer=setTimeout(bar,DUR*1000);
+    var ph=PHRASES[cycle%2];
+    ph.forEach(function(n){
+      if(Math.random()<0.06) return; /* breathe */
+      var t=slotTime(t0,n[0])+ (Math.random()*0.024-0.012);
+      ep(n[1],t,n[2]*EIGHTH*0.92,0.055+Math.random()*0.02,mel);
+    });
+    cycle++;
+    timer=setTimeout(scheduleCycle,BAR*4*1000);
   }
   btn.addEventListener('click',function(){
     if(!ctx && !boot()) return;
@@ -1983,13 +2064,13 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
       now=ctx.currentTime;
       master.gain.cancelScheduledValues(now);
       master.gain.setValueAtTime(master.gain.value,now);
-      master.gain.linearRampToValueAtTime(1,now+1.6);
-      playing=true; if(!timer) bar();
+      master.gain.linearRampToValueAtTime(1,now+1.8);
+      playing=true; if(!timer) scheduleCycle();
     } else {
       now=ctx.currentTime;
       master.gain.cancelScheduledValues(now);
       master.gain.setValueAtTime(master.gain.value,now);
-      master.gain.linearRampToValueAtTime(0,now+0.8);
+      master.gain.linearRampToValueAtTime(0,now+0.9);
       playing=false; clearTimeout(timer); timer=null;
     }
     btn.setAttribute('aria-pressed',playing?'true':'false');
