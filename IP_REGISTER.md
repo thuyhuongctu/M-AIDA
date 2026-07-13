@@ -85,10 +85,15 @@ mâu thuẫn:
 - Commit trùng khớp gói nộp SHTT: `24dac0219b8020bd8f0b1c7d048f7a9ee9340dfe`
   (đối chiếu checksum: 17 tệp mã nguồn trùng 100% với gói SANITIZED; khác biệt duy nhất
   là README.md, thuộc tài liệu mô tả, không phải mã nguồn đăng ký).
-- Trạng thái tag: tag `v7.1.1` hiện có trên GitHub trỏ vào commit `93e38a4` (trước đợt
-  trung lập hóa nhà cung cấp) nên KHÔNG dùng làm bản tham chiếu. Chủ sở hữu cần cập nhật
-  tag bằng hai lệnh sau trên máy có quyền đẩy tag:
-  `git tag -fa v7.1.1 24dac0219b8020bd8f0b1c7d048f7a9ee9340dfe -m "Registered Reference Release"`
-  `git push --force origin v7.1.1`
-  Sau đó tạo GitHub Release "M-AIDA v7.1.1 - Registered Reference Release" từ tag này,
-  dán SHA-256 của gói nộp vào phần ghi chú release.
+- Trạng thái tag: ĐÃ KHẮC PHỤC ngày 14/07/2026 (giờ Việt Nam). Tag `v7.1.1` trước đó
+  trỏ vào commit `93e38a4` (trước đợt trung lập hóa nhà cung cấp) nên không dùng được
+  làm bản tham chiếu; chủ sở hữu đã xóa tag sai và tạo lại qua GitHub API. Trạng thái
+  sau khắc phục, xác minh bằng `git ls-remote --tags origin`: kho chỉ còn duy nhất tag
+  `v7.1.1` trỏ đúng commit `24dac0219b8020bd8f0b1c7d048f7a9ee9340dfe`; tag gõ nhầm
+  `v.7.1.1` phát sinh trong quá trình thao tác cũng đã được xóa.
+- GitHub Release "M-AIDA v7.1.1" đã được tạo với phần ghi chú chứa commit định danh,
+  hai tầng DOI Zenodo và SHA-256 của gói nộp
+  (`43a5d77296757fdd3cdf5c40e585bebcf05f3c9889d7f0dda41b75cd8d9ab9b5`). Ghi chú trạng
+  thái: sau khi thay tag, Release chuyển về bản nháp theo cơ chế của GitHub; bước còn
+  lại là chủ sở hữu bấm Publish (Edit, chọn tag `v7.1.1`, Publish release) và đính kèm
+  gói `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.zip` vào mục Assets.
