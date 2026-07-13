@@ -1,15 +1,14 @@
 {
   "title": "M-AIDA: Meta-Analysis Intelligent Data Assistant",
   "version": "7.1.1",
-  "description": "Research software for international-business meta-analysis: semi-automated effect-size extraction from academic PDFs with an LLM pipeline, a human-in-the-loop verification dashboard, and an immutable data-lock workflow that exports a reproducible effect-size dataset for three-level meta-analytic regression. Authored for the P6 component of the author's doctoral dissertation programme.",
   "upload_type": "software",
-  "access_right": "open",
-  "license": "other-closed",
+  "publication_date": "2026-07-09",
+  "description": "Research software for international-business meta-analysis: semi-automated effect-size extraction from academic PDFs through a vendor-neutral large-language-model adapter, human-in-the-loop verification by the principal investigator, and an immutable data-lock workflow that exports a reproducible effect-size dataset for three-level meta-analytic regression. Built to support the P6 (meta-analysis) component of the first author's doctoral dissertation on the internationalization-performance relationship.",
   "creators": [
     {
       "name": "Do, Thuy Huong",
       "orcid": "0000-0002-7711-2487",
-      "affiliation": "Can Tho University (PhD Candidate)"
+      "affiliation": "Can Tho University"
     },
     {
       "name": "Phan, Anh Tu",
@@ -17,8 +16,27 @@
       "affiliation": "Can Tho University"
     }
   ],
+  "access_right": "open",
+  "license": "other-nc",
+  "notes": "License: M-AIDA Academic Source-Available License v1.0 (LicenseRef-MAIDA-Academic); see the LICENSE file in the repository. Non-commercial academic use is permitted with citation; commercial use requires prior written consent of the copyright holders.",
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.21282516",
+      "relation": "isVersionOf",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://github.com/thuyhuongctu/M-AIDA",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
   "keywords": [
-    "meta-analysis", "effect-size extraction", "international business",
-    "large language models", "reproducible research", "PRISMA"
+    "meta-analysis",
+    "effect-size extraction",
+    "international business",
+    "large language models",
+    "reproducible research",
+    "PRISMA"
   ]
 }
