@@ -2230,12 +2230,12 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     guideImg.src=(POSES[i]||guideDefault);
   }
   var TOUR=[
-    ['overview',"Bonjour à tous! Je m'appelle Hương. Hello, my name is Hương. Welcome to M-AIDA, the software I built for my dissertation. It prepared two hundred and thirty six studies for one meta-analysis, and this page shows exactly how."],
-    ['method',"The workflow has three gates. A language model proposes each statistic with a confidence score, I verify every field myself, and approved records are locked so nobody can quietly change them."],
-    ['landscape',"M-AIDA does not replace screening tools like Rayyan, and it does not run the statistics. It covers the narrow stage in between: converting and governing effect sizes."],
-    ['forest',"Here is what comes out. Each square is one study's effect size, and the diamond is the pooled estimate: r equals zero point zero seven four."],
-    ['atlas',"The atlas maps thirty five economies, plus forty two cross-border studies that are counted but not placed. Colour shows each country's mean effect."],
-    ['tool',"And this is the demo you can try yourself. It runs offline in your browser: convert, verify, lock, export. Reading real PDFs needs the backend server, so this part is an honest simulation of that step. Thank you for visiting."]
+    ['overview',"Bonjour à tous! Je m'appelle Hương. Hello, my name is Hương. Welcome to M-AIDA, the software I built for my dissertation. It prepared two hundred and thirty six studies for one meta-analysis, and this page shows exactly how.","Xin chào, tôi tên là Hương. Chào mừng bạn đến với M-AIDA, phần mềm tôi xây dựng cho luận án tiến sĩ của mình. Nó đã chuẩn bị 236 nghiên cứu cho một phân tích tổng hợp, và trang này cho thấy chính xác cách làm."],
+    ['method',"The workflow has three gates. A language model proposes each statistic with a confidence score, I verify every field myself, and approved records are locked so nobody can quietly change them.","Quy trình có ba cổng. Một mô hình ngôn ngữ đề xuất từng chỉ số kèm điểm tin cậy, tôi tự tay kiểm chứng mọi trường dữ liệu, và các bản ghi được duyệt sẽ bị khóa để không ai có thể lặng lẽ thay đổi."],
+    ['landscape',"M-AIDA does not replace screening tools like Rayyan, and it does not run the statistics. It covers the narrow stage in between: converting and governing effect sizes.","M-AIDA không thay thế các công cụ sàng lọc như Rayyan, và không chạy phần thống kê. Nó chỉ đảm nhận khâu hẹp ở giữa: chuyển đổi và quản trị mức độ ảnh hưởng."],
+    ['forest',"Here is what comes out. Each square is one study's effect size, and the diamond is the pooled estimate: r equals zero point zero seven four.","Đây là kết quả đầu ra. Mỗi ô vuông là mức độ ảnh hưởng của một nghiên cứu, và hình thoi là ước lượng gộp: r = 0,074."],
+    ['atlas',"The atlas maps thirty five economies, plus forty two cross-border studies that are counted but not placed. Colour shows each country's mean effect.","Bản đồ atlas thể hiện 35 nền kinh tế, cộng thêm 42 nghiên cứu xuyên biên giới được đếm nhưng không gắn vào một quốc gia cụ thể. Màu sắc thể hiện mức độ ảnh hưởng trung bình của từng nước."],
+    ['tool',"And this is the demo you can try yourself. It runs offline in your browser: convert, verify, lock, export. Reading real PDFs needs the backend server, so this part is an honest simulation of that step. Thank you for visiting.","Và đây là bản demo bạn có thể tự trải nghiệm. Nó chạy ngay trong trình duyệt của bạn: chuyển đổi, kiểm chứng, khóa, xuất dữ liệu. Việc đọc tệp PDF thật cần máy chủ phía sau, nên phần này là một mô phỏng trung thực của bước đó. Cảm ơn bạn đã ghé thăm."]
   ];
   var idx=-1, active=false, timer=null, voice=null, curAudio=null;
   function pickVoice(){
@@ -2265,9 +2265,9 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     if(!hasTTS){ timer=setTimeout(next, Math.max(3500, line.length*75)); return; }
     try{
       var u=new SpeechSynthesisUtterance(line);
-      if(!voice) voice=pickVoice();
-      if(voice) u.voice=voice;
-      u.lang='en-US'; u.rate=0.95; u.pitch=1.02;
+      if(isVIL()){u.lang='vi-VN';}
+      else{if(!voice) voice=pickVoice(); if(voice) u.voice=voice; u.lang='en-US';}
+      u.rate=0.95; u.pitch=1.02;
       u.onend=next; u.onerror=next;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
@@ -2280,7 +2280,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     if(muted){ timer=setTimeout(next, readTime(line)); return; }
     var fell=false, guard=null;
     function fallback(){ if(fell||!active) return; fell=true; clearTimeout(guard); curAudio=null; ttsSpeak(line,next); }
-    var a=new Audio('voice/stop'+(i+1)+'.mp3');
+    var a=new Audio('voice/'+(isVIL()?'vi/':'')+'stop'+(i+1)+'.mp3');
     curAudio=a; a.preload='auto';
     a.onended=function(){ if(!fell&&active){ fell=true; clearTimeout(guard); next(); } };
     a.onerror=fallback;
@@ -2296,7 +2296,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     if(!active) return;
     idx++;
     if(idx>=TOUR.length){ stop(); return; }
-    var id=TOUR[idx][0], line=TOUR[idx][1];
+    var id=TOUR[idx][0], line=isVIL()?TOUR[idx][2]:TOUR[idx][1];
     var el=document.getElementById(id);
     if(el) el.scrollIntoView({behavior:(document.documentElement.getAttribute('data-motion')==='off'?'auto':'smooth'),block:'start'});
     txt.textContent=line;
@@ -2314,6 +2314,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     if(window.__musicDuck) window.__musicDuck(!muted);
     step();
   });
+  function isVIL(){return document.documentElement.getAttribute('lang')==='vi';}
   var noteTimer=null;
   window.__tourNote=function(text){
     if(active||!text) return;
