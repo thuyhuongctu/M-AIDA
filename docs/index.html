@@ -1985,21 +1985,21 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   var ctx=null, master=null, verb=null, mel=null, melWet=null, keys=null, padBus=null, drums=null, vinyl=null;
   var timer=null, cycle=0, playing=false, mood='calm';
   var MOODS={
-    happy:{bpm:92,swing:0.10,beats:4,vinyl:0.35,melVol:0.062,
+    happy:{bpm:92,swing:0.10,beats:4,vinyl:0.10,melVol:0.062,
       chords:[[48,52,55,59],[45,52,57,60],[41,48,53,57],[43,50,53,59]],
       bass:[36,33,29,31],kick2:0.85,hats:'bright',
       phrases:[
         [[0,72,2],[2,76,2],[4,79,3],[8,77,2],[10,76,2],[12,72,3],[16,69,2],[18,72,2],[20,76,2],[22,77,2],[24,79,4],[28,76,2],[30,74,2]],
         [[0,79,3],[4,81,2],[6,79,2],[8,76,3],[12,72,2],[14,76,2],[16,77,3],[20,74,2],[22,72,2],[24,71,3],[28,72,4]]
       ]},
-    calm:{bpm:64,swing:0.14,beats:4,vinyl:0.55,melVol:0.05,
+    calm:{bpm:64,swing:0.14,beats:4,vinyl:0.16,melVol:0.05,
       chords:[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]],
       bass:[41,40,38,36],kick2:0.4,hats:'soft',
       phrases:[
         [[0,69,2],[2,72,2],[4,76,3],[7,74,4],[11,71,2],[14,67,2],[16,69,2],[18,65,2],[20,62,3],[24,64,2],[26,67,2],[28,72,3],[31,71,1]],
         [[0,76,3],[3,74,3],[6,72,2],[8,71,3],[12,74,3],[16,69,3],[20,65,2],[22,67,2],[24,64,4],[28,62,2],[30,64,2]]
       ]},
-    owner:{bpm:138,swing:0,beats:3,vinyl:0.45,melVol:0.07,waltz:true,
+    owner:{bpm:138,swing:0,beats:3,vinyl:0.13,melVol:0.07,waltz:true,
       chords:[[45,52,57,60],[45,52,57,60],[50,53,57,62],[50,53,57,62],[40,47,52,56],[40,47,52,56],[45,52,57,60],[45,52,57,60]],
       bass:[33,33,38,38,40,40,33,33],
       phrases:[
@@ -2033,13 +2033,13 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     padBus.connect(plp); plp.connect(master);
     var ps=ctx.createGain(); ps.gain.value=0.20; plp.connect(ps); ps.connect(verb);
     drums=ctx.createGain(); drums.gain.value=1; drums.connect(master);
-    var vb=noiseBuf(3.0,function(){return (Math.random()*2-1)*0.018;});
+    var vb=noiseBuf(3.0,function(){return (Math.random()*2-1)*0.008;});
     for(var c=0;c<2;c++){var d=vb.getChannelData(c);
       for(var k=0;k<46;k++){var p=Math.floor(Math.random()*d.length);var a=(Math.random()*0.5+0.3);
         for(var j=0;j<40 && p+j<d.length;j++){d[p+j]+=a*Math.exp(-j/6)*(Math.random()*2-1);}}}
     var src=ctx.createBufferSource(); src.buffer=vb; src.loop=true;
     var vlp=ctx.createBiquadFilter(); vlp.type='lowpass'; vlp.frequency.value=6500;
-    vinyl=ctx.createGain(); vinyl.gain.value=0.5;
+    vinyl=ctx.createGain(); vinyl.gain.value=0.15;
     src.connect(vlp); vlp.connect(vinyl); vinyl.connect(master); src.start();
     return true;
   }
