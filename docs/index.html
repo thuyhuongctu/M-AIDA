@@ -720,6 +720,12 @@ a{color:var(--brand);text-decoration:none;}
   .tourcard{position:fixed;left:1rem;bottom:1rem;z-index:80;display:none;align-items:flex-end;gap:.6rem;max-width:min(420px,calc(100vw - 2rem));}
   .tourcard.show{display:flex;}
   .tourcard img{width:64px;height:auto;flex:0 0 auto;filter:drop-shadow(0 8px 12px rgba(0,0,0,.25));}
+  .hdr-right{position:relative;}
+  .moodpop{position:absolute;top:calc(100% + 10px);right:0;z-index:90;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 44px -20px rgba(0,0,0,.4);padding:.7rem;display:flex;flex-direction:column;gap:.45rem;width:min(320px,calc(100vw - 2rem));}
+  .moodpop[hidden]{display:none;}
+  .moodpop .mq{font-family:var(--mono);font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:var(--brand);padding:0 .2rem .1rem;}
+  .moodpop button{display:flex;align-items:flex-start;gap:.5rem;text-align:left;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);cursor:pointer;padding:.55rem .65rem;font-size:.8rem;color:var(--ink);line-height:1.4;}
+  .moodpop button:hover{border-color:var(--brand-line);background:var(--brand-soft);}
   .tourcard img.tg-still{display:none;}
   :root[data-motion="off"] .tourcard img.tg-anim{display:none;}
   :root[data-motion="off"] .tourcard img.tg-still{display:block;}
@@ -778,6 +784,12 @@ a{color:var(--brand);text-decoration:none;}
     <div class="hdr-right">
       <div class="motionsw" role="group" aria-label="Motion"><span class="ml" data-i18n data-en="Motion" data-vi="Hiệu ứng">Motion</span><span class="seg2"><button id="motionOn" aria-pressed="true">On</button><button id="motionOff" aria-pressed="false" data-i18n data-en="Off" data-vi="Tắt">Off</button></span></div>
       <button class="pill-btn" id="musicBtn" aria-pressed="false" aria-label="Background music" title="Nhạc nền không lời / Background music">♪</button>
+      <div class="moodpop" id="moodPop" hidden>
+        <div class="mq" data-i18n data-en="How are you feeling today?" data-vi="Hôm nay bạn thấy thế nào?">How are you feeling today?</div>
+        <button type="button" data-mood="happy">😊 <span data-i18n data-en="Happy: easy, upbeat instrumental" data-vi="Vui: nhạc không lời tươi vui, thoải mái">Happy: easy, upbeat instrumental</span></button>
+        <button type="button" data-mood="calm">😌 <span data-i18n data-en="Not so great: soothing instrumental" data-vi="Không vui: nhạc không lời xoa dịu tâm trạng">Not so great: soothing instrumental</span></button>
+        <button type="button" data-mood="owner">🎻 <span data-i18n data-en="Nothing at all: then the owner picks, a chanson-style waltz" data-vi="Không gì cả: vậy nghe nhạc chủ trang chọn, điệu valse phong cách chanson Pháp">Nothing at all: then the owner picks, a chanson-style waltz</span></button>
+      </div>
       <button class="pill-btn" id="tourBtn" aria-pressed="false" aria-label="Guided tour with English voice" title="Hương AI dẫn tour giọng tiếng Anh / Guided tour (English voice)">🎧</button>
       <button class="pill-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">◑</button>
       <div class="lang" role="group" aria-label="Language">
@@ -1954,22 +1966,40 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
 </script>
 
 <script>
-/* Background music v2: a composed lo-fi loop synthesized live (Web Audio).
-   Fmaj7-Em7-Dm7-Cmaj7 at 76 BPM, hand-written melody phrases, Rhodes-like
-   keys, warm bass, soft drums, convolution reverb and a vinyl-crackle bed.
-   Zero embedded audio; starts only on the user's click. */
+/* Background music v3: three synthesized moods, zero embedded audio, starts
+   only on the user's click. The note button first asks how the visitor feels:
+   happy (bright lo-fi), not so great (slow soothing keys), or nothing at all,
+   in which case the site owner picks: an ORIGINAL chanson-style waltz in
+   A minor written for this page (an homage to the mood of her favourite
+   French songs, not a copy of any copyrighted melody). */
 (function(){
   var btn=document.getElementById('musicBtn'); if(!btn) return;
+  var pop=document.getElementById('moodPop');
   var ctx=null, master=null, verb=null, mel=null, melWet=null, keys=null, padBus=null, drums=null, vinyl=null;
-  var timer=null, cycle=0, playing=false;
-  var BPM=76, BEAT=60/BPM, BAR=BEAT*4, EIGHTH=BEAT/2, SWING=0.14*EIGHTH;
-  var CHORDS=[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]]; /* Fmaj7 Em7 Dm7 Cmaj7 */
-  var BASS=[41,40,38,36];
-  /* melody phrases: [eighth-slot, midi, eighths-held]; two 4-bar variations */
-  var PHRASES=[
-    [[0,69,2],[2,72,2],[4,76,3],[7,74,4],[11,71,2],[14,67,2],[16,69,2],[18,65,2],[20,62,3],[24,64,2],[26,67,2],[28,72,3],[31,71,1]],
-    [[0,76,3],[3,74,3],[6,72,2],[8,71,3],[12,74,3],[16,69,3],[20,65,2],[22,67,2],[24,64,4],[28,62,2],[30,64,2]]
-  ];
+  var timer=null, cycle=0, playing=false, mood='calm';
+  var MOODS={
+    happy:{bpm:92,swing:0.10,beats:4,vinyl:0.35,melVol:0.062,
+      chords:[[48,52,55,59],[45,52,57,60],[41,48,53,57],[43,50,53,59]],
+      bass:[36,33,29,31],kick2:0.85,hats:'bright',
+      phrases:[
+        [[0,72,2],[2,76,2],[4,79,3],[8,77,2],[10,76,2],[12,72,3],[16,69,2],[18,72,2],[20,76,2],[22,77,2],[24,79,4],[28,76,2],[30,74,2]],
+        [[0,79,3],[4,81,2],[6,79,2],[8,76,3],[12,72,2],[14,76,2],[16,77,3],[20,74,2],[22,72,2],[24,71,3],[28,72,4]]
+      ]},
+    calm:{bpm:64,swing:0.14,beats:4,vinyl:0.55,melVol:0.05,
+      chords:[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]],
+      bass:[41,40,38,36],kick2:0.4,hats:'soft',
+      phrases:[
+        [[0,69,2],[2,72,2],[4,76,3],[7,74,4],[11,71,2],[14,67,2],[16,69,2],[18,65,2],[20,62,3],[24,64,2],[26,67,2],[28,72,3],[31,71,1]],
+        [[0,76,3],[3,74,3],[6,72,2],[8,71,3],[12,74,3],[16,69,3],[20,65,2],[22,67,2],[24,64,4],[28,62,2],[30,64,2]]
+      ]},
+    owner:{bpm:138,swing:0,beats:3,vinyl:0.45,melVol:0.07,waltz:true,
+      chords:[[45,52,57,60],[45,52,57,60],[50,53,57,62],[50,53,57,62],[40,47,52,56],[40,47,52,56],[45,52,57,60],[45,52,57,60]],
+      bass:[33,33,38,38,40,40,33,33],
+      phrases:[
+        [[0,69,4],[4,72,2],[6,76,4],[10,74,2],[12,74,4],[16,71,2],[18,71,4],[22,68,2],[24,69,6],[30,76,4],[34,74,2],[36,72,4],[40,71,2],[42,69,6]],
+        [[0,76,4],[4,77,2],[6,76,2],[8,74,2],[10,72,2],[12,74,6],[18,71,4],[24,72,4],[28,71,2],[30,69,4],[34,68,2],[36,64,6],[42,69,6]]
+      ]}
+  };
   function hz(m){return 440*Math.pow(2,(m-69)/12);}
   function noiseBuf(sec,fn){
     var n=Math.floor(ctx.sampleRate*sec), b=ctx.createBuffer(2,n,ctx.sampleRate);
@@ -1987,7 +2017,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     mel=ctx.createGain(); mel.gain.value=1; mel.connect(master);
     var send=ctx.createGain(); send.gain.value=0.30; mel.connect(send); send.connect(verb);
     var ks=ctx.createGain(); ks.gain.value=0.16; keys.connect(ks); ks.connect(verb);
-    melWet=ctx.createDelay(2); melWet.delayTime.value=EIGHTH*3;
+    melWet=ctx.createDelay(2); melWet.delayTime.value=0.6;
     var fb=ctx.createGain(); fb.gain.value=0.28;
     var dw=ctx.createGain(); dw.gain.value=0.14;
     mel.connect(melWet); melWet.connect(fb); fb.connect(melWet); melWet.connect(dw); dw.connect(master);
@@ -1996,7 +2026,6 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     padBus.connect(plp); plp.connect(master);
     var ps=ctx.createGain(); ps.gain.value=0.20; plp.connect(ps); ps.connect(verb);
     drums=ctx.createGain(); drums.gain.value=1; drums.connect(master);
-    /* vinyl bed: sparse clicks over a faint noise floor, looped */
     var vb=noiseBuf(3.0,function(){return (Math.random()*2-1)*0.018;});
     for(var c=0;c<2;c++){var d=vb.getChannelData(c);
       for(var k=0;k<46;k++){var p=Math.floor(Math.random()*d.length);var a=(Math.random()*0.5+0.3);
@@ -2007,7 +2036,6 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     src.connect(vlp); vlp.connect(vinyl); vinyl.connect(master); src.start();
     return true;
   }
-  /* Rhodes-like key: sine + soft octave partial + slow tremolo */
   function ep(m,t0,dur,vel,bus){
     var g=ctx.createGain();
     g.gain.setValueAtTime(0.0001,t0);
@@ -2025,6 +2053,26 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     var tEnd=t0+Math.max(dur,0.9)+0.6;
     o1.start(t0); o2.start(t0); o3.start(t0); trem.start(t0);
     o1.stop(tEnd); o2.stop(tEnd); o3.stop(tEnd); trem.stop(tEnd);
+  }
+  /* accordion-like voice for the waltz: detuned triangle + soft saw, vibrato, lowpass */
+  function acc(m,t0,dur,vel,bus){
+    var g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.linearRampToValueAtTime(vel,t0+0.045);
+    g.gain.setValueAtTime(vel*0.92,t0+Math.max(dur*0.7,0.08));
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur+0.3);
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2600; lp.Q.value=0.3;
+    g.connect(lp); lp.connect(bus);
+    var vib=ctx.createOscillator(), vg=ctx.createGain();
+    vib.frequency.value=5.5; vg.gain.value=3.5; vib.connect(vg);
+    [[-7,'triangle',0.75],[6,'sawtooth',0.30]].forEach(function(cfg){
+      var o=ctx.createOscillator(); o.type=cfg[1]; o.frequency.value=hz(m); o.detune.value=cfg[0];
+      vg.connect(o.detune);
+      var og=ctx.createGain(); og.gain.value=cfg[2];
+      o.connect(og); og.connect(g);
+      o.start(t0); o.stop(t0+dur+0.4);
+    });
+    vib.start(t0); vib.stop(t0+dur+0.4);
   }
   function bass(m,t0,dur){
     var o=ctx.createOscillator(); o.type='sine'; o.frequency.value=hz(m);
@@ -2066,27 +2114,38 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     var g=ctx.createGain(); g.gain.value=vel;
     src.connect(hp); hp.connect(g); g.connect(drums); src.start(t0);
   }
-  function slotTime(t0,slot){return t0+slot*EIGHTH+(slot%2? SWING:0);}
   function scheduleCycle(){
+    var M=MOODS[mood];
+    var BEAT=60/M.bpm, BAR=BEAT*M.beats, EIGHTH=BEAT/2, SWING=M.swing*EIGHTH;
+    var bars=M.chords.length;
     var t0=ctx.currentTime+0.08;
-    for(var b=0;b<4;b++){
+    for(var b=0;b<bars;b++){
       var bt=t0+b*BAR;
-      pad(CHORDS[b],bt,BAR+1.6);
-      bass(BASS[b],bt,BAR*0.96);
-      /* soft comp chord on the and-of-2 */
-      if(Math.random()<0.75){CHORDS[b].slice(1).forEach(function(m){ep(m,bt+BEAT*1.5+Math.random()*0.02,BEAT,0.028,keys);});}
-      kick(bt); if(Math.random()<0.8) kick(bt+BEAT*2);
-      hat(bt+BEAT,0.014); hat(bt+BEAT*3,Math.random()<0.5?0.018:0.011);
-      if(Math.random()<0.35) hat(bt+BEAT*3.5,0.008);
+      pad(M.chords[b],bt,BAR+1.6);
+      if(M.waltz){
+        bass(M.bass[b],bt,BEAT*0.9);
+        [1,2].forEach(function(k){
+          M.chords[b].slice(1).forEach(function(m){acc(m,bt+BEAT*k,BEAT*0.55,0.018,keys);});
+        });
+      } else {
+        bass(M.bass[b],bt,BAR*0.96);
+        if(Math.random()<0.75){M.chords[b].slice(1).forEach(function(m){ep(m,bt+BEAT*1.5+Math.random()*0.02,BEAT,0.028,keys);});}
+        kick(bt); if(Math.random()<M.kick2) kick(bt+BEAT*2);
+        hat(bt+BEAT,0.014); hat(bt+BEAT*3,Math.random()<0.5?0.018:0.011);
+        if(M.hats==='bright'){hat(bt+BEAT*0.5,0.008);hat(bt+BEAT*2.5,0.009);}
+        if(Math.random()<0.35) hat(bt+BEAT*3.5,0.008);
+      }
     }
-    var ph=PHRASES[cycle%2];
+    var ph=M.phrases[cycle%M.phrases.length];
     ph.forEach(function(n){
-      if(Math.random()<0.06) return; /* breathe */
-      var t=slotTime(t0,n[0])+ (Math.random()*0.024-0.012);
-      ep(n[1],t,n[2]*EIGHTH*0.92,0.055+Math.random()*0.02,mel);
+      if(!M.waltz && Math.random()<0.06) return;
+      var t=t0+n[0]*EIGHTH+(n[0]%2?SWING:0)+(Math.random()*0.024-0.012);
+      var vel=M.melVol+Math.random()*0.015;
+      if(M.waltz) acc(n[1],t,n[2]*EIGHTH*0.92,vel,mel);
+      else ep(n[1],t,n[2]*EIGHTH*0.92,vel,mel);
     });
     cycle++;
-    timer=setTimeout(scheduleCycle,BAR*4*1000);
+    timer=setTimeout(scheduleCycle,BAR*bars*1000);
   }
   window.__musicDuck=function(on){
     if(!ctx||!master||!window.__musicPlaying) return;
@@ -2095,25 +2154,43 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     master.gain.setValueAtTime(master.gain.value,now);
     master.gain.linearRampToValueAtTime(on?0.12:1,now+0.5);
   };
-  btn.addEventListener('click',function(){
+  function hidePop(){ if(pop) pop.hidden=true; }
+  function start(m){
+    mood=m;
     if(!ctx && !boot()) return;
-    var now;
-    if(!playing){
-      if(ctx.resume) ctx.resume();
-      now=ctx.currentTime;
-      master.gain.cancelScheduledValues(now);
-      master.gain.setValueAtTime(master.gain.value,now);
-      master.gain.linearRampToValueAtTime(1,now+1.8);
-      playing=true; window.__musicPlaying=true; if(!timer) scheduleCycle();
-    } else {
-      now=ctx.currentTime;
-      master.gain.cancelScheduledValues(now);
-      master.gain.setValueAtTime(master.gain.value,now);
-      master.gain.linearRampToValueAtTime(0,now+0.9);
-      playing=false; window.__musicPlaying=false; clearTimeout(timer); timer=null;
-    }
-    btn.setAttribute('aria-pressed',playing?'true':'false');
+    if(ctx.resume) ctx.resume();
+    clearTimeout(timer); timer=null; cycle=0;
+    var M=MOODS[m];
+    vinyl.gain.value=M.vinyl;
+    melWet.delayTime.value=(60/M.bpm/2)*3;
+    var now=ctx.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value,now);
+    master.gain.linearRampToValueAtTime(1,now+1.8);
+    playing=true; window.__musicPlaying=true; scheduleCycle();
+    btn.setAttribute('aria-pressed','true');
+  }
+  function stopMusic(){
+    if(!ctx) return;
+    var now=ctx.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value,now);
+    master.gain.linearRampToValueAtTime(0,now+0.9);
+    playing=false; window.__musicPlaying=false; clearTimeout(timer); timer=null;
+    btn.setAttribute('aria-pressed','false');
+  }
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(playing){ stopMusic(); hidePop(); return; }
+    if(pop) pop.hidden=!pop.hidden;
   });
+  if(pop){
+    pop.addEventListener('click',function(e){e.stopPropagation();});
+    pop.querySelectorAll('button[data-mood]').forEach(function(b){
+      b.addEventListener('click',function(){ hidePop(); start(b.getAttribute('data-mood')); });
+    });
+    document.addEventListener('click',hidePop);
+  }
 })();
 </script>
 <script>
