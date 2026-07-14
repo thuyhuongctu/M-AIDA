@@ -2105,12 +2105,13 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
 })();
 </script>
 <script>
-/* Guided tour: the author's avatar narrates the page in English via the
-   Web Speech API (no audio assets). Starts only on click; background
-   music ducks while she speaks. */
+/* Guided tour: narrated in the author's own cloned voice (voice/stopN.m4a,
+   generated offline from her recording with her consent). Falls back to the
+   browser's Web Speech API when the audio files are unavailable. Background
+   music ducks while she speaks. Click-to-start only. */
 (function(){
   var btn=document.getElementById('tourBtn'); if(!btn) return;
-  if(!('speechSynthesis' in window)){ btn.style.display='none'; return; }
+  var hasTTS=('speechSynthesis' in window);
   var card=document.getElementById('tourCard'), txt=document.getElementById('tourText'), stopBtn=document.getElementById('tourStop');
   var TOUR=[
     ['overview',"Hello, my name is Huong. Welcome to M-AIDA, the software I built for my dissertation. It prepared two hundred and thirty six studies for one meta-analysis, and this page shows exactly how."],
@@ -2120,7 +2121,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     ['atlas',"The atlas maps thirty five economies, plus forty two cross-border studies that are counted but not placed. Colour shows each country's mean effect."],
     ['tool',"And this is the demo you can try yourself. It runs offline in your browser: convert, verify, lock, export. Reading real PDFs needs the backend server, so this part is an honest simulation of that step. Thank you for visiting."]
   ];
-  var idx=-1, active=false, timer=null, voice=null;
+  var idx=-1, active=false, timer=null, voice=null, curAudio=null;
   function pickVoice(){
     var vs=window.speechSynthesis.getVoices()||[];
     var pref=['Google US English','Microsoft Zira','Samantha'];
@@ -2128,15 +2129,49 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     for(var k=0;k<vs.length;k++){if((vs[k].lang||'').indexOf('en')===0) return vs[k];}
     return null;
   }
-  if(window.speechSynthesis.onvoiceschanged!==undefined){
+  if(hasTTS && window.speechSynthesis.onvoiceschanged!==undefined){
     window.speechSynthesis.onvoiceschanged=function(){ if(!voice) voice=pickVoice(); };
+  }
+  function killAudio(){
+    if(curAudio){ curAudio.onerror=null; curAudio.onended=null; curAudio.oncanplaythrough=null;
+      try{curAudio.pause(); curAudio.src='';}catch(e){} curAudio=null; }
+    if(hasTTS){ try{window.speechSynthesis.cancel();}catch(e){} }
   }
   function stop(){
     active=false; idx=-1; clearTimeout(timer); timer=null;
-    try{window.speechSynthesis.cancel();}catch(e){}
+    killAudio();
     card.classList.remove('show');
     btn.setAttribute('aria-pressed','false');
     if(window.__musicDuck) window.__musicDuck(false);
+  }
+  function ttsSpeak(line,next){
+    if(!hasTTS){ timer=setTimeout(next, Math.max(3500, line.length*75)); return; }
+    try{
+      var u=new SpeechSynthesisUtterance(line);
+      if(!voice) voice=pickVoice();
+      if(voice) u.voice=voice;
+      u.lang='en-US'; u.rate=0.95; u.pitch=1.02;
+      u.onend=next; u.onerror=next;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+    clearTimeout(timer);
+    timer=setTimeout(next, Math.max(3500, line.length*75));
+  }
+  function speakLine(i,line,next){
+    var fell=false, guard=null;
+    function fallback(){ if(fell||!active) return; fell=true; clearTimeout(guard); curAudio=null; ttsSpeak(line,next); }
+    var a=new Audio('voice/stop'+(i+1)+'.mp3');
+    curAudio=a; a.preload='auto';
+    a.onended=function(){ if(!fell&&active){ fell=true; clearTimeout(guard); next(); } };
+    a.onerror=fallback;
+    a.oncanplaythrough=function(){
+      clearTimeout(guard);
+      a.play().then(function(){ guard=setTimeout(function(){ fallback(); }, (a.duration||30)*1000+4000); })
+              .catch(fallback);
+    };
+    guard=setTimeout(fallback, 3000);
+    try{ a.load(); }catch(e){ fallback(); }
   }
   function step(){
     if(!active) return;
@@ -2147,19 +2182,8 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     if(el) el.scrollIntoView({behavior:(document.documentElement.getAttribute('data-motion')==='off'?'auto':'smooth'),block:'start'});
     txt.textContent=line;
     var done=false;
-    function next(){ if(done||!active) return; done=true; timer=setTimeout(step,700); }
-    try{
-      var u=new SpeechSynthesisUtterance(line);
-      if(!voice) voice=pickVoice();
-      if(voice) u.voice=voice;
-      u.lang='en-US'; u.rate=0.95; u.pitch=1.02;
-      u.onend=next; u.onerror=next;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(u);
-    }catch(e){}
-    /* fallback: advance by reading-time estimate if speech never fires */
-    clearTimeout(timer);
-    timer=setTimeout(next, Math.max(3500, line.length*75));
+    function next(){ if(done||!active) return; done=true; killAudio(); timer=setTimeout(step,700); }
+    speakLine(idx,line,next);
   }
   btn.addEventListener('click',function(){
     if(active){ stop(); return; }
