@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M-AIDA Live Verification Console</title>
+<style>
+  :root{
+    --paper:#faf7f2; --ink:#2b2620; --muted:#8a8177; --line:#e6ded2;
+    --card:#ffffff; --accent:#7a1f2b; --ok:#2e6b46; --warn:#a05a00; --err:#a02020;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font:15px/1.55 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+         padding:14px 22px;border-bottom:1px solid var(--line);background:var(--card)}
+  .brand{font-size:20px;font-weight:800;letter-spacing:.4px}
+  .brand small{font-weight:600;color:var(--muted);margin-left:8px}
+  .pill{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);
+        background:var(--paper);color:var(--muted)}
+  .pill.ok{color:var(--ok);border-color:#bcd7c6}
+  .pill.warn{color:var(--warn);border-color:#e5cfa8}
+  header .sp{flex:1}
+  main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;
+       padding:18px 22px;max-width:1280px;margin:0 auto}
+  @media(max-width:960px){main{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+        padding:16px 18px;box-shadow:0 1px 2px rgba(43,38,32,.04)}
+  h2{margin:0 0 10px;font-size:15px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+  .stats{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .stat{flex:1;min-width:110px;background:var(--card);border:1px solid var(--line);
+        border-radius:12px;padding:10px 14px;text-align:center}
+  .stat b{display:block;font-size:26px}
+  .stat span{font-size:12px;color:var(--muted)}
+  .filters{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .filters button{border:1px solid var(--line);background:var(--paper);border-radius:999px;
+                  padding:4px 14px;cursor:pointer;font-size:13px;color:var(--ink)}
+  .filters button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{color:var(--muted);font-weight:600;text-align:left;padding:6px 8px;
+     border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:7px 8px;border-bottom:1px solid #f0eadf;white-space:nowrap}
+  tr.row{cursor:pointer}
+  tr.row:hover{background:#fbf6ec}
+  tr.row.sel{background:#f6efe1}
+  .b{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600}
+  .b.locked{background:#e8f1ea;color:var(--ok)}
+  .b.pending{background:#fbeedd;color:var(--warn)}
+  .b.verified{background:#e9ecf5;color:#3b4a7a}
+  .b.route1{background:#eef3ee;color:var(--ok)}
+  .b.route08{background:#eff0f7;color:#3b4a7a}
+  .b.route06{background:#fbeedd;color:var(--warn)}
+  .detail h3{margin:2px 0 2px;font-size:17px}
+  .detail .sub{color:var(--muted);font-size:13px;margin-bottom:10px}
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:13.5px;margin-bottom:12px}
+  .kv div b{color:var(--muted);font-weight:600;margin-right:6px}
+  .mp{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+  .mp h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+  .mp table{font-size:12.5px}
+  .diff{color:var(--accent);font-weight:700}
+  label{display:block;font-size:12px;color:var(--muted);margin:8px 0 2px}
+  input,select,textarea{width:100%;padding:7px 9px;border:1px solid var(--line);
+    border-radius:8px;font:inherit;background:#fffdf9;color:var(--ink)}
+  textarea{min-height:64px;resize:vertical}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  .btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  button.act{border:0;border-radius:9px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .approve{background:var(--accent);color:#fff}
+  .lock{background:var(--ink);color:#fff}
+  .ghost{background:var(--paper);border:1px solid var(--line);color:var(--ink)}
+  button.act:disabled{opacity:.45;cursor:not-allowed}
+  .msg{margin-top:12px;padding:9px 12px;border-radius:9px;font-size:13.5px;display:none}
+  .msg.ok{display:block;background:#e8f1ea;color:var(--ok)}
+  .msg.err{display:block;background:#f8e6e6;color:var(--err)}
+  .upload input[type=file]{padding:6px}
+  .note{font-size:12.5px;color:var(--muted);margin-top:8px}
+  footer{max-width:1280px;margin:0 auto;padding:8px 22px 26px;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">M-AIDA <small id="hver">…</small></div>
+  <span class="pill" id="hcount">…</span>
+  <span class="pill" id="hextract">…</span>
+  <span class="sp"></span>
+  <button class="act ghost" onclick="location.href='/docs'">API docs</button>
+  <button class="act ghost" id="exportBtn">Export locked CSV</button>
+</header>
+
+<main>
+  <section>
+    <div class="stats">
+      <div class="stat"><b id="stTotal">-</b><span>effect records</span></div>
+      <div class="stat"><b id="stLocked">-</b><span>locked</span></div>
+      <div class="stat"><b id="stPending">-</b><span>awaiting human review</span></div>
+    </div>
+    <div class="card">
+      <h2>Study database (live API)</h2>
+      <div class="filters" id="filters">
+        <button data-f="all" class="on">All</button>
+        <button data-f="pending">Needs review</button>
+        <button data-f="locked">Locked</button>
+      </div>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>ID</th><th>Study</th><th>Country</th><th>N</th>
+          <th>r</th><th>Route</th><th>Status</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      </div>
+    </div>
+    <div class="card upload" style="margin-top:18px">
+      <h2>Extract a new PDF (real pipeline)</h2>
+      <div class="grid2">
+        <div><label>PDF file</label><input type="file" id="pdfFile" accept="application/pdf"></div>
+        <div><label>Authors</label><input id="pdfAuthors" placeholder="e.g. Nguyen & Tran"></div>
+        <div><label>Title</label><input id="pdfTitle" placeholder="Paper title"></div>
+        <div><label>Year</label><input id="pdfYear" type="number" placeholder="2026"></div>
+      </div>
+      <div class="btns"><button class="act approve" id="extractBtn">Run extraction</button></div>
+      <div class="msg" id="extractMsg"></div>
+      <div class="note">Extraction calls the live language-model pipeline and requires
+        <code>LLM_API_KEY</code> in <code>backend/.env</code>. Without a key the server
+        answers 503 and the message is shown here unchanged; nothing is simulated.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card detail" id="detail">
+      <h2>Record detail &amp; PI verification</h2>
+      <div id="dEmpty" class="note">Select a record on the left. Records marked
+        "needs review" show the frozen machine proposal next to the current values,
+        and can be corrected, approved and locked here: the same governance flow
+        used to build the dissertation database.</div>
+      <div id="dBody" style="display:none">
+        <h3 id="dTitle"></h3>
+        <div class="sub" id="dSub"></div>
+        <div class="kv" id="dKv"></div>
+        <div class="mp" id="dMp" style="display:none">
+          <h4>Machine proposal (frozen at extraction, immutable)</h4>
+          <table><thead><tr><th>Field</th><th>Machine</th><th>Current</th></tr></thead>
+          <tbody id="dMpRows"></tbody></table>
+        </div>
+        <div id="dForm">
+          <div class="grid2">
+            <div><label>Pearson r (override)</label><input id="fR" type="number" step="0.001"></div>
+            <div><label>Sample N (override)</label><input id="fN" type="number"></div>
+            <div><label>DOI measure</label>
+              <select id="fDoi"><option value="">-</option><option>FSTS</option><option>GEO</option>
+              <option>EXP</option><option>FDI</option><option>COMP</option><option>OTH</option></select></div>
+            <div><label>Performance measure</label>
+              <select id="fFp"><option value="">-</option><option>ACC</option><option>MKT</option>
+              <option>LAB</option><option>MIX</option></select></div>
+          </div>
+          <label>PI verification notes (required to approve)</label>
+          <textarea id="fNotes" placeholder="What was checked against the paper, and why any override was made"></textarea>
+          <div class="btns">
+            <button class="act approve" id="btnApprove">Approve &amp; save</button>
+            <button class="act lock" id="btnLock">Lock record</button>
+          </div>
+        </div>
+        <div class="msg" id="dMsg"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  M-AIDA · Meta-Analysis Intelligent Data Assistant · Do Thuy Huong and Phan Anh Tu ·
+  live FastAPI backend, no simulated responses. Values shown come from the seeded
+  research database or from real extractions in this session.
+</footer>
+
+<script>
+'use strict';
+let STUDIES = [], SEL = null, FILTER = 'all';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function routeBadge(c){
+  if (c >= 0.99) return '<span class="b route1">direct r · 1.0</span>';
+  if (c >= 0.79) return '<span class="b route08">from t · 0.8</span>';
+  return '<span class="b route06">estimated · ' + c.toFixed(1) + '</span>';
+}
+function statusBadge(s){
+  if (s.pi_locked) return '<span class="b locked">locked</span>';
+  if (s.requires_verification) return '<span class="b pending">needs review</span>';
+  return '<span class="b verified">approved</span>';
+}
+
+async function api(path, opts){
+  const res = await fetch(path, opts);
+  const text = await res.text();
+  let body = null; try { body = JSON.parse(text); } catch(e){ body = text; }
+  if (!res.ok){
+    const detail = body && body.detail ? body.detail : (res.status + ' ' + res.statusText);
+    const err = new Error(detail); err.status = res.status; throw err;
+  }
+  return body;
+}
+
+async function loadHealth(){
+  try{
+    const h = await api('/api/health');
+    $('hver').textContent = 'v' + h.version + ' · live';
+    $('hcount').textContent = h.study_count + ' records in store';
+    if (h.anthropic_configured){
+      $('hextract').textContent = 'LLM extraction: configured';
+      $('hextract').className = 'pill ok';
+    } else {
+      $('hextract').textContent = 'LLM extraction: no API key (503 on extract)';
+      $('hextract').className = 'pill warn';
+    }
+  }catch(e){
+    $('hver').textContent = 'backend unreachable';
+  }
+}
+
+async function loadStudies(){
+  STUDIES = await api('/api/studies');
+  STUDIES.sort((a,b)=> a.study_id.localeCompare(b.study_id, undefined, {numeric:true}));
+  $('stTotal').textContent = STUDIES.length;
+  $('stLocked').textContent = STUDIES.filter(s=>s.pi_locked).length;
+  $('stPending').textContent = STUDIES.filter(s=>s.requires_verification).length;
+  renderRows();
+}
+
+function renderRows(){
+  const tb = $('rows'); tb.innerHTML = '';
+  const list = STUDIES.filter(s =>
+    FILTER === 'all' ? true :
+    FILTER === 'locked' ? s.pi_locked : s.requires_verification);
+  for (const s of list){
+    const tr = document.createElement('tr');
+    tr.className = 'row' + (SEL === s.study_id ? ' sel' : '');
+    tr.innerHTML = '<td>' + esc(s.study_id) + '</td>' +
+      '<td>' + esc(s.authors) + ' (' + s.year + ')</td>' +
+      '<td>' + esc(s.country) + '</td>' +
+      '<td>' + (s.sample_n ?? '-') + '</td>' +
+      '<td>' + (s.effect_r == null ? '-' : s.effect_r.toFixed(3)) + '</td>' +
+      '<td>' + routeBadge(s.extraction_confidence) + '</td>' +
+      '<td>' + statusBadge(s) + '</td>';
+    tr.onclick = () => { SEL = s.study_id; renderRows(); renderDetail(); };
+    tb.appendChild(tr);
+  }
+}
+
+const MP_FIELDS = ['effect_r','effect_t','effect_beta','effect_df','sample_n',
+  'doi_measure','performance_measure','extraction_confidence'];
+
+function renderDetail(){
+  const s = STUDIES.find(x => x.study_id === SEL);
+  if (!s){ $('dBody').style.display='none'; $('dEmpty').style.display='block'; return; }
+  $('dEmpty').style.display='none'; $('dBody').style.display='block';
+  $('dTitle').textContent = s.authors + ' (' + s.year + ')';
+  $('dSub').textContent = s.study_id + ' · ' + s.country +
+    (s.sample_start ? ' · data ' + s.sample_start + '-' + s.sample_end : '');
+  $('dKv').innerHTML =
+    '<div><b>r</b>' + (s.effect_r == null ? '-' : s.effect_r.toFixed(3)) + '</div>' +
+    '<div><b>N</b>' + (s.sample_n ?? '-') + '</div>' +
+    '<div><b>DOI measure</b>' + esc(s.doi_measure ?? '-') + '</div>' +
+    '<div><b>Performance</b>' + esc(s.performance_measure ?? '-') + '</div>' +
+    '<div><b>ICRV regime</b>' + esc(s.icrv_regime ?? '-') + '</div>' +
+    '<div><b>DPL phase</b>' + esc(s.dpl_phase ?? '-') + '</div>' +
+    '<div><b>Confidence</b>' + s.extraction_confidence.toFixed(2) + '</div>' +
+    '<div><b>Status</b>' + (s.pi_locked ? 'locked ' + (s.locked_at||'').slice(0,19)
+                          : s.requires_verification ? 'needs review' : 'approved') + '</div>' +
+    (s.pi_notes ? '<div style="grid-column:1/-1"><b>PI notes</b>' + esc(s.pi_notes) + '</div>' : '');
+  if (s.machine_proposal){
+    $('dMp').style.display='block';
+    $('dMpRows').innerHTML = MP_FIELDS.map(f => {
+      const m = s.machine_proposal[f], c = s[f];
+      const differs = JSON.stringify(m) !== JSON.stringify(c);
+      return '<tr><td>' + f + '</td><td>' + esc(m ?? '-') + '</td><td class="' +
+        (differs ? 'diff' : '') + '">' + esc(c ?? '-') + '</td></tr>';
+    }).join('');
+  } else $('dMp').style.display='none';
+  $('fR').value = s.effect_r ?? ''; $('fN').value = s.sample_n ?? '';
+  $('fDoi').value = s.doi_measure ?? ''; $('fFp').value = s.performance_measure ?? '';
+  $('fNotes').value = s.pi_notes ?? '';
+  // Buttons stay enabled on locked records on purpose: pressing them shows
+  // the genuine 409/422 responses from the server, which is part of the demo.
+  $('btnLock').disabled = false;
+  $('dMsg').className = 'msg';
+}
+
+function showMsg(el, text, ok){ el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'err'); }
+
+$('btnApprove').onclick = async () => {
+  const s = STUDIES.find(x => x.study_id === SEL); if (!s) return;
+  const notes = $('fNotes').value.trim();
+  if (!notes){ showMsg($('dMsg'), 'PI notes are required before approval.', false); return; }
+  const overrides = {};
+  if ($('fR').value !== '' && Number($('fR').value) !== s.effect_r) overrides.effect_r = Number($('fR').value);
+  if ($('fN').value !== '' && Number($('fN').value) !== s.sample_n) overrides.sample_n = Number($('fN').value);
+  if ($('fDoi').value && $('fDoi').value !== s.doi_measure) overrides.doi_measure = $('fDoi').value;
+  if ($('fFp').value && $('fFp').value !== s.performance_measure) overrides.performance_measure = $('fFp').value;
+  try{
+    await api('/api/studies/' + encodeURIComponent(s.study_id) + '/verify', {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ study_id: s.study_id, field_overrides: overrides,
+                             pi_approved: true, pi_notes: notes })});
+    showMsg($('dMsg'), 'Saved: record approved' +
+      (Object.keys(overrides).length ? ' with ' + Object.keys(overrides).length + ' override(s)' : '') +
+      '. You can now lock it.', true);
+    await loadStudies(); await loadHealth(); renderDetail();
+    $('dMsg').className = 'msg ok';
+  }catch(e){ showMsg($('dMsg'), 'API ' + (e.status||'') + ': ' + e.message, false); }
+};
+
+$('btnLock').onclick = async () => {
+  const s = STUDIES.find(x => x.study_id === SEL); if (!s) return;
+  if (!confirm('Locking is IRREVERSIBLE (further edits return 409). Lock ' + s.study_id + '?')) return;
+  try{
+    await api('/api/studies/' + encodeURIComponent(s.study_id) + '/lock', { method:'POST' });
+    showMsg($('dMsg'), 'Record locked. Any further PATCH /verify now returns 409 Conflict.', true);
+    await loadStudies(); await loadHealth(); renderDetail();
+    $('dMsg').className = 'msg ok';
+  }catch(e){ showMsg($('dMsg'), 'API ' + (e.status||'') + ': ' + e.message, false); }
+};
+
+$('extractBtn').onclick = async () => {
+  const f = $('pdfFile').files[0];
+  if (!f){ showMsg($('extractMsg'), 'Choose a PDF file first.', false); return; }
+  const params = new URLSearchParams();
+  if ($('pdfTitle').value) params.set('title', $('pdfTitle').value);
+  if ($('pdfAuthors').value) params.set('authors', $('pdfAuthors').value);
+  if ($('pdfYear').value) params.set('year', $('pdfYear').value);
+  const form = new FormData(); form.append('file', f);
+  showMsg($('extractMsg'), 'Extracting (live LLM call)…', true);
+  try{
+    const entry = await api('/api/extract/upload?' + params.toString(), { method:'POST', body: form });
+    showMsg($('extractMsg'), 'Extracted ' + entry.study_id + ' (confidence ' +
+      entry.extraction_confidence + '). It appears in the table for verification.', true);
+    await loadStudies(); await loadHealth();
+    SEL = entry.study_id; renderRows(); renderDetail();
+  }catch(e){ showMsg($('extractMsg'), 'API ' + (e.status||'') + ': ' + e.message, false); }
+};
+
+$('exportBtn').onclick = () => { location.href = '/api/studies/export/csv'; };
+$('filters').onclick = (ev) => {
+  const b = ev.target.closest('button'); if (!b) return;
+  FILTER = b.dataset.f;
+  for (const x of $('filters').children) x.classList.toggle('on', x === b);
+  renderRows();
+};
+
+loadHealth();
+loadStudies().then(() => {
+  if (location.hash){ SEL = decodeURIComponent(location.hash.slice(1)); renderRows(); renderDetail(); }
+});
+</script>
+</body>
+</html>
