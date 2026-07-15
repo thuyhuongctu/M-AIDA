@@ -3,6 +3,14 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## Chưa phát hành: bộ trình diễn `demo/` (15/07/2026)
+
+Đóng gói trình diễn, KHÔNG thay đổi mã lõi 7.1.x: `demo/run_defense.py`
+khởi động đúng backend FastAPI hiện có, nạp sẵn bản ghi thật từ cơ sở dữ
+liệu P6 đã khóa (18 dòng mẫu trong `demo/demo_seed.csv`, hoặc toàn bộ qua
+`MAIDA_SEED_CSV`), và phục vụ giao diện một tệp `demo/ui.html` chạy bằng
+Python thuần. Hướng dẫn tiếng Việt: `demo/HUONG_DAN_BAO_VE.md`.
+
 ## 7.1.2 (15/07/2026)
 
 Bản vá quản trị: đưa mã về đúng với giao thức đã mô tả trong tài liệu,

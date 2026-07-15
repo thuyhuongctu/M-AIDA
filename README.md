@@ -45,6 +45,26 @@ docker compose up
 open http://localhost:3000
 ```
 
+## One-command live demo (no Docker, no Node)
+
+For demonstrations (e.g. a thesis defense) the repository ships a packaging
+harness that starts the real backend pre-seeded with real effect-size records
+from the dissertation's locked P6 database and serves a dependency-free web
+console at the same port. No response is simulated; every action goes through
+the live API.
+
+```bash
+pip install -r backend/requirements.txt
+python demo/run_defense.py
+# open http://localhost:8765/  (interactive API docs at /docs)
+```
+
+Seeding rules and options (full-database seed, lock-all mode) are documented in
+`demo/run_defense.py`; a Vietnamese walkthrough for the defense session is in
+`demo/HUONG_DAN_BAO_VE.md`. Live PDF extraction additionally requires
+`LLM_API_KEY` in `backend/.env`; without it the extraction endpoint returns an
+explicit 503 and all other features work offline.
+
 ## Development and tests
 
 ```bash
