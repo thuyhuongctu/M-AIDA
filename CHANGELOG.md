@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
-## 7.1.2 (chưa phát hành, chờ tác giả duyệt)
+## 7.1.2 (15/07/2026)
 
 Bản vá quản trị: đưa mã về đúng với giao thức đã mô tả trong tài liệu,
 không thay đổi kết quả của các bản ghi P6 đã khóa.
