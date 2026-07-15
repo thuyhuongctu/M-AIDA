@@ -137,6 +137,14 @@ class ExtractedEffect(BaseModel):
             "0.6 = converted from β (Peterson & Brown, 2005)"
         ),
     )
+    df_imputed: bool = Field(
+        False,
+        description="True when df was unreported and imputed as n - 2 per the documented protocol (7.1.2)",
+    )
+    beta_outside_pb_domain: bool = Field(
+        False,
+        description="True when |beta| > 0.5, outside the Peterson & Brown (2005) derivation domain (7.1.2)",
+    )
     requires_verification: bool = Field(
         ...,
         description="True when confidence < 0.7 or ambiguous statistics detected",
@@ -198,3 +206,12 @@ class StudyDatabaseEntry(ExtractedEffect):
         None, description="Notion page ID after successful sync"
     )
     pi_notes: str = ""
+    machine_proposal: dict | None = Field(
+        None,
+        description=(
+            "Immutable snapshot of the effect fields as first proposed by the "
+            "model, captured at extraction time and never editable by PI "
+            "overrides (7.1.2). Preserves the machine-vs-human distinction "
+            "per record."
+        ),
+    )
