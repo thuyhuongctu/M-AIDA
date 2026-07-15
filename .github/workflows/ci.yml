@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'dev/**', 'fix/**', 'feat/**', 'chore/**']
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt pytest ruff
+      - name: Lint (syntax errors and undefined names)
+        run: ruff check backend --select E9,F
+      - name: Unit tests (pin the published conversion formulas)
+        working-directory: backend
+        run: pytest tests -q
