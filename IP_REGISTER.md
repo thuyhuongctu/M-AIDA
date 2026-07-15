@@ -63,6 +63,15 @@ mâu thuẫn:
 4. Các văn bản khác trong hồ sơ (đơn đề nghị, tờ khai, văn bản đồng ý đồng
    tác giả, thỏa thuận đồng sở hữu) **giữ nguyên**, không phải nộp lại.
 
+
+4. **Bản vá 7.1.2 (15/07/2026):** bản vá sửa lỗi quản trị theo semver, KHÔNG
+   nằm trong hồ sơ đăng ký quyền tác giả. Hồ sơ mới nộp (07/2026) đăng ký
+   phiên bản 7.1.1; tag v7.1.1 và gói lưu chiểu giữ nguyên tuyệt đối.
+   Nội dung 7.1.2: chặn phòng vệ r trong [-1, 1]; cờ kiểm chứng khi
+   |beta| > 0,5 (ngoài miền Peterson & Brown 2005); thực thi quy tắc
+   df = n - 2 kèm cờ df_imputed; trường machine_proposal bất biến.
+   Không thay đổi giá trị bất kỳ bản ghi P6 đã khóa nào. Xem CHANGELOG.md.
+
 ## 6. Quy tắc sau đóng băng (Post-freeze rules)
 
 - **Không sửa trực tiếp** mã nguồn, kiến trúc, chức năng hay giao diện của bản
