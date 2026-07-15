@@ -1956,7 +1956,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   mapB.forEach(function(c){c.style.cursor='pointer';
     c.addEventListener('mousemove',function(ev){tip.innerHTML=countryTipHTML(c.__d,+slider.value);placeTip(ev);});
     c.addEventListener('mouseleave',hideTip);
-    c.addEventListener('click',function(ev){ev.stopPropagation();tip.innerHTML=countryTipHTML(c.__d,+slider.value);placeTip(ev);if(window.__tourNote){var ak=({'Turkey':'turkey','Poland':'poland','India':'india','Cameroon':'cameroon','China':'china','Vietnam':'vietnam'})[c.__d.c]||'generic';window.__tourNote(noteText(c.__d,+slider.value),ak);}});
+    c.addEventListener('click',function(ev){ev.stopPropagation();tip.innerHTML=countryTipHTML(c.__d,+slider.value);placeTip(ev);if(window.__tourNote){var ak=({'Turkey':'turkey','Poland':'poland','India':'india','China':'china','Vietnam':'vietnam'})[c.__d.c]||'generic';window.__tourNote(noteText(c.__d,+slider.value),ak);}});
   });
 
   // ranking + regions
