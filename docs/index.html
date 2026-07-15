@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>M-AIDA: Meta-Analysis Intelligent Data Assistant</title>
+<meta name="description" content="Human-verified effect-size data preparation for meta-analysis: a language model proposes, the principal investigator verifies, and every analysed record is locked before use. 236 studies, 286 effect sizes, 1978 to 2026.">
+<link rel="canonical" href="https://thuyhuongctu.github.io/M-AIDA/">
+<meta property="og:title" content="M-AIDA: Meta-Analysis Intelligent Data Assistant">
+<meta property="og:description" content="Human-verified effect-size data preparation for meta-analysis: a language model proposes, the principal investigator verifies, and every analysed record is locked before use. 236 studies, 286 effect sizes, 1978 to 2026.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thuyhuongctu.github.io/M-AIDA/">
+<title>M-AIDA: Meta-Analysis Intelligent Data Assistant</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Research software for meta-analysis: semi-automated effect-size extraction from academic PDFs with a vendor-neutral LLM adapter, human-in-the-loop verification, and an immutable data-lock workflow.">
 <meta name="author" content="Do Thuy Huong and Phan Anh Tu, School of Economics, Can Tho University">
@@ -16,7 +23,7 @@
 
   :root {
     --paper:#f4f1ea; --surface:#fffdf8; --surface-2:#faf7f0;
-    --ink:#191f26; --muted:#54606b; --faint:#7d7767;
+    --ink:#191f26; --muted:#54606b; --faint:#675f52;
     --line:#e6e1d6; --line-2:#dbd5c7;
     --brand:#0e4c5a; --brand-strong:#083a45; --brand-soft:#e3eef0; --brand-line:#c7dee1;
     --amber:#b3701a; --amber-strong:#8f5912; --amber-soft:#f4e9d5;
@@ -40,7 +47,7 @@
   }
   :root[data-theme="light"] {
     --paper:#f4f1ea; --surface:#fffdf8; --surface-2:#faf7f0;
-    --ink:#191f26; --muted:#54606b; --faint:#7d7767;
+    --ink:#191f26; --muted:#54606b; --faint:#675f52;
     --line:#e6e1d6; --line-2:#dbd5c7;
     --brand:#0e4c5a; --brand-strong:#083a45; --brand-soft:#e3eef0; --brand-line:#c7dee1;
     --amber:#b3701a; --amber-strong:#8f5912; --amber-soft:#f4e9d5;
@@ -127,6 +134,14 @@
   .hero .wrap { display:grid; grid-template-columns:1.12fr 0.88fr; gap:3rem; align-items:center; padding-top:4.2rem; padding-bottom:1.4rem; }
   .hero h1 { font-weight:600; letter-spacing:-0.017em; font-size:clamp(2.05rem,4.6vw,3.3rem); line-height:1.08; margin-top:1.1rem; }
   .hero .lead { color:var(--muted); max-width:46ch; font-size:1.06rem; line-height:1.65; margin-top:1.15rem; }
+  .citerow { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-top:1rem; }
+  .citerow .doibadge { display:inline-flex; align-items:center; gap:0.35rem; font-family:var(--mono); font-size:0.72rem;
+    padding:0.3rem 0.65rem; border:1px solid var(--brand-line); border-radius:999px; color:var(--brand);
+    background:var(--brand-soft); text-decoration:none; }
+  .citerow .citebtn { font-family:var(--mono); font-size:0.72rem; padding:0.3rem 0.65rem; cursor:pointer;
+    border:1px solid var(--line-2); border-radius:999px; color:var(--muted); background:var(--surface); }
+  .citerow .citebtn:hover { color:var(--ink); border-color:var(--brand-line); }
+  .citerow .citebtn.done { color:var(--brand); border-color:var(--brand-line); }
   .cta-row { display:flex; gap:0.7rem; margin-top:1.8rem; flex-wrap:wrap; }
   .btn {
     display:inline-flex; align-items:center; gap:0.5rem; cursor:pointer; font-family:var(--serif);
@@ -366,7 +381,7 @@
   .refs li i { font-style:italic; }
 
 :root{
-    --paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#7d7767;
+    --paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#675f52;
     --line:#e6e1d6;--line-2:#dbd5c7;--brand:#0e4c5a;--brand-strong:#083a45;--brand-soft:#e3eef0;--brand-line:#c7dee1;
     --amber:#b3701a;--amber-soft:#f4e9d5;--ocean:#eef1ec;--land:#e7e2d6;--grat:#ddd7c9;
     --serif:'Source Serif 4','Source Serif Pro',Charter,'Sitka Text',Cambria,Georgia,serif;
@@ -377,7 +392,7 @@
     --line:#262d37;--line-2:#2c3441;--brand:#4fb2c3;--brand-strong:#7ccbd8;--brand-soft:#0f333a;--brand-line:#1d4750;
     --amber:#d99f49;--amber-soft:#2a2312;--ocean:#10151b;--land:#1c232c;--grat:#232b34;}
 }
-:root[data-theme="light"]{--paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#7d7767;--line:#e6e1d6;--line-2:#dbd5c7;--brand:#0e4c5a;--brand-strong:#083a45;--brand-soft:#e3eef0;--brand-line:#c7dee1;--amber:#b3701a;--amber-soft:#f4e9d5;--ocean:#eef1ec;--land:#e7e2d6;--grat:#ddd7c9;}
+:root[data-theme="light"]{--paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#675f52;--line:#e6e1d6;--line-2:#dbd5c7;--brand:#0e4c5a;--brand-strong:#083a45;--brand-soft:#e3eef0;--brand-line:#c7dee1;--amber:#b3701a;--amber-soft:#f4e9d5;--ocean:#eef1ec;--land:#e7e2d6;--grat:#ddd7c9;}
 :root[data-theme="dark"]{--paper:#0e1116;--surface:#161b22;--surface-2:#1b212a;--ink:#e9eef3;--muted:#9da8b4;--faint:#7e8994;--line:#262d37;--line-2:#2c3441;--brand:#4fb2c3;--brand-strong:#7ccbd8;--brand-soft:#0f333a;--brand-line:#1d4750;--amber:#d99f49;--amber-soft:#2a2312;--ocean:#10151b;--land:#1c232c;--grat:#232b34;}
 *{box-sizing:border-box;}
 html, body{margin:0;padding:0;}
@@ -453,7 +468,7 @@ a{color:var(--brand);text-decoration:none;}
 .mod-atlas #yearSlider{flex:1;min-width:8rem;accent-color:var(--brand);}
 .mod-atlas .yearbig{font-family:var(--serif);font-weight:600;font-size:1.5rem;min-width:3.6rem;text-align:right;font-variant-numeric:tabular-nums;}
 .mod-atlas .legend{display:flex;align-items:center;gap:1rem;padding:.2rem .95rem .85rem;flex-wrap:wrap;font-family:var(--mono);font-size:.6rem;color:var(--muted);}
-.mod-atlas .lg-grad{width:120px;height:9px;border-radius:999px;background:linear-gradient(90deg,#2f7d8c,#cfd8cf,#b3701a);border:1px solid var(--line-2);}
+.mod-atlas .lg-grad{width:120px;height:9px;border-radius:999px;background:linear-gradient(90deg,#2166ac,#e8e2d4,#b3701a);border:1px solid var(--line-2);}
 .mod-atlas .lg-size{display:inline-flex;align-items:center;gap:.4rem;}
 .mod-atlas .lg-size i{display:inline-block;border-radius:50%;background:var(--faint);opacity:.5;}
 .mod-atlas /* ranking */
@@ -505,7 +520,7 @@ a{color:var(--brand);text-decoration:none;}
 
 
 :root{
-    --paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#7d7767;
+    --paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#675f52;
     --line:#e6e1d6;--line-2:#dbd5c7;--brand:#0e4c5a;--brand-strong:#083a45;--brand-soft:#e3eef0;--brand-line:#c7dee1;
     --amber:#b3701a;--amber-soft:#f4e9d5;--good:#2e7d5b;--good-soft:#e0efe7;--warn:#a85c5c;--warn-soft:#f4e3e3;
     --serif:'Source Serif 4','Source Serif Pro',Charter,'Sitka Text',Cambria,Georgia,serif;
@@ -516,7 +531,7 @@ a{color:var(--brand);text-decoration:none;}
     --line:#262d37;--line-2:#2c3441;--brand:#4fb2c3;--brand-strong:#7ccbd8;--brand-soft:#0f333a;--brand-line:#1d4750;
     --amber:#d99f49;--amber-soft:#2a2312;--good:#5cbe93;--good-soft:#122a20;--warn:#d98a8a;--warn-soft:#2c1618;}
 }
-:root[data-theme="light"]{--paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#7d7767;--line:#e6e1d6;--line-2:#dbd5c7;--brand:#0e4c5a;--brand-strong:#083a45;--brand-soft:#e3eef0;--brand-line:#c7dee1;--amber:#b3701a;--amber-soft:#f4e9d5;--good:#2e7d5b;--good-soft:#e0efe7;--warn:#a85c5c;--warn-soft:#f4e3e3;}
+:root[data-theme="light"]{--paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#675f52;--line:#e6e1d6;--line-2:#dbd5c7;--brand:#0e4c5a;--brand-strong:#083a45;--brand-soft:#e3eef0;--brand-line:#c7dee1;--amber:#b3701a;--amber-soft:#f4e9d5;--good:#2e7d5b;--good-soft:#e0efe7;--warn:#a85c5c;--warn-soft:#f4e3e3;}
 :root[data-theme="dark"]{--paper:#0e1116;--surface:#161b22;--surface-2:#1b212a;--ink:#e9eef3;--muted:#9da8b4;--faint:#7e8994;--line:#262d37;--line-2:#2c3441;--brand:#4fb2c3;--brand-strong:#7ccbd8;--brand-soft:#0f333a;--brand-line:#1d4750;--amber:#d99f49;--amber-soft:#2a2312;--good:#5cbe93;--good-soft:#122a20;--warn:#d98a8a;--warn-soft:#2c1618;}
 *{box-sizing:border-box;}
 html, body{margin:0;padding:0;}
@@ -988,6 +1003,11 @@ a{color:var(--brand);text-decoration:none;}
     <span class="eyebrow" data-i18n data-en="Meta-Analysis Intelligent Data Assistant" data-vi="Trợ lý Dữ liệu Thông minh cho Phân tích Tổng hợp">Meta-Analysis Intelligent Data Assistant</span>
     <h1 data-i18n data-en="Human-verified effect-size data preparation for meta-analysis." data-vi="Chuẩn bị dữ liệu mức độ ảnh hưởng có kiểm chứng của con người cho phân tích tổng hợp.">Human-verified effect-size data preparation for meta-analysis.</h1>
     <p data-i18n data-en="The Paper 6 meta-analysis pools 236 studies of internationalisation and firm performance. Here is where they were conducted, when they appeared, and how strong the effect they reported was. Every number is read from the locked M-AIDA dataset." data-vi="Phân tích tổng hợp (Nghiên cứu 6) gộp 236 nghiên cứu về quốc tế hóa và hiệu quả doanh nghiệp. Đây là nơi chúng được thực hiện, thời điểm xuất hiện, và mức độ ảnh hưởng chúng báo cáo. Mọi con số đọc từ bộ dữ liệu M-AIDA đã khóa.">The Paper 6 meta-analysis pools 236 studies of internationalisation and firm performance. Here is where they were conducted, when they appeared, and how strong the effect they reported was. Every number is read from the locked M-AIDA dataset.</p>
+    <div class="citerow">
+      <a class="doibadge" href="https://doi.org/10.5281/zenodo.21282516" target="_blank" rel="noopener">DOI 10.5281/zenodo.21282516</a>
+      <button class="citebtn" id="citeApa" type="button" data-i18n data-en="Cite (APA 7)" data-vi="Tr&iacute;ch dẫn (APA 7)">Cite (APA 7)</button>
+      <button class="citebtn" id="citeBib" type="button">BibTeX</button>
+    </div>
     </div>
     <figure class="heroguide">
       <div class="gbubble">
@@ -1346,7 +1366,7 @@ a{color:var(--brand);text-decoration:none;}
     <h2 data-i18n data-en="The locked dataset becomes a forest plot." data-vi="Bộ dữ liệu đã khóa trở thành một biểu đồ rừng.">The locked dataset becomes a forest plot.</h2>
     <p class="intro" data-i18n data-en="Once the records are verified and locked, they feed a three-level random-effects meta-analysis in R. Each square below is one study's effect size r; the amber diamond is the pooled estimate across the corpus. The point of M-AIDA is the effect sizes themselves, prepared cleanly enough to trust." data-vi="Sau khi các bản ghi được kiểm chứng và khóa, chúng đưa vào mô hình phân tích tổng hợp ảnh hưởng ngẫu nhiên ba tầng trong R. Mỗi ô vuông dưới đây là mức độ ảnh hưởng r của một nghiên cứu; hình thoi màu hổ phách là ước lượng gộp trên toàn kho. Trọng tâm của M-AIDA chính là các mức độ ảnh hưởng, được chuẩn bị đủ sạch để tin cậy.">Once the records are verified and locked, they feed a three-level random-effects meta-analysis in R. Each square below is one study's effect size r; the amber diamond is the pooled estimate across the corpus. The point of M-AIDA is the effect sizes themselves, prepared cleanly enough to trust.</p>
     <figure class="forest-fig">
-      <svg viewBox="0 0 680 334" class="forest-svg" role="img" aria-label="Forest plot of effect sizes" preserveAspectRatio="xMidYMid meet"><line x1="292.7" y1="46" x2="292.7" y2="294.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 3"/><text x="292.7" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">-0.2</text><line x1="373.6" y1="46" x2="373.6" y2="294.0" stroke="var(--line)" stroke-width="1.4"/><text x="373.6" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">+0.0</text><line x1="454.4" y1="46" x2="454.4" y2="294.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 3"/><text x="454.4" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">+0.2</text><line x1="535.3" y1="46" x2="535.3" y2="294.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 3"/><text x="535.3" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">+0.4</text><line x1="414.0" y1="58" x2="527.2" y2="58" stroke="var(--brand)" stroke-width="1.6"/><rect x="463.6" y="51.0" width="14.0" height="14.0" fill="var(--brand)" rx="1.5"/><text x="20" y="61.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Lu & Beamish 2004</text><text x="612" y="61.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.24</text><line x1="373.6" y1="88" x2="494.9" y2="88" stroke="var(--brand)" stroke-width="1.6"/><rect x="427.5" y="81.3" width="13.4" height="13.4" fill="var(--brand)" rx="1.5"/><text x="20" y="91.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Kotabe et al. 2002</text><text x="612" y="91.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.15</text><line x1="345.2" y1="118" x2="511.1" y2="118" stroke="var(--brand)" stroke-width="1.6"/><rect x="423.8" y="111.6" width="12.8" height="12.8" fill="var(--brand)" rx="1.5"/><text x="20" y="121.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Contractor et al. 2003</text><text x="612" y="121.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.14</text><line x1="341.2" y1="148" x2="470.6" y2="148" stroke="var(--brand)" stroke-width="1.6"/><rect x="399.7" y="141.8" width="12.5" height="12.5" fill="var(--brand)" rx="1.5"/><text x="20" y="151.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Pangarkar 2008</text><text x="612" y="151.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.08</text><line x1="321.0" y1="178" x2="410.0" y2="178" stroke="var(--brand)" stroke-width="1.6"/><rect x="358.5" y="171.0" width="14.0" height="14.0" fill="var(--brand)" rx="1.5"/><text x="20" y="181.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Chiao & Yang 2011</text><text x="612" y="181.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">-0.02</text><line x1="316.9" y1="208" x2="385.7" y2="208" stroke="var(--brand)" stroke-width="1.6"/><rect x="342.1" y="200.8" width="14.3" height="14.3" fill="var(--brand)" rx="1.5"/><text x="20" y="211.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Denis, Denis & Yost 2002</text><text x="612" y="211.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">-0.06</text><line x1="337.2" y1="238" x2="381.6" y2="238" stroke="var(--brand)" stroke-width="1.6"/><rect x="353.8" y="230.4" width="15.2" height="15.2" fill="var(--brand)" rx="1.5"/><text x="20" y="241.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Xiao et al. 2013</text><text x="612" y="241.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">-0.03</text><polygon points="394.5,274 403.5,266 412.5,274 403.5,282" fill="var(--amber)"/><text x="20" y="278" font-family="var(--serif)" font-size="12.5" font-weight="600" fill="var(--ink)">Pooled (k = 236)</text><text x="612" y="278" font-family="var(--mono)" font-size="10.5" font-weight="600" fill="var(--amber)">+0.074</text><text x="373.6" y="40" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--faint)">no effect</text></svg>
+      <svg viewBox="0 0 680 334" class="forest-svg" role="img" aria-label="Forest plot of effect sizes" preserveAspectRatio="xMidYMid meet"><line x1="292.7" y1="46" x2="292.7" y2="294.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 3"/><text x="292.7" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">-0.2</text><line x1="373.6" y1="46" x2="373.6" y2="294.0" stroke="var(--line)" stroke-width="1.4"/><text x="373.6" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">+0.0</text><line x1="454.4" y1="46" x2="454.4" y2="294.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 3"/><text x="454.4" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">+0.2</text><line x1="535.3" y1="46" x2="535.3" y2="294.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 3"/><text x="535.3" y="310.0" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">+0.4</text><line x1="414.0" y1="58" x2="527.2" y2="58" stroke="var(--brand)" stroke-width="1.6"/><rect x="463.6" y="51.0" width="14.0" height="14.0" fill="var(--brand)" rx="1.5" style="cursor:help"><title>Lu &amp; Beamish (2004) &middot; r = +0.24 &middot; illustrative selection from the locked P6 corpus</title></rect><text x="20" y="61.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Lu & Beamish 2004</text><text x="612" y="61.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.24</text><line x1="373.6" y1="88" x2="494.9" y2="88" stroke="var(--brand)" stroke-width="1.6"/><rect x="427.5" y="81.3" width="13.4" height="13.4" fill="var(--brand)" rx="1.5" style="cursor:help"><title>Kotabe et al. (2002) &middot; r = +0.15 &middot; illustrative selection from the locked P6 corpus</title></rect><text x="20" y="91.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Kotabe et al. 2002</text><text x="612" y="91.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.15</text><line x1="345.2" y1="118" x2="511.1" y2="118" stroke="var(--brand)" stroke-width="1.6"/><rect x="423.8" y="111.6" width="12.8" height="12.8" fill="var(--brand)" rx="1.5" style="cursor:help"><title>Contractor et al. (2003) &middot; r = +0.14 &middot; illustrative selection from the locked P6 corpus</title></rect><text x="20" y="121.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Contractor et al. 2003</text><text x="612" y="121.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.14</text><line x1="341.2" y1="148" x2="470.6" y2="148" stroke="var(--brand)" stroke-width="1.6"/><rect x="399.7" y="141.8" width="12.5" height="12.5" fill="var(--brand)" rx="1.5" style="cursor:help"><title>Pangarkar (2008) &middot; r = +0.08 &middot; illustrative selection from the locked P6 corpus</title></rect><text x="20" y="151.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Pangarkar 2008</text><text x="612" y="151.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">+0.08</text><line x1="321.0" y1="178" x2="410.0" y2="178" stroke="var(--brand)" stroke-width="1.6"/><rect x="358.5" y="171.0" width="14.0" height="14.0" fill="var(--brand)" rx="1.5" style="cursor:help"><title>Chiao &amp; Yang (2011) &middot; r = &#8722;0.02 &middot; illustrative selection from the locked P6 corpus</title></rect><text x="20" y="181.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Chiao & Yang 2011</text><text x="612" y="181.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">-0.02</text><line x1="316.9" y1="208" x2="385.7" y2="208" stroke="var(--brand)" stroke-width="1.6"/><rect x="342.1" y="200.8" width="14.3" height="14.3" fill="var(--brand)" rx="1.5" style="cursor:help"><title>Denis, Denis &amp; Yost (2002) &middot; r = &#8722;0.06 &middot; illustrative selection from the locked P6 corpus</title></rect><text x="20" y="211.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Denis, Denis & Yost 2002</text><text x="612" y="211.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">-0.06</text><line x1="337.2" y1="238" x2="381.6" y2="238" stroke="var(--brand)" stroke-width="1.6"/><rect x="353.8" y="230.4" width="15.2" height="15.2" fill="var(--brand)" rx="1.5" style="cursor:help"><title>Xiao et al. (2013) &middot; r = &#8722;0.03 &middot; illustrative selection from the locked P6 corpus</title></rect><text x="20" y="241.5" font-family="var(--serif)" font-size="12.5" fill="var(--ink)">Xiao et al. 2013</text><text x="612" y="241.5" font-family="var(--mono)" font-size="10.5" fill="var(--muted)">-0.03</text><polygon points="394.5,274 403.5,266 412.5,274 403.5,282" fill="var(--amber)" style="cursor:help"><title>Pooled random-effects estimate &middot; r = .074, 95% CI [.060, .088] &middot; k = 236 studies</title></polygon><text x="20" y="278" font-family="var(--serif)" font-size="12.5" font-weight="600" fill="var(--ink)">Pooled (k = 236)</text><text x="612" y="278" font-family="var(--mono)" font-size="10.5" font-weight="600" fill="var(--amber)">+0.074</text><text x="373.6" y="40" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--faint)">no effect</text></svg>
       <figcaption data-i18n data-en="Each square is one study's effect size r with its confidence interval; the diamond is the pooled random-effects estimate, r = .074, 95% CI [.060, .088]. Illustrative selection from the locked P6 corpus." data-vi="Mỗi ô vuông là mức độ ảnh hưởng r của một nghiên cứu kèm khoảng tin cậy; hình thoi là ước lượng gộp ảnh hưởng ngẫu nhiên, r = .074, KTC 95% [.060, .088]. Lựa chọn minh họa từ kho P6 đã khóa.">Each square is one study's effect size r with its confidence interval; the diamond is the pooled random-effects estimate, r = .074, 95% CI [.060, .088]. Illustrative selection from the locked P6 corpus.</figcaption>
     </figure>
     <figure class="forest-aside">
@@ -1800,8 +1820,8 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   function repLine(d){if(!d.rep)return '';var lbl=isVI()?'Mẫu lớn nhất':'Largest sample';return '<br><span style="opacity:.75">'+lbl+' · '+d.rep.a+' '+d.rep.y+'</span>';}
   function colorR(r){ // diverging around 0
     var t=Math.max(-.15,Math.min(.40,r));
-    if(t<0){var u=(t+.15)/.15; return mix([47,125,140],[207,216,207],u);}
-    var u=t/.40; return mix([207,216,207],[179,112,26],u);
+    if(t<0){var u=(t+.15)/.15; return mix([33,102,172],[232,226,212],u);}
+    var u=t/.40; return mix([232,226,212],[179,112,26],u);
   }
   function mix(a,b,t){return 'rgb('+a.map(function(x,i){return Math.round(x+(b[i]-x)*t)}).join(',')+')';}
   var maxK=Math.max.apply(null,DATA.countries.map(function(d){return d.k}));
@@ -2701,6 +2721,59 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
       speakLine(idx,curLine,curNext);
     }
   });
+})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "M-AIDA: Meta-Analysis Intelligent Data Assistant",
+  "alternateName": "M-AIDA",
+  "softwareVersion": "7.1.1",
+  "applicationCategory": "Research software",
+  "operatingSystem": "Any (FastAPI backend, web client)",
+  "url": "https://thuyhuongctu.github.io/M-AIDA/",
+  "codeRepository": "https://github.com/thuyhuongctu/M-AIDA",
+  "identifier": [
+    {"@type": "PropertyValue", "propertyID": "DOI", "value": "10.5281/zenodo.21282516"},
+    {"@type": "PropertyValue", "propertyID": "DOI", "value": "10.5281/zenodo.21282517"}
+  ],
+  "sameAs": ["https://doi.org/10.5281/zenodo.21282516"],
+  "license": "https://github.com/thuyhuongctu/M-AIDA/blob/main/LICENSE",
+  "datePublished": "2026",
+  "publisher": {"@type": "Organization", "name": "Can Tho University"},
+  "author": [
+    {"@type": "Person", "name": "Do Thuy Huong", "sameAs": "https://orcid.org/0000-0002-7711-2487",
+     "affiliation": {"@type": "Organization", "name": "School of Economics, Can Tho University"}},
+    {"@type": "Person", "name": "Phan Anh Tu", "sameAs": "https://orcid.org/0000-0003-0667-3137",
+     "affiliation": {"@type": "Organization", "name": "School of Economics, Can Tho University"}}
+  ],
+  "description": "Research software for meta-analysis: semi-automated effect-size extraction from academic PDFs with a vendor-neutral language-model adapter, human-in-the-loop verification by the principal investigator, and an immutable data-lock workflow exporting a reproducible effect-size dataset."
+}
+</script>
+<script>
+(function(){
+  'use strict';
+  var APA = "Do, T. H., \u0026 Phan, A. T. (2026). M-AIDA: Meta-Analysis Intelligent Data Assistant (Version 7.1.1) [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21282516";
+  var BIB = "@software{do_phan_maida_2026,\n  author    = {Do, Thuy Huong and Phan, Anh Tu},\n  title     = {M-AIDA: Meta-Analysis Intelligent Data Assistant},\n  version   = {7.1.1},\n  year      = {2026},\n  publisher = {Can Tho University},\n  doi       = {10.5281/zenodo.21282516},\n  url       = {https://github.com/thuyhuongctu/M-AIDA}\n}";
+  function wire(id, text){
+    var btn = document.getElementById(id);
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      function done(){
+        btn.classList.add('done');
+        var prev = btn.textContent;
+        btn.textContent = '\u2713 ' + prev;
+        setTimeout(function(){ btn.classList.remove('done'); btn.textContent = prev; }, 1600);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ window.prompt('Copy:', text); });
+      } else { window.prompt('Copy:', text); }
+    });
+  }
+  wire('citeApa', APA);
+  wire('citeBib', BIB);
 })();
 </script>
 
