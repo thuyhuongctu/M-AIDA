@@ -808,7 +808,7 @@ a{color:var(--brand);text-decoration:none;}
   .teamring{fill:none;stroke:#b3701a;stroke-width:1.4;pointer-events:none;}
   :root:not([data-motion="off"]) .teamring{animation:tring 2.4s ease-in-out infinite;}
   @keyframes tring{0%,100%{stroke-opacity:.85}50%{stroke-opacity:.2}}
-  .slogan{display:flex;align-items:center;gap:.55rem;margin:.75rem 0 .2rem;}
+  .slogan{display:flex;align-items:center;justify-content:center;gap:.55rem;margin:1.4rem 0 .3rem;}
   .slogan .rose{width:22px;height:27px;color:#c2647a;flex:0 0 auto;}
   .slogan .sl-fr{font-family:var(--serif);font-style:italic;font-size:1.06rem;color:var(--ink);}
   .slogan .sl-vi{font-size:.76rem;color:var(--muted);}
@@ -823,6 +823,10 @@ a{color:var(--brand);text-decoration:none;}
   .clocks{display:inline-flex;gap:.9rem;flex-wrap:wrap;font-family:var(--mono);font-size:.68rem;color:var(--muted);}
   .clocks .ck b{color:var(--ink);font-weight:600;}
   .visits img{height:20px;display:block;opacity:.85;}
+  .flaglayer .vnflag{transition:opacity .5s ease;pointer-events:none;}
+  .travgrp{pointer-events:none;transition:opacity .4s ease;}
+  .travgrp image{filter:drop-shadow(0 4px 6px rgba(0,0,0,.35));}
+  .travbub{transition:opacity .3s ease;}
 </style>
 </head>
 <body>
@@ -834,11 +838,6 @@ a{color:var(--brand);text-decoration:none;}
         <span style="display:inline-flex; align-items:center; gap:0.35rem;">
           <span class="brand-name">M-AIDA</span>
           <svg class="flag" viewBox="0 0 30 20" role="img" aria-label="Vietnam"><rect width="30" height="20" fill="#da251d"/><path fill="#ff0" d="M15 4.2l1.76 5.4h5.68l-4.6 3.34 1.76 5.4L15 14.99l-4.6 3.35 1.76-5.4-4.6-3.34h5.68z"/></svg>
-        <div class="slogan">
-          <svg class="rose" viewBox="0 0 40 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6c-5 0-8.2 3-8.2 7.2 0 5 4.2 8 8.2 8s8.2-3 8.2-8C28.2 9 25 6 20 6z"/><path d="M20 9.2c-2.7 0-4.7 1.7-4.7 4.1 0 2.8 2 4.6 4.7 4.6s4.7-1.8 4.7-4.6"/><path d="M20 12.6c-1.3 0-2.3.8-2.3 2s1 2 2.3 2"/><path d="M20 21.4V42"/><path d="M20 30.4c-4.2-1.2-6-4.4-9.4-4.4 1.2 4.4 4.4 6.4 9.4 6.4z"/><path d="M20 36.4c4.2-1.2 6-4.4 9.4-4.4-1.2 4.4-4.4 6.4-9.4 6.4z"/></g></svg>
-          <span class="sl-fr">La vie en rose</span>
-          <span class="sl-vi" data-i18n data-en="life, in rose colour" data-vi="cuộc đời màu hồng">life, in rose colour</span>
-        </div>
         <div class="sharebar">
           <span class="sh-k" data-i18n data-en="Share" data-vi="Chia sẻ">Share</span>
           <a class="shbtn" target="_blank" rel="noopener" href="https://github.com/thuyhuongctu/M-AIDA" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24"><path d="M12 1.8a10.3 10.3 0 00-3.3 20c.6.1.8-.2.8-.5v-2c-2.9.6-3.5-1.2-3.5-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.6 0-.6 0-.6 1 0 1.6 1 1.6 1 .9 1.6 2.4 1.1 3 .9a2 2 0 01.7-1.4c-2.3-.2-4.7-1.1-4.7-5.1 0-1.1.4-2 1-2.8-.1-.2-.4-1.3.1-2.7 0 0 .9-.3 2.9 1a9.8 9.8 0 015.1 0c2-1.3 2.9-1 2.9-1 .5 1.4.2 2.5.1 2.7.7.8 1 1.7 1 2.8 0 4-2.4 4.9-4.7 5.1.4.3.7 1 .7 1.9v2.8c0 .3.2.6.8.5A10.3 10.3 0 0012 1.8z"/></svg></a>
@@ -1527,6 +1526,10 @@ a{color:var(--brand);text-decoration:none;}
       <span data-i18n data-en="Cite (APA 7): Do, T. H., &amp; Phan, A. T. (2026). <em>M-AIDA: Meta-Analysis Intelligent Data Assistant</em> (Version 7.1.1) [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21282516" data-vi="Trích dẫn (APA 7): Do, T. H., &amp; Phan, A. T. (2026). <em>M-AIDA: Meta-Analysis Intelligent Data Assistant</em> (Version 7.1.1) [Computer software]. Đại học Cần Thơ. https://doi.org/10.5281/zenodo.21282516">Cite (APA 7): Do, T. H., &amp; Phan, A. T. (2026). <em>M-AIDA: Meta-Analysis Intelligent Data Assistant</em> (Version 7.1.1) [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21282516</span><br>
       <span data-i18n data-en="AI disclosure: a large language model proposes candidate statistics only; every value is verified and locked by the principal investigator before analysis." data-vi="Công bố AI: mô hình ngôn ngữ lớn chỉ đề xuất số liệu ứng viên; mọi giá trị được nghiên cứu sinh kiểm chứng và khóa trước khi phân tích.">AI disclosure: a large language model proposes candidate statistics only; every value is verified and locked by the principal investigator before analysis.</span>
     </div>
+    <div class="slogan">
+      <svg class="rose" viewBox="0 0 40 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6c-5 0-8.2 3-8.2 7.2 0 5 4.2 8 8.2 8s8.2-3 8.2-8C28.2 9 25 6 20 6z"/><path d="M20 9.2c-2.7 0-4.7 1.7-4.7 4.1 0 2.8 2 4.6 4.7 4.6s4.7-1.8 4.7-4.6"/><path d="M20 12.6c-1.3 0-2.3.8-2.3 2s1 2 2.3 2"/><path d="M20 21.4V42"/><path d="M20 30.4c-4.2-1.2-6-4.4-9.4-4.4 1.2 4.4 4.4 6.4 9.4 6.4z"/><path d="M20 36.4c4.2-1.2 6-4.4 9.4-4.4-1.2 4.4-4.4 6.4-9.4 6.4z"/></g></svg>
+      <span class="sl-fr">La vie en rose</span>
+    </div>
   </div>
 </footer>
 <script>
@@ -1723,12 +1726,67 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     var t=document.createElementNS(ns,'text');t.setAttribute('x',cx);t.setAttribute('y',cy);t.setAttribute('dy',-radius(DATA.multi.k)-5);t.setAttribute('text-anchor','middle');t.setAttribute('font-family','ui-monospace,Menlo,monospace');t.setAttribute('font-size','9');t.setAttribute('fill','var(--muted)');svg.appendChild(t);
     return {c:c,t:t,upd:function(y){var k=cumMulti(y);c.setAttribute('r',k?radius(k):0);t.textContent=(root.getAttribute('lang')==='vi'?'xuyên biên giới ':'cross-border ')+k;}};}
   var xb1=addXB(document.getElementById('map')), xb2=addXB(document.getElementById('map2'));
+
+  // Vietnamese-flag story: author-team milestones, flags persist from their year on
+  var TRAV_SRC='data:image/webp;base64,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';
+  var FLAGM=[{c:'Turkey',y:2021,en:'I made it to Turkey!',vi:'Tôi đã đến Thổ Nhĩ Kỳ!'},
+             {c:'Poland',y:2021,en:'I made it to Poland!',vi:'Tôi đã đến Ba Lan!'},
+             {c:'India',y:2025,en:'I made it to India!',vi:'Tôi đã đến Ấn Độ!'}];
+  (function(){
+    var ns='http://www.w3.org/2000/svg';var svg=document.getElementById('map');
+    var g=document.createElementNS(ns,'g');g.setAttribute('class','flaglayer');svg.appendChild(g);
+    FLAGM.forEach(function(m){
+      var d=DATA.countries.filter(function(x){return x.c===m.c;})[0];if(!d)return;
+      var p=proj(d.lon,d.lat);m.p=p;
+      var fg=document.createElementNS(ns,'g');
+      fg.setAttribute('class','vnflag');
+      fg.setAttribute('transform','translate('+p[0]+','+p[1]+')');
+      fg.setAttribute('opacity','0');
+      fg.innerHTML='<line x1="0" y1="0" x2="0" y2="-15" stroke="#7a5c40" stroke-width="1.2"/><rect x="0.6" y="-15" width="11" height="7.4" rx="1" fill="#da251d"/><path fill="#ffce00" d="M6.1 -13.7 6.7 -12 8.5 -12 7 -10.9 7.6 -9.2 6.1 -10.3 4.6 -9.2 5.2 -10.9 3.7 -12 5.5 -12Z"/>';
+      m.el=fg;g.appendChild(fg);
+    });
+  })();
+  window.__updFlags=function(y){FLAGM.forEach(function(m){if(m.el)m.el.setAttribute('opacity', y>=m.y?1:0);});};
+  var trav=(function(){
+    var ns='http://www.w3.org/2000/svg';var svg=document.getElementById('map');
+    var g=document.createElementNS(ns,'g');g.setAttribute('class','travgrp');g.setAttribute('opacity','0');
+    var im=document.createElementNS(ns,'image');
+    im.setAttribute('width','46');im.setAttribute('height','46');im.setAttribute('x','-23');im.setAttribute('y','-48');
+    im.setAttributeNS('http://www.w3.org/1999/xlink','href',TRAV_SRC);im.setAttribute('href',TRAV_SRC);
+    var bub=document.createElementNS(ns,'g');bub.setAttribute('class','travbub');bub.setAttribute('opacity','0');
+    bub.innerHTML='<rect x="-82" y="-96" width="164" height="36" rx="8" fill="#fffdf8" stroke="#b3701a" stroke-width="1"/><text x="0" y="-82" text-anchor="middle" font-size="11" fill="#7a4a12" font-style="italic">Merci beaucoup</text><text class="tb2" x="0" y="-68" text-anchor="middle" font-size="10" fill="#3d2f1e"></text>';
+    g.appendChild(im);g.appendChild(bub);svg.appendChild(g);
+    return {g:g,bub:bub,t2:bub.querySelector('.tb2')};
+  })();
+  function storyVisit(m){
+    trav.g.setAttribute('opacity','1');
+    trav.g.style.transition='transform 1s cubic-bezier(.4,0,.2,1)';
+    trav.g.style.transform='translate('+m.p[0]+'px,'+m.p[1]+'px)';
+    trav.t2.textContent=(root.getAttribute('lang')==='vi'?m.vi:m.en);
+    trav.bub.setAttribute('opacity','0');
+    clearTimeout(trav.tb);trav.tb=setTimeout(function(){trav.bub.setAttribute('opacity','1');if(m.el)m.el.setAttribute('opacity','1');},950);
+    clearTimeout(trav.th);trav.th=setTimeout(function(){trav.bub.setAttribute('opacity','0');},3400);
+    clearTimeout(trav.td);trav.td=setTimeout(function(){trav.g.setAttribute('opacity','0');},3800);
+  }
   var tip=document.getElementById('tooltip');
   var slider=document.getElementById('yearSlider');
   var wrapEl=document.getElementById('mapWrap');
   function placeTip(ev){var wrap=wrapEl.getBoundingClientRect();var x=ev.clientX-wrap.left+12,yy=ev.clientY-wrap.top+12;var tw=tip.offsetWidth;if(x+tw>wrap.width-6)x=Math.max(6,wrap.width-tw-6);tip.style.left=x+'px';tip.style.top=yy+'px';tip.style.opacity=1;}
   function hideTip(){tip.style.opacity=0;}
-  function teamLine(d){var t=TEAM[d.c];if(!t)return '';var vi=isVI();var txt=t===3?(vi?'Nhóm tác giả: chương sách năm 2025 về nền kinh tế này nằm trong 236 nghiên cứu được gộp ở đây':'Author team: our 2025 book chapter on this economy is one of the 236 studies pooled here'):t===2?(vi?'Nhóm tác giả: nghiên cứu riêng về nền kinh tế này':'Author team: dedicated primary study of this economy'):(vi?'Nhóm tác giả: trong nghiên cứu gộp 50 nền kinh tế châu Á - Thái Bình Dương':'Author team: in the pooled 50-economy Asia-Pacific study');return '<br><span style="color:#b3701a">★ '+txt+' (Do Thuy Huong & Phan Anh Tu)</span>';}
+  var FLAGSVG='<svg width="13" height="9" viewBox="0 0 13 9" style="vertical-align:-1px"><rect width="13" height="9" fill="#da251d" rx="1"/><path fill="#ffce00" d="M6.5 1.6 7.3 3.7 9.5 3.7 7.7 5 8.4 7.1 6.5 5.8 4.6 7.1 5.3 5 3.5 3.7 5.7 3.7Z"/></svg> ';
+  var STORY={
+    'Turkey':{en:'Author team: Phan, Ninh & Do (2021), grown from the first author&#8217;s master&#8217;s thesis. The Vietnamese flag was planted here first. Merci beaucoup!',vi:'Nhóm tác giả: Phan, Ninh & Do (2021), khởi nguồn từ luận văn thạc sĩ của tác giả thứ nhất. Lá cờ Việt Nam cắm ở đây trước tiên. Merci beaucoup!'},
+    'Poland':{en:'Author team: Phan et al. (2021), the journey continued straight on to Poland. Merci beaucoup!',vi:'Nhóm tác giả: Phan et al. (2021), hành trình nối tiếp ngay sang Ba Lan. Merci beaucoup!'},
+    'India':{en:'Author team: the Do & Phan (2025) book chapter, a part of this dissertation. Merci beaucoup!',vi:'Nhóm tác giả: chương sách Do & Phan (2025), một phần của luận án này. Merci beaucoup!'},
+    'Cameroon':{en:'Author team: Phan, Tran & Lu (2020), dedicated study of this economy.',vi:'Nhóm tác giả: Phan, Tran & Lu (2020), nghiên cứu riêng về nền kinh tế này.'},
+    'China':{en:'Author team: Do & Phan (2026), dedicated SME study.',vi:'Nhóm tác giả: Do & Phan (2026), nghiên cứu riêng về SME.'},
+    'Vietnam':{en:'Author team: Phan et al. (2020), home ground.',vi:'Nhóm tác giả: Phan et al. (2020), sân nhà.'}
+  };
+  function teamLine(d){var t=TEAM[d.c];if(!t)return '';var vi=isVI();var s=STORY[d.c];
+    var flag=(d.c==='Turkey'||d.c==='Poland'||d.c==='India')?FLAGSVG:'';
+    if(s)return '<br><span style="color:#b3701a">&#9733; '+flag+(vi?s.vi:s.en)+'</span>';
+    var txt=vi?'Nhóm tác giả: trong nghiên cứu gộp 50 nền kinh tế châu Á - Thái Bình Dương':'Author team: in the pooled 50-economy Asia-Pacific study';
+    return '<br><span style="color:#b3701a">&#9733; '+txt+' (Do Thuy Huong & Phan Anh Tu)</span>';}
   function noteText(d,y){var vi=isVI();var k=cumK(d,y);var r=cumR(d,y).toFixed(3);var base=vi?(d.c+': '+k+' nghiên cứu từ '+d.first+', hệ số trung bình r = '+r+'.'):(d.c+': '+k+' studies since '+d.first+', mean effect r = '+r+'.');var t=TEAM[d.c];if(t)base+=' '+(t===2?(vi?'Nhóm tác giả có nghiên cứu riêng về nền kinh tế này, cùng nghiên cứu gộp 50 nền kinh tế.':'Our team has a dedicated study of this economy, plus the pooled fifty-economy study.'):(vi?'Nhóm tác giả cũng nghiên cứu nền kinh tế này trong nghiên cứu gộp 50 nền kinh tế châu Á - Thái Bình Dương.':'Our team also covers this economy in the pooled fifty-economy Asia-Pacific study.'));return base;}
   function countryTipHTML(d,y){return '<b>'+d.c+'</b><br>'+cumK(d,y)+' '+(isVI()?'nghiên cứu':'studies')+' · r = '+cumR(d,y).toFixed(3)+'<br>'+regName(d.region)+' · '+(isVI()?'từ':'since')+' '+d.first+repLine(d)+teamLine(d);}
   function xbTipHTML(y){var rl=DATA.multi.rep?('<br><span style="opacity:.75">'+(isVI()?'Mẫu lớn nhất':'Largest sample')+' · '+DATA.multi.rep.a+' '+DATA.multi.rep.y+'</span>'):'';return '<b>'+(isVI()?'Xuyên biên giới / đa vùng':'Cross-border / multi-region')+'</b><br>'+cumMulti(y)+' '+(isVI()?'nghiên cứu':'studies')+' · r = '+cumMultiR(y).toFixed(3)+rl+'<br>'+(isVI()?'không đặt tại một quốc gia':'not tied to one country');}
@@ -1803,7 +1861,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     document.getElementById('regions').innerHTML=arr.map(function(d){return '<div class="reg"><span>'+regName(d[0])+'</span><span><span class="rb" style="display:block;width:'+(d[1]/mx*100)+'%;background:'+(REGCOL[d[0]]||'var(--brand-line)')+'"></span></span><span class="rv">'+d[1]+'</span></div>';}).join('');
   }
 
-  function update(y){document.getElementById('yearLabel').textContent=y;paint(mapB,y);xb1.upd(y);renderRank(y);renderRegions(y);}
+  function update(y){if(window.__updFlags)window.__updFlags(y);document.getElementById('yearLabel').textContent=y;paint(mapB,y);xb1.upd(y);renderRank(y);renderRegions(y);}
   slider.addEventListener('input',function(){update(+slider.value);});
   document.getElementById('colR').onclick=function(){colorMode='r';this.setAttribute('aria-pressed',true);document.getElementById('colReg').setAttribute('aria-pressed',false);paint(mapB,+slider.value);};
   document.getElementById('colReg').onclick=function(){colorMode='region';this.setAttribute('aria-pressed',true);document.getElementById('colR').setAttribute('aria-pressed',false);paint(mapB,+slider.value);};
@@ -1811,11 +1869,32 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   // play
   var playing=false,timer=null,btn=document.getElementById('playBtn');
   function stopSweep(){clearInterval(timer);playing=false;btn.innerHTML='&#9654;';}
+  function startSweepResume(){
+    if(!playing)return;
+    clearInterval(timer);
+    timer=setInterval(function(){var y=+slider.value;if(y>=2026){stopSweep();return;}slider.value=y+1;update(y+1);
+      if(root.getAttribute('data-motion')!=='off'){
+        var ms=FLAGM.filter(function(m){return m.y===y+1;});
+        if(ms.length){
+          clearInterval(timer);
+          ms.forEach(function(m,i){setTimeout(function(){storyVisit(m);},i*2600);});
+          setTimeout(function(){startSweepResume();},ms.length*2600+1400);
+        }
+      }},260);
+  }
   function startSweep(){
     if(playing)stopSweep();
     playing=true;btn.innerHTML='&#10073;&#10073;';
     if(+slider.value>=2026)slider.value=1978;
-    timer=setInterval(function(){var y=+slider.value;if(y>=2026){stopSweep();return;}slider.value=y+1;update(y+1);},260);
+    timer=setInterval(function(){var y=+slider.value;if(y>=2026){stopSweep();return;}slider.value=y+1;update(y+1);
+      if(root.getAttribute('data-motion')!=='off'){
+        var ms=FLAGM.filter(function(m){return m.y===y+1;});
+        if(ms.length){
+          clearInterval(timer);
+          ms.forEach(function(m,i){setTimeout(function(){storyVisit(m);},i*2600);});
+          setTimeout(function(){if(playing)startSweepResume();},ms.length*2600+1400);
+        }
+      }},260);
   }
   btn.onclick=function(){ if(playing){stopSweep();return;} startSweep(); };
   window.__atlasTourSweep=function(){
@@ -1850,16 +1929,18 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   function finishCounts(){cancelAnimationFrame(countRAF);countEls.forEach(function(el,i){el.textContent=countFinals[i];});}
 
   // ---- hero particle field: one dot per study, scatter then settle ----
-  var fx=document.getElementById('fx'),fxx=fx?fx.getContext('2d'):null,fxRAF=null,dots=[],fxW=0,fxH=0,dpr=Math.min(2,window.devicePixelRatio||1),fxT0=null;
+  var fx=document.getElementById('fx'),fxx=fx?fx.getContext('2d'):null,fxRAF=null,dots=[],fxW=0,fxH=0,fxScat=0,dpr=Math.min(2,window.devicePixelRatio||1),fxT0=null;
   var REGSEQ=[];DATA.countries.forEach(function(c){for(var i=0;i<c.k;i++)REGSEQ.push(REGCOL[c.region]||'#8b8574');});for(var mi=0;mi<DATA.multi.k;mi++)REGSEQ.push(REGCOL['Cross-border']);
   function sizeFX(){if(!fx)return;var r=fx.getBoundingClientRect();fxW=r.width;fxH=r.height||200;fx.width=Math.round(fxW*dpr);fx.height=Math.round(fxH*dpr);fxx.setTransform(dpr,0,0,dpr,0,0);}
   var FXCOLS=30;
   function targetXY(i){var rows=Math.ceil(REGSEQ.length/FXCOLS);var gx=i%FXCOLS,gy=Math.floor(i/FXCOLS);return {x:fxW*0.30+gx/(FXCOLS-1)*(fxW*0.66),y:fxH*0.24+gy/Math.max(1,rows-1)*(fxH*0.56)+Math.sin(gx*0.55)*3};}
-  function buildDots(){dots=REGSEQ.map(function(col,i){var t=targetXY(i);return {c:col,x:Math.random()*fxW,y:Math.random()*fxH,tx:t.x,ty:t.y,r:1.5+Math.random()*1.5,ph:Math.random()*6.28};});}
+  function buildDots(){dots=REGSEQ.map(function(col,i){var t=targetXY(i);return {c:col,x:Math.random()*fxW,y:Math.random()*fxH,tx:t.x,ty:t.y,r:1.5+Math.random()*1.5,ph:Math.random()*6.28,sp:0.55+Math.random()*0.75};});}
   function retarget(){dots.forEach(function(d,i){var t=targetXY(i);d.tx=t.x;d.ty=t.y;});}
   function drawDot(d,ox,oy){fxx.beginPath();fxx.arc(d.x+ox,d.y+oy,d.r,0,6.2832);fxx.fillStyle=d.c;fxx.fill();}
-  function frame(ts){if(fxT0==null)fxT0=ts;var el=(ts-fxT0)/1000;fxx.clearRect(0,0,fxW,fxH);
-    dots.forEach(function(d){d.x+=(d.tx-d.x)*0.055;d.y+=(d.ty-d.y)*0.055;d.ox=Math.sin(el*0.8+d.ph)*1.1;d.oy=Math.cos(el*0.7+d.ph)*0.9;});
+  function frame(ts){if(fxT0==null)fxT0=ts;var el=(ts-fxT0)/1000;
+    if(el-fxScat>13){fxScat=el;for(var si=0;si<dots.length;si+=2){dots[si].x=Math.random()*fxW;dots[si].y=Math.random()*fxH;}}
+    fxx.clearRect(0,0,fxW,fxH);
+    dots.forEach(function(d){d.x+=(d.tx-d.x)*0.055;d.y+=(d.ty-d.y)*0.055;d.ox=Math.sin(el*(d.sp||0.8)+d.ph)*2.5;d.oy=Math.cos(el*(d.sp||0.8)*0.85+d.ph)*2.0;});
     fxx.globalAlpha=.12;fxx.strokeStyle=(getComputedStyle(root).getPropertyValue('--brand')||'#0e4c5a').trim();fxx.lineWidth=.7;fxx.beginPath();
     for(var i=0;i<dots.length;i++){var a=dots[i],b=((i+1)%FXCOLS!==0)?dots[i+1]:null,c=dots[i+FXCOLS];
       if(b){fxx.moveTo(a.x+a.ox,a.y+a.oy);fxx.lineTo(b.x+b.ox,b.y+b.oy);}
@@ -1867,7 +1948,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     fxx.stroke();fxx.globalAlpha=.82;
     dots.forEach(function(d){drawDot(d,d.ox||0,d.oy||0);});
     fxRAF=requestAnimationFrame(frame);}
-  function startFX(){if(!fx)return;sizeFX();if(!dots.length)buildDots();if(!motionOn()){drawFXRest();return;}cancelAnimationFrame(fxRAF);fxT0=null;fxRAF=requestAnimationFrame(frame);}
+  function startFX(){if(!fx)return;sizeFX();if(!dots.length)buildDots();if(!motionOn()){drawFXRest();return;}cancelAnimationFrame(fxRAF);fxT0=null;fxScat=0;fxRAF=requestAnimationFrame(frame);}
   function stopFX(){cancelAnimationFrame(fxRAF);fxRAF=null;}
   function drawFXRest(){if(!fx)return;sizeFX();if(!dots.length)buildDots();retarget();fxx.clearRect(0,0,fxW,fxH);fxx.globalAlpha=.82;dots.forEach(function(d){d.x=d.tx;d.y=d.ty;drawDot(d,0,0);});}
   window.addEventListener('resize',function(){if(!fx)return;sizeFX();retarget();if(!motionOn())drawFXRest();});
@@ -2400,16 +2481,8 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     if(window.__musicDuck) window.__musicDuck(false);
   }
   function ttsSpeak(line,next){
-    if(!hasTTS){ timer=setTimeout(next, Math.max(3500, line.length*75)); return; }
-    try{
-      var u=new SpeechSynthesisUtterance(line);
-      if(isVIL()){u.lang='vi-VN';}
-      else{if(!voice) voice=pickVoice(); if(voice) u.voice=voice; u.lang='en-US';}
-      u.rate=0.95; u.pitch=1.02;
-      u.onend=next; u.onerror=next;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(u);
-    }catch(e){}
+    // voice standardization: if Huong AI audio is unavailable, show the text
+    // silently instead of speaking with a different system voice
     clearTimeout(timer);
     timer=setTimeout(next, Math.max(3500, line.length*75));
   }
