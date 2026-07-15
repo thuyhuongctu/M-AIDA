@@ -1754,10 +1754,8 @@ a{color:var(--brand);text-decoration:none;}
     var CKFLAGS={
       vn:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#da251d"/><path fill="#ffce00" d="M15 4.2l1.76 5.4h5.68l-4.6 3.34 1.76 5.4L15 15l-4.6 3.34 1.76-5.4-4.6-3.34h5.68z"/></svg>',
       fr:'<svg viewBox="0 0 30 20"><rect width="10" height="20" fill="#0055a4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ef4135"/></svg>',
-      gb:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#012169"/><path d="M0 0l30 20M30 0L0 20" stroke="#fff" stroke-width="4"/><path d="M0 0l30 20M30 0L0 20" stroke="#c8102e" stroke-width="2"/><path d="M15 0v20M0 10h30" stroke="#fff" stroke-width="6"/><path d="M15 0v20M0 10h30" stroke="#c8102e" stroke-width="3.4"/></svg>',
-      us:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><g fill="#b22234"><rect width="30" height="2.8"/><rect y="5.7" width="30" height="2.8"/><rect y="11.4" width="30" height="2.8"/><rect y="17.2" width="30" height="2.8"/></g><rect width="13" height="10" fill="#3c3b6e"/></svg>'
     };
-    var ZONES=[['Hà Nội','Asia/Ho_Chi_Minh','vn','GMT+7'],['Paris','Europe/Paris','fr','CET'],['London','Europe/London','gb','GMT'],['Washington','America/New_York','us','EST']];
+    var ZONES=[['Hà Nội','Asia/Ho_Chi_Minh','vn','GMT+7'],['Paris','Europe/Paris','fr','CET']];
     wc.innerHTML=ZONES.map(function(z){
       return '<span class="ckcard" data-tz="'+z[1]+'">'+CKFLAGS[z[2]]+'<span class="ckt"><span class="cty">'+z[0]+'</span><span class="tm"></span></span><span class="dt"></span></span>';
     }).join('');
