@@ -836,7 +836,10 @@ a{color:var(--brand);text-decoration:none;}
   #vnmark{position:fixed;top:50%;right:1.2%;transform:translateY(-50%);width:min(30vw,400px);color:var(--muted);opacity:.14;pointer-events:none;z-index:-1;}
   :root[data-theme="dark"] #vnmark{opacity:.17;}
   #vnmark svg{width:100%;height:auto;display:block;}
-  @media (max-width:1150px){#vnmark{display:none;}}
+  @media (max-width:1150px){
+    #vnmark{right:50%;transform:translate(50%,-50%);width:min(78vw,340px);opacity:.09;}
+    :root[data-theme="dark"] #vnmark{opacity:.12;}
+  }
   .slogan .rose{width:22px;height:27px;color:#c2647a;flex:0 0 auto;}
   .slogan .sl-fr{font-family:var(--serif);font-style:italic;font-size:1.06rem;color:var(--ink);}
   .slogan .sl-vi{font-size:.76rem;color:var(--muted);}
