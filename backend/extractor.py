@@ -154,6 +154,16 @@ class StatisticalExtractor:
     # ------------------------------------------------------------------
 
     @staticmethod
+    def clamp_r(r: float) -> float:
+        """Defensive bound: a Pearson correlation must lie in [-1, 1].
+
+        The t conversion is bounded by construction; the Peterson & Brown
+        beta approximation is not, so out-of-range inputs are capped here
+        (added in 7.1.2; such records are always flagged for review).
+        """
+        return max(-1.0, min(1.0, r))
+
+    @staticmethod
     def compute_r_from_t(t: float, df: int) -> float:
         """Convert a t-statistic to Pearson's r.
 
@@ -175,8 +185,13 @@ class StatisticalExtractor:
         the simplified form used throughout the P6 extraction protocol:
 
             r ≈ β × 0.98
+
+        Peterson & Brown derived the approximation for |β| <= 0.5; the
+        extractor therefore forces human review whenever |β| > 0.5
+        (see _build_effect, added in 7.1.2). The result is clamped to
+        [-1, 1] as a defensive bound.
         """
-        return beta * 0.98
+        return StatisticalExtractor.clamp_r(beta * 0.98)
 
     @staticmethod
     def resolve_overridden_r(
@@ -185,7 +200,8 @@ class StatisticalExtractor:
         """Resolve the canonical Pearson r after a PI override."""
         keys = set(overridden_keys)
         if "effect_r" in keys:
-            return data.get("effect_r")
+            r = data.get("effect_r")
+            return None if r is None else StatisticalExtractor.clamp_r(float(r))
         if (
             ("effect_t" in keys or "effect_df" in keys)
             and data.get("effect_t") is not None
@@ -242,8 +258,22 @@ class StatisticalExtractor:
         confidence: float
         computed_r: float | None = None
 
+        sample_n_for_df = raw.get("sample_n")
+        df_imputed = False
+        if (
+            effect_t is not None
+            and effect_df is None
+            and sample_n_for_df is not None
+            and int(sample_n_for_df) > 2
+        ):
+            # Documented protocol fallback: df = n - 2 when unreported.
+            effect_df = int(sample_n_for_df) - 2
+            df_imputed = True
+
+        beta_outside_pb_domain = False
+
         if effect_r is not None:
-            computed_r = effect_r
+            computed_r = self.clamp_r(effect_r)
             confidence = CONFIDENCE_DIRECT_R
         elif effect_t is not None and effect_df is not None:
             computed_r = self.compute_r_from_t(effect_t, effect_df)
@@ -251,11 +281,17 @@ class StatisticalExtractor:
         elif effect_beta is not None:
             computed_r = self.convert_beta_to_r(effect_beta)
             confidence = CONFIDENCE_FROM_BETA
+            # Peterson & Brown (2005) derived r = 0.98*beta for |beta| <= 0.5.
+            beta_outside_pb_domain = abs(effect_beta) > 0.5
         else:
             computed_r = None
             confidence = 0.0
 
-        requires_verification = confidence < CONFIDENCE_REVIEW_THRESHOLD
+        requires_verification = (
+            confidence < CONFIDENCE_REVIEW_THRESHOLD
+            or beta_outside_pb_domain
+            or df_imputed
+        )
 
         doi_measure: DoiMeasure | None = _safe_literal(
             raw.get("doi_measure"), ("FSTS", "GEO", "EXP", "FDI", "COMP", "OTH")
@@ -305,6 +341,8 @@ class StatisticalExtractor:
             dpl_phase=dpl_phase,
             extraction_confidence=confidence,
             requires_verification=requires_verification,
+            df_imputed=df_imputed,
+            beta_outside_pb_domain=beta_outside_pb_domain,
             pi_locked=False,
             extracted_at=datetime.utcnow(),
             locked_at=None,

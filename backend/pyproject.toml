@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "maida-backend"
-version = "7.1.1"
+version = "7.1.2"
 description = "M-AIDA backend - LLM-assisted effect-size extraction with PI verification and immutable data lock for international-business meta-analysis (dissertation P6)."
 requires-python = ">=3.11"
 license = { text = "LicenseRef-MAIDA-Academic" }

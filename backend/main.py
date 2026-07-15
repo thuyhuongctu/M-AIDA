@@ -124,6 +124,18 @@ def health_check() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+def _machine_proposal_snapshot(effect) -> dict:
+    """Freeze what the model proposed before any human touches the record."""
+    keep = (
+        "effect_r", "effect_t", "effect_beta", "effect_df", "sample_n",
+        "p_value", "ci_lower", "ci_upper", "doi_measure",
+        "performance_measure", "extraction_confidence", "df_imputed",
+        "beta_outside_pb_domain",
+    )
+    dump = effect.model_dump()
+    return {k: dump.get(k) for k in keep}
+
+
 @app.post("/api/extract", response_model=StudyDatabaseEntry, tags=["extraction"])
 def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
     """Accept a Base64-encoded PDF and return an extracted effect-size record.
@@ -161,6 +173,7 @@ def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     entry = StudyDatabaseEntry(**effect.model_dump())
+    entry.machine_proposal = _machine_proposal_snapshot(effect)
     _studies[entry.study_id] = entry
     return entry
 
@@ -326,7 +339,9 @@ def verify_study(study_id: str, decision: VerificationDecision) -> StudyDatabase
     overrides = decision.field_overrides
     data = entry.model_dump()
     for field, value in overrides.items():
-        if field in data:
+        if field == "machine_proposal":
+            logger.warning("machine_proposal is immutable; override ignored")
+        elif field in data:
             data[field] = value
         else:
             logger.warning("Ignoring unknown field override %r", field)

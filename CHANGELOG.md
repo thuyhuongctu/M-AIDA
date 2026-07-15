@@ -3,6 +3,22 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## 7.1.2 (chưa phát hành, chờ tác giả duyệt)
+
+Bản vá quản trị: đưa mã về đúng với giao thức đã mô tả trong tài liệu,
+không thay đổi kết quả của các bản ghi P6 đã khóa.
+
+- Chặn phòng vệ r trong [-1, 1] cho mọi tuyến chuyển đổi (t bị chặn sẵn
+  theo công thức; beta và ghi đè r trực tiếp nay được chặn tường minh).
+- Gắn cờ bắt buộc kiểm chứng khi |beta| > 0,5, ngoài miền dẫn xuất của
+  Peterson & Brown (2005).
+- Thực thi quy tắc df = n - 2 khi df không được báo cáo, kèm cờ
+  `df_imputed` minh bạch.
+- Lưu `machine_proposal`: ảnh chụp bất biến các giá trị máy đề xuất tại
+  thời điểm trích xuất, không thể ghi đè, tách bạch máy đề xuất với
+  con người quyết định ở cấp từng bản ghi.
+- 10 unit test mới, gồm test API xác nhận bản ghi đã khóa trả 409.
+
 ## [Unreleased]
 - Web: unified public web app (overview, method, positioning, forest plot,
   interactive study atlas, in-browser demo tool) served via GitHub Pages at
