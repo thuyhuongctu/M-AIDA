@@ -152,13 +152,40 @@
   .reveal{opacity:0;transform:translateY(14px);filter:blur(6px);transition:opacity .7s ease,transform .7s ease,filter .7s ease;}
   .reveal.in{opacity:1;transform:none;filter:none;}
   :root[data-motion="off"] .reveal{opacity:1;transform:none;filter:none;transition:none;}
+  /* header/footer parity with the academic demo: flag, music, world clocks, share */
+  :root{--ease-snap:cubic-bezier(0.23,1,0.32,1);}
+  .hdrflag{width:1.15rem;height:.77rem;border-radius:2px;vertical-align:middle;margin:0 .12rem;box-shadow:0 0 0 1px var(--line);}
+  .musicwrap{position:relative;display:inline-flex;}
+  .moodpop{position:absolute;top:calc(100% + 10px);right:0;z-index:90;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 44px -20px rgba(0,0,0,.4);padding:.7rem;display:flex;flex-direction:column;gap:.45rem;width:min(320px,calc(100vw - 2rem));}
+  .moodpop[hidden]{display:none;}
+  .moodpop .mq{font-family:var(--mono);font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;color:var(--brand);padding:0 .2rem .1rem;}
+  .moodpop button{display:flex;align-items:flex-start;gap:.5rem;text-align:left;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);cursor:pointer;padding:.55rem .65rem;font-size:.8rem;color:var(--ink);line-height:1.4;}
+  .moodpop button:hover{border-color:var(--brand-line);background:var(--brand-soft);}
+  .topstrip{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.45rem 0 .1rem;border-top:1px solid var(--line);margin-top:.55rem;}
+  .clockstrip{display:flex;gap:.55rem;overflow-x:auto;scrollbar-width:none;}
+  .clockstrip::-webkit-scrollbar{display:none;}
+  .ckcard{display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--line-2);border-radius:999px;padding:.28rem .8rem .28rem .5rem;background:var(--surface);flex:0 0 auto;}
+  .ckcard .ckt{display:flex;flex-direction:column;line-height:1.1;}
+  .ckcard .cty{font-family:var(--mono);font-size:.56rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
+  .ckcard .tm{font-family:var(--serif);font-weight:600;font-size:.94rem;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .ckcard .dt{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-left:.15rem;}
+  .ckcard svg.lmk{width:auto;height:24px;color:var(--brand);}
+  .sharebar{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;}
+  .sharebar .sh-k{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:.15rem;}
+  .shbtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;border:1px solid var(--line-2);color:var(--muted);background:var(--surface);cursor:pointer;padding:0;transition:transform .16s var(--ease-snap),border-color .18s ease,color .18s ease;}
+  .shbtn:hover{border-color:var(--brand-line);color:var(--brand);text-decoration:none;}
+  :root:not([data-motion="off"]) .shbtn:active{transform:scale(.94);}
+  .shbtn svg{width:15px;height:15px;fill:currentColor;}
+  .f-slogan{font-family:var(--serif);font-style:italic;color:var(--brand);font-size:.9rem;margin:.1rem 0 .35rem;}
+  .f-authors{font-family:var(--mono);font-size:.62rem;color:var(--faint);line-height:1.75;margin-top:.5rem;}
+  @media(max-width:640px){.topstrip{flex-direction:column;align-items:flex-start;}}
 </style>
 </head>
 <body>
 
 
 <header class="site"><div class="wrap"><div class="bar">
-  <a class="logo" href="#top"><span class="m">M-AIDA</span><span class="c">Cloud</span></a>
+  <a class="logo" href="#top"><span class="m">M-AIDA</span><svg class="hdrflag" viewBox="0 0 30 20" role="img" aria-label="Vietnam"><rect width="30" height="20" fill="#da251d"/><path fill="#ff0" d="M15 4.2l1.76 5.4h5.68l-4.6 3.34 1.76 5.4L15 14.99l-4.6 3.35 1.76-5.4-4.6-3.34h5.68z"/></svg><span class="c">Cloud</span></a>
   <nav class="top" aria-label="Sections">
     <a href="#proof" data-i18n data-en="Proof" data-vi="Bằng chứng">Proof</a>
     <a href="#why" data-i18n data-en="Why" data-vi="Vì sao">Why</a>
@@ -172,11 +199,12 @@
   </nav>
   <div class="ctrl">
     <span class="motionsw"><span class="ml">Motion</span><span><button id="mOn" aria-pressed="true">On</button><button id="mOff" aria-pressed="false">Off</button></span></span>
+    <span class="musicwrap"><button class="pill icon" id="musicBtn" aria-pressed="false" aria-label="Background music" title="Nhạc nền không lời / Background music">&#9834;</button><div class="moodpop" id="moodPop" hidden><div class="mq" data-i18n data-en="How are you feeling today?" data-vi="Hôm nay bạn thấy thế nào?">How are you feeling today?</div><button type="button" data-mood="happy">&#128522; <span data-i18n data-en="Happy: easy, upbeat instrumental" data-vi="Vui: nhạc không lời tươi vui, thoải mái">Happy: easy, upbeat instrumental</span></button><button type="button" data-mood="calm">&#128524; <span data-i18n data-en="Not so great: soothing instrumental" data-vi="Không vui: nhạc không lời xoa dịu tâm trạng">Not so great: soothing instrumental</span></button><button type="button" data-mood="owner">&#127931; <span data-i18n data-en="Nothing at all: then the owner picks, a chanson-style waltz" data-vi="Không gì cả: vậy nghe nhạc chủ trang chọn, điệu valse phong cách chanson Pháp">Nothing at all: then the owner picks, a chanson-style waltz</span></button></div></span>
     <button class="pill icon" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">◑</button>
     <span class="lang" role="group" aria-label="Language"><button id="enBtn" aria-pressed="true">EN</button><button id="viBtn" aria-pressed="false">VI</button></span>
     <a class="cta-mini" href="https://thuyhuongctu.github.io/M-AIDA/#tool" data-i18n data-en="Try the demo" data-vi="Dùng thử demo">Try the demo</a>
   </div>
-</div></div></header>
+</div><div class="wrap topstrip"><div class="clockstrip" id="clockStrip" aria-label="World clocks"></div><div class="sharebar"><span class="sh-k" data-i18n data-en="Share" data-vi="Chia sẻ">Share</span><a class="shbtn" target="_blank" rel="noopener" href="https://github.com/thuyhuongctu/M-AIDA" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24"><path d="M12 1.8a10.3 10.3 0 00-3.3 20c.6.1.8-.2.8-.5v-2c-2.9.6-3.5-1.2-3.5-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.6 0-.6 0-.6 1 0 1.6 1 1.6 1 .9 1.6 2.4 1.1 3 .9a2 2 0 01.7-1.4c-2.3-.2-4.7-1.1-4.7-5.1 0-1.1.4-2 1-2.8-.1-.2-.4-1.3.1-2.7 0 0 .9-.3 2.9 1a9.8 9.8 0 015.1 0c2-1.3 2.9-1 2.9-1 .5 1.4.2 2.5.1 2.7.7.8 1 1.7 1 2.8 0 4-2.4 4.9-4.7 5.1.4.3.7 1 .7 1.9v2.8c0 .3.2.6.8.5A10.3 10.3 0 0012 1.8z"/></svg></a><a class="shbtn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=M-AIDA%20Cloud&amp;url=https%3A%2F%2Fthuyhuongctu.github.io%2FM-AIDA%2Fcommercial.html" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.4l-5-6.5L6 22H2.9l7.3-8.4L1.6 2H8l4.5 6 5.4-6h1zm-1.1 18h1.7L7 3.9H5.2L17.8 20z"/></svg></a><a class="shbtn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fthuyhuongctu.github.io%2FM-AIDA%2Fcommercial.html" aria-label="Share on Facebook" title="Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 22v-8.1h2.7l.4-3.1h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4v2.4H7.6v3.1h2.8V22h3.1z"/></svg></a><a class="shbtn" target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fthuyhuongctu.github.io%2FM-AIDA%2Fcommercial.html" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M5 3.5a2.5 2.5 0 11-.02 5A2.5 2.5 0 015 3.5zM3 9h4v12H3zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.5c0-1.3 0-3-1.9-3s-2.2 1.4-2.2 2.9V21H9z"/></svg></a><a class="shbtn" href="mailto:?subject=M-AIDA%20Cloud&amp;body=https%3A%2F%2Fthuyhuongctu.github.io%2FM-AIDA%2Fcommercial.html" aria-label="Share by email" title="Email"><svg viewBox="0 0 24 24"><path d="M2 5h20a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V6a1 1 0 011-1zm10 7.2L3.4 7v11h17.2V7L12 12.2zM4.6 7h14.8L12 10.8 4.6 7z"/></svg></a></div></div></div></header>
 
 <section class="hero" id="top"><div class="wrap"><div class="hgrid">
   <div>
@@ -342,7 +370,9 @@
   </span>
   <div class="fmid">
     <div class="sig">Je m'appelle Huong</div>
+    <div class="f-slogan">La vie en rose</div>
     <p data-i18n data-en="M-AIDA · Meta-Analysis Intelligent Data Assistant. Do Thuy Huong and Phan Anh Tu, School of Economics, Can Tho University. Cite: DOI 10.5281/zenodo.21282516." data-vi="M-AIDA · Trợ lý Dữ liệu Thông minh cho Phân tích Tổng hợp. Đỗ Thùy Hương và Phan Anh Tú, Trường Kinh tế, Đại học Cần Thơ. Trích dẫn: DOI 10.5281/zenodo.21282516.">M-AIDA · Meta-Analysis Intelligent Data Assistant. Do Thuy Huong and Phan Anh Tu, School of Economics, Can Tho University. Cite: DOI 10.5281/zenodo.21282516.</p>
+      <div class="f-authors">Do Thuy Huong &middot; ORCID 0000-0002-7711-2487<br>Phan Anh Tu (Assoc. Prof. Dr.) &middot; ORCID 0000-0003-0667-3137<br><span data-i18n data-en="Concept DOI 10.5281/zenodo.21282516 &middot; Version DOI 10.5281/zenodo.21282517" data-vi="DOI khái niệm 10.5281/zenodo.21282516 &middot; DOI phiên bản 10.5281/zenodo.21282517">Concept DOI 10.5281/zenodo.21282516 &middot; Version DOI 10.5281/zenodo.21282517</span></div>
   </div>
   <div class="flinks">
     <a href="https://thuyhuongctu.github.io/M-AIDA/" data-i18n data-en="Academic app &amp; demo" data-vi="App học thuật &amp; demo">Academic app &amp; demo</a>
@@ -369,7 +399,9 @@
   function setLang(l){document.querySelectorAll('[data-i18n]').forEach(function(e){var v=e.getAttribute('data-'+l);if(v!=null)e.textContent=v;});en.setAttribute('aria-pressed',l==='en');vi.setAttribute('aria-pressed',l==='vi');root.setAttribute('lang',l);}
   en.addEventListener('click',function(){setLang('en');});
   vi.addEventListener('click',function(){setLang('vi');});
-  if((navigator.language||'').toLowerCase().indexOf('vi')===0)setLang('vi');
+  var qlang=new URLSearchParams(location.search).get('lang');
+  if(qlang==='en'||qlang==='vi'){setLang(qlang);}
+  else if((navigator.language||'').toLowerCase().indexOf('vi')===0){setLang('vi');}
   var els=[].slice.call(document.querySelectorAll('.reveal'));
   if('IntersectionObserver' in window){
     var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
@@ -514,5 +546,249 @@
     <text x="-64" y="20" font-family="ui-monospace,monospace" font-size="9" fill="currentColor">Can Tho · Do Thuy Huong &amp; Phan Anh Tu</text>
   </g>
 <g class="lh" transform="translate(302.1,228.0)"><path d="M-2.4 0 L-1.4 -7 H1.4 L2.4 0 Z" fill="none" stroke="currentColor" stroke-width="1"/><line x1="-2.6" y1="0" x2="2.6" y2="0" stroke="currentColor" stroke-width="1"/><rect x="-1.7" y="-9.2" width="3.4" height="2.2" rx="0.6" fill="none" stroke="currentColor" stroke-width="1"/><circle class="lh-light" cx="0" cy="-8.1" r="1.3" fill="#e8483f"/><circle class="lh-halo" cx="0" cy="-8.1" r="4.2" fill="none" stroke="#e8483f" stroke-width="1"/></g><g class="lh" transform="translate(344.8,435.0)"><path d="M-2.4 0 L-1.4 -7 H1.4 L2.4 0 Z" fill="none" stroke="currentColor" stroke-width="1"/><line x1="-2.6" y1="0" x2="2.6" y2="0" stroke="currentColor" stroke-width="1"/><rect x="-1.7" y="-9.2" width="3.4" height="2.2" rx="0.6" fill="none" stroke="currentColor" stroke-width="1"/><circle class="lh-light" cx="0" cy="-8.1" r="1.3" fill="#e8483f"/><circle class="lh-halo" cx="0" cy="-8.1" r="4.2" fill="none" stroke="#e8483f" stroke-width="1"/></g><g class="lh" transform="translate(71.2,419.4)"><path d="M-2.4 0 L-1.4 -7 H1.4 L2.4 0 Z" fill="none" stroke="currentColor" stroke-width="1"/><line x1="-2.6" y1="0" x2="2.6" y2="0" stroke="currentColor" stroke-width="1"/><rect x="-1.7" y="-9.2" width="3.4" height="2.2" rx="0.6" fill="none" stroke="currentColor" stroke-width="1"/><circle class="lh-light" cx="0" cy="-8.1" r="1.3" fill="#e8483f"/><circle class="lh-halo" cx="0" cy="-8.1" r="4.2" fill="none" stroke="#e8483f" stroke-width="1"/></g><g class="lh" transform="translate(145.3,465.6)"><path d="M-2.4 0 L-1.4 -7 H1.4 L2.4 0 Z" fill="none" stroke="currentColor" stroke-width="1"/><line x1="-2.6" y1="0" x2="2.6" y2="0" stroke="currentColor" stroke-width="1"/><rect x="-1.7" y="-9.2" width="3.4" height="2.2" rx="0.6" fill="none" stroke="currentColor" stroke-width="1"/><circle class="lh-light" cx="0" cy="-8.1" r="1.3" fill="#e8483f"/><circle class="lh-halo" cx="0" cy="-8.1" r="4.2" fill="none" stroke="#e8483f" stroke-width="1"/></g></svg></div>
+<script>
+/* Background music v3: three synthesized moods, zero embedded audio, starts
+   only on the user's click. The note button first asks how the visitor feels:
+   happy (bright lo-fi), not so great (slow soothing keys), or nothing at all,
+   in which case the site owner picks: an ORIGINAL chanson-style waltz in
+   A minor written for this page (an homage to the mood of her favourite
+   French songs, not a copy of any copyrighted melody). */
+(function(){
+  var btn=document.getElementById('musicBtn'); if(!btn) return;
+  var pop=document.getElementById('moodPop');
+  var ctx=null, master=null, verb=null, mel=null, melWet=null, keys=null, padBus=null, drums=null, vinyl=null;
+  var timer=null, cycle=0, playing=false, mood='calm';
+  var MOODS={
+    happy:{bpm:92,swing:0.10,beats:4,vinyl:0.10,melVol:0.062,
+      chords:[[48,52,55,59],[45,52,57,60],[41,48,53,57],[43,50,53,59]],
+      bass:[36,33,29,31],kick2:0.85,hats:'bright',
+      phrases:[
+        [[0,72,2],[2,76,2],[4,79,3],[8,77,2],[10,76,2],[12,72,3],[16,69,2],[18,72,2],[20,76,2],[22,77,2],[24,79,4],[28,76,2],[30,74,2]],
+        [[0,79,3],[4,81,2],[6,79,2],[8,76,3],[12,72,2],[14,76,2],[16,77,3],[20,74,2],[22,72,2],[24,71,3],[28,72,4]]
+      ]},
+    calm:{bpm:64,swing:0.14,beats:4,vinyl:0.16,melVol:0.05,
+      chords:[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]],
+      bass:[41,40,38,36],kick2:0.4,hats:'soft',
+      phrases:[
+        [[0,69,2],[2,72,2],[4,76,3],[7,74,4],[11,71,2],[14,67,2],[16,69,2],[18,65,2],[20,62,3],[24,64,2],[26,67,2],[28,72,3],[31,71,1]],
+        [[0,76,3],[3,74,3],[6,72,2],[8,71,3],[12,74,3],[16,69,3],[20,65,2],[22,67,2],[24,64,4],[28,62,2],[30,64,2]]
+      ]},
+    owner:{bpm:138,swing:0,beats:3,vinyl:0.13,melVol:0.07,waltz:true,
+      chords:[[45,52,57,60],[45,52,57,60],[50,53,57,62],[50,53,57,62],[40,47,52,56],[40,47,52,56],[45,52,57,60],[45,52,57,60]],
+      bass:[33,33,38,38,40,40,33,33],
+      phrases:[
+        [[0,69,4],[4,72,2],[6,76,4],[10,74,2],[12,74,4],[16,71,2],[18,71,4],[22,68,2],[24,69,6],[30,76,4],[34,74,2],[36,72,4],[40,71,2],[42,69,6]],
+        [[0,76,4],[4,77,2],[6,76,2],[8,74,2],[10,72,2],[12,74,6],[18,71,4],[24,72,4],[28,71,2],[30,69,4],[34,68,2],[36,64,6],[42,69,6]]
+      ]}
+  };
+  function hz(m){return 440*Math.pow(2,(m-69)/12);}
+  function noiseBuf(sec,fn){
+    var n=Math.floor(ctx.sampleRate*sec), b=ctx.createBuffer(2,n,ctx.sampleRate);
+    for(var c=0;c<2;c++){var d=b.getChannelData(c);for(var i=0;i<n;i++)d[i]=fn(i,n);}
+    return b;
+  }
+  function boot(){
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC();
+    master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
+    verb=ctx.createConvolver();
+    verb.buffer=noiseBuf(2.2,function(i,n){return (Math.random()*2-1)*Math.pow(1-i/n,2.8);});
+    var verbOut=ctx.createGain(); verbOut.gain.value=0.85; verb.connect(verbOut); verbOut.connect(master);
+    keys=ctx.createGain(); keys.gain.value=1; keys.connect(master);
+    mel=ctx.createGain(); mel.gain.value=1; mel.connect(master);
+    var send=ctx.createGain(); send.gain.value=0.30; mel.connect(send); send.connect(verb);
+    var ks=ctx.createGain(); ks.gain.value=0.16; keys.connect(ks); ks.connect(verb);
+    melWet=ctx.createDelay(2); melWet.delayTime.value=0.6;
+    var fb=ctx.createGain(); fb.gain.value=0.28;
+    var dw=ctx.createGain(); dw.gain.value=0.14;
+    mel.connect(melWet); melWet.connect(fb); fb.connect(melWet); melWet.connect(dw); dw.connect(master);
+    padBus=ctx.createGain(); padBus.gain.value=1;
+    var plp=ctx.createBiquadFilter(); plp.type='lowpass'; plp.frequency.value=950; plp.Q.value=0.4;
+    padBus.connect(plp); plp.connect(master);
+    var ps=ctx.createGain(); ps.gain.value=0.20; plp.connect(ps); ps.connect(verb);
+    drums=ctx.createGain(); drums.gain.value=1; drums.connect(master);
+    var vb=noiseBuf(3.0,function(){return (Math.random()*2-1)*0.008;});
+    for(var c=0;c<2;c++){var d=vb.getChannelData(c);
+      for(var k=0;k<46;k++){var p=Math.floor(Math.random()*d.length);var a=(Math.random()*0.5+0.3);
+        for(var j=0;j<40 && p+j<d.length;j++){d[p+j]+=a*Math.exp(-j/6)*(Math.random()*2-1);}}}
+    var src=ctx.createBufferSource(); src.buffer=vb; src.loop=true;
+    var vlp=ctx.createBiquadFilter(); vlp.type='lowpass'; vlp.frequency.value=6500;
+    vinyl=ctx.createGain(); vinyl.gain.value=0.15;
+    src.connect(vlp); vlp.connect(vinyl); vinyl.connect(master); src.start();
+    return true;
+  }
+  function ep(m,t0,dur,vel,bus){
+    var g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(vel,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+Math.max(dur,0.9)+0.45);
+    var trem=ctx.createOscillator(), tg=ctx.createGain();
+    trem.frequency.value=4.6; tg.gain.value=vel*0.16; trem.connect(tg); tg.connect(g.gain);
+    var o1=ctx.createOscillator(); o1.type='sine'; o1.frequency.value=hz(m);
+    var o2=ctx.createOscillator(); o2.type='sine'; o2.frequency.value=hz(m)*2.001;
+    var g2=ctx.createGain(); g2.gain.value=0.28;
+    var o3=ctx.createOscillator(); o3.type='triangle'; o3.frequency.value=hz(m); o3.detune.value=6;
+    var g3=ctx.createGain(); g3.gain.value=0.18;
+    o1.connect(g); o2.connect(g2); g2.connect(g); o3.connect(g3); g3.connect(g);
+    g.connect(bus);
+    var tEnd=t0+Math.max(dur,0.9)+0.6;
+    o1.start(t0); o2.start(t0); o3.start(t0); trem.start(t0);
+    o1.stop(tEnd); o2.stop(tEnd); o3.stop(tEnd); trem.stop(tEnd);
+  }
+  /* accordion-like voice for the waltz: detuned triangle + soft saw, vibrato, lowpass */
+  function acc(m,t0,dur,vel,bus){
+    var g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.linearRampToValueAtTime(vel,t0+0.045);
+    g.gain.setValueAtTime(vel*0.92,t0+Math.max(dur*0.7,0.08));
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur+0.3);
+    var lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2600; lp.Q.value=0.3;
+    g.connect(lp); lp.connect(bus);
+    var vib=ctx.createOscillator(), vg=ctx.createGain();
+    vib.frequency.value=5.5; vg.gain.value=3.5; vib.connect(vg);
+    [[-7,'triangle',0.75],[6,'sawtooth',0.30]].forEach(function(cfg){
+      var o=ctx.createOscillator(); o.type=cfg[1]; o.frequency.value=hz(m); o.detune.value=cfg[0];
+      vg.connect(o.detune);
+      var og=ctx.createGain(); og.gain.value=cfg[2];
+      o.connect(og); og.connect(g);
+      o.start(t0); o.stop(t0+dur+0.4);
+    });
+    vib.start(t0); vib.stop(t0+dur+0.4);
+  }
+  function bass(m,t0,dur){
+    var o=ctx.createOscillator(); o.type='sine'; o.frequency.value=hz(m);
+    var o2=ctx.createOscillator(); o2.type='triangle'; o2.frequency.value=hz(m);
+    var g=ctx.createGain(), g2=ctx.createGain(); g2.gain.value=0.25;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(0.085,t0+0.05);
+    g.gain.setValueAtTime(0.085,t0+dur*0.6);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    o.start(t0); o2.start(t0); o.stop(t0+dur+0.1); o2.stop(t0+dur+0.1);
+  }
+  function pad(midis,t0,dur){
+    midis.forEach(function(m){
+      [-6,6].forEach(function(det){
+        var o=ctx.createOscillator(); o.type='sawtooth'; o.frequency.value=hz(m); o.detune.value=det;
+        var g=ctx.createGain();
+        g.gain.setValueAtTime(0,t0);
+        g.gain.linearRampToValueAtTime(0.0085,t0+1.9);
+        g.gain.setValueAtTime(0.0085,t0+dur-2.0);
+        g.gain.linearRampToValueAtTime(0,t0+dur);
+        o.connect(g); g.connect(padBus); o.start(t0); o.stop(t0+dur+0.1);
+      });
+    });
+  }
+  function kick(t0){
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.frequency.setValueAtTime(115,t0);
+    o.frequency.exponentialRampToValueAtTime(46,t0+0.09);
+    g.gain.setValueAtTime(0.20,t0);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.22);
+    o.connect(g); g.connect(drums); o.start(t0); o.stop(t0+0.25);
+  }
+  var hatBuf=null;
+  function hat(t0,vel){
+    if(!hatBuf) hatBuf=noiseBuf(0.06,function(i,n){return (Math.random()*2-1)*Math.pow(1-i/n,2);});
+    var src=ctx.createBufferSource(); src.buffer=hatBuf;
+    var hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=6800;
+    var g=ctx.createGain(); g.gain.value=vel;
+    src.connect(hp); hp.connect(g); g.connect(drums); src.start(t0);
+  }
+  var nextCycleT=0;
+  function scheduleCycle(){
+    var M=MOODS[mood];
+    var BEAT=60/M.bpm, BAR=BEAT*M.beats, EIGHTH=BEAT/2, SWING=M.swing*EIGHTH;
+    var bars=M.chords.length;
+    var t0=(nextCycleT>ctx.currentTime+0.05)?nextCycleT:(ctx.currentTime+0.08);
+    for(var b=0;b<bars;b++){
+      var bt=t0+b*BAR;
+      pad(M.chords[b],bt,BAR+1.6);
+      if(M.waltz){
+        bass(M.bass[b],bt,BEAT*0.9);
+        [1,2].forEach(function(k){
+          M.chords[b].slice(1).forEach(function(m){acc(m,bt+BEAT*k,BEAT*0.55,0.018,keys);});
+        });
+      } else {
+        bass(M.bass[b],bt,BAR*0.96);
+        if(Math.random()<0.75){M.chords[b].slice(1).forEach(function(m){ep(m,bt+BEAT*1.5+Math.random()*0.02,BEAT,0.028,keys);});}
+        kick(bt); if(Math.random()<M.kick2) kick(bt+BEAT*2);
+        hat(bt+BEAT,0.014); hat(bt+BEAT*3,Math.random()<0.5?0.018:0.011);
+        if(M.hats==='bright'){hat(bt+BEAT*0.5,0.008);hat(bt+BEAT*2.5,0.009);}
+        if(Math.random()<0.35) hat(bt+BEAT*3.5,0.008);
+      }
+    }
+    var ph=M.phrases[cycle%M.phrases.length];
+    ph.forEach(function(n){
+      if(!M.waltz && Math.random()<0.06) return;
+      var t=t0+n[0]*EIGHTH+(n[0]%2?SWING:0)+(Math.random()*0.024-0.012);
+      var vel=M.melVol+Math.random()*0.015;
+      if(M.waltz) acc(n[1],t,n[2]*EIGHTH*0.92,vel,mel);
+      else ep(n[1],t,n[2]*EIGHTH*0.92,vel,mel);
+    });
+    cycle++;
+    nextCycleT=t0+BAR*bars;
+    timer=setTimeout(scheduleCycle,Math.max(250,(nextCycleT-ctx.currentTime-1.6)*1000));
+  }
+  window.__musicDuck=function(on){
+    if(!ctx||!master||!window.__musicPlaying) return;
+    var now=ctx.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value,now);
+    master.gain.linearRampToValueAtTime(on?0.12:1,now+0.5);
+  };
+  function hidePop(){ if(pop) pop.hidden=true; }
+  function start(m){
+    mood=m;
+    if(!ctx && !boot()) return;
+    if(ctx.resume) ctx.resume();
+    clearTimeout(timer); timer=null; cycle=0; nextCycleT=0;
+    var M=MOODS[m];
+    vinyl.gain.value=M.vinyl;
+    melWet.delayTime.value=(60/M.bpm/2)*3;
+    var now=ctx.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value,now);
+    master.gain.linearRampToValueAtTime(1,now+1.8);
+    playing=true; window.__musicPlaying=true; scheduleCycle();
+    btn.setAttribute('aria-pressed','true');
+  }
+  function stopMusic(){
+    if(!ctx) return;
+    var now=ctx.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value,now);
+    master.gain.linearRampToValueAtTime(0,now+0.9);
+    playing=false; window.__musicPlaying=false; clearTimeout(timer); timer=null;
+    btn.setAttribute('aria-pressed','false');
+  }
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(playing){ stopMusic(); hidePop(); return; }
+    if(pop) pop.hidden=!pop.hidden;
+  });
+  if(pop){
+    pop.addEventListener('click',function(e){e.stopPropagation();});
+    pop.querySelectorAll('button[data-mood]').forEach(function(b){
+      b.addEventListener('click',function(){ hidePop(); start(b.getAttribute('data-mood')); });
+    });
+    document.addEventListener('click',hidePop);
+  }
+})();
+</script>
+<script>
+(function(){
+  var root=document.documentElement;
+  var wc=document.getElementById("clockStrip"); if(!wc) return;
+  var MARKS={vn:'<svg class="lmk" viewBox="0 0 40 28" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M20 1.5v5.5"/><path d="M20 1.5h4.5v2.8H20" fill="currentColor" stroke="none"/><path d="M4 8h32"/><path d="M6 8v5.5M34 8v5.5"/><path d="M9 9.6v3.4M12 9.6v3.4M15 9.6v3.4M18 9.6v3.4M22 9.6v3.4M25 9.6v3.4M28 9.6v3.4M31 9.6v3.4"/><path d="M5.5 13.5h29"/><path d="M8 13.5v6M14 13.5v6M20 13.5v6M26 13.5v6M32 13.5v6"/><path d="M5 19.5h30"/><path d="M3 22.5h34"/><path d="M1.5 25.5h37"/></g></svg>',fr:'<svg class="lmk" viewBox="0 0 20 28" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M10 1.5v3"/><path d="M8.9 4.5C8.9 12 6.6 18.5 3 25.5"/><path d="M11.1 4.5C11.1 12 13.4 18.5 17 25.5"/><path d="M7.3 12.5h5.4"/><path d="M5.4 18.5h9.2"/><path d="M3 25.5c2.6-3.4 11.4-3.4 14 0"/></g></svg>'};
+  var SITES=[{mark:"vn",tz:"Asia/Ho_Chi_Minh",en:"Vietnam",vi:"Việt Nam"},{mark:"fr",tz:"Europe/Paris",en:"France",vi:"Pháp"}];
+  function isVI(){return root.getAttribute("lang")==="vi";}
+  function tzOffset(loc,tz,now){try{var p=new Intl.DateTimeFormat(loc,{timeZone:tz,timeZoneName:"shortOffset"}).formatToParts(now);for(var i=0;i<p.length;i++)if(p[i].type==="timeZoneName")return p[i].value;}catch(e){}return "";}
+  function render(){var vi=isVI();wc.innerHTML=SITES.map(function(z){return '<span class="ckcard" data-tz="'+z.tz+'">'+MARKS[z.mark]+'<span class="ckt"><span class="cty">'+(vi?z.vi:z.en)+'</span><span class="tm"></span></span><span class="dt"></span></span>';}).join("");tick();}
+  function tick(){var vi=isVI();var loc=vi?"vi-VN":"en-GB";var now=new Date();[].slice.call(wc.querySelectorAll(".ckcard")).forEach(function(c){var tz=c.getAttribute("data-tz");c.querySelector(".tm").textContent=new Intl.DateTimeFormat(loc,{hour:"2-digit",minute:"2-digit",hour12:false,timeZone:tz}).format(now);var off=tzOffset(loc,tz,now);c.querySelector(".dt").textContent=new Intl.DateTimeFormat(loc,{day:"2-digit",month:"2-digit",timeZone:tz}).format(now)+(off?" \u00b7 "+off:"");});}
+  render(); setInterval(tick,15000);
+  try{new MutationObserver(render).observe(root,{attributes:true,attributeFilter:["lang"]});}catch(e){}
+})();
+</script>
 </body>
 </html>
