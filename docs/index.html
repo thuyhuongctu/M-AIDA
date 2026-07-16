@@ -285,7 +285,7 @@
   .quote .who b { color:var(--ink); }
 
   /* access */
-  .access { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:2.2rem; }
+  .access { display:grid; grid-template-columns:repeat(auto-fit,minmax(216px,1fr)); gap:1rem; margin-top:2.2rem; }
   .access .card .k { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--brand); }
   .access .card .name { font-family:var(--serif); font-size:1.14rem; font-weight:600; margin:0.25rem 0 0.4rem; }
   .access .card ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.4rem; }
@@ -1599,6 +1599,7 @@ a{color:var(--brand);text-decoration:none;}
       <h2 data-i18n data-en="Open for reading, citation, and verification." data-vi="Công khai để đọc, trích dẫn và kiểm chứng.">Open for reading, citation, and verification.</h2>
       <div class="access">
         <div class="card"><div class="k" data-i18n data-en="Source" data-vi="Mã nguồn">Source</div><div class="name">GitHub</div><ul><li data-i18n data-en="Full source, published openly" data-vi="Toàn bộ mã nguồn, công bố công khai">Full source, published openly</li><li data-i18n data-en="FastAPI backend · React frontend" data-vi="Backend FastAPI · frontend React">FastAPI backend · React frontend</li><li data-i18n data-en="Academic Source-Available Licence" data-vi="Giấy phép Academic Source-Available">Academic Source-Available Licence</li></ul></div>
+        <div class="card"><div class="k" data-i18n data-en="Pre-registration" data-vi="Đăng ký trước">Pre-registration</div><div class="name">OSF</div><ul><li data-i18n data-en="Protocol registered before extraction (PRISMA 2020, Item 24a)" data-vi="Giao thức đăng ký trước khi trích xuất (PRISMA 2020, mục 24a)">Protocol registered before extraction (PRISMA 2020, Item 24a)</li><li><a href="https://osf.io/z37kn" target="_blank" rel="noopener">osf.io/z37kn</a> · DOI 10.17605/OSF.IO/Z37KN</li><li data-i18n data-en="Registered 18 May 2026 · public" data-vi="Đăng ký 18/05/2026 · công khai">Registered 18 May 2026 · public</li></ul></div>
         <div class="card"><div class="k" data-i18n data-en="Archive" data-vi="Lưu trữ">Archive</div><div class="name">Zenodo DOI</div><ul><li>10.5281/zenodo.21282516 <span style="color:var(--faint)" data-i18n data-en="(all versions)" data-vi="(mọi phiên bản)">(all versions)</span></li><li>10.5281/zenodo.21282517 <span style="color:var(--faint)">v7.1.1</span></li><li data-i18n data-en="Citable, versioned, permanent" data-vi="Trích dẫn được, có phiên bản, vĩnh viễn">Citable, versioned, permanent</li></ul></div>
         <div class="card"><div class="k" data-i18n data-en="Rights" data-vi="Quyền">Rights</div><div class="name" data-i18n data-en="Co-owned" data-vi="Đồng sở hữu">Co-owned</div><ul><li data-i18n data-en="Copyright registration in progress" data-vi="Đang đăng ký quyền tác giả">Copyright registration in progress</li><li data-i18n data-en="Can Tho University &amp; the two authors" data-vi="Đại học Cần Thơ &amp; hai tác giả">Can Tho University &amp; the two authors</li><li data-i18n data-en="Non-commercial academic use with citation" data-vi="Dùng học thuật phi thương mại kèm trích dẫn">Non-commercial academic use with citation</li></ul></div>
       </div>
