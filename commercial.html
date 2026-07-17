@@ -199,7 +199,7 @@
   </nav>
   <div class="ctrl">
     <span class="motionsw"><span class="ml">Motion</span><span><button id="mOn" aria-pressed="true">On</button><button id="mOff" aria-pressed="false">Off</button></span></span>
-    <span class="musicwrap"><button class="pill icon" id="musicBtn" aria-pressed="false" aria-label="Background music" title="Nhạc nền không lời / Background music">&#9834;</button><div class="moodpop" id="moodPop" hidden><div class="mq" data-i18n data-en="How are you feeling today?" data-vi="Hôm nay bạn thấy thế nào?">How are you feeling today?</div><button type="button" data-mood="happy">&#128522; <span data-i18n data-en="Happy: easy, upbeat instrumental" data-vi="Vui: nhạc không lời tươi vui, thoải mái">Happy: easy, upbeat instrumental</span></button><button type="button" data-mood="calm">&#128524; <span data-i18n data-en="Not so great: soothing instrumental" data-vi="Không vui: nhạc không lời xoa dịu tâm trạng">Not so great: soothing instrumental</span></button><button type="button" data-mood="owner">&#127931; <span data-i18n data-en="Nothing at all: then the owner picks, a chanson-style waltz" data-vi="Không gì cả: vậy nghe nhạc chủ trang chọn, điệu valse phong cách chanson Pháp">Nothing at all: then the owner picks, a chanson-style waltz</span></button></div></span>
+    <span class="musicwrap"><button class="pill icon" id="musicBtn" aria-pressed="false" aria-label="Background music" title="Nhạc nền không lời / Background music">&#9834;</button><div class="moodpop" id="moodPop" hidden><div class="mq" data-i18n data-en="How are you feeling today?" data-vi="Hôm nay bạn thấy thế nào?">How are you feeling today?</div><button type="button" data-mood="happy">&#128522; <span data-i18n data-en="Happy: easy, upbeat instrumental" data-vi="Vui: nhạc không lời tươi vui, thoải mái">Happy: easy, upbeat instrumental</span></button><button type="button" data-mood="calm">&#128524; <span data-i18n data-en="Not so great: soothing instrumental" data-vi="Không vui: nhạc không lời xoa dịu tâm trạng">Not so great: soothing instrumental</span></button><button type="button" data-mood="owner">&#127931; <span data-i18n data-en="Nothing? Then the author's own pick: the M-AIDA anthem «Que les preuves décident»" data-vi="Không gì cả? Vậy nghe bản của tác giả: ca khúc M-AIDA «Que les preuves décident»">Nothing at all: then the owner picks, a chanson-style waltz</span></button></div></span>
     <button class="pill icon" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">◑</button>
     <span class="lang" role="group" aria-label="Language"><button id="enBtn" aria-pressed="true">EN</button><button id="viBtn" aria-pressed="false">VI</button></span>
     <a class="cta-mini" href="https://thuyhuongctu.github.io/M-AIDA/#tool" data-i18n data-en="Try the demo" data-vi="Dùng thử demo">Try the demo</a>
@@ -739,6 +739,8 @@
   };
   function hidePop(){ if(pop) pop.hidden=true; }
   function start(m){
+    if(window.__songStop)window.__songStop();
+    if(m==='owner'){ mood=m; if(typeof ctx!=='undefined'&&ctx){var _n=ctx.currentTime;master.gain.cancelScheduledValues(_n);master.gain.setValueAtTime(master.gain.value,_n);master.gain.linearRampToValueAtTime(0,_n+0.3);} try{clearTimeout(timer);timer=null;}catch(e){} if(window.__songPlay)window.__songPlay(); playing=true; window.__musicPlaying=true; btn.setAttribute('aria-pressed','true'); return; }
     mood=m;
     if(!ctx && !boot()) return;
     if(ctx.resume) ctx.resume();
@@ -754,6 +756,7 @@
     btn.setAttribute('aria-pressed','true');
   }
   function stopMusic(){
+    if(window.__songStop)window.__songStop();
     if(!ctx) return;
     var now=ctx.currentTime;
     master.gain.cancelScheduledValues(now);
@@ -790,5 +793,5 @@
   try{new MutationObserver(render).observe(root,{attributes:true,attributeFilter:["lang"]});}catch(e){}
 })();
 </script>
-</body>
+<script>(function(){var a=null;window.__songPlay=function(){try{if(!a){a=new Audio('assets/maida_song.mp3');a.loop=true;a.preload='auto';}a.currentTime=0;var p=a.play();if(p&&p.catch)p.catch(function(){});}catch(e){}};window.__songStop=function(){try{if(a)a.pause();}catch(e){}};})();</script></body>
 </html>
