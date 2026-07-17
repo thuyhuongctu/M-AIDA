@@ -112,6 +112,25 @@ non-default backend URL.
 5. **Lock**: an approved record is permanently locked with a UTC timestamp and can no
    longer be edited. Only locked records enter the analysis export.
 
+## Live web pages (GitHub Pages)
+
+The repository is also served as a static site with three linked pages:
+
+- **Main page** ([index.html](https://thuyhuongctu.github.io/M-AIDA/)): overview,
+  positioning, the interactive atlas of 236 studies, the in-browser extraction
+  console, and the Huong AI tour guide. Bilingual EN/VI.
+- **Commercial page** ([commercial.html](https://thuyhuongctu.github.io/M-AIDA/commercial.html)):
+  productization and licensing overview.
+- **Data & Melody** ([data_melody.html](https://thuyhuongctu.github.io/M-AIDA/data_melody.html)):
+  the story of the software told as a guided walk with Huong AI, in Vietnamese,
+  English, and French.
+
+**Theme song.** The mood menu on the main and commercial pages ("Nothing" option)
+plays the M-AIDA anthem *"Je m'appelle Huong - M-AIDA, mon histoire"*
+(`assets/maida_song.mp3`, take 2). Lyrics were written by Do Thuy Huong
+(17 July 2026); the music and recording were generated with AI assistance, so
+authorship claims attach to the lyrics, not the audio.
+
 ## Citation
 
 If you use M-AIDA, please cite it (GitHub renders a "Cite this repository" button
