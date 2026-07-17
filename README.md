@@ -126,10 +126,21 @@ The repository is also served as a static site with three linked pages:
   English, and French.
 
 **Theme song.** The mood menu on the main and commercial pages ("Nothing" option)
-plays the M-AIDA anthem *"Je m'appelle Huong - M-AIDA, mon histoire"*
-(`assets/maida_song.mp3`, take 2). Lyrics were written by Do Thuy Huong
-(17 July 2026); the music and recording were generated with AI assistance, so
-authorship claims attach to the lyrics, not the audio.
+plays the M-AIDA song *"Que les preuves decident"* (`assets/maida_song.mp3`,
+take 3 of four takes, the most even mix). Lyrics were written by Do Thuy Huong
+(17 July 2026) in two sets ("Je m'appelle Huong - M-AIDA, mon histoire" and
+"Que les preuves decident"); the music and recordings were generated with AI
+assistance, so authorship claims attach to the lyrics, not the audio. A small
+now-playing card with the cover art appears while the song plays, and the Data
+& Melody page carries the full song cover: the author's ao dai portrait on a
+floral backdrop with animated falling petals and a Vietnam map watermark.
+
+**Design.** The main and commercial pages ship a premium editorial design
+(ivory default theme, charcoal-and-brass dark theme behind the toggle, glass
+cards, scroll-reveal animations, scroll progress bar). All character artwork
+uses the realistic 3D Huong character in high resolution; cross-page links
+carry the selected language (`?lang=`), and Data & Melody opens in French by
+default with VI / EN / FR toggles.
 
 ## Citation
 
