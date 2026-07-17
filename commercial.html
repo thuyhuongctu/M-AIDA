@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -181,7 +181,7 @@
   @media(max-width:640px){.topstrip{flex-direction:column;align-items:flex-start;}}
 
   /* ===== Premium dark reskin (17/07/2026) ===== */
-  :root, :root[data-theme="dark"] {
+  :root[data-theme="dark"] {
     --paper:#131110; --surface:#1c1916; --surface-2:#232019;
     --ink:#f1ebe1; --muted:#a89e8e; --faint:#8b8172;
     --line:#2f2a23; --line-2:#3b352c;
@@ -189,7 +189,7 @@
     --amber:#c9a24b; --amber-strong:#e3c06a; --amber-soft:#2b2312; --warn:#d0a53f;
     --header-bg:rgba(19,17,16,0.70); --shadow:0,0,0;
   }
-  :root[data-theme="light"] {
+  :root, :root[data-theme="light"] {
     --paper:#f6f1e7; --surface:#fffdf6; --surface-2:#faf5ea;
     --ink:#1c1914; --muted:#5c554a; --faint:#6e6656;
     --line:#e6dfcd; --line-2:#d9d0ba;
@@ -831,7 +831,7 @@
 <script>
 (function(){
   var root=document.documentElement;
-  root.setAttribute('data-theme','dark');
+  if(!root.getAttribute('data-theme'))root.setAttribute('data-theme','light');
   var bar=document.createElement('div');bar.id='pageProg';document.body.appendChild(bar);
   function up(){var h=document.documentElement;var m=h.scrollHeight-h.clientHeight;bar.style.width=(m>0?((h.scrollTop||document.body.scrollTop)/m*100):0)+'%';}
   window.addEventListener('scroll',up,{passive:true});up();
