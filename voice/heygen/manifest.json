@@ -1,0 +1,200 @@
+{
+  "$schema_note": "Manifest for regenerating every M-AIDA audio asset with the HeyGen API. Each entry lists the spoken script, the language, and every output path (root site + docs/ GitHub Pages mirror). Run voice/heygen/generate.py to synthesize.",
+  "version": "1.0.0",
+  "defaults": {
+    "format": "mp3",
+    "sample_rate_hz": 44100,
+    "loudnorm": "I=-16:TP=-1.5:LRA=11",
+    "speed": 1.0
+  },
+  "voices": {
+    "en": {
+      "voice_id": null,
+      "auto_pick_language": "English",
+      "note": "Set voice_id to the author's cloned HeyGen voice (created from Do Thuy Huong's own recording, with her consent) to keep the 'Huong AI' persona. If null, generate.py picks the first English voice returned by GET /v2/voices."
+    },
+    "vi": {
+      "voice_id": null,
+      "auto_pick_language": "Vietnamese",
+      "note": "Set voice_id to the author's cloned Vietnamese HeyGen voice. If null, generate.py picks the first Vietnamese voice returned by GET /v2/voices."
+    }
+  },
+  "assets": [
+    {
+      "id": "tour_en_stop1",
+      "group": "tour",
+      "lang": "en",
+      "outputs": ["voice/stop1.mp3", "docs/voice/stop1.mp3"],
+      "text": "Bonjour à tous! Je m'appelle Hương. Hello, my name is Hương. Welcome to M-AIDA, the software I built for my dissertation. It prepared two hundred and thirty six studies for one meta-analysis, and this page shows exactly how."
+    },
+    {
+      "id": "tour_en_stop2",
+      "group": "tour",
+      "lang": "en",
+      "outputs": ["voice/stop2.mp3", "docs/voice/stop2.mp3"],
+      "text": "The workflow has three gates. A language model proposes each statistic with a confidence score, I verify every field myself, and approved records are locked so nobody can quietly change them."
+    },
+    {
+      "id": "tour_en_stop3",
+      "group": "tour",
+      "lang": "en",
+      "outputs": ["voice/stop3.mp3", "docs/voice/stop3.mp3"],
+      "text": "M-AIDA does not replace screening tools like Rayyan, and it does not run the statistics. It covers the narrow stage in between: converting and governing effect sizes."
+    },
+    {
+      "id": "tour_en_stop4",
+      "group": "tour",
+      "lang": "en",
+      "outputs": ["voice/stop4.mp3", "docs/voice/stop4.mp3"],
+      "text": "Here is what comes out. Each square is one study's effect size, and the diamond is the pooled estimate: r equals zero point zero seven four."
+    },
+    {
+      "id": "tour_en_stop5",
+      "group": "tour",
+      "lang": "en",
+      "outputs": ["voice/stop5.mp3", "docs/voice/stop5.mp3"],
+      "text": "The atlas maps thirty five economies, plus forty two cross-border studies that are counted but not placed. Colour shows each country's mean effect."
+    },
+    {
+      "id": "tour_en_stop6",
+      "group": "tour",
+      "lang": "en",
+      "outputs": ["voice/stop6.mp3", "docs/voice/stop6.mp3"],
+      "text": "And this is the demo you can try yourself. It runs offline in your browser: convert, verify, lock, export. Reading real PDFs needs the backend server, so this part is an honest simulation of that step. Thank you for visiting."
+    },
+    {
+      "id": "tour_vi_stop1",
+      "group": "tour",
+      "lang": "vi",
+      "outputs": ["voice/vi/stop1.mp3", "docs/voice/vi/stop1.mp3"],
+      "text": "Xin chào, tôi tên là Hương. Chào mừng bạn đến với M-AIDA, phần mềm tôi xây dựng cho luận án tiến sĩ của mình. Nó đã chuẩn bị 236 nghiên cứu cho một phân tích tổng hợp, và trang này cho thấy chính xác cách làm."
+    },
+    {
+      "id": "tour_vi_stop2",
+      "group": "tour",
+      "lang": "vi",
+      "outputs": ["voice/vi/stop2.mp3", "docs/voice/vi/stop2.mp3"],
+      "text": "Quy trình có ba cổng. Một mô hình ngôn ngữ đề xuất từng chỉ số kèm điểm tin cậy, tôi tự tay kiểm chứng mọi trường dữ liệu, và các bản ghi được duyệt sẽ bị khóa để không ai có thể lặng lẽ thay đổi."
+    },
+    {
+      "id": "tour_vi_stop3",
+      "group": "tour",
+      "lang": "vi",
+      "outputs": ["voice/vi/stop3.mp3", "docs/voice/vi/stop3.mp3"],
+      "text": "M-AIDA không thay thế các công cụ sàng lọc như Rayyan, và không chạy phần thống kê. Nó chỉ đảm nhận khâu hẹp ở giữa: chuyển đổi và quản trị mức độ ảnh hưởng."
+    },
+    {
+      "id": "tour_vi_stop4",
+      "group": "tour",
+      "lang": "vi",
+      "outputs": ["voice/vi/stop4.mp3", "docs/voice/vi/stop4.mp3"],
+      "text": "Đây là kết quả đầu ra. Mỗi ô vuông là mức độ ảnh hưởng của một nghiên cứu, và hình thoi là ước lượng gộp: r bằng 0,074."
+    },
+    {
+      "id": "tour_vi_stop5",
+      "group": "tour",
+      "lang": "vi",
+      "outputs": ["voice/vi/stop5.mp3", "docs/voice/vi/stop5.mp3"],
+      "text": "Bản đồ atlas thể hiện 35 nền kinh tế, cộng thêm 42 nghiên cứu xuyên biên giới được đếm nhưng không gắn vào một quốc gia cụ thể. Màu sắc thể hiện mức độ ảnh hưởng trung bình của từng nước."
+    },
+    {
+      "id": "tour_vi_stop6",
+      "group": "tour",
+      "lang": "vi",
+      "outputs": ["voice/vi/stop6.mp3", "docs/voice/vi/stop6.mp3"],
+      "text": "Và đây là bản demo bạn có thể tự trải nghiệm. Nó chạy ngay trong trình duyệt của bạn: chuyển đổi, kiểm chứng, khóa, xuất dữ liệu. Việc đọc tệp PDF thật cần máy chủ phía sau, nên phần này là một mô phỏng trung thực của bước đó. Cảm ơn bạn đã ghé thăm."
+    },
+    {
+      "id": "atlas_en_china",
+      "group": "atlas",
+      "lang": "en",
+      "outputs": ["voice/atlas/china.mp3", "docs/voice/atlas/china.mp3"],
+      "text": "China: 30 studies since 2000, mean effect r equals zero point zero nine three. Our team has a dedicated study of this economy, plus the pooled fifty-economy study."
+    },
+    {
+      "id": "atlas_en_india",
+      "group": "atlas",
+      "lang": "en",
+      "outputs": ["voice/atlas/india.mp3", "docs/voice/atlas/india.mp3"],
+      "text": "India: 21 studies since 2007, mean effect r equals zero point zero five nine. Our team also covers this economy in the pooled fifty-economy Asia-Pacific study."
+    },
+    {
+      "id": "atlas_en_vietnam",
+      "group": "atlas",
+      "lang": "en",
+      "outputs": ["voice/atlas/vietnam.mp3", "docs/voice/atlas/vietnam.mp3"],
+      "text": "Vietnam: 8 studies since 2015, mean effect r equals minus zero point zero zero seven. Our team has a dedicated study of this economy, plus the pooled fifty-economy study."
+    },
+    {
+      "id": "atlas_en_poland",
+      "group": "atlas",
+      "lang": "en",
+      "outputs": ["voice/atlas/poland.mp3", "docs/voice/atlas/poland.mp3"],
+      "text": "Poland: 6 studies since 2010, mean effect r equals zero point zero two four. Our team has a dedicated study of this economy, plus the pooled fifty-economy study."
+    },
+    {
+      "id": "atlas_en_turkey",
+      "group": "atlas",
+      "lang": "en",
+      "outputs": ["voice/atlas/turkey.mp3", "docs/voice/atlas/turkey.mp3"],
+      "text": "Turkey: 3 studies since 2012, mean effect r equals zero point zero nine five. Our team has a dedicated study of this economy, plus the pooled fifty-economy study."
+    },
+    {
+      "id": "atlas_en_generic",
+      "group": "atlas",
+      "lang": "en",
+      "outputs": ["voice/atlas/generic.mp3", "docs/voice/atlas/generic.mp3"],
+      "text": "This economy contributes its own studies to the atlas. The card shows how many studies, the first year of evidence, and the mean effect size pooled across them."
+    },
+    {
+      "id": "atlas_vi_china",
+      "group": "atlas",
+      "lang": "vi",
+      "outputs": ["voice/atlas/vi_china.mp3", "docs/voice/atlas/vi_china.mp3"],
+      "text": "Trung Quốc: 30 nghiên cứu từ năm 2000, hệ số trung bình r bằng 0,093. Nhóm tác giả có nghiên cứu riêng về nền kinh tế này, cùng nghiên cứu gộp 50 nền kinh tế."
+    },
+    {
+      "id": "atlas_vi_india",
+      "group": "atlas",
+      "lang": "vi",
+      "outputs": ["voice/atlas/vi_india.mp3", "docs/voice/atlas/vi_india.mp3"],
+      "text": "Ấn Độ: 21 nghiên cứu từ năm 2007, hệ số trung bình r bằng 0,059. Nhóm tác giả cũng nghiên cứu nền kinh tế này trong nghiên cứu gộp 50 nền kinh tế châu Á - Thái Bình Dương."
+    },
+    {
+      "id": "atlas_vi_vietnam",
+      "group": "atlas",
+      "lang": "vi",
+      "outputs": ["voice/atlas/vi_vietnam.mp3", "docs/voice/atlas/vi_vietnam.mp3"],
+      "text": "Việt Nam: 8 nghiên cứu từ năm 2015, hệ số trung bình r bằng âm 0,007. Nhóm tác giả có nghiên cứu riêng về nền kinh tế này, cùng nghiên cứu gộp 50 nền kinh tế."
+    },
+    {
+      "id": "atlas_vi_poland",
+      "group": "atlas",
+      "lang": "vi",
+      "outputs": ["voice/atlas/vi_poland.mp3", "docs/voice/atlas/vi_poland.mp3"],
+      "text": "Ba Lan: 6 nghiên cứu từ năm 2010, hệ số trung bình r bằng 0,024. Nhóm tác giả có nghiên cứu riêng về nền kinh tế này, cùng nghiên cứu gộp 50 nền kinh tế."
+    },
+    {
+      "id": "atlas_vi_turkey",
+      "group": "atlas",
+      "lang": "vi",
+      "outputs": ["voice/atlas/vi_turkey.mp3", "docs/voice/atlas/vi_turkey.mp3"],
+      "text": "Thổ Nhĩ Kỳ: 3 nghiên cứu từ năm 2012, hệ số trung bình r bằng 0,095. Nhóm tác giả có nghiên cứu riêng về nền kinh tế này, cùng nghiên cứu gộp 50 nền kinh tế."
+    },
+    {
+      "id": "atlas_vi_generic",
+      "group": "atlas",
+      "lang": "vi",
+      "outputs": ["voice/atlas/vi_generic.mp3", "docs/voice/atlas/vi_generic.mp3"],
+      "text": "Nền kinh tế này đóng góp các nghiên cứu riêng vào bản đồ atlas. Thẻ thông tin cho biết số nghiên cứu, năm có bằng chứng đầu tiên, và hệ số ảnh hưởng trung bình được gộp."
+    },
+    {
+      "id": "maida_song_vocal",
+      "group": "song",
+      "lang": "vi",
+      "outputs": ["assets/heygen/maida_song_vocal.mp3"],
+      "text_file": "voice/heygen/song_lyrics.txt",
+      "note": "«Que les preuves décident» — lyrics by Do Thuy Huong (17 July 2026), all rights reserved, therefore NOT stored in this manifest. Put the lyrics into voice/heygen/song_lyrics.txt (gitignored) before running. HeyGen synthesizes speech, not singing: this produces a narrated/spoken-word vocal track. The musical arrangement in assets/maida_song.mp3 stays produced with a music-generation tool; generate.py never overwrites it unless --overwrite-song is passed."
+    }
+  ]
+}
