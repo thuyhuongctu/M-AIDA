@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dữ liệu & Giai điệu | M-AIDA</title>
+<meta name="description" content="Dữ liệu & Giai điệu — bản concept nghệ thuật của M-AIDA: âm thanh hoá dữ liệu với giọng AI được uỷ quyền của tác giả, theo triết lý Human in the Loop."/>
+<style>
+  :root{
+    --navy:#0A192F; --navy-2:#0d2137; --gold:#D4AF37; --teal:#2D728F;
+    --teal-2:#3b8fb0; --green:#2E7D32; --bg:#f8f9fa; --paper:#ffffff;
+    --ink:#191c1d; --muted:#44474d; --line:#c5c6cd;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --head:"Segoe UI",Roboto,-apple-system,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  h1,h2,h3,h4{font-family:var(--head);font-weight:800;letter-spacing:-.01em;line-height:1.15}
+
+  /* header */
+  header{background:var(--navy);border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:50}
+  .nav{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+  .brand{font-weight:800;font-size:22px;color:var(--gold);letter-spacing:.02em}
+  .nav-links{display:flex;gap:28px;align-items:center}
+  .nav-links a{color:#fff;opacity:.82;font-size:15px;transition:.2s}
+  .nav-links a:hover{opacity:1;color:var(--teal-2)}
+  .nav-links a.back{opacity:.7;border:1px solid rgba(255,255,255,.2);padding:6px 12px;border-radius:8px;font-size:13px}
+  @media(max-width:720px){.nav-links a:not(.back){display:none}}
+
+  /* hero */
+  .hero{position:relative;min-height:66vh;display:flex;align-items:center;overflow:hidden;color:#fff}
+  .hero-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#0A192F 0%,#0c2036 100%)}
+  .hero-bg svg{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+  .hero-inner{position:relative;z-index:2;padding:64px 0}
+  .eyebrow{color:var(--teal-2);text-transform:uppercase;letter-spacing:.22em;font-size:13px;font-weight:600;margin-bottom:14px}
+  .hero h1{font-size:clamp(38px,7vw,58px);margin-bottom:16px}
+  .hero p.lead{font-size:19px;max-width:34rem;color:#c9d4e4;margin-bottom:28px}
+  .demo-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,.16);border:1px solid var(--gold);color:var(--gold);
+    font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:999px;margin-bottom:22px}
+  .demo-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+  .btns{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{border:0;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:15px;padding:13px 26px;border-radius:8px;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+  .btn.primary{background:var(--teal);color:#fff}
+  .btn.primary:hover{background:var(--teal-2)}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff}
+  .btn.ghost:hover{background:rgba(255,255,255,.1)}
+
+  /* main grid */
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:40px;padding:72px 0}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;gap:44px}}
+  .col-main{display:flex;flex-direction:column;gap:44px}
+  h2.sec{font-size:30px;color:var(--navy);margin-bottom:14px}
+  .prose p{color:var(--muted);margin-bottom:14px}
+  .prose strong{color:var(--navy)}
+
+  /* spectral panel */
+  .panel{background:var(--navy);border-radius:14px;padding:30px;color:#fff;position:relative;overflow:hidden}
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+  .panel-head h3{font-size:22px}
+  .panel-head .sid{color:var(--teal-2);font-size:13px;font-weight:600;margin-top:2px}
+  .panel .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:5px 11px}
+  .bars{height:190px;display:flex;align-items:flex-end;gap:5px}
+  .barc{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;position:relative;cursor:pointer}
+  .bar{width:100%;border-radius:3px 3px 0 0;transform-origin:bottom;animation:pulse 1.8s ease-in-out infinite;transition:filter .25s,transform .25s}
+  .bar.teal{background:var(--teal-2)}
+  .bar.gold{background:var(--gold)}
+  .bar.dim{background:rgba(255,255,255,.18)}
+  .barc:hover .bar{filter:brightness(1.35) drop-shadow(0 0 8px rgba(59,143,176,.6));transform:scaleY(1.08)}
+  .barc .tip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%) translateY(-6px);background:var(--gold);color:var(--navy);
+    font-size:10px;font-weight:700;padding:3px 7px;border-radius:3px;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s}
+  .barc:hover .tip{opacity:1;transform:translateX(-50%) translateY(-10px)}
+  @keyframes pulse{0%,100%{transform:scaleY(1)}25%{transform:scaleY(.7)}50%{transform:scaleY(1.28)}75%{transform:scaleY(.45)}}
+  .panel-foot{margin-top:26px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    font-size:12px;color:rgba(255,255,255,.42);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .panel-note{margin-top:14px;font-size:12px;color:rgba(255,255,255,.55)}
+  .panel-note b{color:var(--gold)}
+
+  /* cards */
+  .card{background:var(--paper);border:1px solid var(--line);padding:26px;border-radius:4px}
+  .card.gold{border-left:4px solid var(--gold)}
+  .card h3{font-size:19px;color:var(--navy)}
+  .chip{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:var(--green);border-radius:4px;padding:2px 8px}
+  .row{display:flex;gap:14px;align-items:flex-start;margin-top:16px}
+  .row .ic{width:22px;height:22px;flex:0 0 22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;margin-top:2px}
+  .row .ic.g{background:var(--green)} .row .ic.d{background:var(--gold);color:var(--navy)}
+  .row .lab{font-size:14px;font-weight:600;color:var(--navy)}
+  .row .val{font-size:12.5px;color:var(--muted)}
+  .team{background:#f3f4f5;border:1px solid var(--line);border-radius:10px;padding:26px;margin-top:24px}
+  .team .who{display:flex;gap:16px;align-items:center}
+  .team img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--teal);background:#e7ebef}
+  .team h4{font-size:19px;color:var(--navy)}
+  .team .role{color:var(--teal);font-weight:600;font-size:13px}
+  .team .quote{margin-top:16px;font-style:italic;color:var(--muted)}
+
+  /* specs */
+  .specs{background:var(--paper);border-top:1px solid var(--line);padding:72px 0}
+  .specs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  @media(max-width:820px){.specs-grid{grid-template-columns:1fr}}
+  .spec{border:1px solid var(--line);padding:30px;border-radius:4px;transition:.2s}
+  .spec:hover{border-color:var(--teal)}
+  .spec .em{font-size:30px;margin-bottom:12px}
+  .spec h4{font-size:18px;margin-bottom:8px;color:var(--navy)}
+  .spec p{color:var(--muted);font-size:15px}
+
+  /* footer */
+  footer{background:var(--navy);border-top:1px solid rgba(255,255,255,.1);padding:44px 0;margin-top:0}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .foot .brand{font-size:20px}
+  .foot .links{display:flex;gap:22px;flex-wrap:wrap}
+  .foot a{color:rgba(255,255,255,.6);font-size:14px}
+  .foot a:hover{color:#fff;text-decoration:underline}
+  .foot .cr{color:rgba(255,255,255,.55);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <div class="brand">M-AIDA</div>
+    <nav class="nav-links">
+      <a href="#overview">Tổng quan</a>
+      <a href="#spectral">Phổ âm</a>
+      <a href="#provenance">Nguồn gốc</a>
+      <a class="back" href="index.html">← Trang chính</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <svg viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+        <g fill="none" stroke-width="2">
+          <path stroke="#2D728F" opacity=".55" d="M0,320 C150,260 300,380 450,320 C600,260 750,380 900,320 C1050,260 1200,380 1200,320"/>
+          <path stroke="#2D728F" opacity=".35" d="M0,360 C150,300 300,420 450,360 C600,300 750,420 900,360 C1050,300 1200,420 1200,360"/>
+          <path stroke="#D4AF37" opacity=".45" d="M0,290 C200,340 400,240 600,300 C800,360 1000,250 1200,300"/>
+          <path stroke="#ffffff" opacity=".12" d="M0,400 C150,360 300,460 450,400 C600,340 750,460 900,400 C1050,340 1200,460 1200,400"/>
+        </g>
+        <g fill="#2D728F" opacity=".5">
+          <circle cx="450" cy="320" r="4"/><circle cx="900" cy="320" r="4"/><circle cx="600" cy="300" r="3.5"/>
+        </g>
+        <g fill="#D4AF37" opacity=".7"><circle cx="600" cy="300" r="4.5"/></g>
+      </svg>
+    </div>
+    <div class="wrap hero-inner">
+      <div class="demo-badge"><span class="dot"></span>Concept nghệ thuật · dữ liệu minh hoạ</div>
+      <div class="eyebrow">Dự án nghiên cứu nghệ thuật</div>
+      <h1>Dữ liệu &amp; Giai điệu</h1>
+      <p class="lead">Khám phá sự giao thoa giữa thuật toán và cảm xúc — nơi các cấu trúc dữ liệu được chuyển thành âm thanh, với giọng AI được uỷ quyền của tác giả.</p>
+      <div class="btns">
+        <button class="btn primary" id="startBtn">▶ Nghe thử phổ âm</button>
+        <a class="btn ghost" href="index.html">Về M-AIDA chính</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRID -->
+  <section class="wrap grid">
+    <div class="col-main">
+      <article id="overview">
+        <h2 class="sec">Tổng quan dự án</h2>
+        <div class="prose">
+          <p><strong>Dữ liệu &amp; Giai điệu</strong> là một thử nghiệm nghệ thuật của hệ sinh thái M-AIDA: hình dung các cấu trúc dữ liệu dưới dạng âm thanh ambient. Đây là một <strong>bản concept</strong> — phần trực quan phổ âm và các con số kỹ thuật trên trang này mang tính minh hoạ, không phải luồng dữ liệu trực tiếp.</p>
+          <p>Điểm cốt lõi là nguyên tắc <strong>giọng nói được uỷ quyền</strong>: mọi mẫu giọng của tác giả chỉ được dùng khi có sự đồng ý rõ ràng của chính tác giả. Điều này thể hiện triết lý <strong>Human in the Loop</strong> (con người trong vòng lặp) mà M-AIDA theo đuổi — máy đề xuất, con người quyết định.</p>
+        </div>
+      </article>
+
+      <!-- SPECTRAL PANEL -->
+      <div class="panel" id="spectral">
+        <div class="panel-head">
+          <div>
+            <h3>Phổ âm tương tác</h3>
+            <div class="sid">Bấm vào từng cột để nghe một nốt (tổng hợp trong trình duyệt)</div>
+          </div>
+          <span class="tag">Minh hoạ</span>
+        </div>
+        <div class="bars" id="bars"></div>
+        <div class="panel-foot">
+          <span>Web Audio API · tổng hợp sine</span>
+          <span>Hiệu ứng: minh hoạ nhịp điệu</span>
+          <span>Không thu thập dữ liệu người dùng</span>
+        </div>
+        <p class="panel-note"><b>Ghi chú trung thực:</b> các cột phổ và giá trị cường độ ở đây là hiệu ứng thị giác minh hoạ; âm thanh khi bấm là nốt sine tổng hợp trực tiếp trong trình duyệt (có thật), không phải phân tích một luồng dữ liệu thực.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card gold" id="provenance">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <h3>Nguồn gốc &amp; minh bạch</h3>
+          <span class="chip">Nguyên tắc</span>
+        </div>
+        <p style="color:var(--muted);font-size:14px;margin-top:12px">Trang này là concept nghệ thuật. Các cam kết dưới đây là <b>nguyên tắc</b> M-AIDA áp dụng khi làm việc với giọng nói và dữ liệu thật.</p>
+        <div class="row"><span class="ic g">✓</span><div><div class="lab">Giọng nói có uỷ quyền</div><div class="val">Chỉ dùng mẫu giọng của tác giả khi được chính tác giả đồng ý.</div></div></div>
+        <div class="row"><span class="ic g">✓</span><div><div class="lab">Số liệu kiểm chứng được</div><div class="val">Ở các trang dữ liệu thật của M-AIDA, mọi con số đều truy vết về nguồn gốc.</div></div></div>
+        <div class="row"><span class="ic d">i</span><div><div class="lab">Trang này = bản demo</div><div class="val">Phổ âm và thông số hiển thị chỉ mang tính minh hoạ nghệ thuật.</div></div></div>
+      </div>
+
+      <div class="team">
+        <div class="who">
+          <img src="data:image/webp;base64,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" alt="Avatar AI của tác giả Hương"/>
+          <div>
+            <h4>Hương</h4>
+            <div class="role">Tác giả &amp; chủ nhiệm</div>
+          </div>
+        </div>
+        <p class="quote">"Âm thanh không chỉ là sóng cơ học — nó là tập hợp các quyết định mang linh hồn của con người."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECS -->
+  <section class="specs">
+    <div class="wrap">
+      <div class="specs-grid">
+        <div class="spec"><div class="em">🧠</div><h4>Tổng hợp tính toán</h4><p>Ý tưởng: dùng mô hình để gợi ý cấu trúc âm thanh từ các mẫu dữ liệu — như một phép ẩn dụ về "nghe thấy" dữ liệu.</p></div>
+        <div class="spec"><div class="em">🎛️</div><h4>Ánh xạ ambient</h4><p>Ánh xạ tần số vào màu sắc và chuyển động để tạo trải nghiệm đa giác quan nhất quán.</p></div>
+        <div class="spec"><div class="em">🔒</div><h4>Giọng được bảo vệ</h4><p>Nguyên tắc bảo mật: mẫu giọng của tác giả luôn được kiểm soát và chỉ dùng khi được uỷ quyền.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="brand">M-AIDA</div>
+    <div class="links">
+      <a href="index.html">Trang chính</a>
+      <a href="index.html#source">Nguồn &amp; trích dẫn</a>
+      <a href="commercial.html">Bản thương mại</a>
+    </div>
+    <div class="cr">© 2026 M-AIDA Ecosystem · Bản concept nghệ thuật</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // build spectral bars
+  var spec=[["teal",40],["teal",70],["dim",30],["teal",90],["gold",50],["teal",80],["teal",60],
+            ["dim",40],["teal",75],["teal",45],["teal",85],["gold",35],["teal",65],["teal",55]];
+  var bars=document.getElementById('bars');
+  spec.forEach(function(s,i){
+    var c=document.createElement('div');c.className='barc';
+    var b=document.createElement('div');b.className='bar '+s[0];
+    b.style.height=s[1]+'%';b.style.animationDelay=(0.1+i*0.13).toFixed(2)+'s';
+    var t=document.createElement('div');t.className='tip';t.textContent='Cường độ (minh hoạ): '+s[1]+'%';
+    c.appendChild(b);c.appendChild(t);bars.appendChild(c);
+  });
+  // web audio: real synthesized tone on click (honest)
+  var actx=null;
+  function tone(freq){
+    try{
+      actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+      if(actx.state==='suspended')actx.resume();
+      var o=actx.createOscillator(),g=actx.createGain();
+      o.type='sine';o.frequency.setValueAtTime(freq,actx.currentTime);
+      g.gain.setValueAtTime(0.11,actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+0.4);
+      o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+0.4);
+    }catch(e){}
+  }
+  Array.prototype.forEach.call(bars.children,function(c,i){
+    c.addEventListener('click',function(){ tone(220*Math.pow(2,i/12)); });
+  });
+  document.getElementById('startBtn').addEventListener('click',function(){
+    var seq=[0,4,7,12,7,4]; seq.forEach(function(n,k){ setTimeout(function(){tone(220*Math.pow(2,n/12));},k*220); });
+    document.getElementById('spectral').scrollIntoView({behavior:'smooth'});
+  });
+})();
+</script>
+</body>
+</html>
