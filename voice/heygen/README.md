@@ -26,12 +26,23 @@ nguyên văn từ mảng `TOUR` cùng hàm `noteText` trong `index.html`, nên g
 
 ## Chuẩn bị / Setup
 
-1. Tạo API key trong HeyGen dashboard (Settings → API), rồi:
+Script hỗ trợ hai "engine":
+
+- **`cli` (khuyến nghị)** — HeyGen CLI v3 chính thức, sinh audio TTS trực tiếp
+  bằng `heygen voice speech create`. Đây là đường đi được gói skill chính thức
+  của HeyGen ([github.com/heygen-com/skills](https://github.com/heygen-com/skills))
+  khuyến nghị; các endpoint REST v1/v2 đã bị HeyGen đánh dấu deprecated.
+- **`api` (dự phòng)** — REST v2 cũ: render video avatar tối giản rồi tách
+  tiếng. Chỉ dùng khi không cài được CLI.
+
+1. Cài CLI và cấu hình key:
 
    ```bash
+   curl -fsSL https://static.heygen.ai/cli/install.sh | bash
    export HEYGEN_API_KEY=...   # tuyệt đối không ghi key vào tệp / never commit the key
-   pip install requests
-   # cần ffmpeg trên PATH để tách audio từ video HeyGen
+   # hoặc đăng nhập OAuth: heygen auth login
+   # cần ffmpeg trên PATH để chuẩn hóa âm lượng và xuất MP3
+   # (engine api cần thêm: pip install requests)
    ```
 
 2. **Giọng "Hương AI"**: để giữ đúng persona của trang (giọng nhân bản từ
@@ -60,11 +71,24 @@ python voice/heygen/generate.py --group atlas
 
 # Chỉ một vài tệp
 python voice/heygen/generate.py --only tour_en_stop1,atlas_vi_vietnam
+
+# Ép chọn engine (mặc định auto: có CLI thì dùng CLI)
+python voice/heygen/generate.py --engine cli
+python voice/heygen/generate.py --engine api   # REST v2 cũ, deprecated
 ```
 
-HeyGen API công khai sinh **video** avatar chứ không sinh audio thuần, nên
-script render một video tối giản cho từng câu rồi dùng ffmpeg tách tiếng,
-chuẩn hóa âm lượng (EBU R128, I=-16 LUFS) và xuất MP3 44,1 kHz.
+Với engine `cli`, mỗi câu được tổng hợp trực tiếp thành audio; với engine
+`api`, script render một video tối giản rồi tách tiếng. Cả hai trường hợp
+audio đều được chuẩn hóa âm lượng (EBU R128, I=-16 LUFS) và xuất MP3
+44,1 kHz bằng ffmpeg.
+
+Nếu dùng Claude Code, có thể cài thêm bộ skill chính thức của HeyGen
+(`heygen-avatar`, `heygen-video`, `heygen-translate`) để tạo avatar
+"Hương AI", clone giọng và làm video thuyết trình:
+
+```bash
+git clone --single-branch --depth 1 https://github.com/heygen-com/skills.git ~/.claude/skills/heygen-skills
+```
 
 ## Về bài hát / About the song
 

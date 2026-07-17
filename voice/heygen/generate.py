@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate every M-AIDA audio asset with the HeyGen API.
+"""Regenerate every M-AIDA audio asset with HeyGen.
 
 The site ships three families of audio, all listed in manifest.json:
 
@@ -10,9 +10,24 @@ The site ships three families of audio, all listed in manifest.json:
 Every file is also mirrored into docs/ for GitHub Pages; the manifest lists
 both output paths so one run keeps the mirrors in sync.
 
-HeyGen's public API produces avatar videos, not bare audio, so each script is
-rendered as a minimal video (any avatar works) and the sound track is then
-extracted and loudness-normalized with ffmpeg into the final mp3.
+Two engines are supported:
+
+  cli (preferred)  The official HeyGen CLI v3 text-to-speech:
+                     heygen voice speech create --text ... --voice-id ...
+                   Direct audio output, no video render needed. Install:
+                     curl -fsSL https://static.heygen.ai/cli/install.sh | bash
+                   Auth: HEYGEN_API_KEY env var, or `heygen auth login`.
+                   This is the path recommended by HeyGen's official skills
+                   package (github.com/heygen-com/skills), which deprecates
+                   the v1/v2 REST endpoints.
+
+  api (fallback)   Legacy REST v2: renders a minimal avatar video per line
+                   via POST /v2/video/generate and extracts the sound track.
+                   Deprecated by HeyGen; kept only for accounts where the
+                   CLI is unavailable. Requires HEYGEN_API_KEY and ffmpeg.
+
+Either way the raw audio is loudness-normalized (EBU R128) and resampled
+with ffmpeg into the final 44.1 kHz mp3.
 
 Usage:
   export HEYGEN_API_KEY=...        # never hardcode or commit the key
@@ -22,7 +37,8 @@ Usage:
   python voice/heygen/generate.py --group tour --lang vi
   python voice/heygen/generate.py --only tour_en_stop1,atlas_vi_vietnam
 
-Requires: python3, requests, ffmpeg on PATH.
+Requires: python3, ffmpeg on PATH; the HeyGen CLI (engine cli) or the
+requests package (engine api).
 """
 
 import argparse
@@ -37,12 +53,14 @@ import urllib.request
 
 try:
     import requests
-except ImportError:  # keep the tool usable for --dry-run without requests
+except ImportError:  # only the legacy api engine needs requests
     requests = None
 
 API_BASE = 'https://api.heygen.com'
 POLL_INTERVAL_SECONDS = 8
 POLL_TIMEOUT_SECONDS = 15 * 60
+CLI_TIMEOUT_SECONDS = 10 * 60
+LOCALES = {'en': 'en-US', 'vi': 'vi-VN'}
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'manifest.json')
 
@@ -51,6 +69,114 @@ def fail(message):
     print(f'error: {message}', file=sys.stderr)
     sys.exit(1)
 
+
+def load_manifest():
+    with open(MANIFEST_PATH, encoding='utf-8') as handle:
+        return json.load(handle)
+
+
+def pick_engine(requested):
+    if requested != 'auto':
+        return requested
+    if shutil.which('heygen'):
+        return 'cli'
+    print('note: HeyGen CLI not found, falling back to the deprecated REST v2 '
+          'engine. Prefer the CLI: '
+          'curl -fsSL https://static.heygen.ai/cli/install.sh | bash')
+    return 'api'
+
+
+# ---------------------------------------------------------------- cli engine
+
+def run_cli(argv):
+    result = subprocess.run(['heygen'] + argv, capture_output=True, text=True,
+                            timeout=CLI_TIMEOUT_SECONDS)
+    if result.returncode != 0:
+        fail(f"heygen {' '.join(argv[:3])} failed: "
+             f'{result.stderr.strip() or result.stdout.strip()}')
+    return result.stdout
+
+
+def cli_json(argv):
+    stdout = run_cli(argv)
+    try:
+        return json.loads(stdout)
+    except json.JSONDecodeError:
+        fail(f"could not parse JSON from `heygen {' '.join(argv[:3])}`; "
+             f'run it with --help to check the arguments. Output was: '
+             f'{stdout[:400]}')
+
+
+def find_audio_ref(payload):
+    """Locate a local file path or audio URL anywhere in a CLI response."""
+    stack = [payload]
+    url = None
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if isinstance(value, str):
+                    if key in ('path', 'file', 'output_path') and \
+                            os.path.exists(value):
+                        return ('path', value)
+                    if value.startswith('http') and (
+                            'audio' in key or value.endswith(
+                                ('.mp3', '.wav', '.m4a', '.aac'))):
+                        url = url or value
+                else:
+                    stack.append(value)
+        elif isinstance(node, list):
+            stack.extend(node)
+    return ('url', url) if url else (None, None)
+
+
+def cli_list_voices():
+    for lang in ('en', 'vi'):
+        payload = cli_json(['voice', 'list', '--language', lang,
+                            '--limit', '50'])
+        voices = payload.get('data', payload)
+        if isinstance(voices, dict):
+            voices = voices.get('voices') or voices.get('items') or []
+        for voice in voices:
+            print(f"{voice.get('voice_id')}  {lang}  "
+                  f"{voice.get('gender', '?'):<8} {voice.get('name')}")
+
+
+def cli_pick_voice_id(manifest, lang, overrides):
+    if overrides.get(lang):
+        return overrides[lang]
+    configured = manifest['voices'][lang].get('voice_id')
+    if configured:
+        return configured
+    payload = cli_json(['voice', 'list', '--language', lang, '--limit', '5'])
+    voices = payload.get('data', payload)
+    if isinstance(voices, dict):
+        voices = voices.get('voices') or voices.get('items') or []
+    if not voices:
+        fail(f'no HeyGen voice found for language "{lang}"; pass --voice-{lang}')
+    voice = voices[0]
+    print(f"note: auto-picked {lang} voice {voice['voice_id']} "
+          f"({voice.get('name')}); set voices.{lang}.voice_id in "
+          f'manifest.json to pin the Huong AI cloned voice.')
+    return voice['voice_id']
+
+
+def cli_synthesize(text, voice_id, lang, workdir):
+    payload = cli_json(['voice', 'speech', 'create', '--text', text,
+                        '--voice-id', voice_id, '--input-type', 'text',
+                        '--language', lang, '--locale', LOCALES[lang]])
+    kind, ref = find_audio_ref(payload)
+    if kind == 'path':
+        return ref
+    if kind == 'url':
+        raw_path = os.path.join(workdir, 'speech-download')
+        urllib.request.urlretrieve(ref, raw_path)
+        return raw_path
+    fail(f'no audio path or URL in `heygen voice speech create` response: '
+         f'{json.dumps(payload)[:400]}')
+
+
+# ------------------------------------------------- legacy api engine (v2)
 
 def api_key():
     key = os.environ.get('HEYGEN_API_KEY')
@@ -78,12 +204,7 @@ def api_post(path, body):
     return response.json()
 
 
-def load_manifest():
-    with open(MANIFEST_PATH, encoding='utf-8') as handle:
-        return json.load(handle)
-
-
-def list_voices():
+def api_list_voices():
     voices = api_get('/v2/voices').get('data', {}).get('voices', [])
     for voice in voices:
         print(f"{voice.get('voice_id')}  {voice.get('language'):<14} "
@@ -91,7 +212,7 @@ def list_voices():
     print(f'{len(voices)} voices')
 
 
-def pick_voice_id(manifest, lang, overrides):
+def api_pick_voice_id(manifest, lang, overrides):
     if overrides.get(lang):
         return overrides[lang]
     configured = manifest['voices'][lang].get('voice_id')
@@ -101,14 +222,14 @@ def pick_voice_id(manifest, lang, overrides):
     voices = api_get('/v2/voices').get('data', {}).get('voices', [])
     for voice in voices:
         if wanted in (voice.get('language') or '').lower():
-            print(f"note: auto-picked {lang} voice "
-                  f"{voice['voice_id']} ({voice.get('name')}); set voices.{lang}."
-                  f"voice_id in manifest.json to pin the Huong AI cloned voice.")
+            print(f"note: auto-picked {lang} voice {voice['voice_id']} "
+                  f"({voice.get('name')}); set voices.{lang}.voice_id in "
+                  f'manifest.json to pin the Huong AI cloned voice.')
             return voice['voice_id']
     fail(f'no HeyGen voice found for language "{wanted}"; pass --voice-{lang}')
 
 
-def pick_avatar_id(explicit):
+def api_pick_avatar_id(explicit):
     if explicit:
         return explicit
     avatars = api_get('/v2/avatars').get('data', {}).get('avatars', [])
@@ -117,7 +238,7 @@ def pick_avatar_id(explicit):
     return avatars[0]['avatar_id']
 
 
-def submit_video(text, voice_id, avatar_id, speed):
+def api_synthesize(text, voice_id, avatar_id, speed, workdir):
     body = {
         'video_inputs': [{
             'character': {'type': 'avatar', 'avatar_id': avatar_id,
@@ -131,26 +252,26 @@ def submit_video(text, voice_id, avatar_id, speed):
     video_id = data.get('video_id')
     if not video_id:
         fail(f'HeyGen did not return a video_id: {data}')
-    return video_id
-
-
-def wait_for_video(video_id):
     deadline = time.time() + POLL_TIMEOUT_SECONDS
     while time.time() < deadline:
         data = api_get('/v1/video_status.get',
                        params={'video_id': video_id}).get('data') or {}
         status = data.get('status')
         if status == 'completed':
-            return data['video_url']
+            video_path = os.path.join(workdir, 'render.mp4')
+            urllib.request.urlretrieve(data['video_url'], video_path)
+            return video_path
         if status == 'failed':
             fail(f'HeyGen render failed for {video_id}: {data.get("error")}')
         time.sleep(POLL_INTERVAL_SECONDS)
     fail(f'timed out waiting for HeyGen video {video_id}')
 
 
-def extract_mp3(video_path, mp3_path, sample_rate, loudnorm):
+# ------------------------------------------------------------------ shared
+
+def to_mp3(raw_path, mp3_path, sample_rate, loudnorm):
     subprocess.run(
-        ['ffmpeg', '-y', '-loglevel', 'error', '-i', video_path, '-vn',
+        ['ffmpeg', '-y', '-loglevel', 'error', '-i', raw_path, '-vn',
          '-af', f'loudnorm={loudnorm}', '-ar', str(sample_rate),
          '-codec:a', 'libmp3lame', '-q:a', '2', mp3_path],
         check=True)
@@ -169,7 +290,7 @@ def asset_text(asset):
     return text or None
 
 
-def generate_asset(asset, manifest, voice_id, avatar_id, args):
+def generate_asset(asset, manifest, engine, voice_id, avatar_id, args):
     text = asset_text(asset)
     if text is None:
         return False
@@ -184,15 +305,16 @@ def generate_asset(asset, manifest, voice_id, avatar_id, args):
         return True
 
     defaults = manifest['defaults']
-    print(f"generating {asset['id']} [{asset['lang']}] ...")
-    video_id = submit_video(text, voice_id, avatar_id, defaults['speed'])
-    video_url = wait_for_video(video_id)
+    print(f"generating {asset['id']} [{asset['lang']}] via {engine} ...")
     with tempfile.TemporaryDirectory() as workdir:
-        video_path = os.path.join(workdir, 'render.mp4')
-        urllib.request.urlretrieve(video_url, video_path)
+        if engine == 'cli':
+            raw_path = cli_synthesize(text, voice_id, asset['lang'], workdir)
+        else:
+            raw_path = api_synthesize(text, voice_id, avatar_id,
+                                      defaults['speed'], workdir)
         mp3_path = os.path.join(workdir, 'audio.mp3')
-        extract_mp3(video_path, mp3_path,
-                    defaults['sample_rate_hz'], defaults['loudnorm'])
+        to_mp3(raw_path, mp3_path,
+               defaults['sample_rate_hz'], defaults['loudnorm'])
         for output in outputs:
             os.makedirs(os.path.dirname(output), exist_ok=True)
             shutil.copyfile(mp3_path, output)
@@ -202,7 +324,12 @@ def generate_asset(asset, manifest, voice_id, avatar_id, args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Generate all M-AIDA audio via the HeyGen API.')
+        description='Generate all M-AIDA audio via HeyGen.')
+    parser.add_argument('--engine', choices=['auto', 'cli', 'api'],
+                        default='auto',
+                        help='cli = official HeyGen CLI v3 TTS (preferred); '
+                             'api = deprecated REST v2 video render; '
+                             'auto picks cli when installed (default)')
     parser.add_argument('--list-voices', action='store_true',
                         help='list HeyGen voices and exit')
     parser.add_argument('--group', choices=['tour', 'atlas', 'song'],
@@ -213,8 +340,8 @@ def main():
     parser.add_argument('--voice-en', help='override English voice_id')
     parser.add_argument('--voice-vi', help='override Vietnamese voice_id')
     parser.add_argument('--avatar-id',
-                        help='HeyGen avatar used for rendering (audio is '
-                             'extracted, so any avatar works)')
+                        help='api engine only: avatar used for the video '
+                             'render the audio is extracted from')
     parser.add_argument('--overwrite-song', action='store_true',
                         help='allow the song entry to overwrite '
                              'assets/maida_song.mp3 if listed as an output')
@@ -223,11 +350,17 @@ def main():
     args = parser.parse_args()
 
     manifest = load_manifest()
+    engine = pick_engine(args.engine)
+
+    if engine == 'api' and not args.dry_run and requests is None:
+        fail('the requests package is required for the api engine: '
+             'pip install requests')
+    if engine == 'cli' and not args.dry_run and shutil.which('heygen') is None:
+        fail('the heygen CLI is not on PATH: '
+             'curl -fsSL https://static.heygen.ai/cli/install.sh | bash')
 
     if args.list_voices:
-        if requests is None:
-            fail('the requests package is required: pip install requests')
-        list_voices()
+        cli_list_voices() if engine == 'cli' else api_list_voices()
         return
 
     assets = manifest['assets']
@@ -244,23 +377,22 @@ def main():
     if not assets:
         fail('no assets matched the given filters')
 
-    if not args.dry_run:
-        if requests is None:
-            fail('the requests package is required: pip install requests')
-        if shutil.which('ffmpeg') is None:
-            fail('ffmpeg is required on PATH to extract mp3 audio')
+    if not args.dry_run and shutil.which('ffmpeg') is None:
+        fail('ffmpeg is required on PATH to produce normalized mp3 audio')
 
     overrides = {'en': args.voice_en, 'vi': args.voice_vi}
     voice_ids, avatar_id = {}, None
     if not args.dry_run:
+        pick = cli_pick_voice_id if engine == 'cli' else api_pick_voice_id
         for lang in sorted({a['lang'] for a in assets}):
-            voice_ids[lang] = pick_voice_id(manifest, lang, overrides)
-        avatar_id = pick_avatar_id(args.avatar_id)
+            voice_ids[lang] = pick(manifest, lang, overrides)
+        if engine == 'api':
+            avatar_id = api_pick_avatar_id(args.avatar_id)
 
     done = sum(
         1 for asset in assets
-        if generate_asset(asset, manifest, voice_ids.get(asset['lang']),
-                          avatar_id, args))
+        if generate_asset(asset, manifest, engine,
+                          voice_ids.get(asset['lang']), avatar_id, args))
     print(f'{done}/{len(assets)} assets processed')
 
 
