@@ -2816,7 +2816,18 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     timer=setTimeout(next, Math.max(3500, line.length*75));
   }
   function readTime(line){ return Math.max(3500, line.length*75); }
-  function speakLine(i,line,next){ timer=setTimeout(next, readTime(line)); }
+  function speakLine(i,line,next){
+    if(muted){ timer=setTimeout(next, readTime(line)); return; }
+    var fell=false, guard=null;
+    function fallback(){ if(fell||!active) return; fell=true; clearTimeout(guard); curAudio=null; timer=setTimeout(next, readTime(line)); }
+    var a=new Audio('voice/'+(isVIL()?'vi/':'')+'stop'+(i+1)+'.mp3');
+    curAudio=a; a.preload='auto';
+    a.onended=function(){ if(!fell&&active){ fell=true; clearTimeout(guard); next(); } };
+    a.onerror=fallback;
+    a.oncanplaythrough=function(){ clearTimeout(guard); a.play().then(function(){ guard=setTimeout(fallback,(a.duration||30)*1000+4000); }).catch(fallback); };
+    guard=setTimeout(fallback, 9000);
+    try{ a.load(); }catch(e){ fallback(); }
+  }
   function step(){
     if(!active) return;
     idx++;
