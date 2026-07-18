@@ -48,7 +48,7 @@
       "url": "/M-AIDA/data_melody.html",
       "icons": [
         {
-          "src": "icons/icon-192.png",
+          "src": "icons/icon-melody-192.png",
           "sizes": "192x192"
         }
       ]
@@ -58,7 +58,7 @@
       "url": "/M-AIDA/commercial.html",
       "icons": [
         {
-          "src": "icons/icon-192.png",
+          "src": "icons/icon-cloud-192.png",
           "sizes": "192x192"
         }
       ]
