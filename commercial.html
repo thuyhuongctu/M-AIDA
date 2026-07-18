@@ -232,7 +232,7 @@
 
   .brand-lockup{display:block;width:min(430px,92%);margin:0 auto .5rem;}
 </style>
-</head>
+<style id="bgfix-2607">body{background:transparent !important;}html{background:var(--paper);}</style></head>
 <body>
 
 
@@ -455,7 +455,7 @@
   en.addEventListener('click',function(){setLang('en');});
   vi.addEventListener('click',function(){setLang('vi');});
   var qlang=new URLSearchParams(location.search).get('lang');
-  var initLang=(qlang==='en'||qlang==='vi')?qlang:(((navigator.language||'').toLowerCase().indexOf('vi')===0)?'vi':null);
+  var initLang=(qlang==='en'||qlang==='vi')?qlang:null;
   if(initLang){if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){setLang(initLang);});}else{setLang(initLang);}}
   var els=[].slice.call(document.querySelectorAll('.reveal'));
   if('IntersectionObserver' in window){
@@ -500,18 +500,18 @@
 (function(){
   var STOPS_ALL={
     en:[
-    ['top',"Hello, my name is Huong. This page presents M-AIDA Cloud, the hosted edition of the software I built for my dissertation. Let me show you around."],
-    ['proof',"Proof first: one real dissertation used M-AIDA end to end. 236 studies became 286 verified, locked, auditable effect-size records."],
-    ['features',"The machine proposes each statistic with a confidence tier; I verify every field; approved records are locked immutably. The human always decides."],
-    ['pricing',"The source-available edition stays free for academic, non-commercial use. Cloud plans are what fund the roadmap."],
-    ['team',"M-AIDA is built at Can Tho University by Do Thuy Huong with Assoc. Prof. Dr. Phan Anh Tu. Merci beaucoup for visiting, and la vie en rose!"]
+    ['top',"Hello, my name is Huong. This page presents M-AIDA Cloud, the hosted edition of the research software I built for my dissertation at Can Tho University. The source-available core already prepared a real doctoral meta-analysis; Cloud adds hosted convenience for teams. Let me show you the evidence first."],
+    ['proof',"Proof, not promises: one real dissertation used M-AIDA end to end. Two hundred thirty six studies from nineteen seventy eight to twenty twenty six became two hundred eighty six verified, locked, auditable effect-size records covering thirty five economies - every number traceable to its source page."],
+    ['features',"The pipeline is extract, convert, gate, verify, lock. The model proposes each statistic with a three-tier confidence score; anything below zero point seven is flagged for mandatory review. Conversions use published formulas only - Cohen for t to r, Peterson and Brown for beta. A human verifies every field, and approved records are locked immutably. The human always has the final say."],
+    ['pricing',"The source-available edition stays free for academic, non-commercial use, forever. Cloud plans - Pro, Team, Enterprise - fund the roadmap: hosted projects, collaboration with agreement statistics, imports from Zotero and Rayyan, and export straight to R metafor."],
+    ['team',"M-AIDA is built at Can Tho University by Do Thuy Huong, lecturer and researcher, with Associate Professor Doctor Phan Anh Tu. Write to us, try the demo, and if you are curious, listen to the project's own album on the songs page. Merci beaucoup for visiting, and la vie en rose!"]
     ],
     vi:[
-    ['top',"Xin chào, tôi là Hương. Trang này giới thiệu M-AIDA Cloud, phiên bản vận hành trên đám mây của phần mềm tôi xây dựng cho luận án của mình. Để tôi dẫn bạn tham quan nhé."],
-    ['proof',"Bằng chứng trước tiên: một luận án tiến sĩ thật đã dùng M-AIDA từ đầu đến cuối. 236 nghiên cứu trở thành 286 bản ghi mức độ ảnh hưởng đã kiểm chứng, đã khóa và kiểm toán được."],
-    ['features',"Máy đề xuất từng số liệu kèm bậc tin cậy; tôi kiểm chứng từng trường dữ liệu; bản ghi được duyệt sẽ khóa bất biến. Con người luôn là người quyết định."],
-    ['pricing',"Bản source-available luôn miễn phí cho học thuật, phi thương mại. Các gói Cloud là nguồn nuôi lộ trình phát triển."],
-    ['team',"M-AIDA được xây dựng tại Trường Đại học Cần Thơ bởi Đỗ Thùy Hương cùng PGS.TS. Phan Anh Tú. Merci beaucoup vì đã ghé thăm, la vie en rose!"]
+    ['top',"Xin chào, tôi là Hương. Trang này giới thiệu M-AIDA Cloud, phiên bản vận hành trên đám mây của phần mềm nghiên cứu tôi xây dựng cho luận án tiến sĩ tại Trường Đại học Cần Thơ. Lõi source-available đã phục vụ một phân tích tổng hợp tiến sĩ thật; Cloud bổ sung tiện ích lưu trữ cho nhóm nghiên cứu. Để tôi cho bạn xem bằng chứng trước."],
+    ['proof',"Bằng chứng, không phải lời hứa: một luận án thật đã dùng M-AIDA từ đầu đến cuối. 236 nghiên cứu giai đoạn 1978-2026 trở thành 286 bản ghi mức độ ảnh hưởng đã kiểm chứng, đã khóa, kiểm toán được, phủ 35 nền kinh tế - mọi con số truy ngược được về trang nguồn."],
+    ['features',"Quy trình gồm trích xuất, quy đổi, chặn cửa, kiểm chứng, khóa. Mô hình đề xuất từng số liệu kèm điểm tin cậy ba bậc; dưới 0,7 bị gắn cờ buộc rà soát. Quy đổi chỉ dùng công thức đã công bố - Cohen cho t sang r, Peterson và Brown cho beta. Con người kiểm từng trường dữ liệu, bản ghi được duyệt sẽ khóa bất biến. Con người luôn là người quyết định cuối cùng."],
+    ['pricing',"Bản source-available luôn miễn phí cho học thuật, phi thương mại. Các gói Cloud - Pro, Team, Enterprise - nuôi lộ trình phát triển: dự án lưu trữ đám mây, cộng tác kèm thống kê đồng thuận, nhập từ Zotero và Rayyan, xuất thẳng sang metafor của R."],
+    ['team',"M-AIDA được xây dựng tại Trường Đại học Cần Thơ bởi Đỗ Thùy Hương, giảng viên - nhà nghiên cứu, cùng PGS.TS. Phan Anh Tú. Hãy viết thư cho chúng tôi, thử bản demo, và nếu tò mò, mời nghe album riêng của dự án ở trang bài hát. Merci beaucoup vì đã ghé thăm, la vie en rose!"]
     ]};
   function STOPS_CUR(){return STOPS_ALL[document.documentElement.getAttribute('lang')==='vi'?'vi':'en'];}
   var card=document.getElementById('hgCard'),txt=document.getElementById('hgTxt');
@@ -578,7 +578,7 @@
   @keyframes lhblink{0%,100%{opacity:.35;}50%{opacity:1;}}
   @keyframes lhhalo{0%,100%{opacity:0;}50%{opacity:.7;}}
   @media (max-width:1150px){
-    #vnmark{right:50%;transform:translate(50%,-50%);width:min(90vw,400px);opacity:.22;}
+    #vnmark{right:50%;transform:translate(50%,-50%);width:min(90vw,400px);opacity:.42;}
     :root[data-theme="dark"] #vnmark{opacity:.12;}
   }
 
@@ -906,5 +906,5 @@
   },true);
 })();</script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
-</body>
+<style id="bgfix2-2607">body{background:transparent !important;}html{background:var(--paper);}#vnmark{opacity:.52 !important;}</style></body>
 </html>
