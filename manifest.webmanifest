@@ -1,0 +1,22 @@
+{
+  "id": "/M-AIDA/",
+  "name": "M-AIDA: Meta-Analysis Intelligent Data Assistant",
+  "short_name": "M-AIDA",
+  "description": "Human-verified effect-size data preparation for meta-analysis. 236 studies, human in the loop, by Do Thuy Huong (Je m'appelle Huong).",
+  "start_url": "/M-AIDA/?source=pwa",
+  "scope": "/M-AIDA/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f1e7",
+  "theme_color": "#f6f1e7",
+  "lang": "en",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Data & Melody", "url": "/M-AIDA/data_melody.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "M-AIDA Cloud", "url": "/M-AIDA/commercial.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

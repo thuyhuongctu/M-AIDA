@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f6f1e7">
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>M-AIDA Cloud: AI-assisted effect-size extraction with human verification</title>
@@ -885,5 +888,6 @@
     a.href=a.getAttribute('href').split('?')[0]+'?lang='+l;
   },true);
 })();</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
 </body>
 </html>

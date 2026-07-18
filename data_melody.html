@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f6f1e7">
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Dữ liệu & Giai điệu | M-AIDA</title>
@@ -484,5 +487,6 @@
     sec.appendChild(d);
   }
 })();</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
 </body>
 </html>

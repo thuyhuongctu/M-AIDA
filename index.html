@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f6f1e7">
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>M-AIDA: Meta-Analysis Intelligent Data Assistant</title>
@@ -2972,5 +2975,6 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     a.href=a.getAttribute('href').split('?')[0]+'?lang='+l;
   },true);
 })();</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
 </body>
 </html>
