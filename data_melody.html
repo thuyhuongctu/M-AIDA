@@ -131,7 +131,7 @@
   @media(prefers-reduced-motion:reduce){#hguide.walking{animation:none}}
 
   /* Vietnam watermark map, as on the main M-AIDA page */
-  #vnmark{position:fixed;top:55%;right:1.5%;transform:translateY(-50%);width:min(32vw,430px);color:var(--rose);opacity:.13;pointer-events:none;z-index:-1;}
+  #vnmark{position:fixed;top:55%;right:1.5%;transform:translateY(-50%);width:min(34vw,460px);color:var(--rose);opacity:.30;pointer-events:none;z-index:-1;}
   #vnmark svg{width:100%;height:auto;display:block;}
   #vnmark .lh-halo{opacity:0;}
   #vnmark .lh-light{animation:lhblink 1.8s ease-in-out infinite;}
@@ -141,7 +141,7 @@
   #vnmark .lh:nth-of-type(4) .lh-light,#vnmark .lh:nth-of-type(4) .lh-halo{animation-delay:1.35s;}
   @keyframes lhblink{0%,100%{opacity:.35;}50%{opacity:1;}}
   @keyframes lhhalo{0%,100%{opacity:0;}50%{opacity:.7;}}
-  @media (max-width:1150px){ #vnmark{right:50%;top:58%;transform:translate(50%,-50%);width:min(92vw,380px);opacity:.09;} }
+  @media (max-width:1150px){ #vnmark{right:50%;top:58%;transform:translate(50%,-50%);width:min(92vw,400px);opacity:.20;} }
 
   /* ===== Premium refinement (17/07/2026): keep rose-gold identity, modernize display ===== */
   #pageProg{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--rose),var(--gold));z-index:80;pointer-events:none;}
@@ -333,6 +333,28 @@
            data-en="The M-AIDA theme song. Lyrics: Do Thuy Huong (17 July 2026). The music was generated with AI assistance on the author's lyrics. Listen via the music menu on the main page, option 'Nothing'."
            data-fr="La chanson-thème de M-AIDA. Paroles : Đỗ Thùy Hương (17 juillet 2026). La musique a été générée avec l'aide de l'IA sur les paroles de l'autrice. À écouter via le menu musique de la page principale, option « Nothing ».">Ca khúc chủ đề của M-AIDA. Lời: Đỗ Thùy Hương (17/07/2026).</p>
         <div style="font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:10px" data-i18n data-vi="© Đỗ Thùy Hương · Lời bài hát: mọi quyền được bảo lưu" data-en="© Do Thuy Huong · Lyrics: all rights reserved" data-fr="© Do Thuy Huong · Paroles : tous droits réservés">© Do Thuy Huong · Paroles : tous droits réservés</div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="wrap" id="tracks" style="padding:56px 24px">
+    <h2 class="sec" data-i18n data-vi="Hai bản chính" data-en="The two main tracks" data-fr="Les deux titres principaux">Hai bản chính</h2>
+    <div class="card" style="padding:26px;display:grid;gap:24px;margin-top:14px">
+      <div>
+        <div style="font-family:var(--serif);font-size:20px">«Que les preuves décident»</div>
+        <div style="color:var(--muted);font-size:14px;margin:6px 0" data-i18n data-vi="Bản chính thức (bản thu 3) · lời: Đỗ Thùy Hương · nhạc tạo với hỗ trợ AI" data-en="Official track (take 3) · lyrics: Do Thuy Huong · music generated with AI assistance" data-fr="Titre officiel (prise 3) · paroles : Do Thuy Huong · musique générée avec l'aide de l'IA">Bản chính thức (bản thu 3)</div>
+        <audio controls preload="none" style="width:100%" src="assets/maida_song.mp3"></audio>
+      </div>
+      <div>
+        <div style="font-family:var(--serif);font-size:20px">«L'humain doit décider»</div>
+        <div style="color:var(--muted);font-size:14px;margin:6px 0" data-i18n data-vi="Biến thể cao trào · lời: Đỗ Thùy Hương · nhạc tạo với hỗ trợ AI" data-en="Dramatic variant · lyrics: Do Thuy Huong · music generated with AI assistance" data-fr="Variante dramatique · paroles : Do Thuy Huong · musique générée avec l'aide de l'IA">Biến thể cao trào</div>
+        <audio controls preload="none" style="width:100%" src="assets/maida_song_lhumain.mp3"></audio>
+      </div>
+      <div>
+        <div style="font-family:var(--serif);font-size:20px" data-i18n data-vi="Bản không lời (hòa tấu)" data-en="Instrumental version" data-fr="Version instrumentale">Bản không lời (hòa tấu)</div>
+        <div style="color:var(--muted);font-size:14px;margin:6px 0" data-i18n data-vi="Tách từ bản chính thức để nghe làm nhạc nền" data-en="Separated from the official track, for background listening" data-fr="Séparée du titre officiel, pour une écoute d'ambiance">Tách từ bản chính thức</div>
+        <audio controls preload="none" style="width:100%" src="assets/maida_song_instrumental.mp3"></audio>
       </div>
     </div>
   </section>
