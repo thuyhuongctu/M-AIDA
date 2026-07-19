@@ -10,7 +10,7 @@ abstract: >-
 type: software
 version: "7.1.1"
 date-released: "2026-07-09"
-license: LicenseRef-MAIDA-Academic
+license: AGPL-3.0-only
 repository-code: "https://github.com/thuyhuongctu/M-AIDA"
 doi: "10.5281/zenodo.21282516"
 identifiers:
