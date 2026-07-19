@@ -114,7 +114,7 @@ non-default backend URL.
 
 ## Live web pages (GitHub Pages)
 
-The repository is also served as a static site with three linked pages:
+The repository is also served as a static site (GitHub Pages):
 
 - **Main page** ([index.html](https://thuyhuongctu.github.io/M-AIDA/)): overview,
   positioning, the interactive atlas of 236 studies, the in-browser extraction
@@ -122,8 +122,16 @@ The repository is also served as a static site with three linked pages:
 - **Commercial page** ([commercial.html](https://thuyhuongctu.github.io/M-AIDA/commercial.html)):
   productization and licensing overview.
 - **Data & Melody** ([data_melody.html](https://thuyhuongctu.github.io/M-AIDA/data_melody.html)):
-  the story of the software told as a guided walk with Huong AI, in Vietnamese,
-  English, and French.
+  the story of the software told as a guided walk with Huong AI (Vietnamese,
+  English, French), with a live World Bank indicators widget.
+- **Songs** ([songs.html](https://thuyhuongctu.github.io/M-AIDA/songs.html)):
+  the M-AIDA song lyrics on a 3D lyric page.
+- **Author's academic homepage** ([huong.html](https://thuyhuongctu.github.io/M-AIDA/huong.html)):
+  Do Thuy Huong's personal page — bio, publications (ORCID), teaching linked to
+  research, an interactive 3D globe of the studied economies, a World Bank data
+  widget, and a blog. Bilingual VI/EN with light/dark themes.
+- **Privacy policy** ([privacy.html](https://thuyhuongctu.github.io/M-AIDA/privacy.html)):
+  cookieless-analytics disclosure (VI/EN).
 
 **Theme song.** The mood menu on the main and commercial pages ("Nothing" option)
 plays the M-AIDA song *"Que les preuves decident"* (`assets/maida_song.mp3`,
