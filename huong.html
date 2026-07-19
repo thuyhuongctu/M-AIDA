@@ -73,6 +73,17 @@ html:not([lang="en"]) .lang-en{display:none}
 .langtog{display:inline-flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
 .langtog button{border:none;background:transparent;color:var(--muted);font:700 .72rem var(--sans);padding:6px 11px;cursor:pointer}
 .langtog button.active{background:var(--accent);color:#fff}
+/* ===== 3D depth (Concept A) ===== */
+@media (prefers-reduced-motion: no-preference){
+  .wrap{perspective:1400px}
+  .card,.about-fig{transition:transform .16s ease, box-shadow .16s ease;will-change:transform}
+  .portrait{animation:floatY 6s ease-in-out infinite}
+  @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .pub{transition:transform .16s ease, box-shadow .16s ease}
+  .pub:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(30,20,20,.14)}
+  .reveal3d{opacity:0;transform:translateY(28px) rotateX(7deg);transform-origin:50% 0;transition:opacity .6s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal3d.in{opacity:1;transform:none}
+}
 </style></head><body>
 <div class="topctl"><span class="langtog"><button type="button" data-lang="vi" class="active">VI</button><button type="button" data-lang="en">EN</button></span><button class="toggle" id="tg"><span class="lang-vi">◐ Sáng / Tối</span><span class="lang-en">◐ Light / Dark</span></button></div>
 <div class="wrap">
@@ -496,4 +507,20 @@ html:not([lang="en"]) .lang-en{display:none}
 })();
 </script>
 <script>(function(){var r=document.documentElement;var b=document.querySelectorAll(".langtog button[data-lang]");function set(l){r.setAttribute("lang",l);b.forEach(function(x){x.classList.toggle("active",x.getAttribute("data-lang")===l);});try{localStorage.setItem("huong_lang",l);}catch(e){}}b.forEach(function(x){x.addEventListener("click",function(){set(x.getAttribute("data-lang"));});});var s="vi";try{s=localStorage.getItem("huong_lang")||"vi";}catch(e){}set(s);})();</script>
+<script>(function(){
+ var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+ // scroll-reveal with depth
+ var secs=document.querySelectorAll("header.hero, main section, .wrap > section");
+ if(!("IntersectionObserver" in window)||reduce){return;}
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{rootMargin:"0px 0px -6% 0px"});
+ document.querySelectorAll("section").forEach(function(s){s.classList.add("reveal3d");io.observe(s);});
+ // 3D tilt toward cursor on cards + framed photo
+ document.querySelectorAll(".card, .about-fig").forEach(function(el){
+   el.addEventListener("mousemove",function(e){var r=el.getBoundingClientRect();
+     var px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+     el.style.transform="perspective(900px) rotateX("+(-py*7).toFixed(2)+"deg) rotateY("+(px*9).toFixed(2)+"deg) translateZ(6px)";
+     el.style.boxShadow="0 20px 42px rgba(30,20,20,.20)";});
+   el.addEventListener("mouseleave",function(){el.style.transform="";el.style.boxShadow="";});
+ });
+})();</script>
 </body></html>
