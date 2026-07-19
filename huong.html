@@ -58,6 +58,14 @@ footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-si
 @media(max-width:560px){.about-fig{float:none;display:block;margin:0 auto 14px;width:150px}}
 .pmeta a{color:var(--muted);text-decoration:underline;text-decoration-color:var(--line)}
 .pmeta a:hover{color:var(--accent)}
+.teach-list{margin-top:8px;display:flex;flex-direction:column}
+.teach-row{display:grid;grid-template-columns:minmax(170px,230px) 1fr;gap:16px;padding:13px 2px;border-bottom:1px solid var(--line)}
+.teach-row:last-child{border-bottom:none}
+.teach-subj{font-weight:600;color:var(--ink);font-size:.95rem}
+.teach-links{font-size:.86rem;color:var(--muted);line-height:1.55}
+.teach-links a{color:var(--accent);text-decoration:none}
+.teach-links a:hover{text-decoration:underline}
+@media(max-width:560px){.teach-row{grid-template-columns:1fr;gap:3px;padding:11px 2px}}
 </style></head><body>
 <button class="toggle" id="tg">◐ Sáng / Tối</button>
 <div class="wrap">
@@ -172,8 +180,20 @@ footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-si
       </div>
       <div class="card">
         <h3>Giảng dạy</h3>
-        <p><span class="ph">[cô bổ sung: học phần/hoạt động giảng dạy nếu muốn hiển thị]</span></p>
+        <p>Giảng viên các học phần kinh tế lượng, phương pháp nghiên cứu, phân tích hoạt động kinh doanh, kinh doanh quốc tế, thương mại điện tử, mô phỏng tình huống kinh doanh, khởi nghiệp &amp; khởi sự doanh nghiệp.</p>
       </div>
+    </div>
+
+    <h3 style="font-size:1.08rem;margin:28px 0 4px">Học phần giảng dạy &amp; nghiên cứu gắn kết</h3>
+    <p style="font-size:.86rem;color:var(--muted);margin:0 0 10px">Mỗi học phần được kết nối với các công trình nghiên cứu liên quan của tôi.</p>
+    <div class="teach-list">
+      <div class="teach-row"><div class="teach-subj">Kinh tế lượng</div><div class="teach-links"><a href="https://doi.org/10.5267/j.ac.2020.9.006" target="_blank" rel="noopener">Kiểm định điều tiết theo kinh nghiệm & giới tính nhà quản lý (Turkey, Accounting, 2020)</a> · <a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Khác biệt hiệu quả DN ở châu Á mới nổi — dữ liệu cấp DN WBES (VEFR, 2026)</a> · <a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Mô hình lực hấp dẫn dòng vốn FDI vào Việt Nam 2006–2015 (Tạp chí QL&KTQT, 2020)</a></div></div>
+      <div class="teach-row"><div class="teach-subj">Phương pháp nghiên cứu trong kinh tế</div><div class="teach-links"><a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Quốc tế hóa & hiệu quả DN: một phân tích tổng hợp (meta-analysis, 2024)</a> · <a href="./" target="_blank" rel="noopener">M-AIDA — công cụ tổng hợp bằng chứng có kiểm chứng con người</a></div></div>
+      <div class="teach-row"><div class="teach-subj">Phân tích hoạt động kinh doanh</div><div class="teach-links"><a href="https://doi.org/10.55908/sdgs.v11i12.1751" target="_blank" rel="noopener">Tác động COVID-19 đến hiệu quả DN xây dựng ở Cần Thơ (J. Law & Sustainable Dev., 2023)</a> · <a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Quốc tế hóa & hiệu quả DN Ấn Độ: vai trò lãnh đạo cấp cao (IntechOpen, 2025)</a> · <a href="https://doi.org/10.5772/intechopen.97432" target="_blank" rel="noopener">Hiệu quả DN sản xuất Thổ Nhĩ Kỳ & tính cách nhà quản lý (IntechOpen, 2021)</a></div></div>
+      <div class="teach-row"><div class="teach-subj">Kinh doanh quốc tế</div><div class="teach-links"><a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Quốc tế hóa DNNVV sản xuất Trung Quốc & hiệu quả (JFAR, 2026)</a> · <a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Điều tiết đặc điểm nhà quản lý & rào cản tài chính — Ba Lan (PalArch’s, 2021)</a> · <a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Khác biệt hiệu quả DN ở châu Á mới nổi (VEFR, 2026)</a></div></div>
+      <div class="teach-row"><div class="teach-subj">Thương mại điện tử</div><div class="teach-links"><a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Tác động của khuyến mại ảo đến cảm nhận & hành vi người tiêu dùng trên sàn TMĐT Việt Nam (2024)</a></div></div>
+      <div class="teach-row"><div class="teach-subj">Mô phỏng tình huống trong kinh doanh</div><div class="teach-links"><a href="https://doi.org/10.1109/air63653.2024.00013" target="_blank" rel="noopener">AI trong giáo dục đại học: nỗi sợ AI có cản trở kết quả học tập? (IEEE AIR, 2024)</a> · <a href="./" target="_blank" rel="noopener">M-AIDA — ứng dụng mô hình ngôn ngữ lớn trong phân tích dữ liệu</a></div></div>
+      <div class="teach-row"><div class="teach-subj">Khởi nghiệp & khởi sự doanh nghiệp</div><div class="teach-links"><a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Quốc tế hóa DNNVV sản xuất Trung Quốc & hiệu quả (JFAR, 2026)</a> · <a href="https://orcid.org/0000-0002-7711-2487" target="_blank" rel="noopener">Khác biệt hiệu quả giữa các doanh nghiệp — dữ liệu cấp DN (VEFR, 2026)</a></div></div>
     </div>
   </section>
 
