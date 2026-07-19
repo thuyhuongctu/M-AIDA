@@ -17,8 +17,8 @@
     }
   ],
   "access_right": "open",
-  "license": "other-nc",
-  "notes": "License: M-AIDA Academic Source-Available License v1.0 (LicenseRef-MAIDA-Academic); see the LICENSE file in the repository. Non-commercial academic use is permitted with citation; commercial use requires prior written consent of the copyright holders.",
+  "license": "AGPL-3.0-only",
+  "notes": "License: GNU Affero General Public License v3.0 (AGPL-3.0-only); see the LICENSE file. Separate commercial terms are available from the copyright holders (dual licensing); see COMMERCIAL-LICENSE.md.",
   "related_identifiers": [
     {
       "identifier": "10.5281/zenodo.21282516",
