@@ -363,6 +363,80 @@
   <p style="margin-top:16px"><a class="btn primary" href="songs.html" data-i18n data-vi="🎼 Trang lời bài hát (3D)" data-en="🎼 Lyrics page (3D)" data-fr="🎼 Page des paroles (3D)">🎼 Trang lời bài hát (3D)</a></p>
   </section>
 
+<style id="wd-style">
+  .wd-card{padding:24px;margin-top:14px}
+  .wd-inds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .wd-ind{font-family:var(--sans);font-size:13px;line-height:1.2;padding:8px 13px;border:1px solid var(--line);
+    background:var(--paper);color:var(--muted);border-radius:999px;cursor:pointer;transition:all .18s ease}
+  .wd-ind:hover{border-color:var(--rose-soft);color:var(--ink)}
+  .wd-ind[aria-selected="true"]{background:var(--rose);border-color:var(--rose);color:#fff;font-weight:600}
+  .wd-countries{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+  .wd-country{font-family:var(--sans);font-size:12.5px;padding:6px 12px 6px 10px;border:1px solid var(--line);
+    background:var(--paper);color:var(--muted);border-radius:999px;cursor:pointer;display:inline-flex;
+    align-items:center;gap:7px;transition:all .16s ease}
+  .wd-country:hover{border-color:var(--rose-soft);color:var(--ink)}
+  .wd-country .dot{width:10px;height:10px;border-radius:50%;background:currentColor;opacity:.25;transition:opacity .16s}
+  .wd-country[aria-pressed="true"]{color:var(--ink);border-color:var(--line);background:var(--cream)}
+  .wd-country[aria-pressed="true"] .dot{opacity:1}
+  .wd-charttitle{font-family:var(--serif);font-size:18px;color:var(--ink);margin:2px 0 10px}
+  .wd-charttitle .u{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400}
+  .wd-svgbox{position:relative;width:100%}
+  #wdChart{width:100%;height:auto;display:block;overflow:visible}
+  .wd-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--sans);font-size:14px;color:var(--muted);pointer-events:none}
+  .wd-gridline{stroke:var(--line);stroke-width:1}
+  .wd-axislbl{font-family:var(--sans);font-size:11px;fill:var(--muted)}
+  .wd-line{fill:none;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+  .wd-dot{stroke:var(--paper);stroke-width:1.4}
+  .wd-hoverline{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;opacity:.6}
+  .wd-tip{position:absolute;pointer-events:none;background:var(--panel);color:#fff;font-family:var(--sans);
+    font-size:12px;line-height:1.5;padding:8px 11px;border-radius:9px;box-shadow:0 8px 24px rgba(58,44,39,.28);
+    opacity:0;transition:opacity .12s;transform:translate(-50%,-108%);white-space:nowrap;z-index:5}
+  .wd-tip b{font-weight:600}
+  .wd-tip .r{display:flex;align-items:center;gap:6px;margin-top:2px}
+  .wd-tip .r i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .wd-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;justify-content:center}
+  .wd-legend span{font-family:var(--sans);font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+  .wd-legend span i{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .wd-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:20px}
+  .wd-mini{border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:var(--cream)}
+  .wd-mini .cn{font-family:var(--sans);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .wd-mini .cn i{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .wd-mini .val{font-family:var(--serif);font-size:22px;color:var(--ink);margin-top:3px;font-weight:600}
+  .wd-mini .yr{font-family:var(--sans);font-size:11px;color:var(--muted);margin-top:1px}
+  .wd-source{font-family:var(--sans);font-size:12px;color:var(--muted);margin-top:18px;text-align:center}
+  .wd-source a{color:var(--rose-deep)}
+  @media (max-width:560px){.wd-cards{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}}
+</style>
+
+<section class="wrap" id="worlddata" style="padding:56px 24px">
+    <h2 class="sec" data-i18n data-vi="Dữ liệu thế giới" data-en="World data" data-fr="Données mondiales">Dữ liệu thế giới</h2>
+    <p style="color:var(--muted);max-width:70ch;margin:6px 0 22px" data-i18n
+       data-vi="Số liệu trực tiếp từ World Bank Open Data — các chỉ số phát triển tài chính, kinh tế và môi trường của những nền kinh tế xuất hiện trong luận án. Chọn chỉ số và quốc gia để so sánh."
+       data-en="Live figures from World Bank Open Data — financial-development, economic and environmental indicators for the economies studied in the dissertation. Pick an indicator and countries to compare."
+       data-fr="Données en direct de la Banque mondiale (Open Data) — indicateurs de développement financier, économiques et environnementaux des économies étudiées dans la thèse. Choisissez un indicateur et des pays à comparer.">Số liệu trực tiếp từ World Bank Open Data — các chỉ số phát triển tài chính, kinh tế và môi trường của những nền kinh tế xuất hiện trong luận án. Chọn chỉ số và quốc gia để so sánh.</p>
+
+    <div class="card wd-card">
+      <div class="wd-inds" id="wdInds" role="tablist" aria-label="Indicator"></div>
+      <div class="wd-countries" id="wdCountries" aria-label="Countries"></div>
+      <div class="wd-chartwrap">
+        <div class="wd-charttitle" id="wdChartTitle"></div>
+        <div class="wd-svgbox">
+          <svg id="wdChart" viewBox="0 0 780 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Time series chart"></svg>
+          <div class="wd-status" id="wdStatus" aria-live="polite"></div>
+        </div>
+        <div class="wd-legend" id="wdLegend"></div>
+      </div>
+      <div class="wd-cards" id="wdCards"></div>
+      <div class="wd-source">
+        <span data-i18n data-vi="Nguồn: " data-en="Source: " data-fr="Source : ">Nguồn: </span>
+        <a href="https://data.worldbank.org" target="_blank" rel="noopener">World Bank Open Data</a>
+        <span> · api.worldbank.org · </span>
+        <span data-i18n data-vi="tải trực tiếp khi bạn xem, giấy phép CC-BY 4.0." data-en="fetched live in your browser, CC-BY 4.0 licence." data-fr="chargé en direct dans votre navigateur, licence CC-BY 4.0.">tải trực tiếp khi bạn xem, giấy phép CC-BY 4.0.</span>
+      </div>
+    </div>
+  </section>
+
 <section class="specs">
     <div class="wrap">
       <div class="specs-grid">
@@ -498,5 +572,223 @@
 <style id="bgfix2-2607">body{background:transparent !important;}html{background:var(--paper);}#vnmark{opacity:.52 !important;}</style>  <!-- Thong ke luot truy cap (GoatCounter) - khong dung cookie, ton trong quyen rieng tu -->
   <script data-goatcounter="https://thuyhuongctu.goatcounter.com/count"
           async src="//gc.zgo.at/count.js"></script>
+<script id="wd-script">
+(function(){
+  var SVGNS='http://www.w3.org/2000/svg';
+  // Chỉ số World Bank gắn với các chủ đề của luận án (phát triển tài chính · kinh tế · môi trường/ESG)
+  var INDS=[
+    {code:'FS.AST.PRVT.GD.ZS', unit:'% GDP', dec:0,
+     vi:'Tín dụng tư nhân (Phát triển tài chính)', en:'Private credit (financial development)', fr:'Crédit privé (dév. financier)'},
+    {code:'NY.GDP.PCAP.CD', unit:'US$', dec:0, money:true,
+     vi:'GDP bình quân đầu người', en:'GDP per capita', fr:'PIB par habitant'},
+    {code:'BX.KLT.DINV.WD.GD.ZS', unit:'% GDP', dec:1,
+     vi:'FDI ròng vào', en:'FDI net inflows', fr:'IDE entrants nets'},
+    {code:'EN.GHG.CO2.PC.CE.AR5', unit:'t/người', dec:2,
+     vi:'Phát thải CO₂ đầu người (ESG · Môi trường)', en:'CO₂ per capita (ESG · Environment)', fr:'CO₂ par habitant (ESG · Environnement)'}
+  ];
+  var COUNTRIES=[
+    {iso:'VNM', color:'#B76E5A', vi:'Việt Nam', en:'Vietnam', fr:'Vietnam', def:true},
+    {iso:'SGP', color:'#C9A24B', vi:'Singapore', en:'Singapore', fr:'Singapour', def:true},
+    {iso:'CHN', color:'#2F6E6A', vi:'Trung Quốc', en:'China', fr:'Chine', def:true},
+    {iso:'THA', color:'#9E5643', vi:'Thái Lan', en:'Thailand', fr:'Thaïlande'},
+    {iso:'MYS', color:'#5E7357', vi:'Malaysia', en:'Malaysia', fr:'Malaisie'},
+    {iso:'FJI', color:'#7A6BA0', vi:'Fiji (SIDS TBD)', en:'Fiji (Pacific SIDS)', fr:'Fidji (PEID)'}
+  ];
+  var T={
+    vi:{loading:'Đang tải dữ liệu…', nodata:'Không có dữ liệu cho lựa chọn này.', err:'Không tải được dữ liệu (kiểm tra kết nối).', pick:'Chọn ít nhất một quốc gia.', latest:'mới nhất'},
+    en:{loading:'Loading data…', nodata:'No data for this selection.', err:'Could not load data (check connection).', pick:'Select at least one country.', latest:'latest'},
+    fr:{loading:'Chargement…', nodata:'Aucune donnée pour cette sélection.', err:'Échec du chargement (vérifiez la connexion).', pick:'Sélectionnez au moins un pays.', latest:'récent'}
+  };
+  function lang(){var l=(document.documentElement.lang||'vi').slice(0,2);return T[l]?l:'vi';}
+  function tr(o){var l=lang();return o[l]||o.vi||o.en;}
+  function t(k){return (T[lang()]||T.vi)[k];}
+
+  var el={inds:document.getElementById('wdInds'), cty:document.getElementById('wdCountries'),
+    svg:document.getElementById('wdChart'), status:document.getElementById('wdStatus'),
+    legend:document.getElementById('wdLegend'), cards:document.getElementById('wdCards'),
+    title:document.getElementById('wdChartTitle')};
+  if(!el.svg) return;
+
+  var state={ind:0, sel:{}, cache:{}, tip:null};
+  COUNTRIES.forEach(function(c){state.sel[c.iso]=!!c.def;});
+
+  function fmt(v,ind){
+    if(v==null||isNaN(v)) return '—';
+    if(ind.money){
+      if(v>=1000) return Math.round(v).toLocaleString('en-US');
+      return v.toFixed(0);
+    }
+    return v.toFixed(ind.dec);
+  }
+
+  function buildControls(){
+    el.inds.innerHTML='';
+    INDS.forEach(function(ind,i){
+      var b=document.createElement('button');
+      b.className='wd-ind'; b.setAttribute('role','tab');
+      b.setAttribute('aria-selected', i===state.ind?'true':'false');
+      b.textContent=tr(ind);
+      b.addEventListener('click',function(){ state.ind=i; buildControls(); render(); });
+      el.inds.appendChild(b);
+    });
+    el.cty.innerHTML='';
+    COUNTRIES.forEach(function(c){
+      var b=document.createElement('button');
+      b.className='wd-country'; b.style.color=c.color;
+      b.setAttribute('aria-pressed', state.sel[c.iso]?'true':'false');
+      b.innerHTML='<span class="dot"></span>'+tr(c);
+      b.addEventListener('click',function(){ state.sel[c.iso]=!state.sel[c.iso]; buildControls(); render(); });
+      el.cty.appendChild(b);
+    });
+  }
+
+  function selectedISOs(){ return COUNTRIES.filter(function(c){return state.sel[c.iso];}).map(function(c){return c.iso;}); }
+
+  function fetchInd(code){
+    if(state.cache[code]) return Promise.resolve(state.cache[code]);
+    var isos=COUNTRIES.map(function(c){return c.iso;}).join(';');
+    var url='https://api.worldbank.org/v2/country/'+isos+'/indicator/'+code+'?format=json&per_page=1000&date=2000:2024';
+    return fetch(url).then(function(r){return r.json();}).then(function(j){
+      var rows=(j&&j[1])||[]; var by={};
+      rows.forEach(function(r){
+        if(r.value==null) return;
+        var iso=r.countryiso3code||(r.country&&r.country.id); if(!iso) return;
+        (by[iso]=by[iso]||[]).push({year:+r.date, value:+r.value});
+      });
+      Object.keys(by).forEach(function(k){by[k].sort(function(a,b){return a.year-b.year;});});
+      state.cache[code]=by; return by;
+    });
+  }
+
+  function render(){
+    var ind=INDS[state.ind];
+    el.title.innerHTML=tr(ind)+' <span class="u">· '+ind.unit+' · 2000–2024</span>';
+    var isos=selectedISOs();
+    clearSvg();
+    el.legend.innerHTML=''; el.cards.innerHTML='';
+    if(!isos.length){ el.status.textContent=t('pick'); return; }
+    el.status.textContent=t('loading');
+    fetchInd(ind.code).then(function(by){
+      var series=isos.map(function(iso){
+        var c=COUNTRIES.filter(function(x){return x.iso===iso;})[0];
+        return {iso:iso, color:c.color, name:tr(c), pts:(by[iso]||[])};
+      }).filter(function(s){return s.pts.length;});
+      if(!series.length){ el.status.textContent=t('nodata'); return; }
+      el.status.textContent='';
+      draw(series, ind);
+      drawLegendCards(series, ind);
+    }).catch(function(){ el.status.textContent=t('err'); });
+  }
+
+  function clearSvg(){ while(el.svg.firstChild) el.svg.removeChild(el.svg.firstChild); }
+  function mk(tag,attrs){var e=document.createElementNS(SVGNS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+  var M={l:58,r:16,t:18,b:34}, W=780, H=400;
+  function draw(series, ind){
+    var pw=W-M.l-M.r, ph=H-M.t-M.b;
+    var yrs=[], vals=[];
+    series.forEach(function(s){s.pts.forEach(function(p){yrs.push(p.year);vals.push(p.value);});});
+    var y0=Math.min.apply(null,yrs), y1=Math.max.apply(null,yrs);
+    var v1=Math.max.apply(null,vals), v0=Math.min.apply(null,vals);
+    if(v0>0) v0=0; // baseline at zero for honest reading
+    var pad=(v1-v0)*0.06||1; v1+=pad;
+    var nice=niceMax(v1); v1=nice;
+    function X(yr){ return M.l + (y1===y0?pw/2:(yr-y0)/(y1-y0)*pw); }
+    function Y(v){ return M.t + ph - (v-v0)/(v1-v0)*ph; }
+
+    // y gridlines + labels
+    var ticks=5;
+    for(var i=0;i<=ticks;i++){
+      var v=v0+(v1-v0)*i/ticks, yy=Y(v);
+      el.svg.appendChild(mk('line',{class:'wd-gridline',x1:M.l,y1:yy,x2:W-M.r,y2:yy}));
+      var lab=mk('text',{class:'wd-axislbl',x:M.l-8,y:yy+4,'text-anchor':'end'});
+      lab.textContent=ind.money&&v>=1000?Math.round(v/1000)+'k':(+v.toFixed(ind.dec)).toLocaleString('en-US');
+      el.svg.appendChild(lab);
+    }
+    // x labels (~6)
+    var step=Math.ceil((y1-y0)/6)||1;
+    for(var yr=y0; yr<=y1; yr+=step){
+      var xx=X(yr);
+      var xl=mk('text',{class:'wd-axislbl',x:xx,y:H-M.b+18,'text-anchor':'middle'});
+      xl.textContent=yr; el.svg.appendChild(xl);
+    }
+    // lines + dots
+    series.forEach(function(s){
+      var d=''; s.pts.forEach(function(p,i){ d+=(i?'L':'M')+X(p.year).toFixed(1)+' '+Y(p.value).toFixed(1)+' '; });
+      el.svg.appendChild(mk('path',{class:'wd-line',d:d,stroke:s.color}));
+      s.pts.forEach(function(p){
+        var c=mk('circle',{class:'wd-dot',cx:X(p.year),cy:Y(p.value),r:2.6,fill:s.color});
+        var ti=document.createElementNS(SVGNS,'title'); ti.textContent=s.name+' · '+p.year+': '+fmt(p.value,ind)+' '+ind.unit;
+        c.appendChild(ti); el.svg.appendChild(c);
+      });
+    });
+    setupHover(series, ind, X, Y, y0, y1);
+  }
+
+  function niceMax(v){
+    if(v<=0) return 1;
+    var mag=Math.pow(10,Math.floor(Math.log10(v)));
+    var n=v/mag;
+    var step=n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10;
+    return step*mag;
+  }
+
+  function setupHover(series, ind, X, Y, y0, y1){
+    var box=el.svg.parentNode; // wd-svgbox
+    if(state.tip){ state.tip.remove(); }
+    var tip=document.createElement('div'); tip.className='wd-tip'; box.appendChild(tip); state.tip=tip;
+    var hl=mk('line',{class:'wd-hoverline',x1:0,y1:M.t,x2:0,y2:H-M.b,opacity:0}); el.svg.appendChild(hl);
+    var overlay=mk('rect',{x:M.l,y:M.t,width:W-M.l-M.r,height:H-M.t-M.b,fill:'transparent'});
+    el.svg.appendChild(overlay);
+    function pt(evt){
+      var r=el.svg.getBoundingClientRect();
+      var sx=(evt.clientX-r.left)/r.width*W;
+      var frac=(sx-M.l)/(W-M.l-M.r); frac=Math.max(0,Math.min(1,frac));
+      var yr=Math.round(y0+frac*(y1-y0));
+      var rows='', anyX=null;
+      series.forEach(function(s){
+        var near=null,bd=1e9; s.pts.forEach(function(p){var dd=Math.abs(p.year-yr);if(dd<bd){bd=dd;near=p;}});
+        if(near){ anyX=X(near.year);
+          rows+='<div class="r"><i style="background:'+s.color+'"></i>'+s.name+': <b>'+fmt(near.value,ind)+'</b> '+ind.unit+'</div>';
+        }
+      });
+      if(anyX==null) return;
+      hl.setAttribute('x1',anyX); hl.setAttribute('x2',anyX); hl.setAttribute('opacity',1);
+      tip.innerHTML='<b>'+yr+'</b>'+rows; tip.style.opacity=1;
+      tip.style.left=(anyX/W*r.width)+'px';
+      tip.style.top=(M.t/H*r.height)+'px';
+    }
+    overlay.addEventListener('mousemove',pt);
+    overlay.addEventListener('mouseleave',function(){tip.style.opacity=0;hl.setAttribute('opacity',0);});
+  }
+
+  function drawLegendCards(series, ind){
+    series.forEach(function(s){
+      var lg=document.createElement('span');
+      lg.innerHTML='<i style="background:'+s.color+'"></i>'+s.name;
+      el.legend.appendChild(lg);
+      var last=s.pts[s.pts.length-1];
+      var m=document.createElement('div'); m.className='wd-mini';
+      m.innerHTML='<div class="cn"><i style="background:'+s.color+'"></i>'+s.name+'</div>'+
+        '<div class="val">'+fmt(last.value,ind)+(ind.unit==='US$'?'':' <span style="font-size:13px;color:var(--muted)">'+ind.unit+'</span>')+'</div>'+
+        '<div class="yr">'+last.year+' · '+t('latest')+'</div>';
+      el.cards.appendChild(m);
+    });
+  }
+
+  // re-render labels when the site language toggle is used
+  var tog=document.querySelector('.langtog');
+  if(tog){ tog.addEventListener('click',function(){ setTimeout(function(){ buildControls(); render(); },30); }); }
+
+  buildControls();
+  // lazy first render when the section scrolls into view (saves a fetch until needed)
+  var sec=document.getElementById('worlddata'), started=false;
+  function kick(){ if(started) return; started=true; render(); }
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){kick();io.disconnect();}});},{rootMargin:'200px'});
+    io.observe(sec);
+  } else { kick(); }
+})();
+</script>
 </body>
 </html>
