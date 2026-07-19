@@ -1,7 +1,7 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21282516.svg)](https://doi.org/10.5281/zenodo.21282516)
-![version](https://img.shields.io/badge/version-7.1.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2018%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-Academic%20Source--Available-lightgrey)
+![version](https://img.shields.io/badge/version-7.1.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2018%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
 academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop
@@ -184,6 +184,11 @@ never commit a real `.env` (it is git-ignored).
 
 ## License
 
-Academic Source-Available License: see `LICENSE`. The software is public for
-transparency, citation, and academic verification; all rights are reserved by the
-authors under automatic copyright.
+M-AIDA is free/open-source software under the **GNU Affero General Public License
+v3.0 (AGPL-3.0-only)** — see [`LICENSE`](LICENSE). The AGPL's Section 13 covers
+network use: running a modified version as a service requires publishing that
+version's source.
+
+The authors also offer **commercial (dual) licensing** for closed-source or
+proprietary use — see [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md). Contact
+huongdt@vlute.edu.vn.
