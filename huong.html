@@ -84,6 +84,13 @@ html:not([lang="en"]) .lang-en{display:none}
   .reveal3d{opacity:0;transform:translateY(28px) rotateX(7deg);transform-origin:50% 0;transition:opacity .6s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
   .reveal3d.in{opacity:1;transform:none}
 }
+/* ===== interactive 3D globe ===== */
+.globe-wrap{display:flex;flex-direction:column;align-items:center;margin:6px 0 22px}
+#globe{width:min(340px,80vw);height:auto;cursor:grab;touch-action:none}
+#globe:active{cursor:grabbing}
+.globe-cap{font-family:var(--sans);font-size:.9rem;color:var(--muted);text-align:center;max-width:60ch;margin-top:10px;min-height:2.6em}
+.globe-cap b{color:var(--ink)}
+.globe-cap a{color:var(--accent)}
 </style></head><body>
 <div class="topctl"><span class="langtog"><button type="button" data-lang="vi" class="active">VI</button><button type="button" data-lang="en">EN</button></span><button class="toggle" id="tg"><span class="lang-vi">◐ Sáng / Tối</span><span class="lang-en">◐ Light / Dark</span></button></div>
 <div class="wrap">
@@ -258,6 +265,10 @@ html:not([lang="en"]) .lang-en{display:none}
   <section id="worlddata">
     <div class="shead"><h2><span class="lang-vi">Dữ liệu thế giới</span><span class="lang-en">World data</span></h2><span class="ln"></span></div>
     <p class="wd-intro"><span class="lang-vi">Số liệu trực tiếp từ World Bank Open Data — các chỉ số phát triển tài chính, kinh tế và môi trường của những nền kinh tế xuất hiện trong luận án. Chọn chỉ số và quốc gia để so sánh.</span><span class="lang-en">Live figures from World Bank Open Data — financial-development, economic and environmental indicators for the economies studied in the dissertation. Pick an indicator and countries to compare.</span></p>
+    <div class="globe-wrap">
+      <canvas id="globe" width="680" height="680" role="img" aria-label="Interactive globe of studied economies"></canvas>
+      <div class="globe-cap" id="globeCap"></div>
+    </div>
     <div class="wd-card">
       <div class="wd-inds" id="wdInds" role="tablist" aria-label="Chỉ số"></div>
       <div class="wd-countries" id="wdCountries" aria-label="Quốc gia"></div>
@@ -522,5 +533,56 @@ html:not([lang="en"]) .lang-en{display:none}
      el.style.boxShadow="0 20px 42px rgba(30,20,20,.20)";});
    el.addEventListener("mouseleave",function(){el.style.transform="";el.style.boxShadow="";});
  });
+})();</script>
+<script>(function(){
+ var cv=document.getElementById("globe"); if(!cv||!cv.getContext) return;
+ var ctx=cv.getContext("2d");
+ var R=300, cx=340, cy=340;
+ var lam=1.85, phi=0.30, drag=false, px=0, py=0, auto=true, vel=0.0035;
+ var COUNTRIES=[
+  {iso:"VNM",lat:16.0,lon:107.5,vi:"Việt Nam",en:"Vietnam",nvi:"Bối cảnh trong nước — FDI, TMĐT, hiệu quả DN, giá trị nơi làm việc.",nen:"Home context — FDI, e-commerce, firm performance, workplace values."},
+  {iso:"SGP",lat:1.35,lon:103.8,vi:"Singapore",en:"Singapore",nvi:"Tính đầy đủ thể chế & quan hệ quốc tế hóa–hiệu quả (bài Singapore).",nen:"Institutional completeness & the internationalization–performance link (Singapore)."},
+  {iso:"CHN",lat:35.0,lon:105.0,vi:"Trung Quốc",en:"China",nvi:"Quốc tế hóa DNNVV sản xuất Trung Quốc & hiệu quả (JFAR, 2026).",nen:"Internationalization of Chinese manufacturing SMEs & performance (JFAR, 2026)."},
+  {iso:"THA",lat:15.0,lon:101.0,vi:"Thái Lan",en:"Thailand",nvi:"Nền so sánh khu vực trong khung dữ liệu doanh nghiệp (WBES).",nen:"Regional comparator in the firm-level WBES frame."},
+  {iso:"MYS",lat:3.5,lon:102.0,vi:"Malaysia",en:"Malaysia",nvi:"Nền so sánh khu vực trong khung dữ liệu doanh nghiệp (WBES).",nen:"Regional comparator in the firm-level WBES frame."},
+  {iso:"FJI",lat:-17.8,lon:178.0,vi:"Fiji",en:"Fiji",nvi:"Đại diện quốc đảo nhỏ Thái Bình Dương (SIDS) trong nghiên cứu.",nen:"Pacific small-island developing state (SIDS) representative."}
+ ];
+ var sel=null;
+ function lang(){return (document.documentElement.lang||"vi").slice(0,2)==="en"?"en":"vi";}
+ function rad(d){return d*Math.PI/180;}
+ function proj(lat,lon){var la=rad(lat),lo=rad(lon);
+   var cosc=Math.sin(phi)*Math.sin(la)+Math.cos(phi)*Math.cos(la)*Math.cos(lo-lam);
+   var x=Math.cos(la)*Math.sin(lo-lam);
+   var y=Math.cos(phi)*Math.sin(la)-Math.sin(phi)*Math.cos(la)*Math.cos(lo-lam);
+   return {x:cx+R*x, y:cy-R*y, vis:cosc>=0};}
+ function sv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||n;}
+ function draw(){
+   ctx.clearRect(0,0,cv.width,cv.height);
+   var ocean=sv("--accent-soft"),line=sv("--line"),accent=sv("--accent"),ink=sv("--ink"),surf=sv("--surface");
+   var g=ctx.createRadialGradient(cx-90,cy-90,60,cx,cy,R);g.addColorStop(0,surf);g.addColorStop(1,ocean);
+   ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fillStyle=g;ctx.fill();ctx.lineWidth=1.4;ctx.strokeStyle=line;ctx.stroke();
+   ctx.lineWidth=1;ctx.strokeStyle=line;ctx.globalAlpha=.7;
+   var mer,par,la,lo,p,st;
+   for(mer=-180;mer<180;mer+=30){st=false;ctx.beginPath();for(la=-90;la<=90;la+=4){p=proj(la,mer);if(p.vis){if(!st){ctx.moveTo(p.x,p.y);st=true;}else ctx.lineTo(p.x,p.y);}else st=false;}ctx.stroke();}
+   for(par=-60;par<=60;par+=30){st=false;ctx.beginPath();for(lo=-180;lo<=180;lo+=4){p=proj(par,lo);if(p.vis){if(!st){ctx.moveTo(p.x,p.y);st=true;}else ctx.lineTo(p.x,p.y);}else st=false;}ctx.stroke();}
+   ctx.globalAlpha=1;var L=lang();
+   COUNTRIES.forEach(function(c){var q=proj(c.lat,c.lon);c._sx=q.x;c._sy=q.y;c._vis=q.vis;if(!q.vis)return;
+     var isS=sel===c,r=isS?9:6.5;
+     ctx.beginPath();ctx.arc(q.x,q.y,r,0,7);ctx.fillStyle=accent;ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle=surf;ctx.stroke();
+     if(isS){ctx.beginPath();ctx.arc(q.x,q.y,r+5,0,7);ctx.lineWidth=2;ctx.strokeStyle=sv("--gold");ctx.stroke();}
+     ctx.font="600 20px system-ui,sans-serif";ctx.fillStyle=ink;ctx.textAlign="left";ctx.fillText(c[L],q.x+r+6,q.y+7);});
+ }
+ function tick(){if(auto&&!drag){lam+=vel;}draw();requestAnimationFrame(tick);}
+ function pos(e){var r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*cv.width,y:(e.clientY-r.top)/r.height*cv.height};}
+ cv.addEventListener("pointerdown",function(e){drag=true;auto=false;var q=pos(e);px=q.x;py=q.y;try{cv.setPointerCapture(e.pointerId);}catch(_){}});
+ cv.addEventListener("pointermove",function(e){if(!drag)return;var q=pos(e);lam+=(q.x-px)*0.005;phi=Math.max(-1.2,Math.min(1.2,phi-(q.y-py)*0.005));px=q.x;py=q.y;});
+ cv.addEventListener("pointerup",function(e){drag=false;var q=pos(e),hit=null,best=28*28;
+   COUNTRIES.forEach(function(c){if(!c._vis)return;var dx=q.x-c._sx,dy=q.y-c._sy,d=dx*dx+dy*dy;if(d<best){best=d;hit=c;}});
+   if(hit){sel=hit;showCap();}setTimeout(function(){auto=true;},2600);});
+ function showCap(){var L=lang(),c=sel,cap=document.getElementById("globeCap");if(!c){cap.innerHTML="";return;}
+   cap.innerHTML="<b>"+c[L]+"</b> — "+(L==="en"?c.nen:c.nvi);}
+ var tog=document.querySelector(".langtog");if(tog)tog.addEventListener("click",function(){setTimeout(function(){if(sel)showCap();else initCap();},30);});
+ function initCap(){var L=lang();document.getElementById("globeCap").innerHTML=L==="en"?"Drag to spin · tap a marker to see the related research.":"Kéo để xoay · chạm một điểm để xem nghiên cứu liên quan.";}
+ initCap();requestAnimationFrame(tick);
 })();</script>
 </body></html>
