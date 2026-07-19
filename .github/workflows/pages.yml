@@ -1,0 +1,57 @@
+name: Deploy web to GitHub Pages
+
+# Đưa trang web tĩnh M-AIDA (các file .html tự chứa + assets/icons/voice) lên
+# GitHub Pages miễn phí. Chỉ xuất bản phần web, không đăng mã nguồn backend.
+# Sau khi merge lần đầu: vào Settings → Pages → Source = "GitHub Actions".
+# Địa chỉ trang: https://<user>.github.io/m-aida/
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - 'assets/**'
+      - 'icons/**'
+      - 'voice/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage static site
+        run: |
+          mkdir -p _site
+          cp ./*.html _site/ 2>/dev/null || true
+          cp manifest.webmanifest sw.js _site/ 2>/dev/null || true
+          for d in assets icons voice; do
+            [ -d "$d" ] && cp -r "$d" _site/
+          done
+          touch _site/.nojekyll
+          echo "Đã dựng $(ls _site/*.html | wc -l) trang HTML."
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
