@@ -13,7 +13,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGES = ["index.html", "commercial.html", "data_melody.html",
-         "songs.html", "huong.html", "privacy.html"]
+         "songs.html", "huong.html", "privacy.html", "asia.html"]
 
 with open(os.path.join(ROOT, "assets/data/site-metrics.json"), encoding="utf-8") as f:
     M = json.load(f)
