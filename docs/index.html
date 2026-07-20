@@ -901,6 +901,16 @@ a{color:var(--brand);text-decoration:none;}
   .travgrp{pointer-events:none;transition:opacity .4s ease;}
   .travgrp image{filter:drop-shadow(0 4px 6px rgba(0,0,0,.35));}
   .travbub{transition:opacity .3s ease;}
+  .utildrawer{position:absolute;top:calc(100% + 10px);right:0;z-index:95;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 44px -20px rgba(0,0,0,.4);padding:.85rem;display:flex;flex-direction:column;gap:.85rem;width:min(320px,calc(100vw - 2rem));transform-origin:top right;}
+  .utildrawer[hidden]{display:none;}
+  .ud-sec{display:flex;flex-direction:column;gap:.5rem;}
+  .ud-sec + .ud-sec{border-top:1px solid var(--line);padding-top:.7rem;}
+  .ud-k{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);}
+  .ud-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  #utilBtn[aria-expanded="true"]{color:var(--brand);border-color:var(--brand-line);}
+  #utilDrawer .moodpop{position:static;width:auto;border:none;box-shadow:none;padding:.15rem 0 0;}
+  #utilDrawer .clockstrip{flex-wrap:wrap;overflow:visible;}
+  #utilDrawer .sharebar{margin:0;}
   .topstrip{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.4rem 0 .55rem;border-top:1px solid var(--line);margin-top:.5rem;}
   .clockstrip{display:flex;gap:.55rem;overflow-x:auto;scrollbar-width:none;}
   .clockstrip::-webkit-scrollbar{display:none;}
@@ -1062,23 +1072,31 @@ a{color:var(--brand);text-decoration:none;}
     </nav>
     <div class="hdr-right">
       <div class="motionsw" role="group" aria-label="Motion"><span class="ml" data-i18n data-en="Motion" data-vi="Hiệu ứng">Motion</span><span class="seg2"><button id="motionOn" aria-pressed="true">On</button><button id="motionOff" aria-pressed="false" data-i18n data-en="Off" data-vi="Tắt">Off</button></span></div>
+      <button class="pill-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">◑</button>
+      <div class="lang" role="group" aria-label="Language">
+        <button id="enBtn" aria-pressed="true">EN</button>
+        <button id="viBtn" aria-pressed="false">VI</button>
+      </div>
+      <button class="pill-btn" id="utilBtn" aria-expanded="false" aria-controls="utilDrawer" aria-haspopup="true" aria-label="More: music, guided tour, world clocks, share" title="Nhạc, tour, đồng hồ, chia sẻ / Music, tour, clocks, share">&#8943;</button>
+      <div class="utildrawer" id="utilDrawer" hidden>
+        <div class="ud-sec">
+          <span class="ud-k" data-i18n data-en="Audio &amp; guided tour" data-vi="&#194;m thanh &amp; tour">Audio &amp; guided tour</span>
+          <div class="ud-row">
       <button class="pill-btn" id="musicBtn" aria-pressed="false" aria-label="Background music" title="Nhạc nền không lời / Background music">♪</button>
+      <button class="pill-btn" id="tourBtn" aria-pressed="false" aria-label="Guided tour with English voice" title="Hương AI dẫn tour giọng tiếng Anh / Guided tour (English voice)">🎧</button>
+          </div>
       <div class="moodpop" id="moodPop" hidden>
         <div class="mq" data-i18n data-en="How are you feeling today?" data-vi="Hôm nay bạn thấy thế nào?">How are you feeling today?</div>
         <button type="button" data-mood="happy">😊 <span data-i18n data-en="Happy: easy, upbeat instrumental" data-vi="Vui: nhạc không lời tươi vui, thoải mái">Happy: easy, upbeat instrumental</span></button>
         <button type="button" data-mood="calm">😌 <span data-i18n data-en="Not so great: soothing instrumental" data-vi="Không vui: nhạc không lời xoa dịu tâm trạng">Not so great: soothing instrumental</span></button>
         <button type="button" data-mood="owner">🎻 <span data-i18n data-en="The author's pick, with vocals: «Que les preuves décident»" data-vi="Bài tác giả chọn, có lời: «Que les preuves décident»">The author's pick, with vocals</span></button><button type="button" data-mood="owner2">🎼 <span data-i18n data-en="The author's pick, instrumental" data-vi="Bài tác giả chọn, không lời">The author's pick, instrumental</span></button>
       </div>
-      <button class="pill-btn" id="tourBtn" aria-pressed="false" aria-label="Guided tour with English voice" title="Hương AI dẫn tour giọng tiếng Anh / Guided tour (English voice)">🎧</button>
-      <button class="pill-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">◑</button>
-      <div class="lang" role="group" aria-label="Language">
-        <button id="enBtn" aria-pressed="true">EN</button>
-        <button id="viBtn" aria-pressed="false">VI</button>
-      </div>
-    </div>
-  </div>
-  <div class="wrap topstrip">
+        </div>
+        <div class="ud-sec">
+          <span class="ud-k" data-i18n data-en="World clocks" data-vi="&#272;&#7891;ng h&#7891; th&#7871; gi&#7899;i">World clocks</span>
     <div class="clockstrip" id="clockStrip" aria-label="World clocks"></div>
+        </div>
+        <div class="ud-sec">
     <div class="sharebar">
           <span class="sh-k" data-i18n data-en="Share" data-vi="Chia sẻ">Share</span>
           <a class="shbtn" target="_blank" rel="noopener" href="https://github.com/thuyhuongctu/M-AIDA" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24"><path d="M12 1.8a10.3 10.3 0 00-3.3 20c.6.1.8-.2.8-.5v-2c-2.9.6-3.5-1.2-3.5-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.6 0-.6 0-.6 1 0 1.6 1 1.6 1 .9 1.6 2.4 1.1 3 .9a2 2 0 01.7-1.4c-2.3-.2-4.7-1.1-4.7-5.1 0-1.1.4-2 1-2.8-.1-.2-.4-1.3.1-2.7 0 0 .9-.3 2.9 1a9.8 9.8 0 015.1 0c2-1.3 2.9-1 2.9-1 .5 1.4.2 2.5.1 2.7.7.8 1 1.7 1 2.8 0 4-2.4 4.9-4.7 5.1.4.3.7 1 .7 1.9v2.8c0 .3.2.6.8.5A10.3 10.3 0 0012 1.8z"/></svg></a>
@@ -1087,6 +1105,9 @@ a{color:var(--brand);text-decoration:none;}
           <a class="shbtn" target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fthuyhuongctu.github.io%2FM-AIDA%2F" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M5 3.5a2.5 2.5 0 11-.02 5A2.5 2.5 0 015 3.5zM3 9h4v12H3zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.5c0-1.3 0-3-1.9-3s-2.2 1.4-2.2 2.9V21H9z"/></svg></a>
           <a class="shbtn" href="mailto:?subject=M-AIDA%3A%20Meta-Analysis%20Intelligent%20Data%20Assistant&amp;body=https%3A%2F%2Fthuyhuongctu.github.io%2FM-AIDA%2F" aria-label="Share by email" title="Email"><svg viewBox="0 0 24 24"><path d="M2 5h20a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V6a1 1 0 011-1zm10 7.2L3.4 7v11h17.2V7L12 12.2zM4.6 7h14.8L12 10.8 4.6 7z"/></svg></a>
         </div>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 <main id="top">
@@ -1096,6 +1117,11 @@ a{color:var(--brand);text-decoration:none;}
     <span class="eyebrow" data-i18n data-en="Meta-Analysis Intelligent Data Assistant" data-vi="Trợ lý Dữ liệu Thông minh cho Phân tích Tổng hợp">Meta-Analysis Intelligent Data Assistant</span>
     <h1 data-i18n data-en="Human-verified effect-size data preparation for meta-analysis." data-vi="Chuẩn bị dữ liệu mức độ ảnh hưởng có kiểm chứng của con người cho phân tích tổng hợp.">Human-verified effect-size data preparation for meta-analysis.</h1>
     <p data-i18n data-en="The Paper 6 meta-analysis pools 236 studies of internationalisation and firm performance. Here is where they were conducted, when they appeared, and how strong the effect they reported was. Every number is read from the locked M-AIDA dataset." data-vi="Phân tích tổng hợp (Nghiên cứu 6) gộp 236 nghiên cứu về quốc tế hóa và hiệu quả doanh nghiệp. Đây là nơi chúng được thực hiện, thời điểm xuất hiện, và mức độ ảnh hưởng chúng báo cáo. Mọi con số đọc từ bộ dữ liệu M-AIDA đã khóa.">The Paper 6 meta-analysis pools 236 studies of internationalisation and firm performance. Here is where they were conducted, when they appeared, and how strong the effect they reported was. Every number is read from the locked M-AIDA dataset.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#atlas"><span data-i18n data-en="Explore the evidence" data-vi="Kh&#225;m ph&#225; b&#7857;ng ch&#7913;ng">Explore the evidence</span> <span class="arrow" aria-hidden="true">&#8594;</span></a>
+      <a class="btn btn-ghost" href="#tool"><span data-i18n data-en="Try M-AIDA" data-vi="D&#249;ng th&#7917; M-AIDA">Try M-AIDA</span> <span class="arrow" aria-hidden="true">&#8594;</span></a>
+      <a class="btn btn-ghost" href="#method"><span data-i18n data-en="Verify the method" data-vi="Ki&#7875;m ch&#7913;ng ph&#432;&#417;ng ph&#225;p">Verify the method</span> <span class="arrow" aria-hidden="true">&#8594;</span></a>
+    </div>
     <div class="citerow">
       <a class="doibadge" href="https://doi.org/10.5281/zenodo.21282516" target="_blank" rel="noopener">DOI 10.5281/zenodo.21282516</a>
       <button class="citebtn" id="citeApa" type="button" data-i18n data-en="Cite (APA 7)" data-vi="Tr&iacute;ch dẫn (APA 7)">Cite (APA 7)</button>
@@ -2982,5 +3008,16 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
 <style id="kpiic-2607">a.kpi-link{text-decoration:none;color:inherit;display:block;cursor:pointer;transition:transform .15s ease}a.kpi-link:hover{transform:translateY(-2px)}a.kpi-link:hover .n{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}.kpi-ic{display:block;margin-bottom:6px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}.kpi-ic svg{display:block}</style>  <!-- Thong ke luot truy cap (GoatCounter) - khong dung cookie, ton trong quyen rieng tu -->
   <script data-goatcounter="https://thuyhuongctu.goatcounter.com/count"
           async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  var b=document.getElementById('utilBtn'), d=document.getElementById('utilDrawer');
+  if(!b||!d) return;
+  function close(){ if(d.hidden) return; d.hidden=true; b.setAttribute('aria-expanded','false'); }
+  function open(){ d.hidden=false; b.setAttribute('aria-expanded','true'); }
+  b.addEventListener('click', function(e){ e.stopPropagation(); if(d.hidden) open(); else close(); });
+  document.addEventListener('click', function(e){ if(!d.hidden && !d.contains(e.target) && e.target!==b) close(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' || e.key==='Esc') close(); });
+})();
+</script>
 </body>
 </html>
