@@ -1303,7 +1303,7 @@ a{color:var(--brand);text-decoration:none;}
       </div>
       <div class="convpanel">
         <div class="convchar">
-          <img id="convChar" src="assets/img/huong/think_scene.jpg" alt="Huong AI studying a floating panel of formulas and charts">
+          <img id="convChar" src="assets/img/huong/think.png" alt="Huong AI studying a floating panel of formulas and charts">
           <span class="convcap" data-i18n data-en="Huong AI sets the rules; the formulas do the rest." data-vi="Hương AI thiết lập quy tắc; công thức làm phần còn lại.">Huong AI sets the rules; the formulas do the rest.</span>
         </div>
         <div class="convgrid">
@@ -2801,7 +2801,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   }
   }
   var convImg=document.getElementById('convChar');
-  if(convImg){convImg.src='assets/img/huong/think_scene.jpg';}
+  if(convImg&&document.documentElement.getAttribute('data-motion')!=='off'){convImg.src=POSE_THINK_V2;}
   var TOUR=[
     ['overview',"Bonjour à tous! Je m'appelle Hương. Welcome to M-AIDA, the Meta-Analysis Intelligent Data Assistant, the research software I built for my doctoral dissertation at Can Tho University under the supervision of Associate Professor Doctor Phan Anh Tu. It read two hundred thirty six studies spanning nineteen seventy eight to twenty twenty six and prepared two hundred eighty six verified effect-size records on internationalization and firm performance across thirty five economies.","Bonjour à tous! Je m'appelle Hương. Chào mừng đến với M-AIDA - Trợ lý Dữ liệu Thông minh cho Phân tích Tổng hợp, phần mềm tôi xây dựng cho luận án tiến sĩ tại Trường Đại học Cần Thơ, dưới sự hướng dẫn của PGS.TS. Phan Anh Tú. Hệ thống đã đọc 236 nghiên cứu trải dài 1978-2026 và chuẩn bị 286 bản ghi mức độ ảnh hưởng đã kiểm chứng về quốc tế hóa và hiệu quả doanh nghiệp trên 35 nền kinh tế."],
     ['method',"The workflow has three gates: extract, verify, lock. A large language model reads each full-text PDF and proposes the statistics - sample size, correlation, t statistic, standardized beta - each with a confidence score. Anything below zero point seven is flagged for mandatory human review. I verify every field against the source page myself; approved records are locked immutably with a timestamp, so no number can be quietly changed afterwards. Every conversion follows published formulas only: t to r by Cohen nineteen eighty eight, beta to r by Peterson and Brown two thousand five.","Quy trình có ba cửa kiểm soát: trích xuất, kiểm chứng, khóa. Mô hình ngôn ngữ lớn đọc toàn văn từng PDF và đề xuất số liệu - cỡ mẫu, hệ số tương quan, thống kê t, beta chuẩn hóa - kèm điểm tin cậy. Dưới 0,7 bị gắn cờ buộc con người rà soát. Tôi tự kiểm từng trường so với trang nguồn; bản ghi được duyệt sẽ khóa bất biến kèm dấu thời gian, không ai sửa lén được. Mọi quy đổi chỉ dùng công thức đã công bố: t sang r theo Cohen (1988), beta sang r theo Peterson và Brown (2005)."],
