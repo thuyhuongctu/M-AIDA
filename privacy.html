@@ -3,9 +3,18 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy Policy | M-AIDA</title>
-<style>body{font-family:Georgia,serif;max-width:680px;margin:0 auto;padding:40px 20px;line-height:1.7;color:#1c1914;background:#f6f1e7}h1{letter-spacing:-.01em}h2{margin-top:2em}code{background:#efe8da;padding:2px 6px;border-radius:4px}</style>
+<style>
+  :root{--bg:#f6f1e7;--ink:#1c1914;--code:#efe8da;--line:#e2d9c9}
+  :root[data-theme=dark]{--bg:#0f1620;--ink:#dfe6ee;--code:#1c2836;--line:#26313f}
+  @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1620;--ink:#dfe6ee;--code:#1c2836;--line:#26313f}}
+  body{font-family:Georgia,serif;max-width:680px;margin:0 auto;padding:40px 20px;line-height:1.7;color:var(--ink);background:var(--bg)}
+  h1{letter-spacing:-.01em}h2{margin-top:2em}code{background:var(--code);padding:2px 6px;border-radius:4px}
+  a{color:#2D728F}:root[data-theme=dark] a{color:#5aa9c9}
+  .pvtheme{position:fixed;top:14px;right:14px;background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 12px;font:600 .74rem system-ui,sans-serif;cursor:pointer;z-index:5}
+</style>
 </head>
 <body>
+<button class="pvtheme" id="pvTheme" aria-label="Sáng / Tối" title="Sáng / Tối">◐</button>
 <h1>Chính sách quyền riêng tư / Privacy Policy</h1>
 <p><em>M-AIDA (Meta-Analysis Intelligent Data Assistant) · Cập nhật / Updated: 19/07/2026</em></p>
 
@@ -33,6 +42,7 @@
   <!-- Thong ke luot truy cap (GoatCounter) - khong dung cookie, ton trong quyen rieng tu -->
   <script data-goatcounter="https://thuyhuongctu.goatcounter.com/count"
           async src="//gc.zgo.at/count.js"></script>
+  <script>(function(){var r=document.documentElement,t=document.getElementById('pvTheme');try{var s=localStorage.getItem('pv_theme');if(s)r.setAttribute('data-theme',s);}catch(e){}t.addEventListener('click',function(){var cur=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');var c=cur==='dark'?'light':'dark';r.setAttribute('data-theme',c);try{localStorage.setItem('pv_theme',c);}catch(e){}});})();</script>
   <script src="assets/mini-music.js" defer></script>
   <script src="assets/mini-guide.js" defer></script>
 </body>
