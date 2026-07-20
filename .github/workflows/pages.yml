@@ -15,6 +15,7 @@ on:
       - 'assets/**'
       - 'icons/**'
       - 'voice/**'
+      - 'scripts/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -32,6 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check site metrics against locked corpus
+        run: python3 scripts/check_site_metrics.py
       - name: Stage static site
         run: |
           mkdir -p _site

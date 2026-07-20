@@ -1,0 +1,22 @@
+{
+  "version": "7.1.1",
+  "dataset": "P6 locked corpus (re-locked 2026-07-07 after cross-batch deduplication)",
+  "estimator": "three-level random-effects, R metafor::rma.mv()",
+  "studies": 236,
+  "effect_sizes": 286,
+  "economies": 35,
+  "cross_border_studies": 42,
+  "pooled_r": 0.074,
+  "pooled_ci": [0.060, 0.088],
+  "adjusted_r": 0.034,
+  "adjusted_ci": [0.018, 0.051],
+  "trim_fill_imputed": 57,
+  "i2_percent": 62.6,
+  "q": 1902.40,
+  "q_df": 285,
+  "search_window": "1977-2026",
+  "concept_doi": "10.5281/zenodo.21282516",
+  "version_doi": "10.5281/zenodo.21282517",
+  "source_of_truth": "p6/results/table1_baseline.csv (thesis repo) — see CANONICAL_NUMBERS_P6.md",
+  "updated_at": "2026-07-20"
+}
