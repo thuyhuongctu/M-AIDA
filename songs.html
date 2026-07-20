@@ -57,8 +57,15 @@
   .hero .bg{position:absolute;inset:0;background-size:cover;background-position:center top;opacity:.34}
   .hero .veil{position:absolute;inset:0;background:linear-gradient(to top,var(--navy) 8%,rgba(10,25,47,.55) 55%,rgba(10,25,47,.2))}
   .hero .row{position:relative;z-index:2;display:flex;align-items:flex-end;gap:clamp(16px,3vw,28px);width:100%;flex-wrap:wrap}
-  .hero .cover{width:clamp(140px,20vw,190px);aspect-ratio:1;border-radius:16px;object-fit:cover;object-position:top center;
-    border:1px solid rgba(255,255,255,.2);box-shadow:0 20px 44px -18px rgba(0,0,0,.7)}
+  .disc-wrap{position:relative;flex:none;perspective:900px;animation:floaty 6s ease-in-out infinite}
+  .disc-wrap .ring{position:absolute;inset:-13px;border-radius:24px;z-index:0;opacity:0;filter:blur(2px);
+    background:conic-gradient(from 0deg,var(--gold),var(--teal-2),var(--teal),var(--gold),var(--teal-2),var(--gold));transition:opacity .6s ease}
+  .disc-wrap.spin .ring{opacity:.6;animation:orbit 9s linear infinite}
+  .hero .cover{position:relative;z-index:1;display:block;width:clamp(140px,20vw,190px);aspect-ratio:1;border-radius:16px;object-fit:cover;object-position:top center;
+    border:1px solid rgba(255,255,255,.2);box-shadow:0 20px 44px -18px rgba(0,0,0,.7);
+    transform:rotateX(0) rotateY(0);transition:transform .25s ease-out;will-change:transform}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes orbit{to{transform:rotate(360deg)}}
   .hero .meta{flex:1;min-width:220px;color:#fff}
   .hero .tag{display:inline-block;background:rgba(212,175,55,.22);color:var(--gold);padding:.2rem .7rem;border-radius:999px;font:700 .7rem var(--mono);letter-spacing:.05em;margin-bottom:.5rem}
   .hero h1{font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.7rem);margin:.1rem 0;line-height:1.1}
@@ -116,7 +123,8 @@
 
   footer{padding:1.2rem;text-align:center;font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);margin-bottom:82px}
   footer a{margin:0 .4rem}
-  @media (prefers-reduced-motion:reduce){.player.playing .wave i{animation:none}.lblk{transition:none}}
+  @media (prefers-reduced-motion:reduce){.player.playing .wave i{animation:none}.lblk{transition:none}
+    .disc-wrap{animation:none}.disc-wrap.spin .ring{animation:none;opacity:.4}.hero .cover{transition:none}}
   svg{display:block}
 </style>
 </head>
@@ -151,7 +159,10 @@
       <div class="bg" style="background-image:url('assets/img/huong/song_cover.jpg')"></div>
       <div class="veil"></div>
       <div class="row">
-        <img class="cover" src="assets/img/huong/song_cover.jpg" alt="Album cover — Do Thuy Huong in ao dai">
+        <div class="disc-wrap" id="discWrap">
+          <span class="ring" aria-hidden="true"></span>
+          <img class="cover" id="cover" src="assets/img/huong/song_cover.jpg" alt="Album cover — Do Thuy Huong in ao dai">
+        </div>
         <div class="meta">
           <span class="tag">Academic Anthem</span>
           <h1>Je m'appelle Hương</h1>
@@ -285,8 +296,22 @@
   document.getElementById('prevBtn').addEventListener('click',function(){ load((cur-1+TRACKS.length)%TRACKS.length,true); });
   document.getElementById('nextBtn').addEventListener('click',function(){ load((cur+1)%TRACKS.length,true); });
 
-  audio.addEventListener('play',function(){ player.classList.add('playing'); ppIcon.innerHTML=ICON_PAUSE; marktracks(); });
-  audio.addEventListener('pause',function(){ player.classList.remove('playing'); ppIcon.innerHTML=ICON_PLAY; marktracks(); });
+  var discWrap=document.getElementById('discWrap');
+  audio.addEventListener('play',function(){ player.classList.add('playing'); if(discWrap)discWrap.classList.add('spin'); ppIcon.innerHTML=ICON_PAUSE; marktracks(); });
+  audio.addEventListener('pause',function(){ player.classList.remove('playing'); if(discWrap)discWrap.classList.remove('spin'); ppIcon.innerHTML=ICON_PLAY; marktracks(); });
+
+  // Gentle 3D tilt on the album art (mockup-inspired), disabled for reduced motion / touch.
+  var cover=document.getElementById('cover');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var fine=window.matchMedia&&window.matchMedia('(pointer:fine)').matches;
+  if(cover&&discWrap&&!reduce&&fine){
+    discWrap.addEventListener('mousemove',function(e){
+      var r=discWrap.getBoundingClientRect();
+      var px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
+      cover.style.transform='rotateY('+(px*14).toFixed(2)+'deg) rotateX('+(-py*14).toFixed(2)+'deg)';
+    });
+    discWrap.addEventListener('mouseleave',function(){ cover.style.transform='rotateX(0) rotateY(0)'; });
+  }
   audio.addEventListener('ended',function(){ document.getElementById('nextBtn').click(); });
   function fmt(s){ if(!s||isNaN(s))return '0:00'; var m=Math.floor(s/60),x=Math.floor(s%60); return m+':'+(x<10?'0':'')+x; }
   audio.addEventListener('loadedmetadata',function(){ tDur.textContent=fmt(audio.duration); });
