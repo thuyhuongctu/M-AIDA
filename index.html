@@ -1272,6 +1272,90 @@ a{color:var(--brand);text-decoration:none;}
     </div>
   </section>
 
+  <!-- THIS PROJECT'S META-ANALYSIS — DEVELOPMENT STORY (3D) -->
+  <style>
+  .devstory{padding:clamp(2.6rem,5vw,4.2rem) 0;position:relative;border-top:1px solid var(--line)}
+  .devstory .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+  .devstory .eyebrow{display:inline-block;font:700 .72rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);margin-bottom:.7rem}
+  .devstory h2{font-family:Charter,Cambria,Georgia,serif;font-size:clamp(1.5rem,3vw,2.05rem);line-height:1.16;margin:.1rem 0 .5rem;color:var(--ink);max-width:22ch}
+  .devstory .lead{color:var(--muted);max-width:62ch;margin:0 0 2rem;font-size:1rem}
+  .dev-stage{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;perspective:1700px}
+  @media(max-width:920px){.dev-stage{grid-template-columns:1fr 1fr;perspective:none}}
+  @media(max-width:560px){.dev-stage{grid-template-columns:1fr}}
+  .dev-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.05rem 1rem 1.2rem;
+    transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1),box-shadow .5s,border-color .3s;
+    box-shadow:0 20px 34px -22px rgba(0,0,0,.5);will-change:transform}
+  .dev-stage .dev-card:nth-child(1){transform:rotateY(12deg) translateZ(-24px)}
+  .dev-stage .dev-card:nth-child(2){transform:rotateY(6deg) translateZ(-6px)}
+  .dev-stage .dev-card:nth-child(3){transform:rotateY(0) translateZ(10px)}
+  .dev-stage .dev-card:nth-child(4){transform:rotateY(-6deg) translateZ(-6px)}
+  .dev-stage .dev-card:nth-child(5){transform:rotateY(-12deg) translateZ(-24px)}
+  .dev-card:hover{transform:rotateY(0) translateZ(30px) scale(1.02)!important;border-color:var(--brand-line);box-shadow:0 34px 54px -24px rgba(0,0,0,.7);z-index:3}
+  @media(max-width:920px){.dev-stage .dev-card{transform:none!important}}
+  :root[data-motion="off"] .dev-card{transform:none!important}
+  .dev-card .dv-step{position:absolute;top:1.05rem;right:1rem;font:700 .78rem ui-monospace,monospace;color:var(--line-2)}
+  .dev-card .dv-yr{display:inline-block;font:700 .68rem ui-monospace,Menlo,Consolas,monospace;letter-spacing:.05em;color:var(--brand);background:var(--brand-soft);border:1px solid var(--brand-line);padding:.24rem .55rem;border-radius:999px}
+  .dev-card .dv-yr.gold{color:var(--amber-strong);background:var(--amber-soft);border-color:var(--amber)}
+  .dev-card .dv-h{font-family:Charter,Cambria,Georgia,serif;font-size:1.02rem;color:var(--ink);margin:.7rem 0 .4rem;line-height:1.2}
+  .dev-card .dv-p{font-size:.82rem;color:var(--muted);line-height:1.5;margin:0}
+  .dev-card .dv-tag{display:inline-block;margin-top:.65rem;font:700 .62rem ui-monospace,monospace;letter-spacing:.03em;color:var(--amber-strong);background:var(--amber-soft);border:1px solid var(--amber);padding:.2rem .5rem;border-radius:6px}
+  .dev-growth{margin-top:1.8rem;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:1.3rem clamp(1rem,3vw,1.8rem)}
+  .dev-growth .gh{font:700 .7rem ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1.1rem}
+  .dev-growth .grow{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+  @media(max-width:640px){.dev-growth .grow{grid-template-columns:1fr}}
+  .grow .gk{font-size:.76rem;color:var(--muted);margin-bottom:.35rem}
+  .grow .gv{display:flex;align-items:baseline;gap:.5rem;font-family:Charter,Cambria,Georgia,serif}
+  .grow .gv .from{font-size:1.15rem;color:var(--muted)}
+  .grow .gv .arr{color:var(--brand);font-weight:700}
+  .grow .gv .to{font-size:1.95rem;font-weight:700;color:var(--ink);line-height:1}
+  .grow .gbar{margin-top:.55rem;height:7px;border-radius:5px;background:var(--line);overflow:hidden}
+  .grow .gbar i{display:block;height:100%;width:100%;border-radius:5px;background:linear-gradient(90deg,var(--brand),var(--amber-strong))}
+  :root:not([data-motion="off"]) .grow .gbar i{animation:devgrow 1.2s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes devgrow{from{width:0}to{width:100%}}
+  @media (prefers-reduced-motion:reduce){.dev-stage .dev-card{transform:none!important}.grow .gbar i{animation:none}}
+  </style>
+  <section class="devstory" id="devstory"><div class="wrap">
+    <span class="eyebrow" data-i18n data-en="The making of this meta-analysis" data-vi="Câu chuyện phát triển của phân tích tổng hợp này">The making of this meta-analysis</span>
+    <h2 data-i18n data-en="From a first conference review to a human-verified corpus." data-vi="Từ bản tổng quan hội thảo đầu tiên đến bộ dữ liệu có người kiểm chứng.">From a first conference review to a human-verified corpus.</h2>
+    <p class="lead" data-i18n data-en="The same question, followed for five years — and a body of evidence that kept growing as the method sharpened." data-vi="Cùng một câu hỏi, theo đuổi suốt năm năm — và một khối bằng chứng lớn dần khi phương pháp được mài sắc.">The same question, followed for five years — and a body of evidence that kept growing as the method sharpened.</p>
+
+    <div class="dev-stage">
+      <div class="dev-card"><span class="dv-step">01</span><span class="dv-yr">2021</span>
+        <div class="dv-h" data-i18n data-en="The question" data-vi="Câu hỏi khởi đầu">The question</div>
+        <p class="dv-p" data-i18n data-en="Master's research concluded. Does going international raise firm performance — or does it depend on where and how?" data-vi="Hoàn thành luận văn thạc sĩ. Quốc tế hóa có nâng cao hiệu quả doanh nghiệp — hay còn tùy nơi và cách làm?">Master's research concluded. Does going international raise firm performance — or does it depend on where and how?</p></div>
+      <div class="dev-card"><span class="dv-step">02</span><span class="dv-yr">2022–24</span>
+        <div class="dv-h" data-i18n data-en="Building the review" data-vi="Dựng bản tổng quan">Building the review</div>
+        <p class="dv-p" data-i18n data-en="A PRISMA systematic search of 1977–2022, hand-coded into a first evidence base." data-vi="Tìm kiếm hệ thống theo PRISMA cho giai đoạn 1977–2022, mã hóa thủ công thành bộ bằng chứng đầu tiên.">A PRISMA systematic search of 1977–2022, hand-coded into a first evidence base.</p>
+        <span class="dv-tag">113 studies · 200 effects</span></div>
+      <div class="dev-card"><span class="dv-step">03</span><span class="dv-yr">Dec 2024</span>
+        <div class="dv-h" data-i18n data-en="Presented" data-vi="Báo cáo hội thảo">Presented</div>
+        <p class="dv-p" data-i18n data-en="At the 6th International Conference in Business, Economics and Finance, Can Tho University (12 Dec 2024)." data-vi="Tại Hội thảo quốc tế lần thứ 6 về Kinh tế, Kinh doanh và Tài chính, Đại học Cần Thơ (12/12/2024).">At the 6th International Conference in Business, Economics and Finance, Can Tho University (12 Dec 2024).</p></div>
+      <div class="dev-card"><span class="dv-step">04</span><span class="dv-yr">2025</span>
+        <div class="dv-h" data-i18n data-en="Published" data-vi="Xuất bản kỷ yếu">Published</div>
+        <p class="dv-p" data-i18n data-en="In the proceedings — Volume 2, Can Tho University Publishing House, pp. 469–489 (ISBN)." data-vi="Trong kỷ yếu — Tập 2, NXB Đại học Cần Thơ, tr. 469–489 (ISBN).">In the proceedings — Volume 2, Can Tho University Publishing House, pp. 469–489 (ISBN).</p></div>
+      <div class="dev-card"><span class="dv-step">05</span><span class="dv-yr gold">2026</span>
+        <div class="dv-h" data-i18n data-en="M-AIDA &amp; the dissertation" data-vi="M-AIDA &amp; luận án">M-AIDA &amp; the dissertation</div>
+        <p class="dv-p" data-i18n data-en="Rebuilt with M-AIDA: AI-extracted, human-verified, locked. The corpus grows and pools to r&#772; = .074." data-vi="Dựng lại cùng M-AIDA: AI trích xuất, người kiểm chứng, khóa bất biến. Bộ dữ liệu mở rộng và gộp cho r&#772; = .074.">Rebuilt with M-AIDA: AI-extracted, human-verified, locked. The corpus grows and pools to r&#772; = .074.</p>
+        <span class="dv-tag">236 studies · 286 effects</span></div>
+    </div>
+
+    <div class="dev-growth">
+      <div class="gh" data-i18n data-en="From the conference review to the dissertation corpus" data-vi="Từ bản tổng quan hội thảo đến bộ dữ liệu luận án">From the conference review to the dissertation corpus</div>
+      <div class="grow">
+        <div><div class="gk" data-i18n data-en="Studies pooled" data-vi="Nghiên cứu được gộp">Studies pooled</div>
+          <div class="gv"><span class="from">113</span><span class="arr">→</span><span class="to">236</span></div>
+          <div class="gbar"><i></i></div></div>
+        <div><div class="gk" data-i18n data-en="Effect sizes" data-vi="Số effect size">Effect sizes</div>
+          <div class="gv"><span class="from">200</span><span class="arr">→</span><span class="to">286</span></div>
+          <div class="gbar"><i></i></div></div>
+        <div><div class="gk" data-i18n data-en="Extraction" data-vi="Cách trích xuất">Extraction</div>
+          <div class="gv"><span class="to" style="font-size:1.05rem;font-weight:600" data-i18n data-en="by hand → M-AIDA, verified &amp; locked" data-vi="thủ công → M-AIDA, kiểm chứng &amp; khóa">by hand → M-AIDA, verified &amp; locked</span></div></div>
+      </div>
+    </div>
+
+    <p class="figcap" data-i18n data-en="<b>Figure 2.</b> The making of this meta-analysis: from a 113-study conference review (presented 2024, published in the 2025 proceedings) to the 236-study, human-verified M-AIDA corpus in the dissertation (2026). Source: the authors." data-vi="<b>Hình 2.</b> Câu chuyện phát triển của phân tích tổng hợp này: từ bản tổng quan 113 nghiên cứu (báo cáo 2024, đăng kỷ yếu 2025) đến bộ dữ liệu 236 nghiên cứu có người kiểm chứng bằng M-AIDA trong luận án (2026). Nguồn: nhóm tác giả."><b>Figure 2.</b> The making of this meta-analysis: from a 113-study conference review (presented 2024, published in the 2025 proceedings) to the 236-study, human-verified M-AIDA corpus in the dissertation (2026). Source: the authors.</p>
+  </div></section>
+
   <!-- METHOD -->
   <section id="method" class="sec">
     <div class="wrap">
