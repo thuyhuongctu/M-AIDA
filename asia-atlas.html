@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas of 50 economies — Internationalization &amp; Firm Performance in Asia</title>
+<meta name="description" content="An atlas of 50 Asian and Pacific economies: each with its flag, its ICRV institutional regime, a distinctive symbol, a famous song, and Huong in its national dress.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/asia.css">
+<style>
+  .atlas-filters{display:flex;gap:.4rem;flex-wrap:wrap;margin:1.2rem 0}
+  .atlas-filters button{font-family:var(--mono);font-size:.72rem;padding:.4rem .8rem;border-radius:999px;border:1px solid var(--line-2);
+    background:var(--surface);color:var(--muted);cursor:pointer}
+  .atlas-filters button.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .atlas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.7rem}
+  .ctile{display:flex;flex-direction:column;gap:.25rem;align-items:flex-start;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:.7rem .8rem;cursor:pointer;text-align:left;transition:transform .14s ease,box-shadow .14s ease,border-color .14s}
+  .ctile:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--brand-line)}
+  .ctile .fl{font-size:1.7rem;line-height:1}
+  .ctile .nm{font-weight:600;font-size:.9rem}
+  .ctile .rgp{font-family:var(--mono);font-size:.56rem;letter-spacing:.05em;padding:.1rem .45rem;border-radius:999px;border:1px solid var(--line-2);color:var(--muted)}
+  .zone-up{color:var(--good);border-color:var(--good)!important}
+  .zone-mid{color:var(--amber-strong);border-color:var(--amber)!important}
+  .zone-low{color:var(--danger);border-color:var(--danger)!important}
+  .modal{position:fixed;inset:0;z-index:80;background:rgba(20,16,12,.55);display:none;align-items:center;justify-content:center;padding:1.2rem}
+  .modal.open{display:flex}
+  .mcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;max-width:640px;width:100%;box-shadow:var(--shadow);
+    overflow:hidden;display:grid;grid-template-columns:1fr 1fr}
+  @media(max-width:560px){.mcard{grid-template-columns:1fr}}
+  .mcard .mfig{background:linear-gradient(160deg,var(--surface-2),var(--brand-soft));display:grid;place-items:end center;position:relative;min-height:300px}
+  .mcard .mfig img{height:290px;filter:drop-shadow(0 14px 20px rgba(0,0,0,.2))}
+  .mcard .mfig .bigflag{position:absolute;top:.7rem;left:.8rem;font-size:2.3rem}
+  .mcard .mbody{padding:1.3rem}
+  .mcard .mbody h3{font-size:1.4rem;margin:.1rem 0 .1rem}
+  .mrow{display:flex;gap:.6rem;align-items:flex-start;margin-top:.9rem;font-size:.9rem}
+  .mrow .ic{font-size:1.3rem;line-height:1.2;flex:none}
+  .mrow .mk{font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);display:block}
+  .mclose{position:absolute;top:.6rem;right:.7rem;border:0;background:rgba(0,0,0,.25);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem}
+  .costume-note{font-family:var(--mono);font-size:.58rem;color:var(--faint);position:absolute;bottom:.5rem;left:0;right:0;text-align:center}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap bar">
+  <a class="brand" href="asia.html" aria-label="Dissertation home">
+    <span class="mk" aria-hidden="true">🗺️</span>
+    <span><b>Internationalization &amp; Firm Performance in Asia</b>
+      <span class="sub">Doctoral dissertation · Do Thuy Huong · Can Tho University</span></span>
+  </a>
+  <nav class="top" aria-label="Sections">
+    <a href="asia.html#framework"><span class="lang-vi">Khung</span><span class="lang-en">Framework</span></a>
+    <a href="asia.html#regimes"><span class="lang-vi">Chế độ</span><span class="lang-en">Regimes</span></a>
+    <a href="asia.html#studies"><span class="lang-vi">Cấu phần</span><span class="lang-en">Studies</span></a>
+    <a href="./"><span class="lang-vi">M-AIDA</span><span class="lang-en">M-AIDA</span></a>
+  </nav>
+  <div class="hctl">
+    <span class="langtog" role="group" aria-label="Language">
+      <button type="button" data-lang="vi" class="active">VI</button>
+      <button type="button" data-lang="en">EN</button>
+    </span>
+    <button class="iconbtn" id="themeBtn" aria-label="Toggle theme" title="Sáng / Tối">◑</button>
+  </div>
+</div></header>
+
+<main id="top"><div class="wrap">
+  <div class="crumb"><a href="asia.html"><span class="lang-vi">Luận án</span><span class="lang-en">Dissertation</span></a> ·
+    <span class="lang-vi">Atlas 50 nền</span><span class="lang-en">Atlas of 50 economies</span></div>
+  <section class="dhero" style="grid-template-columns:1fr">
+    <div>
+      <span class="eyebrow">🗺️ <span class="lang-vi">Atlas văn hóa &amp; thể chế</span><span class="lang-en">Cultural &amp; institutional atlas</span></span>
+      <h1 style="margin:.5rem 0 .3rem"><span class="lang-vi">50 nền kinh tế — Hương trong trang phục từng nước</span><span class="lang-en">50 economies — Huong in each nation's dress</span></h1>
+      <p class="muted" style="max-width:720px"><span class="lang-vi">Mỗi nền kinh tế trong khung phân tích 50 nền: lá cờ, chế độ thể chế ICRV (điểm uốn), một biểu tượng đặc trưng, một bài hát nổi tiếng — và Hương trong trang phục truyền thống của nước đó. Bấm vào một nước để xem chi tiết.</span>
+      <span class="lang-en">Every economy in the 50-economy frame: its flag, its ICRV institutional regime (turning point), a distinctive symbol, a famous song — and Huong in its national dress. Tap a country for details.</span></p>
+    </div>
+  </section>
+
+  <div class="atlas-filters" id="filters"></div>
+  <div class="atlas-grid" id="grid"></div>
+  <p class="muted" style="font-size:.8rem;margin-top:1.4rem"><span class="lang-vi">Ghi chú: hình trang phục truyền thống của Hương cho từng nước đang được bổ sung dần; nơi chưa có, hiển thị tạo hình Hương mặc định. Bài hát và biểu tượng là mặc định có thể chỉnh.</span>
+  <span class="lang-en">Note: Huong's national-dress renders are being added gradually; where one is missing, the default Huong figure is shown. Songs and symbols are editable defaults.</span></p>
+
+  <nav class="prevnext"><a href="asia.html">← <span class="lang-vi">Về trang luận án</span><span class="lang-en">Back to the dissertation</span></a><span></span></nav>
+</div></main>
+
+<div class="modal" id="modal"><div class="mcard">
+  <div class="mfig">
+    <span class="bigflag" id="mFlag"></span>
+    <button class="mclose" id="mClose" aria-label="Close">✕</button>
+    <img id="mImg" src="" alt="">
+    <span class="costume-note" id="mCostumeNote"></span>
+  </div>
+  <div class="mbody">
+    <span class="eyebrow" id="mRegime"></span>
+    <h3 id="mName"></h3>
+    <div class="mrow"><span class="ic" id="mSymIc"></span><div><span class="mk"><span class="lang-vi">Biểu tượng</span><span class="lang-en">Symbol</span></span><span id="mSym"></span></div></div>
+    <div class="mrow"><span class="ic">🎵</span><div><span class="mk"><span class="lang-vi">Bài hát nổi tiếng</span><span class="lang-en">Famous song</span></span><span id="mSong"></span></div></div>
+    <div class="mrow"><span class="ic">👗</span><div><span class="mk"><span class="lang-vi">Trang phục</span><span class="lang-en">National dress</span></span><span id="mCostume"></span></div></div>
+    <div class="mrow"><span class="ic">📈</span><div><span class="mk"><span class="lang-vi">Điểm uốn (chế độ)</span><span class="lang-en">Turning point (regime)</span></span><span id="mTp"></span></div></div>
+  </div>
+</div></div>
+
+<footer><div class="wrap fg">
+  <div><span class="lang-vi">Luận án đang thực hiện — chưa công bố.</span><span class="lang-en">Dissertation in progress — unpublished.</span></div>
+  <div>© 2026 Đỗ Thùy Hương · Can Tho University</div>
+</div></footer>
+
+<script data-goatcounter="https://thuyhuongctu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="assets/asia.js"></script>
+<script>
+(function(){
+  var DATA=[{"key": "singapore", "flag": "🇸🇬", "nv": "Singapore", "ne": "Singapore", "rg": 1, "sym": "🦁", "cv": "Sarong kebaya", "ce": "Sarong kebaya", "song": "Di Tanjong Katong", "kv": "dân ca", "ke": "folk song"}, {"key": "korea", "flag": "🇰🇷", "nv": "Hàn Quốc", "ne": "South Korea", "rg": 1, "sym": "🏯", "cv": "Hanbok", "ce": "Hanbok", "song": "Arirang (아리랑)", "kv": "dân ca", "ke": "folk song"}, {"key": "taiwan", "flag": "🇹🇼", "nv": "Đài Loan", "ne": "Taiwan", "rg": 1, "sym": "🏙️", "cv": "Qipao", "ce": "Qipao", "song": "高山青 Gāoshān Qīng", "kv": "dân ca", "ke": "folk song"}, {"key": "israel", "flag": "🇮🇱", "nv": "Israel", "ne": "Israel", "rg": 1, "sym": "🕎", "cv": "Trang phục truyền thống", "ce": "Traditional dress", "song": "Hava Nagila", "kv": "dân ca", "ke": "folk song"}, {"key": "hongkong", "flag": "🇭🇰", "nv": "Hồng Kông", "ne": "Hong Kong", "rg": 1, "sym": "🏙️", "cv": "Cheongsam", "ce": "Cheongsam", "song": "獅子山下 Below the Lion Rock", "kv": "nhạc phổ thông", "ke": "classic song"}, {"key": "japan", "flag": "🇯🇵", "nv": "Nhật Bản", "ne": "Japan", "rg": 1, "sym": "🗻", "cv": "Kimono", "ce": "Kimono", "song": "Sakura Sakura (さくらさくら)", "kv": "dân ca", "ke": "folk song"}, {"key": "bahrain", "flag": "🇧🇭", "nv": "Bahrain", "ne": "Bahrain", "rg": 2, "sym": "🕌", "cv": "Abaya / Thobe", "ce": "Abaya / Thobe", "song": "Bahrainona", "kv": "quốc ca", "ke": "anthem"}, {"key": "kuwait", "flag": "🇰🇼", "nv": "Kuwait", "ne": "Kuwait", "rg": 2, "sym": "🕌", "cv": "Dishdasha", "ce": "Dishdasha", "song": "Al-Nashid Al-Watani", "kv": "quốc ca", "ke": "anthem"}, {"key": "qatar", "flag": "🇶🇦", "nv": "Qatar", "ne": "Qatar", "rg": 2, "sym": "🏙️", "cv": "Thobe / Abaya", "ce": "Thobe / Abaya", "song": "As Salam al Amiri", "kv": "quốc ca", "ke": "anthem"}, {"key": "oman", "flag": "🇴🇲", "nv": "Oman", "ne": "Oman", "rg": 2, "sym": "🏰", "cv": "Dishdasha", "ce": "Dishdasha", "song": "Nashid as-Salaam as-Sultani", "kv": "quốc ca", "ke": "anthem"}, {"key": "saudiarabia", "flag": "🇸🇦", "nv": "Ả Rập Xê Út", "ne": "Saudi Arabia", "rg": 2, "sym": "🕋", "cv": "Thobe / Abaya", "ce": "Thobe / Abaya", "song": "Aash Al Maleek", "kv": "quốc ca", "ke": "anthem"}, {"key": "brunei", "flag": "🇧🇳", "nv": "Brunei", "ne": "Brunei", "rg": 2, "sym": "🕌", "cv": "Baju Melayu", "ce": "Baju Melayu", "song": "Allah Peliharakan Sultan", "kv": "quốc ca", "ke": "anthem"}, {"key": "china", "flag": "🇨🇳", "nv": "Trung Quốc", "ne": "China", "rg": 3, "sym": "🐼", "cv": "Qipao / Hán phục", "ce": "Qipao / Hanfu", "song": "Mo Li Hua (茉莉花)", "kv": "dân ca", "ke": "folk song"}, {"key": "malaysia", "flag": "🇲🇾", "nv": "Malaysia", "ne": "Malaysia", "rg": 3, "sym": "🌴", "cv": "Baju Kurung", "ce": "Baju Kurung", "song": "Rasa Sayang", "kv": "dân ca", "ke": "folk song"}, {"key": "thailand", "flag": "🇹🇭", "nv": "Thái Lan", "ne": "Thailand", "rg": 3, "sym": "🛕", "cv": "Chut Thai", "ce": "Chut Thai", "song": "Loy Krathong (ลอยกระทง)", "kv": "dân ca", "ke": "folk song"}, {"key": "kazakhstan", "flag": "🇰🇿", "nv": "Kazakhstan", "ne": "Kazakhstan", "rg": 3, "sym": "🦅", "cv": "Chapan", "ce": "Chapan", "song": "Menıñ Qazaqstanym", "kv": "quốc ca", "ke": "anthem"}, {"key": "armenia", "flag": "🇦🇲", "nv": "Armenia", "ne": "Armenia", "rg": 3, "sym": "⛰️", "cv": "Taraz", "ce": "Taraz", "song": "Dle Yaman", "kv": "dân ca", "ke": "folk song"}, {"key": "georgia", "flag": "🇬🇪", "nv": "Georgia", "ne": "Georgia", "rg": 3, "sym": "🍇", "cv": "Chokha", "ce": "Chokha", "song": "Suliko", "kv": "dân ca", "ke": "folk song"}, {"key": "vietnam", "flag": "🇻🇳", "nv": "Việt Nam", "ne": "Vietnam", "rg": 4, "sym": "🪷", "cv": "Áo dài", "ce": "Ao dai", "song": "Trống Cơm", "kv": "dân ca", "ke": "folk song"}, {"key": "philippines", "flag": "🇵🇭", "nv": "Philippines", "ne": "Philippines", "rg": 4, "sym": "🏝️", "cv": "Baro't saya / Barong", "ce": "Baro't saya / Barong", "song": "Bahay Kubo", "kv": "dân ca", "ke": "folk song"}, {"key": "indonesia", "flag": "🇮🇩", "nv": "Indonesia", "ne": "Indonesia", "rg": 4, "sym": "🌋", "cv": "Kebaya / Batik", "ce": "Kebaya / Batik", "song": "Rasa Sayange", "kv": "dân ca", "ke": "folk song"}, {"key": "india", "flag": "🇮🇳", "nv": "Ấn Độ", "ne": "India", "rg": 4, "sym": "🕌", "cv": "Sari", "ce": "Sari", "song": "Vande Mataram", "kv": "ca khúc yêu nước", "ke": "patriotic song"}, {"key": "bangladesh", "flag": "🇧🇩", "nv": "Bangladesh", "ne": "Bangladesh", "rg": 4, "sym": "🌾", "cv": "Sari / Salwar", "ce": "Sari / Salwar", "song": "Amar Sonar Bangla", "kv": "quốc ca", "ke": "anthem"}, {"key": "pakistan", "flag": "🇵🇰", "nv": "Pakistan", "ne": "Pakistan", "rg": 4, "sym": "🕌", "cv": "Shalwar kameez", "ce": "Shalwar kameez", "song": "Dil Dil Pakistan", "kv": "nhạc phổ thông", "ke": "popular song"}, {"key": "mongolia", "flag": "🇲🇳", "nv": "Mông Cổ", "ne": "Mongolia", "rg": 4, "sym": "🏇", "cv": "Deel", "ce": "Deel", "song": "Praise of the Motherland", "kv": "dân ca", "ke": "folk song"}, {"key": "cambodia", "flag": "🇰🇭", "nv": "Campuchia", "ne": "Cambodia", "rg": 5, "sym": "🛕", "cv": "Sampot", "ce": "Sampot", "song": "Arn Nokor", "kv": "dân ca", "ke": "folk song"}, {"key": "laos", "flag": "🇱🇦", "nv": "Lào", "ne": "Laos", "rg": 5, "sym": "🐘", "cv": "Sinh", "ce": "Sinh", "song": "Duang Champa", "kv": "dân ca", "ke": "folk song"}, {"key": "myanmar", "flag": "🇲🇲", "nv": "Myanmar", "ne": "Myanmar", "rg": 5, "sym": "🛕", "cv": "Longyi", "ce": "Longyi", "song": "Kabar Ma Kyay Bu", "kv": "quốc ca", "ke": "anthem"}, {"key": "nepal", "flag": "🇳🇵", "nv": "Nepal", "ne": "Nepal", "rg": 5, "sym": "🏔️", "cv": "Daura-Suruwal / Gunyu", "ce": "Daura-Suruwal / Gunyu", "song": "Resham Firiri", "kv": "dân ca", "ke": "folk song"}, {"key": "srilanka", "flag": "🇱🇰", "nv": "Sri Lanka", "ne": "Sri Lanka", "rg": 5, "sym": "🐘", "cv": "Osari / Sarong", "ce": "Osari / Sarong", "song": "Sri Lanka Matha", "kv": "quốc ca", "ke": "anthem"}, {"key": "bhutan", "flag": "🇧🇹", "nv": "Bhutan", "ne": "Bhutan", "rg": 5, "sym": "🏔️", "cv": "Gho / Kira", "ce": "Gho / Kira", "song": "Druk Tsendhen", "kv": "quốc ca", "ke": "anthem"}, {"key": "maldives", "flag": "🇲🇻", "nv": "Maldives", "ne": "Maldives", "rg": 5, "sym": "🏝️", "cv": "Libaas / Feyli", "ce": "Libaas / Feyli", "song": "Gaumii Salaam", "kv": "quốc ca", "ke": "anthem"}, {"key": "afghanistan", "flag": "🇦🇫", "nv": "Afghanistan", "ne": "Afghanistan", "rg": 5, "sym": "🏔️", "cv": "Perahan / Gand-e-Afghani", "ce": "Perahan / Gand-e-Afghani", "song": "Da Zamong Zeba Watan", "kv": "dân ca", "ke": "folk song"}, {"key": "tajikistan", "flag": "🇹🇯", "nv": "Tajikistan", "ne": "Tajikistan", "rg": 5, "sym": "⛰️", "cv": "Kurta / Atlas", "ce": "Kurta / Atlas", "song": "Surudi Milli", "kv": "quốc ca", "ke": "anthem"}, {"key": "kyrgyzrepublic", "flag": "🇰🇬", "nv": "Kyrgyzstan", "ne": "Kyrgyzstan", "rg": 5, "sym": "🏔️", "cv": "Chapan / Elechek", "ce": "Chapan / Elechek", "song": "Kyrgyz Republic anthem", "kv": "quốc ca", "ke": "anthem"}, {"key": "uzbekistan", "flag": "🇺🇿", "nv": "Uzbekistan", "ne": "Uzbekistan", "rg": 5, "sym": "🕌", "cv": "Chapan / Atlas", "ce": "Chapan / Atlas", "song": "O'zbegim", "kv": "dân ca", "ke": "folk song"}, {"key": "turkmenistan", "flag": "🇹🇲", "nv": "Turkmenistan", "ne": "Turkmenistan", "rg": 5, "sym": "🐎", "cv": "Koynek / Don", "ce": "Koynek / Don", "song": "Garaşsyz Bitarap", "kv": "quốc ca", "ke": "anthem"}, {"key": "iraq", "flag": "🇮🇶", "nv": "Iraq", "ne": "Iraq", "rg": 5, "sym": "🕌", "cv": "Dishdasha / Abaya", "ce": "Dishdasha / Abaya", "song": "Mawtini", "kv": "ca khúc yêu nước", "ke": "patriotic song"}, {"key": "yemen", "flag": "🇾🇪", "nv": "Yemen", "ne": "Yemen", "rg": 5, "sym": "🏜️", "cv": "Thobe / Sitara", "ce": "Thobe / Sitara", "song": "United Republic", "kv": "quốc ca", "ke": "anthem"}, {"key": "jordan", "flag": "🇯🇴", "nv": "Jordan", "ne": "Jordan", "rg": 5, "sym": "🏛️", "cv": "Thobe / Abaya", "ce": "Thobe / Abaya", "song": "As-salam al-malaki", "kv": "quốc ca", "ke": "anthem"}, {"key": "lebanon", "flag": "🇱🇧", "nv": "Lebanon", "ne": "Lebanon", "rg": 5, "sym": "🌲", "cv": "Traditional dress", "ce": "Traditional dress", "song": "Li Beirut", "kv": "nhạc phổ thông", "ke": "classic song"}, {"key": "azerbaijan", "flag": "🇦🇿", "nv": "Azerbaijan", "ne": "Azerbaijan", "rg": 5, "sym": "🔥", "cv": "Kelaghayi", "ce": "Kelaghayi", "song": "Sarı Gəlin", "kv": "dân ca", "ke": "folk song"}, {"key": "fiji", "flag": "🇫🇯", "nv": "Fiji", "ne": "Fiji", "rg": 6, "sym": "🌺", "cv": "Sulu / Masi", "ce": "Sulu / Masi", "song": "Isa Lei", "kv": "dân ca", "ke": "folk song"}, {"key": "samoa", "flag": "🇼🇸", "nv": "Samoa", "ne": "Samoa", "rg": 6, "sym": "🌴", "cv": "Puletasi / Lavalava", "ce": "Puletasi / Lavalava", "song": "Minoi Minoi", "kv": "dân ca", "ke": "folk song"}, {"key": "kiribati", "flag": "🇰🇮", "nv": "Kiribati", "ne": "Kiribati", "rg": 6, "sym": "🐚", "cv": "Te tibuta", "ce": "Te tibuta", "song": "Teirake Kaini Kiribati", "kv": "quốc ca", "ke": "anthem"}, {"key": "tonga", "flag": "🇹🇴", "nv": "Tonga", "ne": "Tonga", "rg": 6, "sym": "🌺", "cv": "Ta'ovala", "ce": "Ta'ovala", "song": "Hala Fononga", "kv": "dân ca", "ke": "folk song"}, {"key": "solomonislands", "flag": "🇸🇧", "nv": "Quần đảo Solomon", "ne": "Solomon Islands", "rg": 6, "sym": "🏝️", "cv": "Traditional dress", "ce": "Traditional dress", "song": "God Save Our Solomon Islands", "kv": "quốc ca", "ke": "anthem"}, {"key": "vanuatu", "flag": "🇻🇺", "nv": "Vanuatu", "ne": "Vanuatu", "rg": 6, "sym": "🌋", "cv": "Island dress", "ce": "Island dress", "song": "Yumi, Yumi, Yumi", "kv": "quốc ca", "ke": "anthem"}, {"key": "papuanewguinea", "flag": "🇵🇬", "nv": "Papua New Guinea", "ne": "Papua New Guinea", "rg": 6, "sym": "🦜", "cv": "Meri blouse", "ce": "Meri blouse", "song": "O Arise, All You Sons", "kv": "quốc ca", "ke": "anthem"}, {"key": "timorleste", "flag": "🇹🇱", "nv": "Timor-Leste", "ne": "Timor-Leste", "rg": 6, "sym": "⛰️", "cv": "Tais", "ce": "Tais", "song": "Pátria", "kv": "quốc ca", "ke": "anthem"}], REG={"1": {"code": "I", "nv": "Tiên tiến đổi mới", "ne": "Advanced-innovation", "zone": "up", "tp": "79.1%"}, "2": {"code": "II", "nv": "Tiên tiến tài nguyên", "ne": "Advanced-resource", "zone": "up", "tp": "62.0%"}, "3": {"code": "III", "nv": "Trung bình cao", "ne": "Upper-middle", "zone": "mid", "tp": "53.6%"}, "4": {"code": "IV", "nv": "Chuyển đổi", "ne": "Transition", "zone": "mid", "tp": "43.0%"}, "5": {"code": "V", "nv": "Mới nổi", "ne": "Emerging", "zone": "low", "tp": "34.2%"}, "6": {"code": "VI", "nv": "Đảo nhỏ SIDS", "ne": "Small-island SIDS", "zone": "low", "tp": "n.s."}};
+  var grid=document.getElementById('grid'), filters=document.getElementById('filters');
+  function isEN(){return document.documentElement.lang==='en';}
+  var active=0;
+  var fdefs=[[0,'Tất cả','All']].concat([1,2,3,4,5,6].map(function(r){return [r,'Nhóm '+REG[r].code,'Group '+REG[r].code];}));
+  fdefs.forEach(function(f){
+    var b=document.createElement('button'); b.dataset.r=f[0];
+    b.innerHTML='<span class="lang-vi">'+f[1]+'</span><span class="lang-en">'+f[2]+'</span>';
+    if(f[0]===0)b.classList.add('active');
+    b.addEventListener('click',function(){active=f[0];
+      filters.querySelectorAll('button').forEach(function(x){x.classList.toggle('active',x===b);});render();});
+    filters.appendChild(b);
+  });
+  function zoneClass(z){return z==='up'?'zone-up':z==='mid'?'zone-mid':'zone-low';}
+  function render(){
+    grid.innerHTML='';
+    DATA.filter(function(d){return active===0||d.rg===active;}).forEach(function(d){
+      var reg=REG[d.rg];
+      var t=document.createElement('div'); t.className='ctile';
+      t.innerHTML='<span class="fl">'+d.flag+'</span>'+
+        '<span class="nm"><span class="lang-vi">'+d.nv+'</span><span class="lang-en">'+d.ne+'</span></span>'+
+        '<span class="rgp '+zoneClass(reg.zone)+'">'+reg.code+'</span>';
+      t.addEventListener('click',function(){openModal(d);});
+      grid.appendChild(t);
+    });
+  }
+  var modal=document.getElementById('modal');
+  function openModal(d){
+    var reg=REG[d.rg];
+    document.getElementById('mFlag').textContent=d.flag;
+    document.getElementById('mName').innerHTML='<span class="lang-vi">'+d.nv+'</span><span class="lang-en">'+d.ne+'</span>';
+    document.getElementById('mRegime').innerHTML='<span class="lang-vi">Chế độ '+reg.code+' · '+reg.nv+'</span><span class="lang-en">Regime '+reg.code+' · '+reg.ne+'</span>';
+    document.getElementById('mSymIc').textContent=d.sym;
+    document.getElementById('mSym').textContent=d.sym+'  ';
+    document.getElementById('mSong').innerHTML='<b>'+d.song+'</b> · <span class="lang-vi">'+d.kv+'</span><span class="lang-en">'+d.ke+'</span>';
+    document.getElementById('mCostume').textContent=isEN()?d.ce:d.cv;
+    document.getElementById('mTp').innerHTML='<b>'+reg.tp+'</b> · <span class="lang-vi">'+reg.nv+'</span><span class="lang-en">'+reg.ne+'</span>';
+    var img=document.getElementById('mImg');
+    img.alt=(isEN()?d.ne:d.nv)+' — Huong';
+    var note=document.getElementById('mCostumeNote');
+    img.onerror=function(){img.onerror=null;img.src='assets/img/huong/welcome.png';
+      note.innerHTML='<span class="lang-vi">Trang phục '+d.cv+' đang cập nhật</span><span class="lang-en">'+d.ce+' render coming soon</span>';};
+    note.innerHTML='';
+    img.src='assets/img/huong/costume/'+d.key+'.png';
+    modal.classList.add('open');
+  }
+  function close(){modal.classList.remove('open');}
+  document.getElementById('mClose').addEventListener('click',close);
+  modal.addEventListener('click',function(e){if(e.target===modal)close();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+  render();
+})();
+</script>
+</body>
+</html>

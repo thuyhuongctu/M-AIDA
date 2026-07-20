@@ -14,7 +14,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGES = ["index.html", "commercial.html", "data_melody.html",
          "songs.html", "huong.html", "privacy.html", "asia.html",
-         "asia-p1.html", "asia-p2.html", "asia-p3.html", "asia-p4.html", "asia-p5.html", "asia-p6.html", "asia-p7.html", "asia-p8.html", "asia-p9.html", "asia-p10.html", "asia-bookchapter.html", "asia-cd1.html", "asia-cd2.html", "asia-maida-paper.html"]
+         "asia-p1.html", "asia-p2.html", "asia-p3.html", "asia-p4.html", "asia-p5.html", "asia-p6.html", "asia-p7.html", "asia-p8.html", "asia-p9.html", "asia-p10.html", "asia-bookchapter.html", "asia-cd1.html", "asia-cd2.html", "asia-maida-paper.html", "asia-atlas.html"]
 
 with open(os.path.join(ROOT, "assets/data/site-metrics.json"), encoding="utf-8") as f:
     M = json.load(f)
