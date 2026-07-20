@@ -116,11 +116,6 @@ non-default backend URL.
 
 The repository is also served as a static site (GitHub Pages):
 
-- **Dissertation site** ([asia.html](https://thuyhuongctu.github.io/M-AIDA/asia.html)):
-  the whole doctoral project — *Internationalization and firm performance in Asia*
-  — across 50 economies: the CDCM/ICRV/FIP frameworks, the three-zone morphology,
-  the six-regime turning-point table, and the P3–P10 component studies. Guided by
-  the Huong AI research assistant. Bilingual VI/EN.
 - **Main page** ([index.html](https://thuyhuongctu.github.io/M-AIDA/)): overview,
   positioning, the interactive atlas of 236 studies, the in-browser extraction
   console, and the Huong AI tour guide. Bilingual EN/VI.
