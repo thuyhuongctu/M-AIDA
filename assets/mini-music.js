@@ -9,8 +9,8 @@
   window.__maidaMiniMusic = true;
 
   var TRACKS = [
+    { t: 'The Heartbeat of M-AIDA', s: 'Que les preuves décident · take 16', f: 'assets/maida_song_official.mp3' },
     { t: 'Que les preuves décident', s: 'take 13', f: 'assets/maida_song_que_les_preuves_take13.mp3' },
-    { t: 'The Heartbeat of M-AIDA', s: 'take 11', f: 'assets/maida_song_heartbeat.mp3' },
     { t: "Je m'appelle Hương", s: 'mon histoire', f: 'assets/maida_song_mon_histoire.mp3' }
   ];
 
@@ -19,6 +19,7 @@
       'max-width:min(78vw,320px);padding:.4rem .55rem;border-radius:999px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;' +
       'background:rgba(10,25,47,.92);color:#eef2f7;border:1px solid rgba(125,155,185,.35);box-shadow:0 10px 30px -10px rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
     '.mm-player button{border:0;background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center;padding:0}' +
+    '.mm-player .mm-thumb{width:30px;height:30px;border-radius:8px;object-fit:cover;object-position:top center;flex:none;border:1px solid rgba(125,155,185,.35);background:#0a192f}' +
     '.mm-player .mm-pp{width:34px;height:34px;border-radius:50%;background:#2D728F;color:#fff;flex:none}' +
     '.mm-player .mm-pp:hover{background:#3a8bad}' +
     '.mm-player .mm-txt{min-width:0;line-height:1.15;overflow:hidden}' +
@@ -44,6 +45,7 @@
     el.setAttribute('role', 'group');
     el.setAttribute('aria-label', 'M-AIDA theme music. Lyrics by the author; music and voice AI-generated.');
     el.innerHTML =
+      '<img class="mm-thumb" src="assets/img/huong/song_aodai.png" alt="">' +
       '<button class="mm-pp" aria-label="Play / pause"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
       '<span class="mm-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
       '<span class="mm-txt"><b></b><small></small></span>' +
