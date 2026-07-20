@@ -1,7 +1,7 @@
 /*!
  * M-AIDA mini music player — shared floating theme-song player.
  * Self-contained (no external deps). Loops the playlist and auto-advances to
- * the next track. Lyrics are the author's; music and vocals are AI-generated.
+ * the next track. Lyrics are the author's (Do Thuy Huong).
  * Include on a page with: <script src="assets/mini-music.js" defer></script>
  */
 (function () {
@@ -43,7 +43,7 @@
     var el = document.createElement('div');
     el.className = 'mm-player';
     el.setAttribute('role', 'group');
-    el.setAttribute('aria-label', 'M-AIDA theme music. Lyrics by the author; music and voice AI-generated.');
+    el.setAttribute('aria-label', 'M-AIDA theme music. Lyrics by Do Thuy Huong.');
     el.innerHTML =
       '<img class="mm-thumb" src="assets/img/huong/song_aodai.png" alt="">' +
       '<button class="mm-pp" aria-label="Play / pause"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
