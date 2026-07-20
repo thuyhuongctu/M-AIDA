@@ -137,8 +137,7 @@ The repository is also served as a static site (GitHub Pages):
 plays the M-AIDA song *"Que les preuves decident"* (`assets/maida_song.mp3`,
 take 3 of four takes, the most even mix). Lyrics were written by Do Thuy Huong
 (17 July 2026) in two sets ("Je m'appelle Huong - M-AIDA, mon histoire" and
-"Que les preuves decident"); the music and recordings were generated with AI
-assistance, so authorship claims attach to the lyrics, not the audio. A small
+"Que les preuves decident"). A small
 now-playing card with the cover art appears while the song plays, and the Data
 & Melody page carries the full song cover: the author's ao dai portrait on a
 floral backdrop with animated falling petals and a Vietnam map watermark.
