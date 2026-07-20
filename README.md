@@ -150,6 +150,14 @@ uses the realistic 3D Huong character in high resolution; cross-page links
 carry the selected language (`?lang=`), and Data & Melody opens in French by
 default with VI / EN / FR toggles.
 
+**Data consistency.** Every headline research number on the site (studies,
+effect sizes, economies, pooled and bias-adjusted *r*, I²) has a single source
+of truth in [`assets/data/site-metrics.json`](assets/data/site-metrics.json),
+mirrored from the locked P6 corpus (`p6/results/table1_baseline.csv` in the
+dissertation repo). A guard, [`scripts/check_site_metrics.py`](scripts/check_site_metrics.py),
+runs in the GitHub Pages workflow and **fails the deploy** if any page drifts
+from those numbers, so the published pages cannot show stale statistics.
+
 ## Citation
 
 If you use M-AIDA, please cite it (GitHub renders a "Cite this repository" button
