@@ -96,7 +96,10 @@
     <div class="mrow"><span class="ic">👗</span><div><span class="mk"><span class="lang-vi">Trang phục</span><span class="lang-en">National dress</span></span><span id="mCostume"></span></div></div>
     <figure class="mcurve"><svg id="mCurve" viewBox="0 0 260 108" style="width:100%;height:auto" role="img" aria-label="institutional curve"></svg>
       <figcaption style="font-family:var(--mono);font-size:.56rem;color:var(--faint);text-align:center;margin-top:.2rem"><span id="mTp"></span></figcaption></figure>
-    <a class="mstudy" id="mStudy" href="#" style="display:none"></a>
+    <div style="margin-top:.9rem;display:flex;gap:1.2rem;flex-wrap:wrap;align-items:center">
+      <a class="mstudy" id="mStudy" href="#" style="display:none;margin:0"></a>
+      <a class="mstudy" id="mWB" href="#" target="_blank" rel="noopener" style="margin:0;font-size:.82rem">🌐 <span class="lang-vi">Dữ liệu World Bank</span><span class="lang-en">World Bank data</span> →</a>
+    </div>
   </div>
 </div></div>
 
@@ -155,6 +158,8 @@
     var st=document.getElementById('mStudy');
     if(d.st){st.style.display='inline-block';st.href=d.st+'.html';st.innerHTML='<span class="lang-vi">Xem nghiên cứu cấu phần</span><span class="lang-en">See the component study</span> →';}
     else st.style.display='none';
+    var iso=String.fromCharCode(65+(d.flag.codePointAt(0)-0x1F1E6))+String.fromCharCode(65+(d.flag.codePointAt(2)-0x1F1E6));
+    document.getElementById('mWB').href='https://data.worldbank.org/country/'+iso;
     var img=document.getElementById('mImg'), note=document.getElementById('mCostumeNote');
     img.alt=(isEN()?d.ne:d.nv)+' — Huong';
     img.onerror=function(){img.onerror=null;img.src='assets/img/huong/welcome.png';
