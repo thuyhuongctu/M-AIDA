@@ -16,6 +16,20 @@
     --serif:Georgia,"Times New Roman",'Times',serif;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
+  :root[data-theme=dark]{
+    --cream:#17120f; --paper:#201a16; --panel:#0f0b09;
+    --rose:#d0876f; --rose-deep:#bb7059; --rose-soft:#3a2823;
+    --gold:#C9A24B; --sage:#a9b79f; --ink:#efe6df; --muted:#b4a69d; --line:#352c26;
+  }
+  :root[data-theme=dark] header{background:rgba(23,18,15,.92)!important}
+  :root[data-theme=dark] .hero{background:linear-gradient(180deg,#241c17 0%,#17120f 100%)!important}
+  :root[data-theme=dark] .team{background:#241c17!important}
+  :root[data-theme=dark] .team img{background:#2a211c!important}
+  :root[data-theme=dark] #hbubble{background:#241c17!important}
+  :root[data-theme=dark] .card,:root[data-theme=dark] .panel,:root[data-theme=dark] .quote{background:rgba(40,32,27,.6)!important}
+  :root[data-theme=dark] .bgm-dock{background:rgba(32,26,22,.96)!important;border-color:var(--line)!important}
+  .dmtheme{background:transparent;border:1px solid var(--line);color:var(--muted);width:32px;height:30px;border-radius:8px;cursor:pointer;font-size:.85rem}
+  .dmtheme:hover{color:var(--rose)}
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:var(--sans);background:var(--cream);color:var(--ink);line-height:1.62;-webkit-font-smoothing:antialiased}
@@ -214,6 +228,7 @@
       <a href="#spectral" data-i18n data-vi="Phổ âm" data-en="Spectrum" data-fr="Spectre">Phổ âm</a>
       <a href="#provenance" data-i18n data-vi="Nguồn gốc" data-en="Provenance" data-fr="Provenance">Nguồn gốc</a>
       <span class="langtog"><button data-lang="fr" class="active">FR</button><button data-lang="en">EN</button><button data-lang="vi">VI</button></span>
+      <button class="dmtheme" id="dmTheme" aria-label="Sáng / Tối" title="Sáng / Tối" style="margin-left:10px">◐</button>
       <a class="back" href="index.html" data-i18n data-vi="← Trang chính" data-en="← Home" data-fr="← Accueil">← Trang chính</a>
     </nav>
   </div>
@@ -791,6 +806,7 @@
 })();
 </script>
 <div style="text-align:center;padding:1.1rem;font-family:var(--sans,system-ui,sans-serif);font-size:13px;opacity:.85;border-top:1px solid rgba(0,0,0,.08);margin-top:1rem"><a href="index.html" style="margin:0 .4rem">M-AIDA</a>·<a href="library.html" style="margin:0 .4rem" data-i18n data-vi="Thư viện Sáng tạo" data-en="Creative Library" data-fr="Bibliothèque créative">Thư viện Sáng tạo</a>·<a href="huong.html" style="margin:0 .4rem" data-i18n data-vi="Trang học thuật cá nhân" data-en="Personal academic page" data-fr="Page académique personnelle">Trang học thuật cá nhân</a></div>
+<script>(function(){var r=document.documentElement,t=document.getElementById('dmTheme');if(!t)return;try{var s=localStorage.getItem('dm_theme');if(s)r.setAttribute('data-theme',s);}catch(e){}t.addEventListener('click',function(){var c=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',c);try{localStorage.setItem('dm_theme',c);}catch(e){}});})();</script>
 <script src="assets/mini-guide.js" defer></script>
 </body>
 </html>
