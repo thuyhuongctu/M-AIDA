@@ -333,8 +333,9 @@
   tb.addEventListener('click',function(){var c=root.getAttribute('data-theme')==='light'?'':'light';if(c)root.setAttribute('data-theme',c);else root.removeAttribute('data-theme');try{localStorage.setItem('songs_theme',c);}catch(e){}});
 
   var TRACKS=[
+    {t:"Que les preuves décident",s:"★ MAIN THEME · take 13 · 3:01",f:"assets/maida_song_que_les_preuves_take13.mp3"},
     {t:"Je m'appelle Hương – M-AIDA, mon histoire",s:"take 1 · 3:04",f:"assets/maida_song_mon_histoire.mp3"},
-    {t:"The Heartbeat of M-AIDA",s:"OFFICIAL · take 11 · 3:02",f:"assets/maida_song_heartbeat.mp3"},
+    {t:"The Heartbeat of M-AIDA",s:"take 11 · 3:02",f:"assets/maida_song_heartbeat.mp3"},
     {t:"Que les preuves décident",s:"take 3 · 3:01",f:"assets/maida_song.mp3"},
     {t:"Que les preuves décident",s:"take 6 · full-range mix · 3:02",f:"assets/maida_song_que_les_preuves_take6.mp3"},
     {t:"The Heartbeat of M-AIDA",s:"take 7 · 76→120→219→76 bpm · 3:04",f:"assets/maida_song_heartbeat_take7.mp3"},
@@ -372,7 +373,8 @@
   }
   function toggle(){ if(!audio.src) load(0,true); else if(audio.paused) audio.play().catch(function(){}); else audio.pause(); }
   document.getElementById('ppBtn').addEventListener('click',toggle);
-  function heroStart(){ if(cur!==0){load(0,true);} else toggle(); }
+  var MH=0; for(var mi=0;mi<TRACKS.length;mi++){ if(TRACKS[mi].f.indexOf('mon_histoire')>=0){ MH=mi; break; } }
+  function heroStart(){ if(cur!==MH){load(MH,true);} else toggle(); }
   document.getElementById('ctaPlay').addEventListener('click',heroStart);
   var hp=document.getElementById('heroPlay');
   hp.addEventListener('click',heroStart);
@@ -388,7 +390,7 @@
   audio.addEventListener('timeupdate',function(){
     var d=audio.duration||0, p=d?audio.currentTime/d:0;
     bar.style.width=(p*100)+'%'; tCur.textContent=fmt(audio.currentTime); tDur.textContent=fmt(d);
-    if(cur===0 && lblks.length){
+    if(TRACKS[cur]&&TRACKS[cur].f.indexOf('mon_histoire')>=0 && lblks.length){
       var idx=Math.min(lblks.length-1,Math.floor(p*lblks.length));
       lblks.forEach(function(b,k){b.classList.toggle('active',k===idx);});
       var a=lblks[idx]; if(a){var r=a.getBoundingClientRect(),host=document.getElementById('lyrics').getBoundingClientRect();
