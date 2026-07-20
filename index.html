@@ -1313,6 +1313,8 @@ a{color:var(--brand);text-decoration:none;}
   :root:not([data-motion="off"]) .grow .gbar i{animation:devgrow 1.2s cubic-bezier(.2,.7,.2,1) both}
   @keyframes devgrow{from{width:0}to{width:100%}}
   @media (prefers-reduced-motion:reduce){.dev-stage .dev-card{transform:none!important}.grow .gbar i{animation:none}}
+  /* Declutter the "How it works" area: drop the small floating character stickers that read as messy. */
+  #method .stkr, #method .stepfig{display:none!important}
   </style>
   <section class="devstory" id="devstory"><div class="wrap">
     <span class="eyebrow" data-i18n data-en="The making of this meta-analysis" data-vi="Câu chuyện phát triển của phân tích tổng hợp này">The making of this meta-analysis</span>
@@ -2825,6 +2827,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   var POSE_POINT='assets/img/huong/present.png';
   var POSE_WAVE_V2='assets/img/huong/welcome.png';
   var POSE_WALK_V2='assets/img/huong/welcome2.png';
+  var POSE_THUMBS_V2='assets/img/huong/welcome3.png';
   var POSE_THINK_V2='assets/img/huong/think.png';
   var POSE_FISTS_V2='assets/img/huong/guide_tech.png';
   var POSES=null;
@@ -2840,7 +2843,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     // One costume per page: the tour guide wears the flag-pin ao dai, cycling
     // between its ao dai poses so the figure keeps some life while staying in
     // the same national dress as the hero greeting figure.
-    POSES=[POSE_WAVE_V2, POSE_WALK_V2];
+    POSES=[POSE_WAVE_V2, POSE_WALK_V2, POSE_THUMBS_V2];
   }
   var poseSpin=null;
   function showPose(k){
