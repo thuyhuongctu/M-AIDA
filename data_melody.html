@@ -171,18 +171,22 @@
   @media (prefers-reduced-motion: reduce){[data-rev]{opacity:1;transform:none;transition:none;}}
   :focus-visible{outline:2px solid var(--rose);outline-offset:2px;}
 
-  /* Song cover: full floral backdrop + swaying petals */
+  /* Song cover: brand-tone backdrop + falling music notes */
   #songcover{position:relative;overflow:hidden;max-width:none;padding:64px 24px !important;background:
-    radial-gradient(60% 80% at 8% 18%, rgba(231,196,182,.55) 0%, rgba(231,196,182,0) 60%),
-    radial-gradient(50% 70% at 92% 12%, rgba(201,162,75,.28) 0%, rgba(201,162,75,0) 65%),
-    radial-gradient(70% 90% at 85% 95%, rgba(183,110,90,.30) 0%, rgba(183,110,90,0) 60%),
-    linear-gradient(180deg,#FDF6F0 0%,#F7E7DC 55%,#F3DFD2 100%);}
+    radial-gradient(60% 80% at 8% 18%, rgba(45,114,143,.30) 0%, rgba(45,114,143,0) 60%),
+    radial-gradient(50% 70% at 92% 12%, rgba(201,162,75,.26) 0%, rgba(201,162,75,0) 65%),
+    radial-gradient(70% 90% at 85% 95%, rgba(10,25,47,.16) 0%, rgba(10,25,47,0) 60%),
+    linear-gradient(180deg,#F3F7F9 0%,#E7EFF2 55%,#DCE8EC 100%);}
+  :root[data-theme="dark"] #songcover{background:
+    radial-gradient(60% 80% at 8% 18%, rgba(45,114,143,.36) 0%, rgba(45,114,143,0) 60%),
+    radial-gradient(50% 70% at 92% 12%, rgba(201,162,75,.22) 0%, rgba(201,162,75,0) 65%),
+    linear-gradient(180deg,#0d1c30 0%,#0a1626 55%,#0a192f 100%);}
   #songcover>*{position:relative;z-index:2;max-width:1120px;margin-left:auto;margin-right:auto;}
   #songcover .petal{position:absolute;top:-6%;z-index:1;pointer-events:none;will-change:transform;opacity:.85;
     animation:petalFall var(--pd,11s) linear var(--pl,0s) infinite;}
   #songcover .petal svg{display:block;animation:petalSway var(--ps,3.4s) ease-in-out var(--pl,0s) infinite alternate;}
   #songcover .petal.front{z-index:3;opacity:.6;}
-  @keyframes petalFall{0%{transform:translateY(-8vh) rotate(0deg);}100%{transform:translateY(115vh) rotate(200deg);}}
+  @keyframes petalFall{0%{transform:translateY(-8vh) rotate(0deg);}100%{transform:translateY(115vh) rotate(60deg);}}
   @keyframes petalSway{0%{transform:translateX(-16px) rotate(-14deg);}100%{transform:translateX(16px) rotate(14deg);}}
   @media (prefers-reduced-motion: reduce){#songcover .petal{display:none;}}
 
@@ -575,7 +579,7 @@
 <script>(function(){
   var sec=document.getElementById('songcover'); if(!sec) return;
   if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var cols=['#E7C4B6','#DCA08C','#C9A24B','#B76E5A','#F0D7CB'];
+  var cols=['#2D728F','#3a8bad','#C9A24B','#5aa9c9','#8FB9C9'];
   for(var i=0;i<16;i++){
     var d=document.createElement('div');
     d.className='petal'+(i%4===0?' front':'');
@@ -584,7 +588,7 @@
     d.style.setProperty('--pd',(9+Math.random()*9)+'s');
     d.style.setProperty('--ps',(2.6+Math.random()*2)+'s');
     d.style.setProperty('--pl',(-Math.random()*12)+'s');
-    d.innerHTML='<svg width="'+s+'" height="'+(s*1.25)+'" viewBox="0 0 20 25"><path d="M10 0 C16 5 20 12 15 20 C13 23 7 23 5 20 C0 12 4 5 10 0 Z" fill="'+c+'" fill-opacity="0.9"/></svg>';
+    d.innerHTML='<svg width="'+s+'" height="'+(s*1.35)+'" viewBox="0 0 24 30"><g fill="'+c+'" fill-opacity="0.92"><rect x="14.2" y="3.5" width="2.3" height="16"/><path d="M16.5 3.5c4.7 1 6.1 4.9 3.9 8.9 1-3.7-1.9-5.5-3.9-4.7z"/><ellipse cx="10.6" cy="20.4" rx="5" ry="3.7" transform="rotate(-22 10.6 20.4)"/></g></svg>';
     sec.appendChild(d);
   }
 })();</script>
