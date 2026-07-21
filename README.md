@@ -124,23 +124,30 @@ The repository is also served as a static site (GitHub Pages):
 - **Data & Melody** ([data_melody.html](https://thuyhuongctu.github.io/M-AIDA/data_melody.html)):
   the story of the software told as a guided walk with Huong AI (Vietnamese,
   English, French), with a live World Bank indicators widget.
+- **Creative Library** ([library.html](https://thuyhuongctu.github.io/M-AIDA/library.html)):
+  a hub that links the project's components (the meta-analysis platform, the
+  Data & Melody walk, the songs, and the academic page). Bilingual EN/VI with
+  light/dark themes.
 - **Songs** ([songs.html](https://thuyhuongctu.github.io/M-AIDA/songs.html)):
-  the M-AIDA song lyrics on a 3D lyric page.
+  the main work *"The Heartbeat of M-AIDA (Que les preuves decident)"* on an
+  immersive 3D lyric console with synchronized lyrics, an artist gallery, and
+  the full recording archive.
 - **Author's academic homepage** ([huong.html](https://thuyhuongctu.github.io/M-AIDA/huong.html)):
-  Do Thuy Huong's personal page — bio, publications (ORCID), teaching linked to
+  Do Thuy Huong's personal page, bio, publications (ORCID), teaching linked to
   research, an interactive 3D globe of the studied economies, a World Bank data
   widget, and a blog. Bilingual VI/EN with light/dark themes.
 - **Privacy policy** ([privacy.html](https://thuyhuongctu.github.io/M-AIDA/privacy.html)):
   cookieless-analytics disclosure (VI/EN).
 
-**Theme song.** The mood menu on the main and commercial pages ("Nothing" option)
-plays the M-AIDA song *"Que les preuves decident"* (`assets/maida_song.mp3`,
-take 3 of four takes, the most even mix). Lyrics were written by Do Thuy Huong
-(17 July 2026) in two sets ("Je m'appelle Huong - M-AIDA, mon histoire" and
-"Que les preuves decident"). A small
-now-playing card with the cover art appears while the song plays, and the Data
-& Melody page carries the full song cover: the author's ao dai portrait on a
-floral backdrop with animated falling petals and a Vietnam map watermark.
+**Theme song.** The project's main work is *"The Heartbeat of M-AIDA (Que les
+preuves decident)"* (`assets/maida_song_official.mp3`, an extended cut of about
+4.5 minutes). It is featured on the Songs page and is available site-wide
+through a shared floating player that loops and auto-advances the full recording
+archive. The mood menu on the main and commercial pages also plays an earlier
+take (`assets/maida_song.mp3`). All lyrics were written by Do Thuy Huong
+(17 July 2026). The Data & Melody page carries the full song cover: the author's
+ao dai portrait on a floral backdrop with animated falling petals and a Vietnam
+map watermark.
 
 **Design.** The main and commercial pages ship a premium editorial design
 (ivory default theme, charcoal-and-brass dark theme behind the toggle, glass
@@ -192,10 +199,10 @@ never commit a real `.env` (it is git-ignored).
 ## License
 
 M-AIDA is free/open-source software under the **GNU Affero General Public License
-v3.0 (AGPL-3.0-only)** — see [`LICENSE`](LICENSE). The AGPL's Section 13 covers
+v3.0 (AGPL-3.0-only)**, see [`LICENSE`](LICENSE). The AGPL's Section 13 covers
 network use: running a modified version as a service requires publishing that
 version's source.
 
 The authors also offer **commercial (dual) licensing** for closed-source or
-proprietary use — see [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md). Contact
+proprietary use, see [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md). Contact
 huongdt@vlute.edu.vn.
