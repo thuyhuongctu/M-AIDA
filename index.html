@@ -939,16 +939,17 @@ a{color:var(--brand);text-decoration:none;}
   .fbadge.ok{background:#e7f2ea;color:#1e6b3a;border-color:#bcd9c5;}
   .fbadge.mid{background:#eef0f6;color:#33477a;border-color:#c6cede;}
   .fbadge.low{background:#f7ecdd;color:#8a5a12;border-color:#e2ccab;}
-  :root:not([data-motion="off"]) .convgrid .fcard{opacity:0;transform:translateY(10px);}
-  :root:not([data-motion="off"]) .convpanel.in .fcard{opacity:1;transform:none;transition:opacity .5s var(--ease-snap),transform .5s var(--ease-snap);}
+  :root:not([data-motion="off"]) .convgrid .fcard{opacity:0;transform:translateY(10px) rotateX(6deg);}
+  :root:not([data-motion="off"]) .convpanel.in .fcard{opacity:1;transform:rotateX(6deg);transition:opacity .5s var(--ease-snap),transform .5s var(--ease-snap);}
   :root:not([data-motion="off"]) .convpanel.in .fcard:nth-child(2){transition-delay:.15s;}
   :root:not([data-motion="off"]) .convpanel.in .fcard:nth-child(3){transition-delay:.3s;}
   /* 3D formula cards */
   .convgrid{perspective:1100px;}
-  .convgrid .fcard{transition:transform .45s cubic-bezier(.16,1,.3,1),box-shadow .45s ease;
-    box-shadow:0 12px 26px -14px rgba(10,25,47,.28),0 2px 6px rgba(10,25,47,.10);}
-  .convpanel.in .fcard:hover{transform:translateY(-5px) rotateX(8deg) rotateY(-6deg) scale(1.02);
-    box-shadow:0 30px 52px -20px rgba(45,114,143,.5);}
+  .convgrid .fcard{transform:rotateX(6deg);transform-origin:50% 100%;transform-style:preserve-3d;
+    transition:transform .45s cubic-bezier(.16,1,.3,1),box-shadow .45s ease;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 18px 34px -16px rgba(10,25,47,.40),0 4px 10px rgba(10,25,47,.16);}
+  .convpanel.in .fcard:hover{transform:translateY(-7px) rotateX(0deg) scale(1.03);
+    box-shadow:0 34px 56px -20px rgba(45,114,143,.5);}
   .convgrid .fcard .frm-big{font-size:1.34rem;
     text-shadow:0 1px 0 rgba(255,255,255,.6),0 3px 5px rgba(10,25,47,.22);}
   :root[data-theme="dark"] .convgrid .fcard .frm-big{text-shadow:0 1px 0 rgba(0,0,0,.5),0 3px 6px rgba(0,0,0,.55);}
