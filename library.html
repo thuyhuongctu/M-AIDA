@@ -13,7 +13,7 @@
     --bg:#050a14; --bg2:#0a192f;
     --panel:rgba(12,26,46,.62); --panel-2:rgba(20,36,60,.5); --solid:#0d1c32;
     --line:rgba(125,155,185,.20); --ink:#eef2f7; --muted:#9fb0c4;
-    --navy:#0A192F; --teal:#3a8bad; --teal-2:#5aa9c9; --gold:#D4AF37;
+    --navy:#0A192F; --teal:#3a8bad; --teal-2:#5aa9c9; --gold:#C9A24B;
     --serif:'Iowan Old Style',Georgia,'Times New Roman',serif;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
@@ -30,11 +30,11 @@
 
   .field{position:fixed;inset:0;z-index:0;pointer-events:none;background:
     radial-gradient(1100px 620px at 12% -4%, rgba(45,114,143,.30), transparent 60%),
-    radial-gradient(900px 560px at 108% 6%, rgba(212,175,55,.10), transparent 55%),
+    radial-gradient(900px 560px at 108% 6%, rgba(201,162,75,.10), transparent 55%),
     radial-gradient(1000px 720px at 50% 120%, rgba(10,25,47,.9), transparent 60%), var(--bg)}
   :root[data-theme="light"] .field{background:
     radial-gradient(1000px 560px at 10% -6%, rgba(45,114,143,.16), transparent 60%),
-    radial-gradient(900px 520px at 110% 6%, rgba(212,175,55,.10), transparent 55%), var(--bg)}
+    radial-gradient(900px 520px at 110% 6%, rgba(201,162,75,.10), transparent 55%), var(--bg)}
 
   header.top{position:fixed;top:0;left:0;width:100%;height:60px;z-index:40;background:var(--panel);
     backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line);
@@ -87,7 +87,7 @@
   .card p{color:var(--muted);font-size:.86rem;margin:0;line-height:1.55;flex:1}
   .card .go{margin-top:1rem;font:700 .74rem var(--mono);letter-spacing:.04em;color:var(--teal-2);display:inline-flex;align-items:center;gap:.4rem}
   .chip{font:700 .58rem var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:.2rem .5rem;border-radius:999px}
-  .chip.new{color:var(--gold);background:rgba(212,175,55,.14);border:1px solid rgba(212,175,55,.4)}
+  .chip.new{color:var(--gold);background:rgba(201,162,75,.14);border:1px solid rgba(201,162,75,.4)}
   .chip.lock{color:var(--muted);background:var(--panel-2);border:1px solid var(--line)}
   .card.locked{opacity:.82;cursor:default}
   .card.locked .go{color:var(--muted)}
