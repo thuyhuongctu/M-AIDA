@@ -66,6 +66,9 @@
   .hero .figwrap .ring{position:absolute;width:82%;aspect-ratio:1;border-radius:50%;border:1px dashed rgba(125,165,195,.3)}
   :root:not([data-theme="light"]) .hero .figwrap .ring{animation:spin 40s linear infinite}
   .hero .figwrap img{position:relative;z-index:1;max-height:360px;width:auto;filter:drop-shadow(0 24px 40px rgba(0,0,0,.5))}
+  .hero .figwrap img.scenepic{width:100%;max-width:400px;height:auto;aspect-ratio:1;object-fit:cover;border-radius:22px;
+    border:1px solid var(--line);box-shadow:0 34px 74px -30px rgba(0,0,0,.55);filter:none}
+  .hero .figwrap.scene .ring{width:92%;border-style:solid;border-color:rgba(45,114,143,.28)}
   @keyframes spin{to{transform:rotate(360deg)}}
   :root:not([data-theme="light"]) .hero .figwrap img{animation:floaty 6s ease-in-out infinite}
   @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -123,10 +126,10 @@
       <h1><span class="vi">Thư viện <b>Sáng tạo</b></span><span class="en">The <b>Creative</b> Library</span></h1>
       <p><span class="vi">Nơi hội tụ các thành phần của dự án M-AIDA — nền tảng phân tích tổng hợp, câu chuyện dữ liệu &amp; giai điệu, kho bài hát, và trang học thuật cá nhân. Hãy cùng Hương khám phá.</span><span class="en">Everything in the M-AIDA project in one place — the meta-analysis platform, the data &amp; melody walk, the song archive, and the author's academic page. Explore it with Huong.</span></p>
     </div>
-    <div class="figwrap">
+    <div class="figwrap scene">
       <span class="glow" aria-hidden="true"></span>
       <span class="ring" aria-hidden="true"></span>
-      <img src="assets/img/huong/welcome.png" alt="Huong AI in a white ao dai, greeting">
+      <img class="scenepic" src="assets/img/huong/scene_library.jpg" alt="Huong AI in a white ao dai in a futuristic music-library space">
     </div>
   </section>
 
