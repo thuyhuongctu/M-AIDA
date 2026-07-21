@@ -1414,18 +1414,65 @@ a{color:var(--brand);text-decoration:none;}
       </div>
     </div>
     <div class="wrap" style="margin-top:1.6rem">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,3vw,30px);align-items:end;
-        border:1px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,28px) clamp(14px,3vw,30px);background:var(--brand-soft)">
-        <figure style="margin:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.7rem">
-          <img src="assets/img/huong/pose_thumbs2.png" alt="Huong approving a record" loading="lazy"
-               style="height:clamp(150px,22vw,230px);width:auto;filter:drop-shadow(0 12px 18px rgba(0,0,0,.22))">
-          <figcaption style="font-size:.9rem;color:var(--muted);max-width:34ch"><b style="color:var(--ink)" data-i18n data-en="Verify" data-vi="Kiểm chứng">Verify</b>, <span data-i18n data-en="every proposed value is reviewed and locked by the researcher." data-vi="mỗi giá trị đề xuất đều được nghiên cứu viên duyệt và khóa.">every proposed value is reviewed and locked by the researcher.</span></figcaption>
-        </figure>
-        <figure style="margin:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.7rem">
-          <img src="assets/img/huong/pose_tablet.png" alt="Huong presenting the analysis on a tablet" loading="lazy"
-               style="height:clamp(150px,22vw,230px);width:auto;filter:drop-shadow(0 12px 18px rgba(0,0,0,.22))">
-          <figcaption style="font-size:.9rem;color:var(--muted);max-width:34ch"><b style="color:var(--ink)" data-i18n data-en="Interpret" data-vi="Diễn giải">Interpret</b>, <span data-i18n data-en="the human reads the evidence and makes the call." data-vi="con người đọc bằng chứng và ra quyết định.">the human reads the evidence and makes the call.</span></figcaption>
-        </figure>
+<style>
+  .simflow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,2.4vw,26px);
+    border:1px solid var(--line);border-radius:22px;padding:clamp(24px,3.6vw,38px) clamp(16px,3vw,30px) clamp(18px,3vw,28px);
+    background:var(--brand-soft);overflow:hidden;perspective:900px}
+  .simflow-cap{grid-column:1/-1;text-align:center;font-family:var(--mono);font-size:.64rem;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--brand);opacity:.8;margin:0 0 .3rem}
+  .simflow-line{position:absolute;left:9%;right:9%;top:clamp(78px,10vw,104px);height:3px;border-radius:3px;
+    background:linear-gradient(90deg,var(--brand),var(--amber));opacity:.30;z-index:0}
+  .simflow-line span{position:absolute;top:-3.5px;left:-6%;width:40px;height:10px;border-radius:10px;
+    background:radial-gradient(closest-side,var(--brand),transparent);filter:blur(.5px)}
+  :root:not([data-motion="off"]) .simflow-line span{animation:simPacket 9.6s cubic-bezier(.7,0,.3,1) infinite}
+  @keyframes simPacket{0%{left:-6%}12%{left:9%}25%{left:37%}37%{left:37%}50%{left:63%}62%{left:63%}75%{left:90%}100%{left:104%}}
+  .simstep{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem}
+  .simstep-ico{width:clamp(46px,6vw,58px);height:clamp(46px,6vw,58px);border-radius:50%;display:grid;place-items:center;
+    background:var(--surface);border:1px solid var(--line);color:var(--brand);
+    box-shadow:0 10px 20px -10px rgba(10,25,47,.42);transition:transform .4s,box-shadow .4s,border-color .4s,color .4s}
+  .simstep-ico svg{width:26px;height:26px}
+  .simstep b{font-size:.92rem;color:var(--ink)}
+  .simstep-val{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--brand);
+    background:color-mix(in srgb,var(--brand) 12%,transparent);border:1px solid color-mix(in srgb,var(--brand) 30%,var(--line));
+    padding:.12rem .55rem;border-radius:999px;opacity:.45;transition:opacity .4s}
+  .simstep small{font-size:.76rem;color:var(--muted);max-width:24ch;line-height:1.42}
+  :root:not([data-motion="off"]) .simstep .simstep-ico{animation:simGlow 9.6s ease-in-out infinite;animation-delay:var(--d)}
+  :root:not([data-motion="off"]) .simstep .simstep-val{animation:simReveal 9.6s ease-in-out infinite;animation-delay:var(--d)}
+  @keyframes simGlow{0%,100%{transform:none;border-color:var(--line);color:var(--brand);box-shadow:0 10px 20px -10px rgba(10,25,47,.42)}
+    6%{transform:translateY(-6px) scale(1.09);border-color:var(--amber);color:var(--amber);box-shadow:0 18px 32px -12px rgba(45,114,143,.55)}
+    22%{transform:none;border-color:var(--line);color:var(--brand)}}
+  @keyframes simReveal{0%,3%{opacity:.45}7%{opacity:1}24%{opacity:1}30%{opacity:.45}100%{opacity:.45}}
+  :root[data-motion="off"] .simstep-val{opacity:1}
+  @media(prefers-reduced-motion:reduce){.simflow-line span{animation:none}.simstep .simstep-ico,.simstep .simstep-val{animation:none}.simstep-val{opacity:1}}
+  @media(max-width:720px){.simflow{grid-template-columns:repeat(2,1fr);row-gap:24px}.simflow-line{display:none}}
+</style>
+      <div class="simflow" role="img" aria-label="M-AIDA pipeline: one record flows from Extract to Verify to Lock to Interpret; every value is human-verified before it is locked.">
+        <p class="simflow-cap" data-i18n data-en="One record · four gates" data-vi="Một bản ghi · bốn cửa">One record · four gates</p>
+        <span class="simflow-line" aria-hidden="true"><span></span></span>
+        <div class="simstep" style="--d:0s">
+          <span class="simstep-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h7l5 5V21H6z"/><path d="M13 2.5v5h5"/><path d="M9 13h6M9 16.5h6"/></svg></span>
+          <b data-i18n data-en="Extract" data-vi="Trích xuất">Extract</b>
+          <span class="simstep-val">r = ?</span>
+          <small data-i18n data-en="M-AIDA reads the PDF and proposes r." data-vi="M-AIDA đọc PDF và đề xuất r.">M-AIDA reads the PDF and proposes r.</small>
+        </div>
+        <div class="simstep" style="--d:2.4s">
+          <span class="simstep-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <b data-i18n data-en="Verify" data-vi="Kiểm chứng">Verify</b>
+          <span class="simstep-val">0.82 &#10003;</span>
+          <small data-i18n data-en="The researcher checks every field." data-vi="Nghiên cứu viên duyệt từng trường.">The researcher checks every field.</small>
+        </div>
+        <div class="simstep" style="--d:4.8s">
+          <span class="simstep-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg></span>
+          <b data-i18n data-en="Lock" data-vi="Khóa">Lock</b>
+          <span class="simstep-val" data-i18n data-en="locked" data-vi="đã khóa">locked</span>
+          <small data-i18n data-en="Sealed with a timestamp; immutable." data-vi="Đóng dấu thời gian; bất biến.">Sealed with a timestamp; immutable.</small>
+        </div>
+        <div class="simstep" style="--d:7.2s">
+          <span class="simstep-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-3.9 3.4-6 7-6s7 2.1 7 6"/></svg></span>
+          <b data-i18n data-en="Interpret" data-vi="Diễn giải">Interpret</b>
+          <span class="simstep-val" data-i18n data-en="human &#10003;" data-vi="con người &#10003;">human &#10003;</span>
+          <small data-i18n data-en="The human reads the evidence and makes the call." data-vi="Con người đọc bằng chứng và ra quyết định.">The human reads the evidence and makes the call.</small>
+        </div>
       </div>
     </div>
   </section>
