@@ -16,18 +16,18 @@
   var css = '' +
     '.mm-player{position:fixed;right:16px;bottom:16px;z-index:2147483000;display:flex;align-items:center;gap:.5rem;' +
       'max-width:min(78vw,320px);padding:.4rem .55rem;border-radius:999px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;' +
-      'background:rgba(10,25,47,.92);color:#eef2f7;border:1px solid rgba(125,155,185,.35);box-shadow:0 10px 30px -10px rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
+      'background:rgba(36,20,25,.92);color:#eef2f7;border:1px solid rgba(125,155,185,.35);box-shadow:0 10px 30px -10px rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
     '.mm-player button{border:0;background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center;padding:0}' +
-    '.mm-player .mm-thumb{width:30px;height:30px;border-radius:8px;object-fit:cover;object-position:top center;flex:none;border:1px solid rgba(125,155,185,.35);background:#0a192f}' +
-    '.mm-player .mm-pp{width:34px;height:34px;border-radius:50%;background:#2D728F;color:#fff;flex:none}' +
-    '.mm-player .mm-pp:hover{background:#3a8bad}' +
+    '.mm-player .mm-thumb{width:30px;height:30px;border-radius:8px;object-fit:cover;object-position:top center;flex:none;border:1px solid rgba(125,155,185,.35);background:#241419}' +
+    '.mm-player .mm-pp{width:34px;height:34px;border-radius:50%;background:#8a4a58;color:#fff;flex:none}' +
+    '.mm-player .mm-pp:hover{background:#a86675}' +
     '.mm-player .mm-txt{min-width:0;line-height:1.15;overflow:hidden}' +
     '.mm-player .mm-txt b{font-size:.78rem;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
     '.mm-player .mm-txt small{font-size:.62rem;color:#9fb0c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}' +
     '.mm-player .mm-next{color:#9fb0c4;flex:none;width:26px;height:30px}' +
     '.mm-player .mm-next:hover{color:#eef2f7}' +
     '.mm-player .mm-wave{display:flex;align-items:flex-end;gap:2px;height:16px;flex:none}' +
-    '.mm-player .mm-wave i{width:3px;height:4px;background:#D4AF37;border-radius:1px}' +
+    '.mm-player .mm-wave i{width:3px;height:4px;background:#C9A24B;border-radius:1px}' +
     '.mm-player.playing .mm-wave i{animation:mmwv .8s ease-in-out infinite alternate}' +
     '.mm-player.playing .mm-wave i:nth-child(2){animation-delay:.15s}.mm-player.playing .mm-wave i:nth-child(3){animation-delay:.3s}.mm-player.playing .mm-wave i:nth-child(4){animation-delay:.22s}' +
     '@keyframes mmwv{from{height:4px}to{height:15px}}' +

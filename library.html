@@ -6,22 +6,22 @@
 <title>Thư viện Sáng tạo, M-AIDA</title>
 <meta name="description" content="A hub for the M-AIDA project: the meta-analysis platform, the Data & Melody walk, the song archive, and the author's academic page.">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#050a14">
+<meta name="theme-color" content="#140a0d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --bg:#050a14; --bg2:#0a192f;
-    --panel:rgba(12,26,46,.62); --panel-2:rgba(20,36,60,.5); --solid:#0d1c32;
+    --bg:#140a0d; --bg2:#241419;
+    --panel:rgba(32,18,23,.62); --panel-2:rgba(42,25,31,.5); --solid:#1f1318;
     --line:rgba(125,155,185,.20); --ink:#eef2f7; --muted:#9fb0c4;
-    --navy:#0A192F; --teal:#3a8bad; --teal-2:#5aa9c9; --gold:#C9A24B;
+    --navy:#241419; --teal:#a86675; --teal-2:#c98f9c; --gold:#C9A24B;
     --serif:'Iowan Old Style',Georgia,'Times New Roman',serif;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
   }
   :root[data-theme="light"]{
-    --bg:#e9eef3; --bg2:#f6f8fa;
+    --bg:#efe7e9; --bg2:#f8f4f5;
     --panel:rgba(255,255,255,.8); --panel-2:rgba(255,255,255,.64); --solid:#ffffff;
-    --line:#d8dee6; --ink:#141b25; --muted:#54636f; --teal:#2D728F; --teal-2:#3a8bad;
+    --line:#d8dee6; --ink:#141b25; --muted:#54636f; --teal:#8a4a58; --teal-2:#a86675;
   }
   *{box-sizing:border-box} html,body{margin:0;padding:0} html{scroll-behavior:smooth}
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -29,11 +29,11 @@
   html[lang="en"] .vi{display:none} html:not([lang="en"]) .en{display:none}
 
   .field{position:fixed;inset:0;z-index:0;pointer-events:none;background:
-    radial-gradient(1100px 620px at 12% -4%, rgba(45,114,143,.30), transparent 60%),
+    radial-gradient(1100px 620px at 12% -4%, rgba(138,74,88,.30), transparent 60%),
     radial-gradient(900px 560px at 108% 6%, rgba(201,162,75,.10), transparent 55%),
-    radial-gradient(1000px 720px at 50% 120%, rgba(10,25,47,.9), transparent 60%), var(--bg)}
+    radial-gradient(1000px 720px at 50% 120%, rgba(36,20,25,.9), transparent 60%), var(--bg)}
   :root[data-theme="light"] .field{background:
-    radial-gradient(1000px 560px at 10% -6%, rgba(45,114,143,.16), transparent 60%),
+    radial-gradient(1000px 560px at 10% -6%, rgba(138,74,88,.16), transparent 60%),
     radial-gradient(900px 520px at 110% 6%, rgba(201,162,75,.10), transparent 55%), var(--bg)}
 
   header.top{position:fixed;top:0;left:0;width:100%;height:60px;z-index:40;background:var(--panel);
@@ -62,13 +62,13 @@
   .hero p{color:var(--muted);max-width:52ch;margin:.2rem auto 0;font-size:1.02rem}
   @media(min-width:821px){.hero p{margin-left:0}}
   .hero .figwrap{position:relative;display:grid;place-items:center;min-height:280px}
-  .hero .figwrap .glow{position:absolute;width:74%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(45,114,143,.4),transparent 66%);filter:blur(24px)}
+  .hero .figwrap .glow{position:absolute;width:74%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(138,74,88,.4),transparent 66%);filter:blur(24px)}
   .hero .figwrap .ring{position:absolute;width:82%;aspect-ratio:1;border-radius:50%;border:1px dashed rgba(125,165,195,.3)}
   :root:not([data-theme="light"]) .hero .figwrap .ring{animation:spin 40s linear infinite}
   .hero .figwrap img{position:relative;z-index:1;max-height:360px;width:auto;filter:drop-shadow(0 24px 40px rgba(0,0,0,.5))}
   .hero .figwrap img.scenepic{width:100%;max-width:400px;height:auto;aspect-ratio:1;object-fit:cover;border-radius:22px;
     border:1px solid var(--line);box-shadow:0 34px 74px -30px rgba(0,0,0,.55);filter:none}
-  .hero .figwrap.scene .ring{width:92%;border-style:solid;border-color:rgba(45,114,143,.28)}
+  .hero .figwrap.scene .ring{width:92%;border-style:solid;border-color:rgba(138,74,88,.28)}
   @keyframes spin{to{transform:rotate(360deg)}}
   :root:not([data-theme="light"]) .hero .figwrap img{animation:floaty 6s ease-in-out infinite}
   @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -107,7 +107,7 @@
 <div class="field"></div>
 
 <header class="top">
-  <a class="brand" href="index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="mgLib" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2D728F"/><stop offset="1" stop-color="#C9A24B"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="7.5" fill="url(#mgLib)"/><g fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".95"><path d="M8 10 h8"/><path d="M8 14 h11"/><path d="M8 18 h6"/></g><g fill="#fff"><circle cx="16" cy="10" r="1.5"/><circle cx="19" cy="14" r="1.5"/><circle cx="14" cy="18" r="1.5"/></g><path d="M16 21.4 l3.4 2.4 l-3.4 2.4 l-3.4 -2.4 z" fill="#fff"/></svg> M-AIDA <small><span class="vi">Thư viện</span><span class="en">Library</span></small></a>
+  <a class="brand" href="index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="mgLib" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a4a58"/><stop offset="1" stop-color="#C9A24B"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="7.5" fill="url(#mgLib)"/><g fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".95"><path d="M8 10 h8"/><path d="M8 14 h11"/><path d="M8 18 h6"/></g><g fill="#fff"><circle cx="16" cy="10" r="1.5"/><circle cx="19" cy="14" r="1.5"/><circle cx="14" cy="18" r="1.5"/></g><path d="M16 21.4 l3.4 2.4 l-3.4 2.4 l-3.4 -2.4 z" fill="#fff"/></svg> M-AIDA <small><span class="vi">Thư viện</span><span class="en">Library</span></small></a>
   <nav>
     <a href="index.html">M-AIDA</a>
     <a href="songs.html"><span class="vi">Bài hát</span><span class="en">Songs</span></a>
