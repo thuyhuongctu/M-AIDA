@@ -55,7 +55,7 @@ không thay đổi kết quả của các bản ghi P6 đã khóa.
   Added `vite.config.ts`, root `index.html`, `tsconfig.json`, `src/vite-env.d.ts`,
   and `frontend/.env.example`; the API base URL now reads `import.meta.env.VITE_API_URL`.
   Build output stays in `build/` so the Docker/nginx setup is unchanged.
-- CI: added `.github/workflows/maida-ci.yml` running the backend pytest suite
+- CI: added `.github/workflows/ci.yml` running the backend pytest suite
   and the frontend Vite production build on every change.
 
 ## [7.0.1] - 2026-06-10
