@@ -9,7 +9,7 @@
   window.__maidaMiniMusic = true;
 
   var TRACKS = [
-    { t: 'The Heartbeat of M-AIDA', s: 'Que les preuves décident · take 16', f: 'assets/maida_song_official.mp3' },
+    { t: 'The Heartbeat of M-AIDA', s: 'Que les preuves décident · bản mở rộng', f: 'assets/maida_song_official.mp3' },
     { t: 'Que les preuves décident', s: 'take 13', f: 'assets/maida_song_que_les_preuves_take13.mp3' },
     { t: "Je m'appelle Hương", s: 'mon histoire', f: 'assets/maida_song_mon_histoire.mp3' }
   ];
