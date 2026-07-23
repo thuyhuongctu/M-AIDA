@@ -1,0 +1,36 @@
+# M-AIDA — production compose for a single host (VPS / container host).
+# See DEPLOY.md for the full runbook.
+#
+#   cp backend/.env.production.example backend/.env    # fill in real secrets
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# The frontend (nginx) is the only published service; it proxies /api/ to the
+# backend on the internal network. Put a TLS reverse proxy (Caddy/Traefik) in
+# front of it for HTTPS in production.
+
+services:
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    restart: unless-stopped
+    expose:
+      - "8765"                      # internal only; reached via the frontend's /api proxy
+    healthcheck:
+      # python-based check (the slim image has no curl)
+      test: ["CMD", "python", "-c", "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://localhost:8765/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""            # same-origin; nginx proxies /api/ to backend
+    restart: unless-stopped
+    ports:
+      - "80:3000"                   # host:container — front this with Caddy/Traefik for TLS
+    depends_on:
+      backend:
+        condition: service_healthy

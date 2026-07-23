@@ -65,6 +65,14 @@ Seeding rules and options (full-database seed, lock-all mode) are documented in
 `LLM_API_KEY` in `backend/.env`; without it the extraction endpoint returns an
 explicit 503 and all other features work offline.
 
+## Production deployment
+
+To run the app for real (single host / VPS, prebuilt GHCR images, or a managed
+host) see **[DEPLOY.md](DEPLOY.md)**: `docker-compose.prod.yml`,
+`backend/.env.production.example`, and a GHCR image-build workflow are provided.
+The staged plan toward a commercial SaaS (PostgreSQL, auth, billing) is in
+`KE_HOACH_TRIEN_KHAI_APP_vi.md` in the dissertation repository.
+
 ## Development and tests
 
 ```bash
