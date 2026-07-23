@@ -1,7 +1,7 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21282516.svg)](https://doi.org/10.5281/zenodo.21282516)
-![version](https://img.shields.io/badge/version-7.1.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2018%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+![version](https://img.shields.io/badge/version-7.1.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
 academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop
@@ -19,7 +19,7 @@ dissertation on the internationalization-performance relationship.
 ## System Architecture
 
 ```text
-frontend (React 18, :3000)
+frontend (React 19, :3000)
     calls --> backend (FastAPI, :8765)
                  |-- extractor.py    vendor-neutral LLM parsing
                  |-- engines.py      provider adapter (LLM_PROVIDER / LLM_API_KEY / LLM_MODEL)
@@ -130,8 +130,9 @@ The repository is also served as a static site (GitHub Pages):
   light/dark themes.
 - **Songs** ([songs.html](https://thuyhuongctu.github.io/M-AIDA/songs.html)):
   the main work *"The Heartbeat of M-AIDA (Que les preuves decident)"* on an
-  immersive 3D lyric console with synchronized lyrics, an artist gallery, and
-  the full recording archive.
+  immersive 3D lyric console with synchronized lyrics, an artist gallery, and a
+  curated pair of non-duplicate recordings (the extended main work plus
+  *"Je m'appelle Hương – mon histoire"*).
 - **Author's academic homepage** ([huong.html](https://thuyhuongctu.github.io/M-AIDA/huong.html)):
   Do Thuy Huong's personal page, bio, publications (ORCID), teaching linked to
   research, an interactive 3D globe of the studied economies, a World Bank data
@@ -142,16 +143,18 @@ The repository is also served as a static site (GitHub Pages):
 **Theme song.** The project's main work is *"The Heartbeat of M-AIDA (Que les
 preuves decident)"* (`assets/maida_song_official.mp3`, an extended cut of about
 4.5 minutes). It is featured on the Songs page and is available site-wide
-through a shared floating player that loops and auto-advances the full recording
-archive. The mood menu on the main and commercial pages also plays an earlier
-take (`assets/maida_song.mp3`). All lyrics were written by Do Thuy Huong
-(17 July 2026). The Data & Melody page carries the full song cover: the author's
-ao dai portrait on a floral backdrop with animated falling petals and a Vietnam
-map watermark.
+through a shared floating player that loops the curated pair (the main work plus
+*"Je m'appelle Hương – mon histoire"*). The mood menu on the main and commercial
+pages plays the *heartbeat* recording (`assets/maida_song_heartbeat.mp3`), with an
+instrumental option. All lyrics were written by Do Thuy Huong (17 July 2026). The
+Data & Melody page carries the full song cover: the author's ao dai portrait on a
+floral backdrop with animated falling music notes and a Vietnam map watermark.
 
-**Design.** The main and commercial pages ship a premium editorial design
-(ivory default theme, charcoal-and-brass dark theme behind the toggle, glass
-cards, scroll-reveal animations, scroll progress bar). All character artwork
+**Design.** The main and commercial pages ship a premium editorial design in the
+*"Je m'appelle Hương"* brand palette — a warm ivory default theme with a
+dusty-mauve primary and a warm-gold accent, a rosewood dark theme behind the
+toggle, glass cards, scroll-reveal animations, and a scroll progress bar. The
+academic `asia-*` atlas pages keep their own terracotta/ochre/green data theme. All character artwork
 uses the realistic 3D Huong character in high resolution; cross-page links
 carry the selected language (`?lang=`), and Data & Melody opens in French by
 default with VI / EN / FR toggles.
