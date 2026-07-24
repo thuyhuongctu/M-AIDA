@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#00c4ff">
+<title>BizArena AI — Thị trường sống | M-AIDA</title>
+<meta name="description" content="BizArena AI: a playable multi-agent 'living market' business-simulation game for management education. Five teams compete on one market simulated by AI customer segments. Bilingual VI/EN.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8F%9F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Manrope:wght@400;500;600&family=Hanken+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Lumina AI design system (Stitch 1535486079933077060) ===== */
+:root{
+  --primary:#006687;--cyan:#00c4ff;--teal:#033337;--charcoal:#161c20;
+  --bg:#f4faff;--surface:#fff;--surface-alt:#f2f2f2;--container:#e9eff3;
+  --ink:#161c20;--ink-2:#3d484f;--outline:#6d7980;--line:#dbe4ea;
+  --amber:#fda127;--error:#ba1a1a;--good:#0a9b6d;
+  --fd:'Plus Jakarta Sans',system-ui,sans-serif;--fb:'Manrope',system-ui,sans-serif;--fl:'Hanken Grotesk',system-ui,sans-serif;
+  --r:8px;--r-lg:16px;--r-xl:24px;--r-full:9999px;
+  --sh:0 10px 30px rgba(0,102,135,.07);--sh-teal:0 20px 40px rgba(0,196,255,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fb);background:var(--bg);color:var(--ink);line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+/* back to library */
+.backbar{max-width:1200px;margin:0 auto;padding:14px 24px 0}
+.backlink{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--fl);font-weight:700;font-size:13px;color:var(--primary);text-decoration:none;background:var(--container);padding:7px 13px;border-radius:var(--r-full)}
+.backlink:hover{filter:brightness(.97)}
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--fd);font-weight:800;font-size:22px;color:var(--teal);letter-spacing:-.02em}
+.brand b{color:var(--cyan)}
+.top .meta{display:flex;gap:14px;align-items:center;font-family:var(--fl);font-size:13px;color:var(--ink-2)}
+.round-pill{background:var(--container);border-radius:var(--r-full);padding:7px 14px;font-weight:700;color:var(--primary)}
+/* tabs */
+.tabs{display:flex;gap:6px;margin:22px 0;background:var(--container);padding:5px;border-radius:var(--r-lg);flex-wrap:wrap}
+.tab{flex:1;min-width:110px;border:none;background:transparent;font-family:var(--fl);font-weight:700;font-size:14px;color:var(--ink-2);padding:11px;border-radius:var(--r);cursor:pointer;transition:.15s}
+.tab.active{background:var(--surface);color:var(--primary);box-shadow:0 2px 8px rgba(0,102,135,.08)}
+.tab:disabled{opacity:.4;cursor:not-allowed}
+/* panels */
+.panel{display:none;padding-bottom:60px}.panel.on{display:block;animation:f .3s ease}
+@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-family:var(--fd);font-weight:800;font-size:34px;color:var(--teal);letter-spacing:-.01em;margin:8px 0 4px}
+h1 .hl{color:var(--cyan)}
+.lead{color:var(--ink-2);margin-bottom:22px;max-width:640px}
+.grid{display:grid;gap:18px}.g2{grid-template-columns:1fr 1fr}.g5{grid-template-columns:repeat(5,1fr)}
+.card{background:var(--surface);border-radius:var(--r-lg);padding:24px;box-shadow:var(--sh)}
+.card h3{font-family:var(--fd);font-size:17px;color:var(--teal);margin-bottom:14px}
+label{display:block;font-family:var(--fl);font-weight:700;font-size:12px;letter-spacing:.02em;color:var(--outline);text-transform:uppercase;margin:12px 0 5px}
+input,select{width:100%;font-family:var(--fb);font-size:15px;padding:11px 13px;border:1px solid var(--line);background:var(--surface-alt);border-radius:var(--r);color:var(--ink)}
+input:focus,select:focus{outline:none;border-color:var(--cyan);background:#fff}
+.btn{font-family:var(--fl);font-weight:700;border:none;border-radius:var(--r);padding:13px 24px;cursor:pointer;font-size:15px}
+.btn-primary{background:var(--cyan);color:#00323f;box-shadow:0 8px 22px rgba(0,196,255,.32)}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-ghost{background:transparent;border:1.5px solid var(--charcoal);color:var(--charcoal)}
+.center{text-align:center;margin-top:26px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--fl);font-weight:700;font-size:12px;color:var(--primary);background:rgba(0,196,255,.12);padding:6px 13px;border-radius:var(--r-full)}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan)}
+/* team decision cards */
+.team-badge{font-family:var(--fl);font-weight:700;font-size:12px;color:#fff;padding:3px 9px;border-radius:var(--r-full)}
+.trow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.locked{opacity:.6}
+/* market bars */
+.mrow{display:flex;align-items:center;gap:12px;margin:11px 0}
+.mrow .nm{font-family:var(--fl);font-weight:700;font-size:13px;width:90px}
+.track{flex:1;height:16px;background:var(--container);border-radius:var(--r-full);overflow:hidden}
+.fill{height:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--cyan),#71d2ff);transition:width .6s}
+.mrow .pc{font-family:var(--fl);font-weight:700;font-size:13px;width:56px;text-align:right}
+.teal-card{background:var(--teal);color:#dbeef2;border-radius:var(--r-xl);padding:28px;box-shadow:var(--sh-teal)}
+.teal-card h3{color:#fff}
+.teal-card .track{background:rgba(255,255,255,.12)}
+.report{font-family:var(--fb);color:var(--ink-2);line-height:1.65}
+.report .ai{background:rgba(0,196,255,.07);border-left:3px solid var(--cyan);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font-family:var(--fl);font-size:12px;color:var(--outline);text-transform:uppercase}
+tr.win td{background:rgba(0,196,255,.06)}
+.seg{display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.seg span{font-family:var(--fl);font-size:11px;background:var(--container);padding:4px 9px;border-radius:var(--r-full);color:var(--ink-2)}
+.foot{border-top:1px solid var(--line);padding:22px 0;text-align:center;font-family:var(--fl);font-size:12px;color:var(--outline)}
+.foot a{color:var(--primary);text-decoration:none;font-weight:700}
+@media(max-width:820px){.g5,.g2{grid-template-columns:1fr}h1{font-size:27px}}
+</style></head>
+<body>
+<div class="backbar"><a class="backlink" href="library.html">← <span>Thư viện Sáng tạo · M-AIDA</span></a></div>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">BizArena<b>·AI</b></div>
+    <div class="meta"><span class="round-pill" id="roundPill">Vòng 0 / 6</span><span id="modeTag" class="chip"><span class="dot"></span>THỊ TRƯỜNG SỐNG</span></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="setup">Thiết lập</button>
+    <button class="tab" data-tab="play" id="tabPlay" disabled>Chơi</button>
+    <button class="tab" data-tab="market" id="tabMarket" disabled>Thị trường</button>
+    <button class="tab" data-tab="report" id="tabReport" disabled>Báo cáo</button>
+  </div>
+
+  <!-- SETUP -->
+  <div class="panel on" id="p-setup">
+    <span class="chip"><span class="dot"></span>MÔ PHỎNG TÌNH HUỐNG KINH DOANH · EC1314</span>
+    <h1>Cấu hình <span class="hl">đấu trường</span></h1>
+    <p class="lead">5 đội cùng cạnh tranh trên MỘT thị trường do khách hàng AI (5 phân khúc) mô phỏng. Mỗi vòng: đặt giá · chất lượng · marketing → thị trường tự phản ứng.</p>
+    <div class="grid g2">
+      <div class="card"><h3>Thông tin lớp</h3>
+        <label>Học phần</label><input id="courseName" value="Mô phỏng tình huống trong kinh doanh (EC1314)">
+        <label>Số vòng (quý)</label><input id="numRounds" type="number" value="6" min="3" max="12">
+        <label>Vốn ban đầu (triệu VND)</label><input id="capital" type="number" value="500">
+      </div>
+      <div class="card"><h3>5 đội tham gia</h3><div id="teamInputs"></div></div>
+    </div>
+    <div class="center"><button class="btn btn-primary" onclick="startGame()">✓ Bắt đầu Vòng 1</button></div>
+  </div>
+
+  <!-- PLAY -->
+  <div class="panel" id="p-play">
+    <h1>Ra quyết định — <span class="hl">Vòng <span id="playRound">1</span></span></h1>
+    <p class="lead">Mỗi đội đặt <b>Giá bán</b> (k VND/sp), <b>Chất lượng</b> (1–10), <b>Marketing</b> (triệu VND). Chốt cả 5 đội rồi bấm "Chạy vòng".</p>
+    <div class="grid g5" id="decisionCards"></div>
+    <div class="center"><button class="btn btn-primary" onclick="runRound()">⚡ Chạy vòng — Thị trường phản ứng</button></div>
+  </div>
+
+  <!-- MARKET -->
+  <div class="panel" id="p-market">
+    <h1>Thị trường <span class="hl">sống</span> — Vòng <span id="mktRound">1</span></h1>
+    <p class="lead">Kết quả cầu và thị phần "nổi lên" từ lựa chọn của <span id="agentN">25</span> khách hàng AI.</p>
+    <div class="grid g2">
+      <div class="teal-card"><h3>Thị phần đang hình thành</h3><div id="mktBars"></div>
+        <div class="seg" id="segInfo"></div></div>
+      <div class="card"><h3>Cầu & doanh số vòng này</h3><div id="mktTable"></div></div>
+    </div>
+    <div class="center"><button class="btn btn-primary" onclick="show('report')">Xem báo cáo phân tích →</button></div>
+  </div>
+
+  <!-- REPORT -->
+  <div class="panel" id="p-report">
+    <h1>Báo cáo <span class="hl">ReportAgent</span></h1>
+    <div class="grid g2">
+      <div class="card"><h3>Phân tích "vì sao" + what-if</h3><div class="report" id="reportBody"></div></div>
+      <div class="card"><h3>Bảng xếp hạng luỹ kế</h3><div id="leaderboard"></div></div>
+    </div>
+    <div class="center" id="nextWrap"><button class="btn btn-primary" onclick="nextRound()">→ Vòng tiếp theo</button></div>
+  </div>
+
+  <div class="foot">BizArena·AI — Thị trường sống đa tác tử · Design "Lumina AI" · © 2026 NCS Đỗ Thùy Hương · <a href="library.html">Thư viện Sáng tạo M-AIDA</a></div>
+</div>
+
+<script>
+/* ================= ENGINE: living market (rule-based agents) ================= */
+const SEGMENTS = {
+  "Nhạy giá":         [1.30,0.55,0.35,0.20],
+  "Chuộng chất lượng":[0.55,1.30,0.45,0.35],
+  "Theo xu hướng":    [0.70,0.70,1.25,0.20],
+  "Trung thành TH":   [0.80,0.90,0.40,1.20],
+  "Thực dụng":        [1.00,1.00,0.60,0.40],
+};
+const SEG_W = [0.30,0.20,0.18,0.15,0.17];
+const COLORS = ["#00c4ff","#0a9b6d","#fda127","#7a5cff","#e0387e"];
+
+// seeded RNG (mulberry32) — tái lập
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){return (r()+r()+r()-1.5)*1.2;}
+
+let R = rng(42);
+let state = null;
+
+function makeAgents(n){
+  const segNames=Object.keys(SEGMENTS), agents=[];
+  for(let i=0;i<n;i++){
+    let x=R(),acc=0,seg=segNames[0];
+    for(let s=0;s<segNames.length;s++){acc+=SEG_W[s]; if(x<=acc){seg=segNames[s];break;}}
+    agents.push({seg, reservation:30+R()*25, pref:Math.floor(R()*5), satis:0});
+  }
+  return agents;
+}
+function runMarket(agents, teams){
+  const aware=teams.map(t=>Math.min(1,t.mkt/8));
+  const wom=teams.map((_,j)=>{const f=agents.filter(a=>a.pref===j); return f.length? (f.reduce((s,a)=>s+a.satis,0)/f.length)*0.5:0;});
+  const choices=teams.map(()=>0); let nobuy=0;
+  agents.forEach(a=>{
+    const [ps,qw,ms,loy]=SEGMENTS[a.seg];
+    let best=-1,bu=0;
+    teams.forEach((t,j)=>{
+      let u=qw*t.quality - ps*(t.price-35)/5 + ms*aware[j] + (a.pref===j?loy*0.8:0) + wom[j] - (t.price<=a.reservation?0:3) + gauss(R);
+      if(u>bu){bu=u;best=j;}
+    });
+    if(best<0){nobuy++;return;}
+    choices[best]++;
+    const t=teams[best];
+    a.satis=0.6*a.satis+0.4*(t.quality-(t.price-35)/6);
+    if(R()<0.3) a.pref=best;
+  });
+  return {choices,nobuy,aware};
+}
+/* ================= FINANCE (deterministic) ================= */
+const SCALE=400, FIXED=40, VARC=15; // 1 agent-mẫu ≈ 400 sp thị trường; CP cố định 40tr/quý; biến đổi 15k/sp
+function finance(team, sampleUnits){
+  const units = sampleUnits*SCALE;                    // quy mẫu -> thị trường thật
+  const revenue = team.price*units/1000;              // triệu VND
+  const cost = FIXED + VARC*units/1000 + team.mkt;    // triệu
+  return {units, revenue:+revenue.toFixed(1), cost:+cost.toFixed(1), profit:+(revenue-cost).toFixed(1)};
+}
+/* ================= STATE / FLOW ================= */
+function startGame(){
+  const names=[...document.querySelectorAll('.team-name')].map((e,i)=>e.value||('Đội '+(i+1)));
+  R=rng(42);
+  state={
+    round:1, numRounds:+document.getElementById('numRounds').value||6,
+    agents:makeAgents(25),
+    teams:names.map((n,i)=>({name:n,color:COLORS[i],cumProfit:0,history:[]})),
+    lastResult:null
+  };
+  document.getElementById('agentN').textContent=state.agents.length;
+  ['tabPlay','tabMarket','tabReport'].forEach(id=>document.getElementById(id).disabled=false);
+  renderDecisions(); updatePill(); show('play');
+}
+function updatePill(){document.getElementById('roundPill').textContent='Vòng '+(state?state.round:0)+' / '+(state?state.numRounds:6);}
+function renderDecisions(){
+  document.getElementById('playRound').textContent=state.round;
+  document.getElementById('decisionCards').innerHTML = state.teams.map((t,i)=>`
+    <div class="card"><div class="trow"><span class="team-badge" style="background:${t.color}">Đội ${i+1}</span>
+      <b style="font-family:var(--fd);font-size:14px">${t.name}</b></div>
+      <label>Giá (k/sp)</label><input type="number" id="pr_${i}" value="35">
+      <label>Chất lượng (1–10)</label><input type="number" id="ql_${i}" value="6" min="1" max="10">
+      <label>Marketing (triệu)</label><input type="number" id="mk_${i}" value="5">
+    </div>`).join('');
+}
+function runRound(){
+  const teams=state.teams.map((t,i)=>({
+    price:+document.getElementById('pr_'+i).value,
+    quality:+document.getElementById('ql_'+i).value,
+    mkt:+document.getElementById('mk_'+i).value,
+    name:t.name,color:t.color
+  }));
+  const res=runMarket(state.agents, teams);
+  const total=res.choices.reduce((a,b)=>a+b,0);
+  const fin=teams.map((t,i)=>finance(t,res.choices[i]));
+  fin.forEach((f,i)=>{state.teams[i].cumProfit=+(state.teams[i].cumProfit+f.profit).toFixed(1); state.teams[i].history.push({round:state.round,...f,share:total?100*res.choices[i]/total:0,decision:teams[i]});});
+  state.lastResult={teams,res,total,fin};
+  renderMarket(); renderReport(); updatePill(); show('market');
+}
+function renderMarket(){
+  const {teams,res,total,fin}=state.lastResult;
+  document.getElementById('mktRound').textContent=state.round;
+  const order=[...teams.keys()].sort((a,b)=>res.choices[b]-res.choices[a]);
+  document.getElementById('mktBars').innerHTML=order.map(j=>{
+    const pc=total?100*res.choices[j]/total:0;
+    return `<div class="mrow"><span class="nm" style="color:#bfe6f0">${teams[j].name}</span>
+      <div class="track"><div class="fill" style="width:${pc}%;background:${teams[j].color}"></div></div>
+      <span class="pc" style="color:#fff">${pc.toFixed(0)}%</span></div>`;}).join('');
+  const segCount={}; state.agents.forEach(a=>segCount[a.seg]=(segCount[a.seg]||0)+1);
+  document.getElementById('segInfo').innerHTML=Object.entries(segCount).map(([k,v])=>`<span>${k}: ${v}</span>`).join('');
+  document.getElementById('mktTable').innerHTML=`<table><thead><tr><th>Đội</th><th>Bán</th><th>Doanh thu</th><th>Chi phí</th><th>Lợi nhuận</th></tr></thead><tbody>${
+    teams.map((t,i)=>`<tr><td>${t.name}</td><td>${fin[i].units}</td><td>${fin[i].revenue}</td><td>${fin[i].cost}</td><td style="color:${fin[i].profit>=0?'var(--good)':'var(--error)'};font-weight:700">${fin[i].profit>=0?'+':''}${fin[i].profit}</td></tr>`).join('')
+  }</tbody></table><p style="font-family:var(--fl);font-size:12px;color:var(--outline);margin-top:8px">Đơn vị: triệu VND · ${res.nobuy} khách không mua</p>`;
+}
+function renderReport(){
+  const {teams,res,total}=state.lastResult;
+  const cheapest=teams.reduce((m,t,i)=>t.price<teams[m].price?i:m,0);
+  const bestQ=teams.reduce((m,t,i)=>t.quality>teams[m].quality?i:m,0);
+  const bigMkt=teams.reduce((m,t,i)=>t.mkt>teams[m].mkt?i:m,0);
+  const winner=[...teams.keys()].sort((a,b)=>res.choices[b]-res.choices[a])[0];
+  document.getElementById('reportBody').innerHTML=`
+    <div class="ai">🤖 <b>${teams[winner].name}</b> dẫn đầu vòng ${state.round} với ${(100*res.choices[winner]/total).toFixed(0)}% thị phần.</div>
+    <p>• Đội <b>${teams[cheapest].name}</b> (giá thấp nhất ${teams[cheapest].price}k) hút phân khúc <i>Nhạy giá</i>.<br>
+    • Đội <b>${teams[bestQ].name}</b> (chất lượng ${teams[bestQ].quality}) thu hút <i>Chuộng chất lượng</i>.<br>
+    • Đội <b>${teams[bigMkt].name}</b> (marketing ${teams[bigMkt].mkt}tr) nâng nhận biết ở <i>Theo xu hướng</i>.</p>
+    <div class="ai">💡 <b>What-if:</b> nếu một đội hạ giá ~10% ở vòng sau, nhóm <i>Nhạy giá</i> (${Math.round(state.agents.filter(a=>a.seg==='Nhạy giá').length)} KH) có thể đổi lựa chọn — nhưng coi chừng biên lợi nhuận.</div>`;
+  const rank=[...state.teams].map((t,i)=>({...t,i})).sort((a,b)=>b.cumProfit-a.cumProfit);
+  document.getElementById('leaderboard').innerHTML=`<table><thead><tr><th>#</th><th>Đội</th><th>LN luỹ kế</th></tr></thead><tbody>${
+    rank.map((t,r)=>`<tr class="${r===0?'win':''}"><td>${r+1}</td><td><span class="team-badge" style="background:${t.color}">${t.name}</span></td><td style="color:${t.cumProfit>=0?'var(--good)':'var(--error)'};font-weight:700">${t.cumProfit>=0?'+':''}${t.cumProfit}</td></tr>`).join('')
+  }</tbody></table>`;
+  document.getElementById('nextWrap').innerHTML = state.round>=state.numRounds
+    ? `<div class="chip"><span class="dot"></span>KẾT THÚC — ${rank[0].name} vô địch! 🏆</div>`
+    : `<button class="btn btn-primary" onclick="nextRound()">→ Vòng tiếp theo</button>`;
+}
+function nextRound(){ if(state.round>=state.numRounds)return; state.round++; renderDecisions(); updatePill(); show('play'); }
+/* ================= TABS ================= */
+function show(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p-'+name).classList.add('on');
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ if(!t.disabled) show(t.dataset.tab); }));
+/* init team inputs */
+document.getElementById('teamInputs').innerHTML=['ALPHA','BETA','GAMMA','DELTA','EPSILON'].map((n,i)=>
+  `<div class="trow"><span class="team-badge" style="background:${COLORS[i]}">Đội ${i+1}</span><input class="team-name" value="Doanh nghiệp ${n}"></div>`).join('');
+</script>
+<script data-goatcounter="https://thuyhuongctu.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body></html>
