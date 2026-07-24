@@ -17,3 +17,6 @@ node_modules/
 /build
 .pytest_cache/
 *.egg-info/
+
+# Song lyrics (all rights reserved, provided locally for HeyGen synthesis)
+voice/heygen/song_lyrics.txt
