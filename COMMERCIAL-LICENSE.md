@@ -23,7 +23,7 @@ the licensed party, under mutually agreed terms.
 
 ## How to obtain a commercial license
 
-Contact **Do Thuy Huong — huongdt@vlute.edu.vn** with a short description of your
+Contact **Do Thuy Huong — thuyhuongctu@gmail.com** (or **Phan Anh Tu — patu@ctu.edu.vn**) with a short description of your
 intended use. Because the authors hold the full copyright in M-AIDA, they are
 free to grant such licenses (dual licensing).
 

@@ -220,4 +220,4 @@ version's source.
 
 The authors also offer **commercial (dual) licensing** for closed-source or
 proprietary use, see [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md). Contact
-huongdt@vlute.edu.vn.
+thuyhuongctu@gmail.com or patu@ctu.edu.vn.
