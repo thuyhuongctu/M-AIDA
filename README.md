@@ -134,17 +134,21 @@ The repository is also served as a static site (GitHub Pages):
   English, French), with a live World Bank indicators widget.
 - **Creative Library** ([library.html](https://thuyhuongctu.github.io/M-AIDA/library.html)):
   a hub that links the project's components (the meta-analysis platform, the
-  Data & Melody walk, the songs, and the academic page). Bilingual EN/VI with
-  light/dark themes.
+  Data & Melody walk, the songs, the BizOn simulation game, and the academic
+  page), with a Huong AI image gallery. Bilingual EN/VI with light/dark themes.
 - **Songs** ([songs.html](https://thuyhuongctu.github.io/M-AIDA/songs.html)):
   the main work *"The Heartbeat of M-AIDA (Que les preuves decident)"* on an
   immersive 3D lyric console with synchronized lyrics, an artist gallery, and a
   curated pair of non-duplicate recordings (the extended main work plus
   *"Je m'appelle Hương – mon histoire"*).
+- **BizOn AI** ([bizon.html](https://thuyhuongctu.github.io/M-AIDA/bizon.html)):
+  a playable, multi-agent "living market" business-simulation game used in the
+  author's Business Simulation course.
 - **Author's academic homepage** ([huong.html](https://thuyhuongctu.github.io/M-AIDA/huong.html)):
   Do Thuy Huong's personal page, bio, publications (ORCID), teaching linked to
-  research, an interactive 3D globe of the studied economies, a World Bank data
-  widget, and a blog. Bilingual VI/EN with light/dark themes.
+  research, journal peer-review / academic service, an interactive 3D globe of the
+  studied economies, a World Bank data widget, and a blog. Bilingual VI/EN with
+  light/dark themes.
 - **Privacy policy** ([privacy.html](https://thuyhuongctu.github.io/M-AIDA/privacy.html)):
   cookieless-analytics disclosure (VI/EN).
 
