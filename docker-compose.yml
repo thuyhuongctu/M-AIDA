@@ -1,23 +1,38 @@
-version: "3.8"
-
 services:
   backend:
     build: ./backend
     ports:
       - "8765:8765"
     env_file: ./backend/.env
+    environment:
+      # Keep the SQLite file on the mounted volume, not in the container layer,
+      # so records survive `docker compose down` as well as a process restart.
+      - MAIDA_DB_PATH=/data/maida.db
+    volumes:
+      - maida-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8765/api/health"]
+      # Probed with the interpreter that is guaranteed to exist in this image;
+      # the earlier CMD used curl, which python:3.12-slim does not ship, so the
+      # check could never pass and frontend's service_healthy was unsatisfiable.
+      test: ["CMD", "python", "-c", "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://localhost:8765/api/health').status==200 else 1)"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 15s
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      # Vite inlines import.meta.env at build time, so the API base URL has to
+      # be a build arg, not a runtime `environment:` entry. An empty value makes
+      # the client use same-origin relative paths.
+      args:
+        VITE_API_URL: ""
     ports:
       - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:8765
     depends_on:
       backend:
         condition: service_healthy
+
+volumes:
+  maida-data:

@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "M-AIDA Defense App",
+  "short_name": "M-AIDA",
+  "description": "Presenter-controlled, offline-ready demonstration of the M-AIDA human-verified meta-analysis workflow.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#faf7f2",
+  "theme_color": "#7a1f2b",
+  "lang": "en",
+  "icons": [
+    {"src": "/demo-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

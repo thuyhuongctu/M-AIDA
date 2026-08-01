@@ -114,6 +114,9 @@ export interface StudyFilters {
   locked?: boolean | null;
 }
 
+/** What the next upload will actually do, as reported by the backend. */
+export type ExtractionMode = "live" | "rehearsed_fallback" | "unavailable";
+
 export interface HealthResponse {
   status: string;
   version: string;
@@ -121,6 +124,12 @@ export interface HealthResponse {
   llm_configured?: boolean;
   anthropic_configured?: boolean;
   notion_configured: boolean;
+  /** Storage backend in use; "sqlite" means records survive a restart. */
+  storage?: string;
+  storage_path?: string;
+  llm_ready?: boolean;
+  demo_mode?: boolean;
+  extraction_mode?: ExtractionMode;
 }
 
 export interface NotionSyncResponse {

@@ -14,10 +14,10 @@ POST   /api/notion/sync           Push all locked studies to Notion
 
 Data persistence
 ----------------
-Studies are stored in an in-memory dict keyed by study_id (UUID string).
-TODO: Replace with SQLite persistence using aiosqlite + SQLAlchemy Core so
-      data survives process restarts.  The StudyDatabaseEntry model already
-      has all required fields; only main.py needs to change.
+Studies are persisted in SQLite via ``store.StudyStore`` (see backend/store.py),
+keyed by study_id (UUID string).  Records therefore survive process restarts,
+which matters most in a live demo: a reload in front of an audience no longer
+erases verified and locked work.
 """
 
 from __future__ import annotations
@@ -34,11 +34,13 @@ from fastapi import FastAPI, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
+from demo_fallback import build_fallback_entry
 from engines import make_engine
 from extractor import StatisticalExtractor
 from models import ExtractedEffect, ExtractionRequest, StudyDatabaseEntry, VerificationDecision
 from notion_sync import NotionSync
 from settings import get_settings
+from store import StudyStore
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -64,10 +66,9 @@ app.add_middleware(
 )
 
 # ---------------------------------------------------------------------------
-# In-memory study store
-# TODO: Replace with SQLite persistence (aiosqlite + SQLAlchemy Core)
+# Persistent study store (SQLite; see backend/store.py)
 # ---------------------------------------------------------------------------
-_studies: dict[str, StudyDatabaseEntry] = {}
+_studies = StudyStore(settings.maida_db_path)
 
 
 # ---------------------------------------------------------------------------
@@ -107,14 +108,32 @@ def _get_notion() -> NotionSync:
 
 @app.get("/api/health", tags=["system"])
 def health_check() -> dict[str, Any]:
-    """Return service status and configuration flags."""
+    """Return service status, configuration flags and demo-readiness signals.
+
+    The extra fields exist so the UI can show a single status strip during a
+    live demo. A presenter needs to know, at a glance and before starting,
+    whether the backend is up, whether the store is persistent, whether live
+    extraction is actually available, and what will happen if it is not.
+    """
+    llm_ready = bool(settings.anthropic_api_key)
     return {
         "status": "ok",
         "version": "7.1.1",
         "study_count": len(_studies),
-        "anthropic_configured": bool(settings.anthropic_api_key),
+        "anthropic_configured": llm_ready,
         "notion_configured": bool(
             settings.notion_token and settings.notion_database_id
+        ),
+        # Storage is persistent by construction now; reported so the UI can say so.
+        "storage": "sqlite",
+        "storage_path": settings.maida_db_path,
+        # The mode the next upload will actually take.
+        "llm_ready": llm_ready,
+        "demo_mode": settings.maida_demo_mode,
+        "extraction_mode": (
+            "live"
+            if llm_ready
+            else ("rehearsed_fallback" if settings.maida_demo_mode else "unavailable")
         ),
     }
 
@@ -142,7 +161,13 @@ def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
 
     The PDF is decoded, text is extracted via PyMuPDF, and the
     StatisticalExtractor LLM pipeline produces an ExtractedEffect.  The result
-    is stored in the in-memory study store and returned to the caller.
+    is persisted in the study store and returned to the caller.
+
+    When live extraction is unavailable (no API key, no network, or a provider
+    error) and demo mode is enabled, a rehearsed fallback record is returned
+    instead of an error so a defence walkthrough survives a dead connection.
+    The fallback is stamped as such and always requires human verification;
+    with demo mode off, the original error propagates unchanged.
     """
     # Decode PDF bytes
     try:
@@ -163,18 +188,27 @@ def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
             status_code=422, detail=f"PDF text extraction failed: {exc}"
         ) from exc
 
-    extractor = _get_extractor()
     try:
+        extractor = _get_extractor()
         effect: ExtractedEffect = extractor.extract_from_text(
             full_text, request.paper_metadata
         )
     except Exception as exc:
+        if settings.maida_demo_mode:
+            logger.warning(
+                "Live extraction unavailable (%s); returning rehearsed fallback "
+                "because demo mode is on.",
+                exc,
+            )
+            return _studies.put(build_fallback_entry(request.paper_metadata))
+        if isinstance(exc, HTTPException):
+            raise
         logger.exception("Extraction failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     entry = StudyDatabaseEntry(**effect.model_dump())
     entry.machine_proposal = _machine_proposal_snapshot(effect)
-    _studies[entry.study_id] = entry
+    _studies.put(entry)
     return entry
 
 
@@ -224,7 +258,7 @@ def list_studies(
 
     All filter parameters are ANDed together.
     """
-    results = list(_studies.values())
+    results = _studies.values()
 
     if icrv is not None:
         results = [s for s in results if s.icrv_regime == icrv]
@@ -358,7 +392,7 @@ def verify_study(study_id: str, decision: VerificationDecision) -> StudyDatabase
         data["requires_verification"] = False
 
     updated = StudyDatabaseEntry(**data)
-    _studies[study_id] = updated
+    _studies.put(updated)
     return updated
 
 
@@ -398,7 +432,7 @@ def lock_study(study_id: str) -> StudyDatabaseEntry:
     data["pi_locked"] = True
     data["locked_at"] = datetime.utcnow()
     locked = StudyDatabaseEntry(**data)
-    _studies[study_id] = locked
+    _studies.put(locked)
     return locked
 
 
@@ -430,7 +464,7 @@ def notion_sync() -> dict[str, Any]:
             # Persist the Notion page_id back to the in-memory store
             data = study.model_dump()
             data["notion_page_id"] = page_id
-            _studies[study.study_id] = StudyDatabaseEntry(**data)
+            _studies.put(StudyDatabaseEntry(**data))
             synced += 1
         except Exception as exc:
             logger.error("Notion sync failed for study %s: %s", study.study_id, exc)

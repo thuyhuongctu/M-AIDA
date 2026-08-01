@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7a1f2b">
+<link rel="manifest" href="/manifest.webmanifest">
 <title>M-AIDA Live Verification Console</title>
 <style>
   :root{
@@ -82,7 +84,11 @@
   <div class="brand">M-AIDA <small id="hver">…</small></div>
   <span class="pill" id="hcount">…</span>
   <span class="pill" id="hextract">…</span>
+  <span class="pill" id="hnetwork">…</span>
   <span class="sp"></span>
+  <button class="act ghost" id="presenterBtn">Presenter PIN</button>
+  <button class="act ghost" id="fullBtn">Defense mode</button>
+  <button class="act ghost" id="resetBtn">Reset demo</button>
   <button class="act ghost" onclick="location.href='/docs'">API docs</button>
   <button class="act ghost" id="exportBtn">Export locked CSV</button>
 </header>
@@ -337,6 +343,32 @@ $('extractBtn').onclick = async () => {
 };
 
 $('exportBtn').onclick = () => { location.href = '/api/studies/export/csv'; };
+$('presenterBtn').onclick = () => {
+  sessionStorage.removeItem('maida-demo-pin');
+  const pin = presenterPin();
+  if (pin) $('presenterBtn').textContent = 'Presenter unlocked';
+};
+$('fullBtn').onclick = async () => {
+  document.body.classList.toggle('presentation');
+  if (!document.fullscreenElement) await document.documentElement.requestFullscreen().catch(()=>{});
+  else await document.exitFullscreen().catch(()=>{});
+};
+$('resetBtn').onclick = async () => {
+  if (!confirm('Reset the demo to the verified P6 seed? This removes changes made during this session.')) return;
+  try{
+    await api('/api/demo/reset', {method:'POST'});
+    SEL = null; await loadStudies(); await loadHealth(); renderDetail();
+    alert('Defense demo restored to its verified seed.');
+  }catch(e){ alert('Reset failed: ' + e.message); }
+};
+function updateNetwork(){
+  const el = $('hnetwork');
+  el.textContent = navigator.onLine ? 'network: online' : 'network: offline-ready';
+  el.className = 'pill ' + (navigator.onLine ? 'ok' : 'warn');
+}
+window.addEventListener('online', updateNetwork);
+window.addEventListener('offline', updateNetwork);
+updateNetwork();
 $('filters').onclick = (ev) => {
   const b = ev.target.closest('button'); if (!b) return;
   FILTER = b.dataset.f;

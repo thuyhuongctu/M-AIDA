@@ -1,0 +1,1 @@
+case_id,predicted_in_scope,predicted_route,predicted_r,predicted_n,predicted_doi_measure,predicted_performance_measure,confidence,requires_verification,fields_corrected,verification_minutes,hallucinated,provenance_present,model_provider,model_id,prompt_version,temperature,run_date,verifier_id

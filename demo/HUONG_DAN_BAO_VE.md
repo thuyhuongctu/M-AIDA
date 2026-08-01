@@ -81,3 +81,64 @@ MAIDA_SEED_CSV=/duong/dan/p6_study_database.csv python demo/run_defense.py
 Chạy thử toàn bộ kịch bản mục 4 ít nhất một lần trên chính máy sẽ mang
 đi bảo vệ, khi KHÔNG có mạng (sau khi đã cài thư viện): toàn bộ demo
 hoạt động ngoại tuyến, trừ bước trích xuất PDF thật cần mạng.
+
+
+## 7. Defense App v1: PIN, lưu trạng thái và khôi phục
+
+Khi khởi động, terminal in ra một **Presenter PIN** ngẫu nhiên. Giao diện chỉ
+yêu cầu PIN khi có thao tác làm thay đổi dữ liệu (trích xuất, xác minh, khóa,
+reset). Các thao tác đọc, lọc và xuất dữ liệu vẫn hoạt động bình thường.
+
+- Trạng thái phiên được lưu tại `demo/.defense-state.json` và tự khôi phục sau
+  khi khởi động lại.
+- Nút **Reset demo** đưa ứng dụng về đúng bộ dữ liệu P6 mẫu đã kiểm chứng.
+- Nút **Defense mode** bật giao diện toàn màn hình, chữ lớn và header cố định.
+- Chỉ báo **network** giúp người trình bày biết đang online hay dùng app shell
+  offline.
+- Có thể đặt PIN cố định trước buổi bảo vệ:
+
+```bash
+MAIDA_DEMO_PIN=2468 python demo/run_defense.py
+```
+
+Trên Windows PowerShell:
+
+```powershell
+$env:MAIDA_DEMO_PIN="2468"
+python demo/run_defense.py
+```
+
+Không đưa PIN thật vào Git hoặc slide công khai.
+
+## 8. Cài như ứng dụng trên máy/điện thoại
+
+Khi trang `http://localhost:8765/` được mở bằng Chrome/Edge trên máy chạy
+demo, chọn **Install app / Cài đặt ứng dụng** từ menu trình duyệt. App shell,
+manifest và service worker được phục vụ trực tiếp bởi FastAPI.
+
+Để trình diễn trên điện thoại trong cùng mạng, chạy laptop và điện thoại trên
+cùng Wi-Fi/hotspot, mở địa chỉ LAN của laptop, ví dụ
+`http://192.168.1.10:8765/`. Một số trình duyệt chỉ cho phép cài PWA đầy đủ
+trên HTTPS; vì vậy laptop cục bộ vẫn là thiết bị trình diễn chính, điện thoại là
+màn hình phụ.
+
+## 9. Kịch bản trình diễn 6 phút
+
+1. **0:00–0:45:** mở Dashboard, nêu dữ liệu thật và nguồn P6 đã khóa.
+2. **0:45–1:45:** lọc bản ghi locked/pending và giải thích ba đường chuyển đổi.
+3. **1:45–3:30:** chọn một bản ghi pending, đối chiếu machine proposal, nhập
+   ghi chú PI và phê duyệt.
+4. **3:30–4:15:** khóa bản ghi; thử sửa lại để chứng minh API trả 409.
+5. **4:15–5:00:** xuất CSV đã khóa và mở tài liệu API.
+6. **5:00–6:00:** nếu có mạng, chạy PDF mẫu; nếu không, chỉ báo offline chứng
+   minh phần kiểm chứng, khóa và xuất dữ liệu vẫn hoạt động.
+
+## 10. Checklist trước khi vào phòng
+
+- Chạy `python demo/smoke_test.py`.
+- Khởi động app, ghi Presenter PIN vào giấy riêng.
+- Nhấn **Reset demo** và kiểm tra số locked/pending.
+- Mở sẵn một bản ghi pending.
+- Chuẩn bị PDF mẫu nhưng không phụ thuộc vào live LLM.
+- Tắt thông báo hệ điều hành; cắm nguồn laptop.
+- Giữ một bản CSV export dự phòng và ảnh chụp màn hình kết quả.

@@ -17,3 +17,11 @@ node_modules/
 /build
 .pytest_cache/
 *.egg-info/
+
+# SQLite study store (runtime data, never source)
+*.db
+*.db-wal
+*.db-shm
+
+# Vite production output
+frontend/build/

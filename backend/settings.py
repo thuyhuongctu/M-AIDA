@@ -43,6 +43,16 @@ class Settings(BaseSettings):
     notion_database_id: str = ""
     maida_port: int = 8765
 
+    # Path of the SQLite file backing the study store. Records used to live in
+    # a module-level dict and were lost on every restart; a file-backed store
+    # means a crashed or reloaded process no longer destroys verified work.
+    maida_db_path: str = "maida.db"
+
+    # Demo mode enables two presentation-only behaviours, both off by default
+    # so a production deployment is unaffected: a rehearsed fallback record
+    # when live extraction is unavailable, and a demo-reset route.
+    maida_demo_mode: bool = False
+
     # Allowed CORS origins (comma-separated in env; pydantic-settings handles list)
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 

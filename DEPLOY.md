@@ -68,10 +68,19 @@ On hosts that inject their own `$PORT`, override the backend start command to
 | `NOTION_TOKEN`, `NOTION_DATABASE_ID` | `backend/.env` | optional Notion sync |
 | TLS certificate | reverse proxy (Caddy auto-provisions) | HTTPS |
 
+## Runtime configuration (not secret)
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `MAIDA_DB_PATH` | `maida.db` | SQLite file backing the study store. Point it at a mounted volume in containers; `docker-compose.yml` already maps `/data`. |
+| `MAIDA_DEMO_MODE` | `false` | Presentation-only behaviours. When on, extraction falls back to a clearly-stamped rehearsed record if the LLM is unreachable, and `POST /api/demo/reset?confirm=true` can clear the store. **Keep this off wherever real research data lives.** |
+
 ## Production hardening still on the roadmap
 
-The current build stores studies **in memory** (they reset on restart). Before
-paid/commercial use, add PostgreSQL persistence, authentication + multi-tenancy,
-and billing — see the staged plan in
+Studies are now persisted in SQLite, so they survive a process restart; that is
+sufficient for single-researcher and demo use but not for multi-tenant service.
+Before paid/commercial use, add PostgreSQL persistence, authentication +
+multi-tenancy, upload limits with server-side type checking, and billing — see
+the staged plan in
 [`../p6/tools/maida/KE_HOACH_TRIEN_KHAI_APP_vi.md`](KE_HOACH_TRIEN_KHAI_APP_vi.md)
 (Part B) in the dissertation repo.

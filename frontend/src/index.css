@@ -380,3 +380,43 @@ body {
 .success-message { color: #065f46; font-size: 0.88rem; }
 .loading-text, .empty-text { color: #718096; font-size: 0.88rem; text-align: center; padding: 1.5rem; }
 .hint-text { font-size: 0.78rem; color: #a0aec0; margin: 0.4rem 0 0; }
+
+/* ---------------------------------------------------------------------------
+   Status banner (demo readiness strip)
+   --------------------------------------------------------------------------- */
+.status-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.6rem 1rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.status-pill-label {
+  color: #475569;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.status-banner-note {
+  flex-basis: 100%;
+  margin: 0.25rem 0 0;
+  color: #92400e;
+  line-height: 1.45;
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-banner { background: #0f172a; border-bottom-color: #1e293b; }
+  .status-pill-label { color: #94a3b8; }
+  .status-banner-note { color: #fbbf24; }
+}

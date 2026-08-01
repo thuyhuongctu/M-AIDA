@@ -9,6 +9,7 @@
 import React, { useCallback, useState } from "react";
 import ExportPanel from "./components/ExportPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
+import StatusBanner from "./components/StatusBanner";
 import VerificationDashboard from "./components/VerificationDashboard";
 import { StudyDatabaseEntry } from "./types";
 import "./index.css";
@@ -40,6 +41,9 @@ export default function App() {
           Meta-Analysis Intelligent Data Assistant - Internationalization &amp; Performance
         </p>
       </header>
+
+      {/* Live status strip: backend, data, extraction mode, network */}
+      <StatusBanner />
 
       {/* Tab navigation */}
       <nav className="tab-nav" role="tablist">
