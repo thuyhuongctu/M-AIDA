@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">M-AIDA Research</string>
+    <string name="title_activity_main">M-AIDA Research</string>
+    <string name="package_name">io.github.thuyhuongctu.maida</string>
+    <string name="custom_url_scheme">io.github.thuyhuongctu.maida</string>
+</resources>

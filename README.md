@@ -77,6 +77,22 @@ host) see **[DEPLOY.md](DEPLOY.md)**: `docker-compose.prod.yml`,
 The staged plan toward a commercial SaaS (PostgreSQL, auth, billing) is in
 `KE_HOACH_TRIEN_KHAI_APP_vi.md` in the dissertation repository.
 
+## Mobile release candidate
+
+The React frontend now includes provisional Capacitor 8 projects for Android
+and iOS. Public app-store distribution is deliberately blocked until the CTU
+intellectual-property agreement, final publisher/bundle ID, production HTTPS
+API, data disclosures, support process, and physical-device tests are approved.
+See [`docs/mobile/APP_STORE_READINESS.md`](docs/mobile/APP_STORE_READINESS.md).
+
+The **Evidence Atlas** adds research-grade descriptive visual diagnostics for
+evidence geography, extracted effects, measurement coverage, and verification
+risks. Its interpretation rules and roadmap are documented in
+[`docs/RESEARCH_INTELLIGENCE.md`](docs/RESEARCH_INTELLIGENCE.md).
+
+This mobile v7.2.0 release-candidate work does not change the frozen and citable
+M-AIDA v7.1.1 research baseline.
+
 ## Development and tests
 
 ```bash

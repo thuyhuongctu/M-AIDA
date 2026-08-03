@@ -1,21 +1,35 @@
 {
   "name": "maida-frontend",
-  "version": "0.1.0",
+  "version": "7.2.0-rc.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "mobile:check": "node scripts/validate-mobile-release.mjs",
+    "mobile:release-check": "node scripts/validate-mobile-release.mjs --store",
+    "mobile:sync": "npm run build && cap sync",
+    "mobile:prepare:store": "npm run mobile:release-check && npm run build && cap sync",
+    "mobile:open:android": "cap open android",
+    "mobile:open:ios": "cap open ios",
+    "test:mobile": "node --test scripts/validate-mobile-release.test.mjs"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/network": "^8.0.1",
+    "@capacitor/share": "^8.0.1",
     "axios": "^1.7.2",
     "lucide-react": "^0.576.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/ios": "^8.5.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",

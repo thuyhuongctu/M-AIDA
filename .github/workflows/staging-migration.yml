@@ -1,0 +1,146 @@
+name: Protected staging migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact deployed commit SHA to verify before migration
+        required: true
+        type: string
+      confirmation:
+        description: Type MIGRATE-STAGING exactly
+        required: true
+        type: string
+      apply_migration:
+        description: Apply migration; otherwise run preflight only
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maida-protected-staging-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate-and-smoke:
+    environment: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+      CONFIRMATION: ${{ inputs.confirmation }}
+      STAGING_APP_DIR: ${{ vars.STAGING_APP_DIR }}
+      STAGING_DB_PATH: ${{ vars.STAGING_DB_PATH }}
+      STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+      STAGING_SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+      STAGING_SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+      STAGING_SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+      STAGING_SSH_KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+      STAGING_SMOKE_TOKEN: ${{ secrets.STAGING_SMOKE_TOKEN }}
+
+    steps:
+      - name: Enforce protected inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$CONFIRMATION" = "MIGRATE-STAGING"
+          [[ "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test -n "$STAGING_APP_DIR"
+          test -n "$STAGING_DB_PATH"
+          test -n "$STAGING_BASE_URL"
+          test -n "$STAGING_SSH_HOST"
+          test -n "$STAGING_SSH_USER"
+          test -n "$STAGING_SSH_PRIVATE_KEY"
+          test -n "$STAGING_SSH_KNOWN_HOSTS"
+          [[ "$STAGING_APP_DIR" = /* ]]
+          [[ "$STAGING_DB_PATH" = /* ]]
+          [[ "$STAGING_BASE_URL" == https://* ]]
+          [[ "$STAGING_BASE_URL" != */ ]]
+          [[ "$STAGING_APP_DIR$STAGING_DB_PATH$STAGING_BASE_URL" != *"'"* ]]
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Configure SSH with pinned host identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$STAGING_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$STAGING_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Verify exact staging deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(ssh "$STAGING_SSH_USER@$STAGING_SSH_HOST" \
+            "cd '$STAGING_APP_DIR' && git rev-parse HEAD")"
+          test "$remote_sha" = "$EXPECTED_SHA"
+          ssh "$STAGING_SSH_USER@$STAGING_SSH_HOST" \
+            "cd '$STAGING_APP_DIR' && git diff --quiet && git diff --cached --quiet"
+
+      - name: Preflight staging database
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh "$STAGING_SSH_USER@$STAGING_SSH_HOST" \
+            "cd '$STAGING_APP_DIR' && python3 backend/ops/staging_migration.py \
+              --database '$STAGING_DB_PATH' \
+              --environment staging \
+              --confirm MIGRATE-STAGING \
+              --dry-run \
+              --report /tmp/maida-staging-preflight.json"
+          scp "$STAGING_SSH_USER@$STAGING_SSH_HOST:/tmp/maida-staging-preflight.json" \
+            "$RUNNER_TEMP/maida-staging-preflight.json"
+
+      - name: Apply protected migration
+        if: ${{ inputs.apply_migration }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh "$STAGING_SSH_USER@$STAGING_SSH_HOST" \
+            "cd '$STAGING_APP_DIR' && python3 backend/ops/staging_migration.py \
+              --database '$STAGING_DB_PATH' \
+              --environment staging \
+              --confirm MIGRATE-STAGING \
+              --report /tmp/maida-staging-migration.json"
+          scp "$STAGING_SSH_USER@$STAGING_SSH_HOST:/tmp/maida-staging-migration.json" \
+            "$RUNNER_TEMP/maida-staging-migration.json"
+
+      - name: Run read-only staging smoke test
+        if: ${{ inputs.apply_migration }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$STAGING_SMOKE_TOKEN" | \
+            ssh "$STAGING_SSH_USER@$STAGING_SSH_HOST" \
+              "cd '$STAGING_APP_DIR' && python3 backend/ops/staging_smoke.py \
+                --database '$STAGING_DB_PATH' \
+                --base-url '$STAGING_BASE_URL' \
+                --bearer-token-stdin \
+                --report /tmp/maida-staging-smoke.json"
+          scp "$STAGING_SSH_USER@$STAGING_SSH_HOST:/tmp/maida-staging-smoke.json" \
+            "$RUNNER_TEMP/maida-staging-smoke.json"
+
+      - name: Upload staging evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-migration-smoke-${{ inputs.expected_sha }}
+          path: |
+            ${{ runner.temp }}/maida-staging-preflight.json
+            ${{ runner.temp }}/maida-staging-migration.json
+            ${{ runner.temp }}/maida-staging-smoke.json
+          if-no-files-found: warn
+          retention-days: 30

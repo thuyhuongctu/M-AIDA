@@ -19,10 +19,18 @@ Requirements: a Linux host with Docker + Docker Compose.
 
 ```bash
 git clone https://github.com/thuyhuongctu/M-AIDA.git && cd M-AIDA
+export MAIDA_DATA_DIR=/srv/maida/data
+mkdir -p "$MAIDA_DATA_DIR"
 cp backend/.env.production.example backend/.env      # fill in LLM_API_KEY etc.
 docker compose -f docker-compose.prod.yml up -d --build
 # app on http://<host>/   (health: http://<host>/api/health via the proxy)
 ```
+
+`MAIDA_DATA_DIR` must be an absolute, durable host directory for staging and
+production. Compose mounts it at `/data`, while the backend is forced to use
+`MAIDA_DB_PATH=/data/maida.db`; rebuilding or replacing the container therefore
+does not discard the SQLite store. The default `./data` fallback is intended
+only for a local single-host rehearsal.
 
 For HTTPS put a TLS reverse proxy in front (one-liner with Caddy):
 
@@ -32,7 +40,12 @@ docker run -d --name caddy --network host \
   -v $PWD/Caddyfile:/etc/caddy/Caddyfile caddy
 ```
 
-Update to a new version: `git pull && docker compose -f docker-compose.prod.yml up -d --build`.
+Update to a new version without changing `MAIDA_DATA_DIR`:
+
+```bash
+git pull
+docker compose -f docker-compose.prod.yml up -d --build
+```
 
 ## Option B — Prebuilt images (GHCR)
 
@@ -72,7 +85,8 @@ On hosts that inject their own `$PORT`, override the backend start command to
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `MAIDA_DB_PATH` | `maida.db` | SQLite file backing the study store. Point it at a mounted volume in containers; `docker-compose.yml` already maps `/data`. |
+| `MAIDA_DATA_DIR` | `./data` in production compose | Host directory mounted at `/data`. Use an absolute durable path for staging/production. |
+| `MAIDA_DB_PATH` | `maida.db`; forced to `/data/maida.db` by production compose | SQLite file backing the study store. Both compose configurations keep it on a mounted volume. |
 | `MAIDA_DEMO_MODE` | `false` | Presentation-only behaviours. When on, extraction falls back to a clearly-stamped rehearsed record if the LLM is unreachable, and `POST /api/demo/reset?confirm=true` can clear the store. **Keep this off wherever real research data lives.** |
 
 ## Production hardening still on the roadmap

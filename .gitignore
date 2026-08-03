@@ -22,6 +22,7 @@ node_modules/
 *.db
 *.db-wal
 *.db-shm
+/data/
 
 # Vite production output
 frontend/build/

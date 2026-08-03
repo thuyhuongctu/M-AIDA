@@ -1,20 +1,26 @@
 /**
  * M-AIDA v7.1.1 - Root application component.
  *
- * Two-tab layout:
+ * Three-workspace layout:
  *   1. Extract       - PDF upload and LLM extraction (ExtractionPanel)
- *   2. Verify & Lock - PI verification dashboard (VerificationDashboard + ExportPanel)
+ *   2. Evidence Atlas - descriptive research intelligence (ResearchIntelligence)
+ *   3. Verify & Lock - PI verification dashboard (VerificationDashboard + ExportPanel)
  */
 
-import React, { useCallback, useState } from "react";
+import { App as CapacitorApp } from "@capacitor/app";
+import { Share } from "@capacitor/share";
+import { ExternalLink, Network, Share2 } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 import ExportPanel from "./components/ExportPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
+import ResearchIntelligence from "./components/ResearchIntelligence";
 import StatusBanner from "./components/StatusBanner";
+import { runtimeConfig } from "./config";
 import VerificationDashboard from "./components/VerificationDashboard";
 import { StudyDatabaseEntry } from "./types";
 import "./index.css";
 
-type Tab = "extract" | "verify";
+type Tab = "extract" | "verify" | "intelligence";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("extract");
@@ -29,18 +35,63 @@ export default function App() {
     setActiveTab("verify");
   }, []);
 
+  const shareApp = useCallback(async () => {
+    await Share.share({
+      title: "M-AIDA Research",
+      text: "M-AIDA supports human-verified data extraction for meta-analysis research.",
+      url: runtimeConfig.supportUrl,
+      dialogTitle: "Share M-AIDA",
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!runtimeConfig.isNative || runtimeConfig.platform !== "android") return;
+    let removeListener: (() => Promise<void>) | undefined;
+    void CapacitorApp.addListener("backButton", ({ canGoBack }) => {
+      if (activeTab !== "extract") setActiveTab("extract");
+      else if (canGoBack) window.history.back();
+      else void CapacitorApp.minimizeApp();
+    }).then((handle) => {
+      removeListener = () => handle.remove();
+    });
+    return () => {
+      if (removeListener) void removeListener();
+    };
+  }, [activeTab]);
+
+  const canShare =
+    runtimeConfig.isNative ||
+    (typeof navigator !== "undefined" && typeof navigator.share === "function");
+
   return (
     <div className="app">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       {/* Header */}
       <header className="app-header">
-        <div className="header-brand">
-          <h1 className="app-title">M-AIDA</h1>
-          <span className="app-version">v7.1.1</span>
+        <div>
+          <div className="header-brand">
+            <h1 className="app-title">M-AIDA</h1>
+            <span className="app-version">v{runtimeConfig.appVersion}</span>
+          </div>
+          <p className="app-subtitle">
+            Meta-Analysis Intelligent Data Assistant
+          </p>
         </div>
-        <p className="app-subtitle">
-          Meta-Analysis Intelligent Data Assistant - Internationalization &amp; Performance
-        </p>
+        {canShare && (
+          <button className="header-action" type="button" onClick={() => void shareApp()}>
+            <Share2 size={17} aria-hidden="true" />
+            Share
+          </button>
+        )}
       </header>
+
+      {!runtimeConfig.storePublicationAllowed && (
+        <aside className="release-gate" aria-label="Release status">
+          <strong>Internal evaluation build.</strong> Store publication remains
+          blocked until the CTU intellectual-property agreement and release
+          checklist are approved.
+        </aside>
+      )}
 
       {/* Live status strip: backend, data, extraction mode, network */}
       <StatusBanner />
@@ -57,6 +108,15 @@ export default function App() {
         </button>
         <button
           role="tab"
+          aria-selected={activeTab === "intelligence"}
+          className={`tab-btn ${activeTab === "intelligence" ? "active" : ""}`}
+          onClick={() => setActiveTab("intelligence")}
+        >
+          <Network size={16} aria-hidden="true" />
+          Evidence Atlas
+        </button>
+        <button
+          role="tab"
           aria-selected={activeTab === "verify"}
           className={`tab-btn ${activeTab === "verify" ? "active" : ""}`}
           onClick={() => setActiveTab("verify")}
@@ -69,7 +129,7 @@ export default function App() {
       </nav>
 
       {/* Tab content */}
-      <main className="app-main">
+      <main className="app-main" id="main-content">
         {activeTab === "extract" && (
           <div className="tab-content">
             <ExtractionPanel onExtracted={handleExtracted} />
@@ -93,13 +153,22 @@ export default function App() {
             <ExportPanel />
           </div>
         )}
+
+        {activeTab === "intelligence" && <ResearchIntelligence />}
       </main>
 
       <footer className="app-footer">
         <p>
-          M-AIDA v7.1.1 · PhD Dissertation Research Tool · Asia-Pacific I&rarr;P
-          Meta-Analysis
+          M-AIDA v{runtimeConfig.appVersion} · Human verification required
         </p>
+        <nav className="footer-links" aria-label="Legal and support">
+          <a href={runtimeConfig.privacyPolicyUrl} target="_blank" rel="noreferrer">
+            Privacy <ExternalLink size={12} aria-hidden="true" />
+          </a>
+          <a href={runtimeConfig.supportUrl} target="_blank" rel="noreferrer">
+            Support <ExternalLink size={12} aria-hidden="true" />
+          </a>
+        </nav>
       </footer>
     </div>
   );

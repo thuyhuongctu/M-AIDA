@@ -13,8 +13,10 @@
  * shown on screen can be mistaken for a live model output.
  */
 
+import { Network } from "@capacitor/network";
 import React, { useCallback, useEffect, useState } from "react";
 import { fetchHealth } from "../api";
+import { runtimeConfig } from "../config";
 import type { HealthResponse } from "../types";
 
 const POLL_INTERVAL_MS = 15_000;
@@ -52,14 +54,31 @@ export default function StatusBanner() {
   useEffect(() => {
     void poll();
     const timer = window.setInterval(() => void poll(), POLL_INTERVAL_MS);
+    let disposed = false;
+    let removeNativeListener: (() => Promise<void>) | undefined;
     const goOnline = () => setOnline(true);
     const goOffline = () => setOnline(false);
-    window.addEventListener("online", goOnline);
-    window.addEventListener("offline", goOffline);
+
+    if (runtimeConfig.isNative) {
+      void Network.getStatus().then((status) => {
+        if (!disposed) setOnline(status.connected);
+      });
+      void Network.addListener("networkStatusChange", (status) => {
+        if (!disposed) setOnline(status.connected);
+      }).then((handle) => {
+        removeNativeListener = () => handle.remove();
+      });
+    } else {
+      window.addEventListener("online", goOnline);
+      window.addEventListener("offline", goOffline);
+    }
+
     return () => {
+      disposed = true;
       window.clearInterval(timer);
       window.removeEventListener("online", goOnline);
       window.removeEventListener("offline", goOffline);
+      if (removeNativeListener) void removeNativeListener();
     };
   }, [poll]);
 

@@ -34,15 +34,148 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - name: Install locked dependencies
         working-directory: frontend
         run: npm ci
+      - name: Audit production dependencies
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
       - name: Type-check
         working-directory: frontend
         run: npm run typecheck
+      - name: Mobile release-gate tests
+        working-directory: frontend
+        run: npm run test:mobile
+      - name: Mobile project check
+        working-directory: frontend
+        run: npm run mobile:check
       - name: Production build
         working-directory: frontend
         run: npm run build
+      - name: Sync native web assets
+        working-directory: frontend
+        run: npx cap sync --deployment
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - name: Install Android API 36
+        run: >-
+          "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          "platforms;android-36" "build-tools;36.0.0"
+      - name: Build Android debug package
+        working-directory: frontend/android
+        run: ./gradlew assembleDebug
+
+  ios:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Verify Xcode 26 and iOS 26 SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          xcodebuild -version | tee "$RUNNER_TEMP/xcode-version.txt"
+          xcrun --sdk iphoneos --show-sdk-version | tee "$RUNNER_TEMP/ios-sdk-version.txt"
+
+          xcode_version="$(xcodebuild -version | awk '/^Xcode / { print $2 }')"
+          ios_sdk_version="$(xcrun --sdk iphoneos --show-sdk-version)"
+          xcode_major="${xcode_version%%.*}"
+          ios_sdk_major="${ios_sdk_version%%.*}"
+
+          if ! [[ "$xcode_major" =~ ^[0-9]+$ ]] || (( xcode_major < 26 )); then
+            echo "::error::Xcode 26 or newer is required; found ${xcode_version:-unknown}."
+            exit 1
+          fi
+
+          if ! [[ "$ios_sdk_major" =~ ^[0-9]+$ ]] || (( ios_sdk_major < 26 )); then
+            echo "::error::iOS SDK 26 or newer is required; found ${ios_sdk_version:-unknown}."
+            exit 1
+          fi
+      - name: Install locked dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Build web assets
+        working-directory: frontend
+        run: npm run build
+      - name: Sync iOS project
+        working-directory: frontend
+        run: npx cap sync ios --deployment
+      - name: Inspect Xcode project
+        working-directory: frontend/ios/App
+        run: xcodebuild -list -project App.xcodeproj
+      - name: Build iOS simulator app
+        working-directory: frontend/ios/App
+        run: >-
+          xcodebuild
+          -project App.xcodeproj
+          -scheme App
+          -configuration Debug
+          -sdk iphonesimulator
+          -destination 'generic/platform=iOS Simulator'
+          CODE_SIGNING_ALLOWED=NO
+          build
+      - name: Create unsigned iOS release archive
+        working-directory: frontend/ios/App
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          xcodebuild \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/M-AIDA.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            DEVELOPMENT_TEAM="" \
+            archive | tee "$RUNNER_TEMP/ios-archive.log"
+      - name: Verify and package archive evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -d "$RUNNER_TEMP/M-AIDA.xcarchive"
+          test -f "$RUNNER_TEMP/M-AIDA.xcarchive/Info.plist"
+
+          plutil -p "$RUNNER_TEMP/M-AIDA.xcarchive/Info.plist" \
+            | tee "$RUNNER_TEMP/archive-info.txt"
+
+          find "$RUNNER_TEMP/M-AIDA.xcarchive/Products/Applications" \
+            -maxdepth 1 \
+            -type d \
+            -name '*.app' \
+            -print \
+            | tee "$RUNNER_TEMP/archive-apps.txt"
+
+          test -s "$RUNNER_TEMP/archive-apps.txt"
+
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$RUNNER_TEMP/M-AIDA.xcarchive" \
+            "$RUNNER_TEMP/M-AIDA.xcarchive.zip"
+      - name: Upload iOS release-smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release-smoke-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/xcode-version.txt
+            ${{ runner.temp }}/ios-sdk-version.txt
+            ${{ runner.temp }}/ios-archive.log
+            ${{ runner.temp }}/archive-info.txt
+            ${{ runner.temp }}/archive-apps.txt
+            ${{ runner.temp }}/M-AIDA.xcarchive.zip
+          if-no-files-found: warn
+          retention-days: 14

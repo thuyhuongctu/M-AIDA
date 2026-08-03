@@ -7,6 +7,7 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { runtimeConfig } from "./config";
 import type {
   ExtractionRequest,
   HealthResponse,
@@ -16,12 +17,10 @@ import type {
   VerificationDecision,
 } from "./types";
 
-const BASE_URL =
-  import.meta.env.VITE_API_URL ?? "http://localhost:8765";
-
 const http: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: runtimeConfig.apiUrl,
   headers: { "Content-Type": "application/json" },
+  timeout: 30_000,
 });
 
 // ---------------------------------------------------------------------------

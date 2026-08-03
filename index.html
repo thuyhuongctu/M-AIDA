@@ -1042,6 +1042,7 @@ a{color:var(--brand);text-decoration:none;}
     border-radius:8px;overflow-x:auto;font-size:.82rem;line-height:1.6}
   .da-cmd code{white-space:pre}
 </style>
+<link rel="stylesheet" href="assets/research-intelligence.css">
 <style id="bgfix-2607">body{background:transparent !important;}html{background:var(--paper);}</style></head>
 <body>
 <div id="vnmark" aria-hidden="true"><svg viewBox="-12 -46 604 650" xmlns="http://www.w3.org/2000/svg" overflow="visible">
@@ -1089,6 +1090,7 @@ a{color:var(--brand);text-decoration:none;}
       <a href="#landscape" data-i18n data-en="Positioning" data-vi="Định vị">Positioning</a>
       <a href="#forest" data-i18n data-en="Forest" data-vi="Biểu đồ">Forest</a>
       <a href="#atlas" data-i18n data-en="Atlas" data-vi="Bản đồ">Atlas</a>
+      <a href="#intelligence" data-i18n data-en="Intelligence" data-vi="Vấn đề">Intelligence</a>
       <a href="#tool" data-i18n data-en="Tool" data-vi="Công cụ">Tool</a>
       <a href="#defense-app" data-i18n data-en="Console" data-vi="Bảng điều khiển">Console</a>
       <a href="#access" data-i18n data-en="Source" data-vi="Mã nguồn">Source</a>
@@ -1784,6 +1786,70 @@ a{color:var(--brand);text-decoration:none;}
       <span data-i18n data-en="Bubbles are placed at country centroids from the locked P6 dataset (35 located economies, 194 studies). A further 42 studies use cross-border or multi-region samples and are counted in the totals but not placed on the map. Colour encodes the country mean of the extracted Pearson r." data-vi="Vòng tròn đặt tại tâm quốc gia từ bộ dữ liệu P6 đã khóa (35 nền kinh tế định vị được, 194 nghiên cứu). 42 nghiên cứu còn lại dùng mẫu xuyên biên giới hoặc đa vùng, được tính vào tổng nhưng không đặt trên bản đồ. Màu thể hiện r trung bình của quốc gia.">Bubbles are placed at country centroids from the locked P6 dataset (35 located economies, 194 studies). A further 42 studies use cross-border or multi-region samples and are counted in the totals but not placed on the map. Colour encodes the country mean of the extracted Pearson r.</span>
     </div>
   </div></section>
+  </section>
+
+  <section class="research-intel" id="intelligence" data-lens="geography" aria-labelledby="ri-public-title">
+    <div class="ri-shell">
+      <div class="ri-top">
+        <div>
+          <span class="ri-kicker" data-i18n data-en="M-AIDA Research Intelligence" data-vi="Trí tuệ nghiên cứu M-AIDA">M-AIDA Research Intelligence</span>
+          <h2 id="ri-public-title" data-i18n data-en="See the research problems, not only the results." data-vi="Nhìn thấy vấn đề nghiên cứu, không chỉ kết quả.">See the research problems, <em>not only the results.</em></h2>
+        </div>
+        <div>
+          <p class="ri-intro" data-i18n data-en="An interactive diagnostic layer over the locked P6 corpus. Switch lenses to inspect concentration, dispersion, sensitivity and evidence governance." data-vi="Một lớp chẩn đoán tương tác trên kho P6 đã khóa. Chuyển góc nhìn để xem mức độ tập trung, phân tán, độ nhạy và quản trị bằng chứng.">An interactive diagnostic layer over the locked P6 corpus. Switch lenses to inspect concentration, dispersion, sensitivity and evidence governance.</p>
+          <div class="ri-status"><i></i><span data-i18n data-en="Canonical P6 metrics · version 7.1.1" data-vi="Chỉ số P6 chuẩn · phiên bản 7.1.1">Canonical P6 metrics · version 7.1.1</span></div>
+        </div>
+      </div>
+
+      <div class="ri-metrics" aria-label="Evidence corpus metrics">
+        <article class="ri-metric"><span data-i18n data-en="Studies" data-vi="Nghiên cứu">Studies</span><strong data-metric="studies">236</strong><small data-i18n data-en="Locked corpus" data-vi="Kho dữ liệu đã khóa">Locked corpus</small></article>
+        <article class="ri-metric"><span data-i18n data-en="Effect sizes" data-vi="Kích thước hiệu ứng">Effect sizes</span><strong data-metric="effects">286</strong><small data-i18n data-en="Three-level model" data-vi="Mô hình ba tầng">Three-level model</small></article>
+        <article class="ri-metric"><span data-i18n data-en="Economies" data-vi="Nền kinh tế">Economies</span><strong data-metric="economies">35</strong><small data-i18n data-en="Located samples" data-vi="Mẫu được định vị">Located samples</small></article>
+        <article class="ri-metric"><span data-i18n data-en="Cross-border" data-vi="Xuyên biên giới">Cross-border</span><strong data-metric="cross">42</strong><small data-i18n data-en="Counted, not pinned" data-vi="Được tính, không ghim">Counted, not pinned</small></article>
+      </div>
+
+      <div class="ri-console">
+        <div class="ri-stage">
+          <div class="ri-toolbar">
+            <div class="ri-toolbar-title"><span data-i18n data-en="Diagnostic workspace" data-vi="Không gian chẩn đoán">Diagnostic workspace</span><strong data-i18n data-en="Research Problem Radar" data-vi="Radar vấn đề nghiên cứu">Research Problem Radar</strong></div>
+            <div class="ri-tabs" role="tablist" aria-label="Research intelligence lenses">
+              <button class="ri-tab" type="button" role="tab" data-lens="geography" aria-selected="true" data-i18n data-en="Geography" data-vi="Địa lý">Geography</button>
+              <button class="ri-tab" type="button" role="tab" data-lens="heterogeneity" aria-selected="false" data-i18n data-en="Heterogeneity" data-vi="Dị biệt">Heterogeneity</button>
+              <button class="ri-tab" type="button" role="tab" data-lens="bias" aria-selected="false" data-i18n data-en="Bias sensitivity" data-vi="Độ nhạy">Bias sensitivity</button>
+              <button class="ri-tab" type="button" role="tab" data-lens="governance" aria-selected="false" data-i18n data-en="Governance" data-vi="Quản trị">Governance</button>
+            </div>
+          </div>
+          <div class="ri-visual" role="img" aria-label="Stylized world evidence map with research issue callouts">
+            <div class="ri-map-grid"></div>
+            <svg class="ri-map-svg" viewBox="0 0 900 430" aria-hidden="true">
+              <defs><linearGradient id="riRoute" x1="0" x2="1"><stop stop-color="#4ce2dc"/><stop offset=".5" stop-color="#45b6ff"/><stop offset="1" stop-color="#8f7cff"/></linearGradient></defs>
+              <g class="land"><path d="M53 135 115 70 226 62 289 116 250 166 177 172 154 254 86 214 111 163Z"/><path d="m236 229 73 25 35 83-55 85-42-90-34-65Z"/><path d="m353 112 75-62 114 27 45 60 118 13 139 83-70 88-129-21-69 58-93-30-52-87-93-68Z"/><path d="m438 260 103 11 63 60-46 95-77-22-49-81Z"/><path d="m706 328 100 5 71 50-78 39-110-48Z"/></g>
+              <g><path class="route" d="M175 145 Q420 20 690 177"/><path class="route" d="M286 295 Q440 115 720 237"/><path class="route" d="M461 155 Q545 50 784 350"/><path class="route" d="M575 300 Q490 145 175 145"/><path class="route" d="M690 177 Q620 95 461 155"/></g>
+              <g><circle class="node" cx="175" cy="145" r="7"/><circle class="node" cx="286" cy="295" r="5"/><circle class="node" cx="461" cy="155" r="6"/><circle class="node" cx="575" cy="300" r="7"/><circle class="node" cx="690" cy="177" r="10"/><circle class="node" cx="720" cy="237" r="6"/><circle class="node" cx="784" cy="350" r="5"/></g>
+            </svg>
+            <div class="ri-legend"><span><i></i><b data-i18n data-en="Located evidence" data-vi="Bằng chứng định vị">Located evidence</b></span><span><i></i><b data-i18n data-en="Synthesis links" data-vi="Liên kết tổng hợp">Synthesis links</b></span></div>
+            <div class="ri-callout" data-callout="geo"><span data-i18n data-en="Concentration" data-vi="Tập trung">Concentration</span><strong>70 / 236</strong><small data-i18n data-en="East Asia studies" data-vi="Nghiên cứu Đông Á">East Asia studies</small></div>
+            <div class="ri-callout" data-callout="cross"><span data-i18n data-en="Mapping limit" data-vi="Giới hạn bản đồ">Mapping limit</span><strong>42</strong><small data-i18n data-en="Cross-border samples not pinned" data-vi="Mẫu xuyên biên giới không ghim">Cross-border samples not pinned</small></div>
+            <div class="ri-callout" data-callout="method"><span data-i18n data-en="Model signal" data-vi="Tín hiệu mô hình">Model signal</span><strong>I² 62.6%</strong><small data-i18n data-en="Meaningful between-study dispersion" data-vi="Phân tán đáng kể giữa nghiên cứu">Meaningful between-study dispersion</small></div>
+          </div>
+        </div>
+        <aside class="ri-detail" aria-live="polite">
+          <span class="ri-detail-label" data-i18n data-en="Selected lens" data-vi="Góc nhìn đã chọn">Selected lens</span>
+          <h3 data-ri="title">Evidence geography</h3>
+          <p class="ri-detail-copy" data-ri="copy">The evidence base is internationally distributed, but its density is uneven.</p>
+          <div class="ri-gauge">
+            <div class="ri-gauge-head"><span data-ri="label">East Asia studies</span><strong data-ri="value">70 / 236</strong></div>
+            <div class="ri-track"><i data-ri="bar"></i></div><small data-ri="note">Approximately 29.7% of the locked corpus</small>
+          </div>
+          <ul class="ri-findings" data-ri="findings"></ul>
+          <p class="ri-integrity"><strong data-i18n data-en="Interpretation boundary." data-vi="Ranh giới diễn giải.">Interpretation boundary.</strong> <span data-i18n data-en="These are descriptive diagnostics for research planning. They do not replace the registered meta-analytic model or researcher judgment." data-vi="Đây là các chẩn đoán mô tả phục vụ hoạch định nghiên cứu. Chúng không thay thế mô hình phân tích tổng hợp đã đăng ký hay phán đoán của nhà nghiên cứu.">These are descriptive diagnostics for research planning. They do not replace the registered meta-analytic model or researcher judgment.</span></p>
+        </aside>
+      </div>
+      <div class="ri-bottom">
+        <div class="ri-note"><strong data-i18n data-en="Human-governed evidence" data-vi="Bằng chứng do con người quản trị">Human-governed evidence</strong><span data-i18n data-en="All analyzed records were human verified and locked before synthesis." data-vi="Tất cả bản ghi phân tích đều được con người kiểm chứng và khóa trước khi tổng hợp.">All analyzed records were human verified and locked before synthesis.</span></div>
+        <div class="ri-note is-warn"><strong data-i18n data-en="Sensitivity ≠ corrected truth" data-vi="Độ nhạy ≠ chân lý đã sửa">Sensitivity ≠ corrected truth</strong><span data-i18n data-en="The adjusted estimate tests robustness; it is not presented as the uniquely correct effect." data-vi="Ước lượng điều chỉnh kiểm tra độ bền; không được trình bày như hiệu ứng đúng duy nhất.">The adjusted estimate tests robustness; it is not presented as the uniquely correct effect.</span></div>
+      </div>
+    </div>
   </section>
 
   <section class="sec mod-tool" id="tool"><div class="modwrap">
@@ -3221,6 +3287,7 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     a.href=a.getAttribute('href').split('?')[0]+'?lang='+l;
   },true);
 })();</script>
+<script src="assets/research-intelligence.js" defer></script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
 <style id="kpiic-2607">a.kpi-link{text-decoration:none;color:inherit;display:block;cursor:pointer;transition:transform .15s ease}a.kpi-link:hover{transform:translateY(-2px)}a.kpi-link:hover .n{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}.kpi-ic{display:block;margin-bottom:6px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}.kpi-ic svg{display:block}</style>  <!-- Thong ke luot truy cap (GoatCounter) - khong dung cookie, ton trong quyen rieng tu -->
   <script data-goatcounter="https://thuyhuongctu.goatcounter.com/count"

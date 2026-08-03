@@ -1,6 +1,7 @@
 # M-AIDA — production compose for a single host (VPS / container host).
 # See DEPLOY.md for the full runbook.
 #
+#   export MAIDA_DATA_DIR=/srv/maida/data
 #   cp backend/.env.production.example backend/.env    # fill in real secrets
 #   docker compose -f docker-compose.prod.yml up -d --build
 #
@@ -12,9 +13,18 @@ services:
   backend:
     build: ./backend
     env_file: ./backend/.env
+    environment:
+      # Always place SQLite on the mounted host directory, never in the
+      # disposable container layer. The env file may contain the same value;
+      # this explicit compose setting is the deployment safety boundary.
+      MAIDA_DB_PATH: /data/maida.db
     restart: unless-stopped
     expose:
       - "8765"                      # internal only; reached via the frontend's /api proxy
+    volumes:
+      # Use an absolute host path for staging/production. The ./data fallback
+      # is suitable only for a local single-host rehearsal.
+      - "${MAIDA_DATA_DIR:-./data}:/data"
     healthcheck:
       # python-based check (the slim image has no curl)
       test: ["CMD", "python", "-c", "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://localhost:8765/api/health').status==200 else 1)"]

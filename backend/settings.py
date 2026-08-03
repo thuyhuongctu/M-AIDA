@@ -54,7 +54,12 @@ class Settings(BaseSettings):
     maida_demo_mode: bool = False
 
     # Allowed CORS origins (comma-separated in env; pydantic-settings handles list)
-    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost",
+        "capacitor://localhost",
+    ]
 
     @property
     def resolved_model(self) -> str:
