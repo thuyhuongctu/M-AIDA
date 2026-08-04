@@ -159,9 +159,39 @@ def test_A3_hai_cong_thuc_cho_ket_qua_khac_nhau():
     close(vp / v0, 230 / 220)
 
 
-def test_A3_beta_cung_la_rieng_phan():
-    """beta đã kiểm soát các biến khác nên không phải bậc không."""
-    assert from_beta(0.30, n=200, n_predictors=8).metric_type == PARTIAL
+def test_A3_beta_la_bac_khong_suy_ra():
+    """
+    P&B hiệu chuẩn công thức để khôi phục r BẬC KHÔNG (số hạng .05*lambda
+    tồn tại vì phép khớp với r bậc không quan sát được). metric_type mô tả
+    đại lượng cần ước lượng; nguồn gốc suy ra nằm ở estimand_source.
+    """
+    rec = from_beta(0.30, n=200, n_predictors=8)
+    assert rec.metric_type == ZERO_ORDER
+    assert rec.estimand_source == "imputed_pb2005"
+    assert rec.source_controls is True
+    # phương sai theo đại lượng đích: (1 - 0.344^2)^2 / 199
+    close(rec.variance, (1 - 0.344 ** 2) ** 2 / 199)
+    assert rec.variance_formula == "(1-r^2)^2/(n-1)"
+
+
+def test_A3_ba_lop_tach_bach():
+    """
+    r báo cáo : zero_order · observed · không kiểm soát  -> mô hình chính
+    t hồi quy : partial    · observed · có kiểm soát     -> mô hình chính
+    beta      : zero_order · imputed  · có kiểm soát     -> chỉ độ nhạy
+    """
+    r_rec = from_reported_r(0.24, n=231)
+    t_rec = from_t(2.14, n=231, n_predictors=10)
+    b_rec = from_beta(0.30, n=200, n_predictors=8)
+    assert (r_rec.metric_type, r_rec.estimand_source, r_rec.source_controls) == \
+        (ZERO_ORDER, "observed", False)
+    assert (t_rec.metric_type, t_rec.estimand_source, t_rec.source_controls) == \
+        (PARTIAL, "observed", True)
+    assert (b_rec.metric_type, b_rec.estimand_source, b_rec.source_controls) == \
+        (ZERO_ORDER, "imputed_pb2005", True)
+    # chỉ bản ghi observed vào mô hình chính
+    main = [x for x in (r_rec, t_rec, b_rec) if x.estimand_source == "observed"]
+    assert len(main) == 2 and b_rec not in main
 
 
 # =========================================================================

@@ -53,6 +53,13 @@ MetricType = Literal["zero_order", "partial", "semipartial"]
 #   reported = taken verbatim from the paper
 #   derived  = computed as n − p − 1 from sample_n and n_predictors
 DfSource = Literal["reported", "derived"]
+# Whether the canonical r is an observed statistic or an imputed estimate.
+# metric_type describes the ESTIMAND; estimand_source describes the ORIGIN —
+# two different things that must never be conflated:
+#   observed       = reported r, or r computed exactly from t and df
+#   imputed_pb2005 = estimated from β via Peterson & Brown (2005); feeds
+#                    sensitivity analyses only, never the main model
+EstimandSource = Literal["observed", "imputed_pb2005"]
 
 
 # ---------------------------------------------------------------------------
@@ -113,6 +120,22 @@ class ExtractedEffect(BaseModel):
             "Kind of correlation the canonical r is: zero_order | partial | "
             "semipartial. Determines the sampling-variance formula; PI-confirmed "
             "at Gate 2."
+        ),
+    )
+    estimand_source: EstimandSource | None = Field(
+        None,
+        description=(
+            "observed = reported r or exact t→r conversion; imputed_pb2005 = "
+            "estimated from β via Peterson & Brown (2005) — sensitivity "
+            "analyses only, never the main pooling model"
+        ),
+    )
+    source_controls: bool | None = Field(
+        None,
+        description=(
+            "True when the source statistic came from a model controlling for "
+            "other variables (t from multiple regression, standardised β); "
+            "False for a plain correlation-matrix r"
         ),
     )
     df_source: DfSource | None = Field(

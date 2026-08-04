@@ -57,6 +57,24 @@ cả khi máy người xem không có phông Source Serif 4 hay JetBrains Mono.
   nhận diện phải tách bạch.
 - Bản dưới 16px là tệp riêng, không phải bản thu nhỏ tự động.
 
+## Hai hệ thiết kế — lằn ranh theo bên phát hành
+
+Hệ sinh thái có hai hệ thiết kế **có chủ ý**, và lằn ranh nằm ở bên phát
+hành, không nằm ở loại nội dung:
+
+> **Hệ thể chế** (Be Vietnam Pro, trung tính) dùng khi Đại học Cần Thơ là
+> bên phát hành hoặc bên nhận. **Hệ M-AIDA** (Source Serif 4 + hổ phách)
+> dùng khi M-AIDA là bên phát hành. Không bề mặt nào được trộn hai hệ.
+
+Theo đó: hồ sơ pháp lý và thuyết minh đề tài là thể chế; bài báo, poster
+hội thảo và trang bảo vệ luận án là M-AIDA (thứ đang được bảo vệ chính là
+công trình). Hai ràng buộc cứng:
+
+- Hai hệ **không bao giờ dùng chung một tệp token**.
+- **Màu hổ phách không xuất hiện trong hệ thể chế** — hổ phách là dấu hiệu
+  "đã khóa và đã gộp" của M-AIDA; để nó rò sang tài liệu thể chế là làm
+  loãng đúng thứ khó bắt chước nhất.
+
 ## Giao diện
 
 Biến gốc và thành phần chuẩn nằm ở `css/tokens.css` và `css/components.css`

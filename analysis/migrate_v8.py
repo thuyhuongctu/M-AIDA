@@ -47,7 +47,8 @@ V8_FIELDS = [
     "icrv", "cdai", "dpl", "intl_measure", "perf_measure", "include_flag",
     # thống kê
     "n", "stat_type", "source_value", "r_v711", "r_v8", "delta_r",
-    "metric_type", "variance", "variance_formula", "fisher_z", "var_z",
+    "metric_type", "estimand_source", "source_controls",
+    "variance", "variance_formula", "fisher_z", "var_z",
     "df", "df_source", "n_predictors", "lambda_applied", "beta_in_range",
     "confidence", "flagged",
     # trường mã hóa mới — PI điền, script không đoán
@@ -107,6 +108,8 @@ def _fill_from_conversion(row: dict, stat_type: str, value: float,
         "r_v8": rec.r,
         "delta_r": None if old is None else rec.r - old,
         "metric_type": rec.metric_type,
+        "estimand_source": rec.estimand_source,
+        "source_controls": rec.source_controls,
         "variance": rec.variance,
         "variance_formula": rec.variance_formula,
         "fisher_z": rec.fisher_z,

@@ -46,6 +46,7 @@ variance_z <- function(metric_type, n, df = NA) {
 ## --- Ba đường chuyển đổi ---------------------------------------------------
 from_reported_r <- function(r, n) {
   list(r = r, metric_type = "zero_order",
+       estimand_source = "observed", source_controls = FALSE,
        variance = variance_zero_order(r, n),
        fisher_z = fisher_z(r), var_z = variance_z("zero_order", n),
        df = NA, df_source = "not_applicable",
@@ -58,6 +59,7 @@ from_t <- function(t, n, n_predictors = NA, df_reported = NA) {
   d <- degrees_of_freedom(n, n_predictors, df_reported)
   r <- t / sqrt(t^2 + d$df)
   list(r = r, metric_type = "partial",
+       estimand_source = "observed", source_controls = TRUE,
        variance = variance_partial(r, d$df),
        fisher_z = fisher_z(r), var_z = variance_z("partial", n, d$df),
        df = d$df, df_source = d$source,
@@ -75,18 +77,17 @@ from_beta <- function(beta, n, n_predictors = NA, df_reported = NA) {
   }
   lambda <- if (beta >= 0) 1 else 0
   r <- 0.98 * beta + 0.05 * lambda
+  ## Đại lượng đích là BẬC KHÔNG: P&B hiệu chuẩn công thức bằng cách khớp
+  ## với r bậc không quan sát được (số hạng .05*lambda tồn tại vì phép khớp
+  ## đó). Nguồn gốc suy ra ghi ở estimand_source; bản ghi imputed KHÔNG vào
+  ## mô hình chính, chỉ phân tích độ nhạy. df vẫn ghi lại để kiểm toán.
   d <- tryCatch(degrees_of_freedom(n, n_predictors, df_reported),
                 error = function(e) list(df = NA, source = "missing"))
-  if (!is.na(d$df)) {
-    v  <- variance_partial(r, d$df); vz <- variance_z("partial", n, d$df)
-    fo <- "(1-r^2)^2/df"
-  } else {
-    v  <- variance_zero_order(r, n); vz <- variance_z("zero_order", n)
-    fo <- "(1-r^2)^2/(n-1) [tạm thời, thiếu df]"
-  }
-  list(r = r, metric_type = "partial", variance = v,
-       fisher_z = fisher_z(r), var_z = vz,
-       df = d$df, df_source = d$source, variance_formula = fo,
+  list(r = r, metric_type = "zero_order",
+       estimand_source = "imputed_pb2005", source_controls = TRUE,
+       variance = variance_zero_order(r, n),
+       fisher_z = fisher_z(r), var_z = variance_z("zero_order", n),
+       df = d$df, df_source = d$source, variance_formula = "(1-r^2)^2/(n-1)",
        lambda_applied = TRUE, beta_in_range = TRUE,
        confidence = 0.60, flagged = TRUE)
 }
@@ -149,6 +150,16 @@ if (sys.nframe() == 0) {
   e <- tryCatch({ from_beta(0.62, 150, 7); "khong loi" }, error = function(e) "co loi")
   stopifnot(e == "co loi"); cat("  PASS  A1 ngoài khoảng thì loại trừ\n")
 
+  ## Ba lớp tách bạch: metric_type là đại lượng đích, estimand_source là nguồn
+  b <- from_beta(0.30, 200, 8)
+  stopifnot(b$metric_type == "zero_order",
+            b$estimand_source == "imputed_pb2005",
+            b$source_controls == TRUE)
+  ok(b$variance, (1 - 0.344^2)^2 / 199, "A3 beta: phương sai bậc không")
+  stopifnot(from_t(2.5, 80, 12)$estimand_source == "observed",
+            from_reported_r(0.24, 231)$source_controls == FALSE)
+  cat("  PASS  A3 ba lớp: observed/imputed tách bạch\n")
+
   cat("\nTất cả kiểm tra đạt.\n")
 }
 
@@ -159,13 +170,20 @@ if (sys.nframe() == 0) {
 ##
 ## ## 1. Tính cỡ ảnh hưởng THEO ĐÚNG ĐẠI LƯỢNG (A3 + A4)
 ## ##    metafor có sẵn hai thước đo tách biệt; kiểm tra tên tham số bằng ?escalc
+## ##    Beta quy đổi thuộc nhóm ZCOR (đại lượng đích bậc không) nhưng mô
+## ##    hình chính chỉ lấy quan sát trực tiếp: estimand_source == "observed".
 ## dat0 <- escalc(measure = "ZCOR",  ri = r, ni = n,
-##                data = subset(dat, metric_type == "zero_order"))
+##                data = subset(dat, metric_type == "zero_order" &
+##                                   estimand_source == "observed"))
 ## datp <- escalc(measure = "ZPCOR", ti = t, ni = n, mi = n_predictors,
 ##                data = subset(dat, metric_type == "partial"))
+## dat_sens <- escalc(measure = "ZCOR", ri = r, ni = n,
+##                data = subset(dat, estimand_source == "imputed_pb2005"))
 ##
-## ## 2. KHÔNG gộp hai nhóm nếu chưa mã hóa metric_type làm biến điều tiết.
-## ##    Hoặc chuẩn hóa toàn bộ về ZPCOR, hoặc chạy riêng rồi so sánh.
+## ## 2. KHÔNG gộp hai nhóm metric_type nếu chưa mã hóa nó làm biến điều
+## ##    tiết. Mô hình chính = observed; thêm dat_sens vào phân tích độ nhạy
+## ##    (phương sai bậc không bỏ qua sai số quy đổi -> trọng số đã lớn hơn
+## ##    mức đáng có, không để nó kéo mô hình chính).
 ##
 ## ## 3. Ba cấp so với hai cấp (C2)
 ## m3 <- rma.mv(yi, vi, random = ~ 1 | study_id/effect_id, data = datp, method = "REML")

@@ -40,6 +40,12 @@ BETA_MIN, BETA_MAX = -0.50, 0.50
 ZERO_ORDER = "zero_order"
 PARTIAL = "partial"
 
+# estimand_source: đại lượng là quan sát trực tiếp hay suy ra qua P&B (2005).
+# metric_type mô tả ĐẠI LƯỢNG CẦN ƯỚC LƯỢNG; estimand_source mô tả NGUỒN GỐC
+# con số — hai thứ khác nhau và không được lẫn.
+OBSERVED = "observed"
+IMPUTED_PB2005 = "imputed_pb2005"
+
 
 class ConversionError(ValueError):
     """Bản ghi không đủ thông tin để chuyển đổi một cách hợp lệ."""
@@ -49,7 +55,9 @@ class ConversionError(ValueError):
 class Record:
     """Một bản ghi cỡ ảnh hưởng đã chuyển đổi, đủ trường để tái lập."""
     r: float
-    metric_type: str                 # A3
+    metric_type: str                 # A3 — đại lượng cần ước lượng
+    estimand_source: str             # observed | imputed_pb2005
+    source_controls: bool            # thống kê nguồn có kiểm soát biến khác không
     variance: float                  # A3 — phương sai trên thang r
     fisher_z: float                  # A4
     var_z: float                     # A4 — phương sai trên thang z
@@ -161,7 +169,8 @@ def from_reported_r(r: float, n: int) -> Record:
     var = variance_zero_order(r, n)
     z = fisher_z(r)
     return Record(
-        r=r, metric_type=ZERO_ORDER, variance=var,
+        r=r, metric_type=ZERO_ORDER, estimand_source=OBSERVED,
+        source_controls=False, variance=var,
         fisher_z=z, var_z=variance_z(ZERO_ORDER, n, None),
         df=None, df_source="not_applicable", n=n, n_predictors=None,
         variance_formula="(1-r^2)^2/(n-1)",
@@ -181,7 +190,8 @@ def from_t(t: float, n: int, n_predictors: Optional[int] = None,
     r = t / math.sqrt(t ** 2 + df)
     var = variance_partial(r, df)
     return Record(
-        r=r, metric_type=PARTIAL, variance=var,
+        r=r, metric_type=PARTIAL, estimand_source=OBSERVED,
+        source_controls=True, variance=var,
         fisher_z=fisher_z(r), var_z=variance_z(PARTIAL, n, df),
         df=df, df_source=df_source, n=n, n_predictors=n_predictors,
         variance_formula="(1-r^2)^2/df",
@@ -201,6 +211,15 @@ def from_beta(beta: float, n: int, n_predictors: Optional[int] = None,
     lambda = 1 nếu beta >= 0, lambda = 0 nếu beta < 0.
     Số hạng .05 chỉ cộng cho beta không âm, nên việc bỏ quên nó làm lệch
     MỘT CHIỀU: chỉ hạ thấp các hiệu ứng dương.
+
+    Đại lượng cần ước lượng là TƯƠNG QUAN BẬC KHÔNG: P&B hiệu chuẩn công
+    thức bằng cách khớp với r bậc không quan sát được — số hạng .05*lambda
+    tồn tại chính vì phép khớp đó. metric_type mô tả đại lượng cần ước
+    lượng, không mô tả nguồn gốc con số; nguồn gốc (suy ra, thống kê nguồn
+    có kiểm soát biến khác) nằm ở estimand_source và source_controls.
+    Bản ghi suy ra KHÔNG vào mô hình chính — chỉ phân tích độ nhạy: công
+    thức phương sai bậc không coi giá trị suy ra như quan sát trực tiếp,
+    tức bỏ qua sai số quy đổi, nên trọng số vốn đã lớn hơn mức đáng có.
     """
     in_range = BETA_MIN <= beta <= BETA_MAX
     if not in_range:
@@ -213,31 +232,25 @@ def from_beta(beta: float, n: int, n_predictors: Optional[int] = None,
     lam = 1.0 if beta >= 0 else 0.0
     r = 0.98 * beta + 0.05 * lam
 
-    # beta là hệ số đã kiểm soát các biến khác -> đại lượng riêng phần.
+    # df vẫn ghi lại nếu suy được — phục vụ kiểm toán, không dùng cho
+    # phương sai (đại lượng đích là bậc không).
     try:
         df, df_source = degrees_of_freedom(n, n_predictors, df_reported)
     except ConversionError:
         df, df_source = None, "missing"
 
-    if df is not None:
-        var = variance_partial(r, df)
-        vz = variance_z(PARTIAL, n, df)
-        formula = "(1-r^2)^2/df"
-    else:
-        var = variance_zero_order(r, n)
-        vz = variance_z(ZERO_ORDER, n, None)
-        formula = "(1-r^2)^2/(n-1) [tạm thời, thiếu df]"
-
     return Record(
-        r=r, metric_type=PARTIAL, variance=var,
-        fisher_z=fisher_z(r), var_z=vz,
+        r=r, metric_type=ZERO_ORDER, estimand_source=IMPUTED_PB2005,
+        source_controls=True, variance=variance_zero_order(r, n),
+        fisher_z=fisher_z(r), var_z=variance_z(ZERO_ORDER, n, None),
         df=df, df_source=df_source, n=n, n_predictors=n_predictors,
-        variance_formula=formula,
+        variance_formula="(1-r^2)^2/(n-1)",
         lambda_applied=True, beta_in_range=True,
         confidence=0.60, flagged=True,  # 0.60 < 0.70 -> luôn chờ rà soát
         source_stat="beta", source_value=beta,
-        notes=["Suy từ beta: đưa vào phân tích độ nhạy riêng. "
-               "Quy đổi từ beta có thể gây chệch đáng kể khi ước lượng hiệu ứng tổng thể."],
+        notes=["Suy từ beta (imputed_pb2005): KHÔNG vào mô hình chính, chỉ "
+               "phân tích độ nhạy. Phương sai bậc không bỏ qua sai số quy đổi "
+               "nên trọng số vốn đã lớn hơn mức đáng có."],
     )
 
 

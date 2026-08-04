@@ -335,6 +335,8 @@ class StatisticalExtractor:
         beta_outside_pb_domain = False
         lambda_applied = False
         metric_type: str | None = None
+        estimand_source: str | None = None
+        source_controls: bool | None = None
 
         if effect_r is not None:
             computed_r = self.clamp_r(effect_r)
@@ -342,6 +344,8 @@ class StatisticalExtractor:
             # Directly reported r in this literature is normally the
             # correlation-matrix (zero-order) value; the PI confirms at Gate 2.
             metric_type = "zero_order"
+            estimand_source = "observed"
+            source_controls = False
         elif effect_t is not None and effect_df is not None:
             computed_r = self.compute_r_from_t(effect_t, effect_df)
             confidence = CONFIDENCE_FROM_T
@@ -352,16 +356,22 @@ class StatisticalExtractor:
                 if n_predictors is not None and n_predictors <= 1
                 else "partial"
             )
+            estimand_source = "observed"
+            source_controls = metric_type == "partial"
         elif effect_beta is not None:
             computed_r = self.convert_beta_to_r(effect_beta)
             beta_outside_pb_domain = computed_r is None
             if computed_r is not None:
                 confidence = CONFIDENCE_FROM_BETA
                 lambda_applied = True
-                # A standardised β already controls for the other predictors,
-                # so the imputed correlation is a PARTIAL quantity (canonical
-                # decision of the A1–A3 fix pack, analysis/effect_size.py).
-                metric_type = "partial"
+                # Peterson & Brown calibrated the imputation against observed
+                # ZERO-ORDER correlations (the .05·λ term exists because of
+                # that fit), so the estimand is zero-order. The imputed origin
+                # lives in estimand_source; such records feed sensitivity
+                # analyses only, never the main model.
+                metric_type = "zero_order"
+                estimand_source = "imputed_pb2005"
+                source_controls = True
             else:
                 confidence = 0.0
         else:
@@ -370,21 +380,11 @@ class StatisticalExtractor:
 
         variance_r: float | None = None
         variance_formula: str | None = None
-        if computed_r is not None and metric_type == "partial":
-            if effect_df:
-                variance_r = self.variance_of_r(
-                    computed_r, df=effect_df, metric_type="partial"
-                )
-                variance_formula = "(1 - r^2)^2 / df"
-            elif sample_n_for_df is not None and int(sample_n_for_df) > 1:
-                # No df available (β without predictor count): the zero-order
-                # formula stands in provisionally and is labelled as such.
-                variance_r = self.variance_of_r(
-                    computed_r,
-                    sample_n=int(sample_n_for_df),
-                    metric_type="zero_order",
-                )
-                variance_formula = "(1 - r^2)^2 / (n - 1) [provisional, missing df]"
+        if computed_r is not None and metric_type == "partial" and effect_df:
+            variance_r = self.variance_of_r(
+                computed_r, df=effect_df, metric_type="partial"
+            )
+            variance_formula = "(1 - r^2)^2 / df"
         elif (
             computed_r is not None
             and metric_type == "zero_order"
@@ -452,6 +452,8 @@ class StatisticalExtractor:
             dpl_phase=dpl_phase,
             n_predictors=n_predictors,
             metric_type=metric_type,
+            estimand_source=estimand_source,
+            source_controls=source_controls,
             df_source=df_source,
             lambda_applied=lambda_applied,
             variance_r=variance_r,

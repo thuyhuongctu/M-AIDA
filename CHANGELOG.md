@@ -39,6 +39,14 @@ lại (bước 2) trước khi chạy lại mô hình gộp.
   `Rscript analysis/effect_size.R`, kèm khung quy trình metafor bước 3–7
   (ba cấp/hai cấp, phương sai vững theo cụm, khoảng dự báo, PET-PEESE,
   giả thuyết chữ S).
+- QUYẾT ĐỊNH CHỐT (04/08/2026): bản ghi suy từ β mang `metric_type =
+  zero_order` — P&B hiệu chuẩn công thức để khôi phục r bậc không; nguồn
+  gốc tách sang hai trường mới `estimand_source` (observed /
+  imputed_pb2005) và `source_controls`. Ba lớp: r báo cáo (zero_order ·
+  observed), t hồi quy (partial · observed), β quy đổi (zero_order ·
+  imputed — chỉ phân tích độ nhạy, không vào mô hình chính vì phương sai
+  bậc không bỏ qua sai số quy đổi). Đồng bộ Python + R + backend +
+  migrate_v8; test đảo lại tương ứng (20 test tay + 60 test backend).
 - CHÍNH SÁCH THẾ HỆ KHÓA: tập khóa v7.1.1 (đã có DOI) giữ nguyên, không
   ghi đè; việc mã lại theo công thức mới sinh tập v8.0.0 như một lần khóa
   độc lập, mỗi bản ghi mang trường mới `derived_from` trỏ về bản gốc,

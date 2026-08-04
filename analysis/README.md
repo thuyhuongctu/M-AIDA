@@ -8,7 +8,7 @@ dữ liệu và cho pipeline R.
 | Tệp | Nội dung |
 |---|---|
 | `effect_size.py` | Module Python đã sửa, kèm bộ mã lại CSV (`recode_csv`) |
-| `test_effect_size.py` | 19 kiểm thử đơn vị, mọi giá trị kỳ vọng đều tính tay |
+| `test_effect_size.py` | 20 kiểm thử đơn vị, mọi giá trị kỳ vọng đều tính tay |
 | `effect_size.R` | Bản R tương đương, tự kiểm tra khi chạy `Rscript analysis/effect_size.R`; phần cuối là khung quy trình metafor cho bước 3–7 (ba cấp/hai cấp, phương sai vững theo cụm, khoảng dự báo, PET-PEESE, giả thuyết chữ S) |
 | `mau_cu.csv` · `mau_moi.csv` | Bộ dữ liệu mẫu trước và sau khi mã lại |
 | `migrate_v8.py` | Bước 2: di trú lược đồ v7.1.1 → v8.0.0-draft, sinh bảng thu hồi thống kê nguồn cho 47 bản ghi `is_estimated = 1`, và hoàn tất khi có `--recovered` |
@@ -32,8 +32,24 @@ rơi vào hàng chờ rà soát.
 Tương quan bậc không: `Var(r) = (1 − r²)² / (n − 1)`.
 Tương quan riêng phần: `Var(r_p) = (1 − r_p²)² / df`.
 Dùng nhầm công thức nghĩa là trọng số của nghiên cứu trong mô hình gộp sai,
-và ước lượng gộp sai theo. β đã kiểm soát các biến khác nên bản ghi suy từ
-β mang `metric_type = partial`.
+và ước lượng gộp sai theo.
+
+**Quyết định đã chốt (04/08/2026): bản ghi suy từ β mang
+`metric_type = zero_order`** — Peterson & Brown hiệu chuẩn công thức bằng
+cách khớp với r bậc không quan sát được (số hạng `.05·λ` tồn tại vì phép
+khớp đó). `metric_type` mô tả *đại lượng cần ước lượng*; nguồn gốc con số
+nằm ở hai trường riêng, tách thành ba lớp:
+
+| Nguồn | metric_type | estimand_source | source_controls | Mô hình chính |
+|---|---|---|---|---|
+| r báo cáo | `zero_order` | `observed` | False | có |
+| t hồi quy | `partial` | `observed` | True | có |
+| β quy đổi | `zero_order` | `imputed_pb2005` | True | **không — chỉ độ nhạy** |
+
+Bản ghi suy ra không vào mô hình chính vì `(1−r²)²/(n−1)` coi giá trị suy
+ra như quan sát trực tiếp — bỏ qua sai số quy đổi nên trọng số vốn đã lớn
+hơn mức đáng có. Trong R: β vào nhóm `ZCOR` nhưng mô hình chính lọc
+`estimand_source == "observed"`.
 
 Kèm theo A4: mọi bản ghi đều mang sẵn `fisher_z` và `var_z` để gộp trên
 thang z rồi chuyển ngược khi báo cáo.
@@ -41,7 +57,7 @@ thang z rồi chuyển ngược khi báo cáo.
 ## Chạy
 
 ```bash
-python3 test_effect_size.py            # 19/19 đạt, không cần pytest
+python3 test_effect_size.py            # 20/20 đạt, không cần pytest
 python3 effect_size.py mau_cu.csv ra.csv
 ```
 
@@ -56,8 +72,8 @@ CSV đầu vào cần các cột `author, year, stat_type, value, n` và nên c�
 | Lu & Beamish | r 0.24 | 0.2400 | 0.2400 | +0.0000 | zero_order |
 | Contractor et al. | t 2.14 | 0.1400 | 0.1428 | +0.0028 | partial |
 | Pangarkar | t 1.98 | 0.1650 | 0.1698 | +0.0048 | partial |
-| Chiao & Yang | β 0.18 | 0.1764 | 0.2264 | +0.0500 | partial |
-| Denis et al. | β −0.22 | −0.2156 | −0.2156 | +0.0000 | partial |
+| Chiao & Yang | β 0.18 | 0.1764 | 0.2264 | +0.0500 | zero_order (imputed) |
+| Denis et al. | β −0.22 | −0.2156 | −0.2156 | +0.0000 | zero_order (imputed) |
 | Nghien cuu Y | t 2.5 | 0.2724 | 0.2921 | +0.0197 | partial |
 | Nghien cuu Z | β 0.62 | — | loại trừ | — | ngoài khoảng hợp lệ |
 
@@ -68,7 +84,7 @@ cách có hệ thống chứ không phải nhiễu ngẫu nhiên.
 Lưu ý về vai trò của bộ mẫu: phép so khớp từng byte giữa đầu ra
 `recode_csv` và `mau_moi.csv` là **kiểm thử hồi quy** — nó chứng minh mã
 chạy ổn định giữa các lần sửa, không chứng minh công thức đúng. Tính đúng
-đắn nằm ở 19 kiểm thử tính tay; khi viết bài, dẫn các ví dụ tính tay chứ
+đắn nằm ở 20 kiểm thử tính tay; khi viết bài, dẫn các ví dụ tính tay chứ
 không dẫn phép so khớp byte.
 
 ## Thế hệ khóa v8.0.0 — không ghi đè tập khóa v7.1.1

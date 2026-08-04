@@ -60,26 +60,44 @@ class TestBetaDomain:
         assert eff.requires_verification is True
         assert eff.effect_r is None  # excluded, not converted-and-clamped
 
-    def test_beta_within_domain_not_flagged(self):
+    def test_beta_within_domain_is_imputed_zero_order(self):
+        # P&B calibrated the imputation against observed zero-order r, so the
+        # estimand is zero-order; the imputed origin lives in estimand_source.
         eff = _extract({"effect_beta": 0.3, "sample_n": 100})
         assert eff.beta_outside_pb_domain is False
         assert eff.lambda_applied is True
         assert eff.effect_r == pytest.approx(0.344)
-        # β controls for the other predictors → partial quantity; without a
-        # predictor count the variance falls back to the zero-order formula
-        # and says so.
-        assert eff.metric_type == "partial"
-        assert "provisional" in (eff.variance_formula or "")
+        assert eff.metric_type == "zero_order"
+        assert eff.estimand_source == "imputed_pb2005"
+        assert eff.source_controls is True
+        assert eff.variance_r == pytest.approx((1 - 0.344**2) ** 2 / 99)
+        assert eff.variance_formula == "(1 - r^2)^2 / (n - 1)"
 
-    def test_beta_with_predictor_count_gets_partial_variance(self):
-        # n = 268, p = 11 → df = 256; Var = (1 − r²)²/df with r = 0.98·0.18 + 0.05
+    def test_beta_with_predictor_count_keeps_zero_order_variance(self):
+        # df is still derived (n = 268, p = 11 → 256) for the audit trail, but
+        # the variance follows the zero-order estimand, not df.
         eff = _extract({"effect_beta": 0.18, "sample_n": 268, "n_predictors": 11})
         assert eff.effect_df == 256
         assert eff.df_source == "derived"
-        assert eff.metric_type == "partial"
+        assert eff.metric_type == "zero_order"
+        assert eff.estimand_source == "imputed_pb2005"
         assert eff.effect_r == pytest.approx(0.2264)
-        assert eff.variance_r == pytest.approx((1 - 0.2264**2) ** 2 / 256)
-        assert eff.variance_formula == "(1 - r^2)^2 / df"
+        assert eff.variance_r == pytest.approx((1 - 0.2264**2) ** 2 / 267)
+        assert eff.variance_formula == "(1 - r^2)^2 / (n - 1)"
+
+    def test_three_layer_separation(self):
+        # r reported: zero_order · observed; t from regression: partial ·
+        # observed; β: zero_order · imputed — only observed feeds the main model.
+        r_eff = _extract({"effect_r": 0.24, "sample_n": 231})
+        t_eff = _extract({"effect_t": 2.14, "effect_df": 220, "sample_n": 231,
+                          "n_predictors": 10})
+        b_eff = _extract({"effect_beta": 0.3, "sample_n": 100})
+        assert (r_eff.metric_type, r_eff.estimand_source, r_eff.source_controls) == \
+            ("zero_order", "observed", False)
+        assert (t_eff.metric_type, t_eff.estimand_source, t_eff.source_controls) == \
+            ("partial", "observed", True)
+        assert (b_eff.metric_type, b_eff.estimand_source, b_eff.source_controls) == \
+            ("zero_order", "imputed_pb2005", True)
 
 
 class TestDfImputation:
