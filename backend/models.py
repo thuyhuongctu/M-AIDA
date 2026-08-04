@@ -209,6 +209,15 @@ class ExtractedEffect(BaseModel):
     pi_locked: bool = Field(
         False, description="True after Principal Investigator permanently locks entry"
     )
+    derived_from: str | None = Field(
+        None,
+        description=(
+            "study_id/effect_id of the prior-generation locked record this one "
+            "was re-coded from. Locked records are never edited in place: a "
+            "formula correction produces a NEW lock generation whose records "
+            "point back to their v7.1.1 originals via this field."
+        ),
+    )
     extracted_at: datetime = Field(default_factory=datetime.utcnow)
     locked_at: datetime | None = None
 

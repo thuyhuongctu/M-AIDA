@@ -29,9 +29,22 @@ lại (bước 2) trước khi chạy lại mô hình gộp.
   var_z (A4), `legacy_r` đo chênh lệch với cách tính cũ, và `recode_csv`
   mã lại CSV kèm cột `r_legacy`/`delta_r`; 19 kiểm thử tính tay
   (`analysis/test_effect_size.py`, chạy được không cần pytest); bộ mẫu
-  `mau_cu.csv` → `mau_moi.csv` đối chiếu từng byte. Backend đồng bộ theo
-  ngữ nghĩa gói: bản ghi suy từ β mang `metric_type = partial` (β đã kiểm
-  soát các biến khác), df suy được cả cho đường β khi có `n_predictors`.
+  `mau_cu.csv` → `mau_moi.csv` làm kiểm thử hồi quy (khớp từng byte —
+  chứng minh mã ổn định; tính đúng đắn nằm ở 19 test tính tay). Backend
+  đồng bộ theo ngữ nghĩa gói: bản ghi suy từ β mang `metric_type =
+  partial` (β đã kiểm soát các biến khác), df suy được cả cho đường β khi
+  có `n_predictors`.
+- Bản R chuẩn `analysis/effect_size.R` (thay `effect_sizes.R` +
+  `test_effect_sizes.R` tạm thời): tự kiểm tra khi chạy
+  `Rscript analysis/effect_size.R`, kèm khung quy trình metafor bước 3–7
+  (ba cấp/hai cấp, phương sai vững theo cụm, khoảng dự báo, PET-PEESE,
+  giả thuyết chữ S).
+- CHÍNH SÁCH THẾ HỆ KHÓA: tập khóa v7.1.1 (đã có DOI) giữ nguyên, không
+  ghi đè; việc mã lại theo công thức mới sinh tập v8.0.0 như một lần khóa
+  độc lập, mỗi bản ghi mang trường mới `derived_from` trỏ về bản gốc,
+  phát hành DOI phiên bản mới và ghi nhật ký sai lệch OSF. Trang công
+  khai hạ `r̄ = .074` xuống trạng thái tạm thời (thuộc v7.1.1, chờ thế hệ
+  khóa v8.0.0) ở ô KPI, đoạn phương pháp và chú thích biểu đồ rừng.
 
 ## Chưa phát hành: bộ trình diễn `demo/` (15/07/2026)
 

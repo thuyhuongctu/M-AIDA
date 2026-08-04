@@ -9,7 +9,7 @@ dữ liệu và cho pipeline R.
 |---|---|
 | `effect_size.py` | Module Python đã sửa, kèm bộ mã lại CSV (`recode_csv`) |
 | `test_effect_size.py` | 19 kiểm thử đơn vị, mọi giá trị kỳ vọng đều tính tay |
-| `effect_sizes.R` | Bản R tương đương (testthat: `test_effect_sizes.R`) |
+| `effect_size.R` | Bản R tương đương, tự kiểm tra khi chạy `Rscript analysis/effect_size.R`; phần cuối là khung quy trình metafor cho bước 3–7 (ba cấp/hai cấp, phương sai vững theo cụm, khoảng dự báo, PET-PEESE, giả thuyết chữ S) |
 | `mau_cu.csv` · `mau_moi.csv` | Bộ dữ liệu mẫu trước và sau khi mã lại |
 
 ## Ba lỗi được sửa
@@ -64,14 +64,36 @@ CSV đầu vào cần các cột `author, year, stat_type, value, n` và nên c�
 chiều: sai số cũ chỉ đẩy theo một hướng, nên ước lượng gộp bị hạ thấp một
 cách có hệ thống chứ không phải nhiễu ngẫu nhiên.
 
-## Lưu ý
+Lưu ý về vai trò của bộ mẫu: phép so khớp từng byte giữa đầu ra
+`recode_csv` và `mau_moi.csv` là **kiểm thử hồi quy** — nó chứng minh mã
+chạy ổn định giữa các lần sửa, không chứng minh công thức đúng. Tính đúng
+đắn nằm ở 19 kiểm thử tính tay; khi viết bài, dẫn các ví dụ tính tay chứ
+không dẫn phép so khớp byte.
+
+## Thế hệ khóa v8.0.0 — không ghi đè tập khóa v7.1.1
+
+Sửa công thức nghĩa là các bản ghi đã khóa cho giá trị `r` khác — nhưng
+tập v7.1.1 đã phát hành kèm DOI và tuyên bố cốt lõi của M-AIDA là bản ghi
+khóa rồi thì không sửa. Vì vậy việc mã lại được xử lý như **một thế hệ
+khóa mới**, không phải một bản sửa tại chỗ:
+
+1. Tập khóa v7.1.1 giữ nguyên, không đụng vào.
+2. Tập v8.0.0 sinh ra như một lần khóa độc lập; mỗi bản ghi mang con trỏ
+   `derived_from` về bản ghi gốc v7.1.1.
+3. Phát hành DOI phiên bản mới trên Zenodo, phần thay đổi ghi rõ đây là
+   hiệu chỉnh công thức A1–A3.
+4. Ghi vào nhật ký sai lệch OSF, vì đây là thay đổi so với kế hoạch đã
+   đăng ký.
+
+Cách làm này biến việc sửa lỗi thành bằng chứng cho chính hệ thống: phát
+hiện được lỗi ở tầng công thức, truy ngược được ảnh hưởng tới từng bản
+ghi, và phát hành lại mà không mất dấu vết.
+
+## Lưu ý khi chạy bản R
 
 Môi trường dựng gói này không có R cài sẵn nên bản R chưa chạy tại chỗ;
-mọi giá trị kỳ vọng trong test R trùng đúng với các ví dụ tính tay đã chạy
-đạt ở bản Python. Chạy
-`Rscript -e 'testthat::test_file("analysis/test_effect_sizes.R")'`
-một lần trước khi dùng. Khung quy trình metafor cho bước 5–7 (mô hình ba
-cấp so với hai cấp, phương sai vững theo cụm, khoảng dự báo, bảng nhiều
-ước lượng thiên lệch, kiểm định giả thuyết chữ S) sẽ bổ sung ở bước 5;
-kiểm tra lại tên tham số của `escalc` bằng `?escalc` trước khi chạy, vì
-metafor có thay đổi giữa các phiên bản.
+mọi giá trị kỳ vọng trong phần tự kiểm tra của nó trùng đúng với các ví
+dụ tính tay đã chạy đạt ở bản Python. Chạy `Rscript analysis/effect_size.R`
+một lần trước khi dùng. Kiểm tra lại tên tham số của `escalc` bằng
+`?escalc` trước khi chạy khối metafor, vì metafor có thay đổi giữa các
+phiên bản.
