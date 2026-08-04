@@ -1315,7 +1315,7 @@ a{color:var(--brand);text-decoration:none;}
         <div class="convgrid">
           <div class="fcard"><span class="fbadge ok">1.0</span><div class="frm-big">r</div><p data-i18n data-en="Reported directly: kept as published." data-vi="Báo cáo trực tiếp: giữ nguyên như công bố.">Reported directly: kept as published.</p></div>
           <div class="fcard"><span class="fbadge mid">0.8</span><div class="frm-big">r = &#8730;( t&#178; / (t&#178; + df) )</div><p data-i18n data-en="From a t statistic; df = n &#8722; 2 when unreported (Cohen, 1988)." data-vi="Từ thống kê t; df = n &#8722; 2 khi không báo cáo (Cohen, 1988).">From a t statistic; df = n &#8722; 2 when unreported (Cohen, 1988).</p></div>
-          <div class="fcard"><span class="fbadge low">0.6</span><div class="frm-big">r &#8776; 0.98 &#183; &#946;</div><p data-i18n data-en="From a standardized beta, always flagged (Peterson &amp; Brown, 2005). Anything below 0.70 waits for human review." data-vi="Từ hệ số beta chuẩn hóa, luôn gắn cờ (Peterson &amp; Brown, 2005). Dưới 0,70 phải chờ con người duyệt.">From a standardized beta, always flagged (Peterson &amp; Brown, 2005). Anything below 0.70 waits for human review.</p></div>
+          <div class="fcard"><span class="fbadge low">0.6</span><div class="frm-big">r = 0.98&#183;&#946; + 0.05&#183;&#955;</div><p data-i18n data-en="From a standardized beta via r = 0.98·β + 0.05·λ, always flagged (Peterson &amp; Brown, 2005; |β| ≤ 0.5 only). Anything below 0.70 waits for human review." data-vi="Từ hệ số beta chuẩn hóa qua r = 0,98·β + 0,05·λ, luôn gắn cờ (Peterson &amp; Brown, 2005; chỉ khi |β| ≤ 0,5). Dưới 0,70 phải chờ con người duyệt.">From a standardized beta via r = 0.98·β + 0.05·λ, always flagged (Peterson &amp; Brown, 2005; |β| ≤ 0.5 only). Anything below 0.70 waits for human review.</p></div>
         </div>
       </div>
     </div>
@@ -1680,7 +1680,7 @@ a{color:var(--brand);text-decoration:none;}
       </div>
       <div class="empty" id="emptyMsg" data-i18n data-en="No records yet. Upload a PDF or CSV, or load the sample dataset above." data-vi="Chưa có bản ghi. Hãy tải lên PDF hoặc CSV, hoặc nạp bộ dữ liệu mẫu ở trên.">No records yet. Upload a PDF or CSV, or load the sample dataset above.</div>
 
-      <div class="method" data-i18n data-en="Conversions: r is taken directly (confidence 1.0). t becomes r = t / sqrt(t^2 + df), with df = n - 2 when df is absent (confidence 0.8, Cohen 1988). beta becomes r = 0.98 * beta (confidence 0.6, Peterson and Brown 2005). Signs are preserved and r is bounded to the unit interval. Any record below 0.70 is flagged." data-vi="Chuyển đổi: r lấy trực tiếp (độ tin cậy 1,0). t thành r = t / sqrt(t^2 + df), với df = n - 2 khi thiếu df (độ tin cậy 0,8, Cohen 1988). beta thành r = 0,98 * beta (độ tin cậy 0,6, Peterson và Brown 2005). Dấu được bảo toàn và r bị chặn trong khoảng đơn vị. Bản ghi dưới 0,70 được gắn cờ.">Conversions: r is taken directly (confidence 1.0). t becomes r = t / sqrt(t^2 + df), with df = n - 2 when df is absent (confidence 0.8, Cohen 1988). beta becomes r = 0.98 * beta (confidence 0.6, Peterson and Brown 2005). Signs are preserved and r is bounded to the unit interval. Any record below 0.70 is flagged.</div>
+      <div class="method" data-i18n data-en="Conversions: r is taken directly (confidence 1.0). t becomes r = t / sqrt(t^2 + df); when df is absent it is derived as n - p - 1 from the model's predictor count, never as a bare n - 2 (confidence 0.8, Cohen 1988). beta becomes r = 0.98 * beta + 0.05 * lambda, lambda = 1 when beta >= 0 (Peterson and Brown 2005, valid for |beta| <= 0.5; outside that domain no conversion is made). Zero-order and partial correlations carry different variance formulas and are coded separately. Any record below 0.70 is flagged." data-vi="Chuyển đổi: r lấy trực tiếp (độ tin cậy 1,0). t thành r = t / sqrt(t^2 + df); khi thiếu df thì suy ra bằng n - p - 1 từ số biến giải thích của mô hình, không bao giờ lấy mặc định n - 2 (độ tin cậy 0,8, Cohen 1988). beta thành r = 0,98 * beta + 0,05 * lambda, lambda = 1 khi beta >= 0 (Peterson và Brown 2005, chỉ hợp lệ khi |beta| <= 0,5; ngoài khoảng đó không quy đổi). Tương quan bậc không và tương quan riêng phần dùng công thức phương sai khác nhau và được mã riêng. Bản ghi dưới 0,70 được gắn cờ.">Conversions: r is taken directly (confidence 1.0). t becomes r = t / sqrt(t^2 + df); when df is absent it is derived as n - p - 1 from the model's predictor count, never as a bare n - 2 (confidence 0.8, Cohen 1988). beta becomes r = 0.98 * beta + 0.05 * lambda, lambda = 1 when beta >= 0 (Peterson and Brown 2005, valid for |beta| <= 0.5; outside that domain no conversion is made). Zero-order and partial correlations carry different variance formulas and are coded separately. Any record below 0.70 is flagged.</div>
     </section>
 
     <!-- STEP 3: EXPORT -->
@@ -2336,11 +2336,14 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     var st=(rec.stat_type||'').trim().toLowerCase();
     var v=parseFloat(rec.value);
     var n=rec.n!==''&&rec.n!=null?parseFloat(rec.n):null;
-    var df=rec.df!==''&&rec.df!=null?parseFloat(rec.df):(n!=null?n-2:null);
+    var p=rec.n_predictors!==''&&rec.n_predictors!=null?parseFloat(rec.n_predictors):null;
+    // df = n - p - 1 (Peterson & Brown fix pack); a bare n - 2 default is
+    // only valid for the bivariate case, so imputation requires p.
+    var df=rec.df!==''&&rec.df!=null?parseFloat(rec.df):((n!=null&&p!=null)?n-p-1:null);
     if(isNaN(v))return {error:'value'};
     if(st==='r'){return {r:clampR(v),conf:1.0,formula:'direct r',src:'r = '+fmt(v)};}
-    if(st==='t'){if(df==null||df<=0||isNaN(df))return {error:'df'};return {r:clampR(v/Math.sqrt(v*v+df)),conf:0.8,formula:'r = t / sqrt(t^2 + df)',src:'t = '+fmt(v)+', df = '+fmt(df)};}
-    if(st==='beta'||st==='β'||st==='b'){return {r:clampR(0.98*v),conf:0.6,formula:'r = 0.98 * beta',src:'beta = '+fmt(v)};}
+    if(st==='t'){if(df==null||df<=0||isNaN(df))return {error:'df'};return {r:clampR(v/Math.sqrt(v*v+df)),conf:0.8,formula:'r = t / sqrt(t^2 + df), df = n - p - 1',src:'t = '+fmt(v)+', df = '+fmt(df)};}
+    if(st==='beta'||st==='β'||st==='b'){if(Math.abs(v)>0.5)return {error:'type'};var lam=v>=0?1:0;return {r:clampR(0.98*v+0.05*lam),conf:0.6,formula:'r = 0.98 * beta + 0.05 * lambda',src:'beta = '+fmt(v)};}
     return {error:'type'};
   }
   function fmt(x){if(x==null||isNaN(x))return '';var n=+x;return Number.isInteger(n)?String(n):n.toFixed(3).replace(/0+$/,'').replace(/\.$/,'');}

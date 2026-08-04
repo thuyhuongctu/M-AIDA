@@ -41,6 +41,18 @@ IcrvRegime = Literal["I", "II", "III", "FR", "MX"]
 # DPL phase, assigned by the PI from the study's median data year:
 #   PRE = Precede, SPN = Span, FOL = Follow.
 DplPhase = Literal["PRE", "SPN", "FOL"]
+# What kind of correlation the canonical r is. Zero-order and partial
+# correlations answer different questions AND have different sampling
+# variances, so they must never be pooled under one formula:
+#   zero_order  = bivariate Pearson r (correlation-matrix value)
+#   partial     = from a coefficient in a multiple regression (t → r)
+#   semipartial = semipartial correlation, kept separate; not poolable with
+#                 either of the above without an explicit decision
+MetricType = Literal["zero_order", "partial", "semipartial"]
+# Provenance of the degrees of freedom paired with a t-statistic:
+#   reported = taken verbatim from the paper
+#   derived  = computed as n − p − 1 from sample_n and n_predictors
+DfSource = Literal["reported", "derived"]
 
 
 # ---------------------------------------------------------------------------
@@ -86,6 +98,44 @@ class ExtractedEffect(BaseModel):
     )
     effect_df: int | None = Field(
         None, description="Degrees of freedom paired with t-statistic"
+    )
+    n_predictors: int | None = Field(
+        None,
+        ge=1,
+        description=(
+            "Number of predictors p in the regression model supplying t or β "
+            "(focal variable plus controls, excluding intercept); df = n − p − 1"
+        ),
+    )
+    metric_type: MetricType | None = Field(
+        None,
+        description=(
+            "Kind of correlation the canonical r is: zero_order | partial | "
+            "semipartial. Determines the sampling-variance formula; PI-confirmed "
+            "at Gate 2."
+        ),
+    )
+    df_source: DfSource | None = Field(
+        None,
+        description="Whether effect_df was reported verbatim or derived as n − p − 1",
+    )
+    lambda_applied: bool = Field(
+        False,
+        description=(
+            "True when the +0.05·λ term of Peterson & Brown (2005) was applied "
+            "in the β → r conversion (λ = 1 for β ≥ 0, else 0)"
+        ),
+    )
+    variance_r: float | None = Field(
+        None,
+        description=(
+            "Sampling variance of r: (1 − r²)²/(n − 1) for zero-order, "
+            "(1 − r²)²/df for partial correlations"
+        ),
+    )
+    variance_formula: str | None = Field(
+        None,
+        description="Exact variance formula applied to this record, for audit",
     )
     p_value: float | None = Field(None, description="Reported p-value")
     ci_lower: float | None = Field(
@@ -139,11 +189,18 @@ class ExtractedEffect(BaseModel):
     )
     df_imputed: bool = Field(
         False,
-        description="True when df was unreported and imputed as n - 2 per the documented protocol (7.1.2)",
+        description=(
+            "True when df was unreported and derived as n − p − 1 from "
+            "sample_n and n_predictors (never as a bare n − 2)"
+        ),
     )
     beta_outside_pb_domain: bool = Field(
         False,
-        description="True when |beta| > 0.5, outside the Peterson & Brown (2005) derivation domain (7.1.2)",
+        description=(
+            "True when |beta| > 0.5, outside the Peterson & Brown (2005) "
+            "derivation domain; such records receive no converted r and are "
+            "excluded from pooling"
+        ),
     )
     requires_verification: bool = Field(
         ...,

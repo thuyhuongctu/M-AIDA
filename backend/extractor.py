@@ -52,6 +52,10 @@ Extract ONLY the following statistics:
 - t  : t-statistic (report alongside df if both present)
 - df : degrees of freedom
 - β  : standardised regression coefficient (beta)
+- p# : number of predictor variables in the regression model that the reported
+       t or β comes from (focal variable plus all controls, excluding the
+       intercept); null when the statistic is not from a regression or the
+       count cannot be determined from the text
 - F  : F-statistic (for context; not directly convertible)
 - p  : reported p-value (exact or inequality, e.g. p < 0.05)
 - CI : 95 % confidence interval for r if reported
@@ -81,6 +85,7 @@ Return a single JSON object - no markdown, no prose - with exactly these keys:
   "effect_t": <float|null>,
   "effect_beta": <float|null>,
   "effect_df": <int|null>,
+  "n_predictors": <int|null>,
   "p_value": <float|null>,
   "ci_lower": <float|null>,
   "ci_upper": <float|null>,
@@ -176,22 +181,69 @@ class StatisticalExtractor:
         r_unsigned = math.sqrt(t_sq / (t_sq + df))
         return r_unsigned if t >= 0 else -r_unsigned
 
+    #: Peterson & Brown (2005) derived their approximation for |β| <= 0.5;
+    #: outside this domain the imputation is undefined and must not be used.
+    PB_BETA_DOMAIN = 0.5
+
     @staticmethod
-    def convert_beta_to_r(beta: float) -> float:
+    def convert_beta_to_r(beta: float) -> float | None:
         """Approximate Pearson's r from a standardised regression coefficient.
 
-        Peterson & Brown (2005) estimate r = 0.98*beta + 0.05*lambda, where
-        lambda = 1 if beta is non-negative and 0 otherwise. This tool applies
-        the simplified form used throughout the P6 extraction protocol:
+        Full Peterson & Brown (2005) formula:
 
-            r ≈ β × 0.98
+            r = 0.98·β + 0.05·λ,   λ = 1 if β >= 0, else 0
 
-        Peterson & Brown derived the approximation for |β| <= 0.5; the
-        extractor therefore forces human review whenever |β| > 0.5
-        (see _build_effect, added in 7.1.2). The result is clamped to
-        [-1, 1] as a defensive bound.
+        Returns ``None`` when |β| > 0.5: the approximation was derived only
+        for that domain, so such records carry no usable effect size and are
+        excluded from conversion (they surface as flagged, unconverted
+        records — not as clamped numbers).
         """
-        return StatisticalExtractor.clamp_r(beta * 0.98)
+        if abs(beta) > StatisticalExtractor.PB_BETA_DOMAIN:
+            return None
+        lam = 1.0 if beta >= 0 else 0.0
+        return StatisticalExtractor.clamp_r(0.98 * beta + 0.05 * lam)
+
+    @staticmethod
+    def degrees_of_freedom(sample_n: int, n_predictors: int) -> int:
+        """Residual df for a t-statistic taken from a regression model.
+
+            df = n − p − 1
+
+        where p counts every predictor in the model (focal variable plus
+        controls, excluding the intercept). The bivariate case p = 1 reduces
+        to the familiar n − 2; a bare n − 2 default is wrong whenever the t
+        comes from a multiple regression and is never applied here.
+        """
+        return sample_n - n_predictors - 1
+
+    @staticmethod
+    def variance_of_r(
+        r: float,
+        *,
+        sample_n: int | None = None,
+        df: int | None = None,
+        metric_type: str = "zero_order",
+    ) -> float:
+        """Sampling variance of a correlation, by metric type.
+
+        Zero-order (Pearson) correlation:
+            Var(r)   = (1 − r²)² / (n − 1)
+        Partial correlation (Aloe & Thompson, 2013):
+            Var(r_p) = (1 − r_p²)² / df,   df = n − p − 1
+
+        The two denominators differ, so pooling weights computed with the
+        zero-order formula are wrong for partial correlations. ``metric_type``
+        is therefore required — there is no silent default across types.
+        """
+        if metric_type == "zero_order":
+            if sample_n is None or sample_n <= 1:
+                raise ValueError("zero-order variance requires sample_n > 1")
+            return (1.0 - r * r) ** 2 / (sample_n - 1)
+        if metric_type == "partial":
+            if df is None or df <= 0:
+                raise ValueError("partial-correlation variance requires df > 0")
+            return (1.0 - r * r) ** 2 / df
+        raise ValueError(f"unsupported metric_type: {metric_type!r}")
 
     @staticmethod
     def resolve_overridden_r(
@@ -258,34 +310,81 @@ class StatisticalExtractor:
         confidence: float
         computed_r: float | None = None
 
+        n_predictors_raw = raw.get("n_predictors")
+        n_predictors: int | None = (
+            int(n_predictors_raw) if n_predictors_raw is not None else None
+        )
+
         sample_n_for_df = raw.get("sample_n")
+        df_source: str | None = "reported" if effect_df is not None else None
         df_imputed = False
         if (
             effect_t is not None
             and effect_df is None
             and sample_n_for_df is not None
-            and int(sample_n_for_df) > 2
+            and n_predictors is not None
+            and int(sample_n_for_df) - n_predictors - 1 > 0
         ):
-            # Documented protocol fallback: df = n - 2 when unreported.
-            effect_df = int(sample_n_for_df) - 2
+            # df = n − p − 1. Without a predictor count there is no valid
+            # imputation: the record stays unconverted and flagged instead
+            # of silently receiving the bivariate n − 2.
+            effect_df = self.degrees_of_freedom(int(sample_n_for_df), n_predictors)
+            df_source = "derived"
             df_imputed = True
 
         beta_outside_pb_domain = False
+        lambda_applied = False
+        metric_type: str | None = None
 
         if effect_r is not None:
             computed_r = self.clamp_r(effect_r)
             confidence = CONFIDENCE_DIRECT_R
+            # Directly reported r in this literature is normally the
+            # correlation-matrix (zero-order) value; the PI confirms at Gate 2.
+            metric_type = "zero_order"
         elif effect_t is not None and effect_df is not None:
             computed_r = self.compute_r_from_t(effect_t, effect_df)
             confidence = CONFIDENCE_FROM_T
+            # A t taken from a coefficient in a multiple regression yields a
+            # partial correlation; only the bivariate p = 1 case is zero-order.
+            metric_type = (
+                "zero_order"
+                if n_predictors is not None and n_predictors <= 1
+                else "partial"
+            )
         elif effect_beta is not None:
             computed_r = self.convert_beta_to_r(effect_beta)
-            confidence = CONFIDENCE_FROM_BETA
-            # Peterson & Brown (2005) derived r = 0.98*beta for |beta| <= 0.5.
-            beta_outside_pb_domain = abs(effect_beta) > 0.5
+            beta_outside_pb_domain = computed_r is None
+            if computed_r is not None:
+                confidence = CONFIDENCE_FROM_BETA
+                lambda_applied = True
+                # Peterson & Brown's imputation targets the zero-order r.
+                metric_type = "zero_order"
+            else:
+                confidence = 0.0
         else:
             computed_r = None
             confidence = 0.0
+
+        variance_r: float | None = None
+        variance_formula: str | None = None
+        if computed_r is not None and metric_type == "partial" and effect_df:
+            variance_r = self.variance_of_r(
+                computed_r, df=effect_df, metric_type="partial"
+            )
+            variance_formula = "(1 - r^2)^2 / df"
+        elif (
+            computed_r is not None
+            and metric_type == "zero_order"
+            and sample_n_for_df is not None
+            and int(sample_n_for_df) > 1
+        ):
+            variance_r = self.variance_of_r(
+                computed_r,
+                sample_n=int(sample_n_for_df),
+                metric_type="zero_order",
+            )
+            variance_formula = "(1 - r^2)^2 / (n - 1)"
 
         requires_verification = (
             confidence < CONFIDENCE_REVIEW_THRESHOLD
@@ -339,6 +438,12 @@ class StatisticalExtractor:
             icrv_regime=icrv_regime,
             cdai_score=cdai_score,
             dpl_phase=dpl_phase,
+            n_predictors=n_predictors,
+            metric_type=metric_type,
+            df_source=df_source,
+            lambda_applied=lambda_applied,
+            variance_r=variance_r,
+            variance_formula=variance_formula,
             extraction_confidence=confidence,
             requires_verification=requires_verification,
             df_imputed=df_imputed,

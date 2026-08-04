@@ -1,11 +1,13 @@
-"""Tests for the 7.1.2 governance patch.
+"""Tests for the 7.1.2 governance patch (updated for the formula fixes).
 
-Pins the four fixes that align the code with the documented protocol:
-(1) defensive clamp of r into [-1, 1]; (2) mandatory review when a beta
-conversion falls outside the Peterson & Brown (2005) derivation domain
-|beta| <= 0.5; (3) the documented df = n - 2 fallback, now implemented and
-flagged; (4) the machine's original proposal is stored per record and
-survives PI overrides, and locked records reject changes with HTTP 409.
+Pins the fixes that align the code with the corrected protocol:
+(1) defensive clamp of r into [-1, 1]; (2) a beta outside the Peterson &
+Brown (2005) derivation domain |beta| <= 0.5 yields NO converted r and is
+excluded, not clamped; (3) df is only ever derived as n − p − 1 when a
+predictor count is known — records missing both df and n_predictors stay
+unconverted and flagged; (4) the machine's original proposal is stored per
+record and survives PI overrides, and locked records reject changes with
+HTTP 409.
 """
 
 from __future__ import annotations
@@ -36,14 +38,15 @@ def _extract(payload: dict):
 
 
 class TestClamp:
-    def test_beta_conversion_is_clamped_high(self):
-        assert StatisticalExtractor.convert_beta_to_r(1.2) == 1.0
+    def test_beta_outside_domain_yields_none_not_clamp(self):
+        # Out-of-domain betas used to be converted and clamped to ±1; the
+        # corrected behaviour is no conversion at all.
+        assert StatisticalExtractor.convert_beta_to_r(1.2) is None
+        assert StatisticalExtractor.convert_beta_to_r(-1.5) is None
 
-    def test_beta_conversion_is_clamped_low(self):
-        assert StatisticalExtractor.convert_beta_to_r(-1.5) == -1.0
-
-    def test_in_range_beta_unchanged(self):
-        assert StatisticalExtractor.convert_beta_to_r(0.3) == pytest.approx(0.294)
+    def test_in_range_beta_uses_full_peterson_brown(self):
+        # 0.98·0.3 + 0.05·1 = 0.344 (the λ term is no longer dropped)
+        assert StatisticalExtractor.convert_beta_to_r(0.3) == pytest.approx(0.344)
 
     def test_direct_r_override_is_clamped(self):
         r = StatisticalExtractor.resolve_overridden_r({"effect_r": 1.7}, {"effect_r"})
@@ -51,26 +54,43 @@ class TestClamp:
 
 
 class TestBetaDomain:
-    def test_beta_above_half_forces_review(self):
+    def test_beta_above_half_is_excluded_and_flagged(self):
         eff = _extract({"effect_beta": 0.6, "sample_n": 100})
         assert eff.beta_outside_pb_domain is True
         assert eff.requires_verification is True
+        assert eff.effect_r is None  # excluded, not converted-and-clamped
 
     def test_beta_within_domain_not_flagged(self):
         eff = _extract({"effect_beta": 0.3, "sample_n": 100})
         assert eff.beta_outside_pb_domain is False
+        assert eff.lambda_applied is True
+        assert eff.effect_r == pytest.approx(0.344)
 
 
 class TestDfImputation:
-    def test_df_imputed_as_n_minus_2(self):
+    def test_no_imputation_without_predictor_count(self):
+        # The old code silently defaulted to df = n − 2 here. Without a
+        # predictor count there is no valid df: the record stays
+        # unconverted and flagged for PI review.
         eff = _extract({"effect_t": 2.0, "sample_n": 102})
-        assert eff.effect_df == 100
+        assert eff.effect_df is None
+        assert eff.df_imputed is False
+        assert eff.effect_r is None
+        assert eff.requires_verification is True
+
+    def test_df_derived_as_n_minus_p_minus_1(self):
+        # n = 102, p = 12 → df = 89 (a bare n − 2 would have said 100)
+        eff = _extract({"effect_t": 2.0, "sample_n": 102, "n_predictors": 12})
+        assert eff.effect_df == 89
+        assert eff.df_source == "derived"
         assert eff.df_imputed is True
+        assert eff.metric_type == "partial"
         assert eff.requires_verification is True
 
     def test_reported_df_not_flagged(self):
         eff = _extract({"effect_t": 2.0, "effect_df": 100, "sample_n": 102})
         assert eff.df_imputed is False
+        assert eff.df_source == "reported"
 
 
 class TestGovernanceApi:

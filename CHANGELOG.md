@@ -3,6 +3,29 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## Chưa phát hành: sửa ba công thức A1–A3 theo bản rà soát Paper 6 (04/08/2026)
+
+Bước 1 trong bảy bước chạy lại. Ba lỗi tầng công thức được sửa đồng bộ ở
+backend Python, máy tính demo trong trình duyệt, phần mô tả phương pháp
+trên trang, và module R mới `analysis/effect_sizes.R` (kèm testthat).
+LƯU Ý: các bản ghi P6 đã khóa suy từ beta hoặc từ t thiếu df PHẢI được mã
+lại (bước 2) trước khi chạy lại mô hình gộp.
+
+- A1 — Peterson & Brown (2005) đầy đủ: `r = 0.98·β + 0.05·λ`, λ = 1 khi
+  β ≥ 0. Bản cũ bỏ số hạng λ nên mọi hiệu ứng dương suy từ β bị hạ thấp
+  đúng 0,05. Ngoài khoảng |β| ≤ 0,5 nay KHÔNG quy đổi (trả về None/NA và
+  loại khỏi gộp) thay vì chặn về ±1.
+- A2 — Bậc tự do cho t từ hồi quy bội: `df = n − p − 1` với trường mới
+  `n_predictors`; không còn mặc định `n − 2`. Thiếu số biến giải thích thì
+  bản ghi không quy đổi và gắn cờ chờ PI, kèm `df_source` (reported/derived).
+- A3 — Tách loại thước đo bằng trường `metric_type` (zero_order / partial /
+  semipartial) và tính phương sai đúng theo loại:
+  bậc không `(1−r²)²/(n−1)`, riêng phần `(1−r²)²/df`; lưu `variance_r` và
+  `variance_formula` trên từng bản ghi để kiểm toán.
+- Kiểm thử: viết lại `test_effect_size_conversions.py` với ví dụ tính tay
+  cho cả ba công thức; cập nhật `test_712_governance.py` theo hành vi mới
+  (58 test đạt). Test R: `analysis/test_effect_sizes.R`.
+
 ## Chưa phát hành: bộ trình diễn `demo/` (15/07/2026)
 
 Đóng gói trình diễn, KHÔNG thay đổi mã lõi 7.1.x: `demo/run_defense.py`
