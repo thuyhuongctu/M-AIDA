@@ -11,6 +11,7 @@ dữ liệu và cho pipeline R.
 | `test_effect_size.py` | 19 kiểm thử đơn vị, mọi giá trị kỳ vọng đều tính tay |
 | `effect_size.R` | Bản R tương đương, tự kiểm tra khi chạy `Rscript analysis/effect_size.R`; phần cuối là khung quy trình metafor cho bước 3–7 (ba cấp/hai cấp, phương sai vững theo cụm, khoảng dự báo, PET-PEESE, giả thuyết chữ S) |
 | `mau_cu.csv` · `mau_moi.csv` | Bộ dữ liệu mẫu trước và sau khi mã lại |
+| `migrate_v8.py` | Bước 2: di trú lược đồ v7.1.1 → v8.0.0-draft, sinh bảng thu hồi thống kê nguồn cho 47 bản ghi `is_estimated = 1`, và hoàn tất khi có `--recovered` |
 
 ## Ba lỗi được sửa
 
