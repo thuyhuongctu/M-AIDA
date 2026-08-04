@@ -319,7 +319,7 @@ class StatisticalExtractor:
         df_source: str | None = "reported" if effect_df is not None else None
         df_imputed = False
         if (
-            effect_t is not None
+            (effect_t is not None or effect_beta is not None)
             and effect_df is None
             and sample_n_for_df is not None
             and n_predictors is not None
@@ -358,8 +358,10 @@ class StatisticalExtractor:
             if computed_r is not None:
                 confidence = CONFIDENCE_FROM_BETA
                 lambda_applied = True
-                # Peterson & Brown's imputation targets the zero-order r.
-                metric_type = "zero_order"
+                # A standardised β already controls for the other predictors,
+                # so the imputed correlation is a PARTIAL quantity (canonical
+                # decision of the A1–A3 fix pack, analysis/effect_size.py).
+                metric_type = "partial"
             else:
                 confidence = 0.0
         else:
@@ -368,11 +370,21 @@ class StatisticalExtractor:
 
         variance_r: float | None = None
         variance_formula: str | None = None
-        if computed_r is not None and metric_type == "partial" and effect_df:
-            variance_r = self.variance_of_r(
-                computed_r, df=effect_df, metric_type="partial"
-            )
-            variance_formula = "(1 - r^2)^2 / df"
+        if computed_r is not None and metric_type == "partial":
+            if effect_df:
+                variance_r = self.variance_of_r(
+                    computed_r, df=effect_df, metric_type="partial"
+                )
+                variance_formula = "(1 - r^2)^2 / df"
+            elif sample_n_for_df is not None and int(sample_n_for_df) > 1:
+                # No df available (β without predictor count): the zero-order
+                # formula stands in provisionally and is labelled as such.
+                variance_r = self.variance_of_r(
+                    computed_r,
+                    sample_n=int(sample_n_for_df),
+                    metric_type="zero_order",
+                )
+                variance_formula = "(1 - r^2)^2 / (n - 1) [provisional, missing df]"
         elif (
             computed_r is not None
             and metric_type == "zero_order"

@@ -25,6 +25,13 @@ lại (bước 2) trước khi chạy lại mô hình gộp.
 - Kiểm thử: viết lại `test_effect_size_conversions.py` với ví dụ tính tay
   cho cả ba công thức; cập nhật `test_712_governance.py` theo hành vi mới
   (58 test đạt). Test R: `analysis/test_effect_sizes.R`.
+- Gói chuẩn độc lập `analysis/effect_size.py` (v8.0.0): thêm Fisher z +
+  var_z (A4), `legacy_r` đo chênh lệch với cách tính cũ, và `recode_csv`
+  mã lại CSV kèm cột `r_legacy`/`delta_r`; 19 kiểm thử tính tay
+  (`analysis/test_effect_size.py`, chạy được không cần pytest); bộ mẫu
+  `mau_cu.csv` → `mau_moi.csv` đối chiếu từng byte. Backend đồng bộ theo
+  ngữ nghĩa gói: bản ghi suy từ β mang `metric_type = partial` (β đã kiểm
+  soát các biến khác), df suy được cả cho đường β khi có `n_predictors`.
 
 ## Chưa phát hành: bộ trình diễn `demo/` (15/07/2026)
 

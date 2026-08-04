@@ -65,6 +65,21 @@ class TestBetaDomain:
         assert eff.beta_outside_pb_domain is False
         assert eff.lambda_applied is True
         assert eff.effect_r == pytest.approx(0.344)
+        # β controls for the other predictors → partial quantity; without a
+        # predictor count the variance falls back to the zero-order formula
+        # and says so.
+        assert eff.metric_type == "partial"
+        assert "provisional" in (eff.variance_formula or "")
+
+    def test_beta_with_predictor_count_gets_partial_variance(self):
+        # n = 268, p = 11 → df = 256; Var = (1 − r²)²/df with r = 0.98·0.18 + 0.05
+        eff = _extract({"effect_beta": 0.18, "sample_n": 268, "n_predictors": 11})
+        assert eff.effect_df == 256
+        assert eff.df_source == "derived"
+        assert eff.metric_type == "partial"
+        assert eff.effect_r == pytest.approx(0.2264)
+        assert eff.variance_r == pytest.approx((1 - 0.2264**2) ** 2 / 256)
+        assert eff.variance_formula == "(1 - r^2)^2 / df"
 
 
 class TestDfImputation:
