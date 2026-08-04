@@ -46,6 +46,8 @@ class TestEngineInjection:
                 "performance_measure": "ACC",
                 "evidence_page": 5,
                 "evidence_quote": "Model 2 reports t = 2.5 for FSTS (n = 102).",
+                "n_evidence_page": 5,
+                "n_evidence_quote": "The sample consists of 102 firms.",
             }
         )
         extractor = StatisticalExtractor(engine=engine)

@@ -47,7 +47,7 @@ V8_FIELDS = [
     "icrv", "cdai", "dpl", "intl_measure", "perf_measure", "include_flag",
     # thống kê
     "n", "stat_type", "source_value", "r_v711", "r_v8", "delta_r",
-    "metric_type", "estimand_source", "source_controls",
+    "metric_type", "estimand_source", "source_controls", "r_source", "n_source",
     "variance", "variance_formula", "fisher_z", "var_z",
     "df", "df_source", "n_predictors", "lambda_applied", "beta_in_range",
     "confidence", "flagged",
@@ -58,17 +58,25 @@ V8_FIELDS = [
 ]
 
 RECOVERY_FIELDS = [
-    "study_id", "effect_id", "author", "year", "country", "n",
+    "study_id", "effect_id", "author", "year", "country", "n_v711",
     "r_v711", "notes_v711",
     # người thu hồi điền từ hồ sơ mã hóa gốc hoặc bài gốc:
-    "stat_type",        # t | beta
+    "stat_type",        # t | beta | r
     "source_value",     # giá trị t hoặc beta như bài báo cáo
+    "n_reported",       # CỠ MẪU THẬT từ bài — BẮT BUỘC. n của v7.1.1 trong
+                        # nhóm này 91% chia hết cho 10, tức là điền ước lượng;
+                        # n bịa là TRỌNG SỐ bịa. Không hồi được thì ghi
+                        # KHONG_HOI_DUOC -> bản ghi bị loại, không điền ước lượng
     "df_reported",      # df nếu bài in ra; để trống nếu không
     "n_predictors",     # số biến giải thích của mô hình (không kể hệ số chặn)
     "recovery_source",  # bảng nào / trang nào trong bài
     "recovered_by",     # ai thu hồi
     "recovery_date",
 ]
+
+# r_source theo loại thống kê nguồn: reported (nguyên văn) / derived (tính
+# chính xác từ t, df) / imputed (P&B từ beta — chỉ độ nhạy)
+R_SOURCE_BY_STAT = {"r": "reported", "t": "derived", "beta": "imputed"}
 
 
 def _base_row(src: dict) -> dict:
@@ -142,8 +150,12 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
             estimated = src["is_estimated"].strip() == "1"
 
             if not estimated:
-                # r trực tiếp: A1/A2 không chạm tới, chỉ bổ sung A3/A4
+                # r trực tiếp: A1/A2 không chạm tới, chỉ bổ sung A3/A4.
+                # n của nhóm này coi là báo cáo thật (chữ số cuối phân bố
+                # đều); xác nhận chéo qua bảng đối chiếu ngược E2.
                 _fill_from_conversion(row, "r", float(src["r"]), int(src["n"]))
+                row["r_source"] = "reported"
+                row["n_source"] = "reported"
                 rows.append(row)
                 continue
 
@@ -151,24 +163,51 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
             if rec is None:
                 row["stat_type"] = ""
                 row["notes"] = (row["notes"] + "; " if row["notes"] else "") + \
-                    "CHỜ THU HỒI THỐNG KÊ NGUỒN (is_estimated=1 ở v7.1.1)"
+                    "CHỜ THU HỒI THỐNG KÊ NGUỒN VÀ n THẬT (is_estimated=1; " \
+                    "n của v7.1.1 trong nhóm này là điền ước lượng)"
                 rows.append(row)
                 pending.append(src)
                 continue
 
+            n_rep_raw = (rec.get("n_reported") or "").strip()
+            if not n_rep_raw.isdigit():
+                # Không hồi được n thật thì LOẠI: một n điền tay là một trọng
+                # số đặt ngầm không ai kiểm được.
+                why = ("không hồi được n thật (n v7.1.1 = %s là ước lượng) — "
+                       "loại, không điền ước lượng" % src["n"])
+                row["stat_type"] = rec.get("stat_type", "")
+                row["source_value"] = rec.get("source_value", "")
+                row["flagged"] = True
+                row["n_source"] = "imputed"
+                row["notes"] = (row["notes"] + "; " if row["notes"] else "") + \
+                    f"LOẠI TRỪ KHỎI GỘP: {why}"
+                rows.append(row)
+                excluded.append((src["effect_id"], why))
+                continue
+
+            n_true = int(n_rep_raw)
             try:
                 _fill_from_conversion(
                     row,
                     rec["stat_type"].strip().lower(),
                     float(rec["source_value"]),
-                    int(src["n"]),
+                    n_true,
                     int(rec["n_predictors"]) if rec.get("n_predictors", "").strip() else None,
                     int(rec["df_reported"]) if rec.get("df_reported", "").strip() else None,
                 )
+                row["n"] = n_true
+                row["r_source"] = R_SOURCE_BY_STAT.get(
+                    rec["stat_type"].strip().lower(), ""
+                )
+                row["n_source"] = "reported"
+                if n_true != int(src["n"]):
+                    row["notes"] = (row["notes"] + "; " if row["notes"] else "") + \
+                        f"n v7.1.1 = {src['n']} là ước lượng; n thật = {n_true}"
                 rows.append(row)
             except ConversionError as e:
                 row["stat_type"] = rec["stat_type"]
                 row["source_value"] = rec["source_value"]
+                row["n"] = n_true
                 row["flagged"] = True
                 row["notes"] = (row["notes"] + "; " if row["notes"] else "") + \
                     f"LOẠI TRỪ KHỎI GỘP: {e}"
@@ -190,7 +229,7 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 w.writerow({
                     "study_id": src["study_id"], "effect_id": src["effect_id"],
                     "author": src["author"], "year": src["year"],
-                    "country": src["country"], "n": src["n"],
+                    "country": src["country"], "n_v711": src["n"],
                     "r_v711": src["r"], "notes_v711": src["notes"],
                 })
 

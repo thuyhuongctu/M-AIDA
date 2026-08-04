@@ -63,6 +63,10 @@ Extract ONLY the following statistics:
 - evidence_quote : the VERBATIM sentence (or table caption row) from the text
                    that contains the focal statistic. Copy it exactly; do not
                    paraphrase. If you cannot quote it, return null statistics.
+- n_evidence_page  : 1-based page number where the sample size is stated
+- n_evidence_quote : the VERBATIM sentence stating the sample size. Same rule:
+                     if you cannot quote it, return null sample_n. Never round
+                     or estimate a sample size.
 
 Also classify the study on these two text-determinable dimensions, and report
 the data window:
@@ -95,6 +99,8 @@ Return a single JSON object - no markdown, no prose - with exactly these keys:
   "ci_upper": <float|null>,
   "evidence_page": <int|null>,
   "evidence_quote": <string|null>,
+  "n_evidence_page": <int|null>,
+  "n_evidence_quote": <string|null>,
   "doi_measure": <"FSTS"|"GEO"|"EXP"|"FDI"|"COMP"|"OTH"|null>,
   "performance_measure": <"ACC"|"MKT"|"LAB"|"MIX"|null>
 }
@@ -106,7 +112,8 @@ Rules:
    boundary value (0.001).
 4. If the paper reports a negative t or β, preserve the sign.
 5. Never hallucinate statistics; return null for any field not found.
-6. evidence_quote is MANDATORY whenever any statistic is non-null: a record
+6. evidence_quote is MANDATORY whenever any statistic is non-null, and
+   n_evidence_quote is MANDATORY whenever sample_n is non-null: a record
    without verbatim evidence will be rejected by the pipeline.
 """
 
@@ -420,6 +427,13 @@ class StatisticalExtractor:
             int(evidence_page_raw) if evidence_page_raw is not None else None
         )
         evidence_quote: str | None = (raw.get("evidence_quote") or "").strip() or None
+        n_evidence_page_raw = raw.get("n_evidence_page")
+        n_evidence_page: int | None = (
+            int(n_evidence_page_raw) if n_evidence_page_raw is not None else None
+        )
+        n_evidence_quote: str | None = (
+            (raw.get("n_evidence_quote") or "").strip() or None
+        )
         if computed_r is not None and not evidence_quote:
             # E1 gate: statistics with no verbatim evidence are rejected
             # outright — an unevidenced number is indistinguishable from a
@@ -427,6 +441,23 @@ class StatisticalExtractor:
             raise EvidenceMissingError(
                 "statistics proposed with no evidence_quote"
             )
+        if sample_n_for_df is not None and not n_evidence_quote:
+            # Same gate for n: a guessed sample size is a guessed WEIGHT, and
+            # it distorts every other study in the pooled model.
+            raise EvidenceMissingError(
+                "sample_n proposed with no n_evidence_quote"
+            )
+
+        # Per-quantity provenance: r by conversion path; n is always reported
+        # at live extraction (the evidence gate above guarantees it).
+        r_source: str | None = None
+        if effect_r is not None:
+            r_source = "reported"
+        elif computed_r is not None and effect_t is not None:
+            r_source = "derived"
+        elif computed_r is not None and effect_beta is not None:
+            r_source = "imputed"
+        n_source: str | None = "reported" if sample_n_for_df is not None else None
 
         requires_verification = (
             confidence < CONFIDENCE_REVIEW_THRESHOLD
@@ -481,8 +512,12 @@ class StatisticalExtractor:
             cdai_score=cdai_score,
             dpl_phase=dpl_phase,
             n_predictors=n_predictors,
+            r_source=r_source,
+            n_source=n_source,
             evidence_page=evidence_page,
             evidence_quote=evidence_quote,
+            n_evidence_page=n_evidence_page,
+            n_evidence_quote=n_evidence_quote,
             metric_type=metric_type,
             estimand_source=estimand_source,
             source_controls=source_controls,

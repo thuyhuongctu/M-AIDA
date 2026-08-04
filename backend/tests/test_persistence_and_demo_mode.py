@@ -74,6 +74,8 @@ class EchoEngine:
             "sample_n": int(m.group(2)),
             "evidence_page": 1,
             "evidence_quote": m.group(0),
+            "n_evidence_page": 1,
+            "n_evidence_quote": f"n = {m.group(2)}",
         })
 
 
@@ -85,6 +87,21 @@ class NoEvidenceEngine:
 
     def complete(self, system: str, user: str, max_tokens: int = 1024) -> str:
         return json.dumps({"effect_r": 0.25, "sample_n": 50})
+
+
+class NoNEvidenceEngine:
+    """Engine that evidences r but guesses the sample size (finding E2-n)."""
+
+    provider = "nonev"
+    model = "nonev-1"
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> str:
+        return json.dumps({
+            "effect_r": 0.25,
+            "sample_n": 200,
+            "evidence_page": 3,
+            "evidence_quote": "The correlation between DOI and ROA is .25.",
+        })
 
 
 def _inject(main_module, engine) -> None:
@@ -171,4 +188,18 @@ def test_statistics_without_evidence_are_rejected(tmp_path, monkeypatch):
     assert res.status_code == 422
     assert "evidence" in res.json()["detail"].lower()
     # And nothing was persisted.
+    assert client.get("/api/health").json()["study_count"] == 0
+
+
+def test_sample_size_without_evidence_is_rejected(tmp_path, monkeypatch):
+    """A guessed n is a guessed weight: n passes the same gate as r."""
+    client = _client(tmp_path, monkeypatch, demo=False)
+    import main as main_module
+
+    _inject(main_module, NoNEvidenceEngine())
+    res = client.post(
+        "/api/extract", json={"pdf_content": _make_pdf(), "paper_metadata": {}}
+    )
+    assert res.status_code == 422
+    assert "n_evidence" in res.json()["detail"]
     assert client.get("/api/health").json()["study_count"] == 0

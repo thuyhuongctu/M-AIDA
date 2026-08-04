@@ -35,6 +35,8 @@ class FakeEngine:
 DEFAULT_EVIDENCE = {
     "evidence_page": 7,
     "evidence_quote": "Table 3 reports the focal coefficient for DOI.",
+    "n_evidence_page": 4,
+    "n_evidence_quote": "The final sample comprises the firms described above.",
 }
 
 

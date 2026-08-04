@@ -60,6 +60,14 @@ DfSource = Literal["reported", "derived"]
 #   imputed_pb2005 = estimated from β via Peterson & Brown (2005); feeds
 #                    sensitivity analyses only, never the main model
 EstimandSource = Literal["observed", "imputed_pb2005"]
+# Per-quantity provenance. is_estimated of v7.1.1 conflated the origin of r
+# with the origin of n; they are tracked separately because a fabricated n
+# fabricates the WEIGHT of the record and distorts every other study in the
+# pooled model:
+#   reported = taken verbatim from the paper (with evidence)
+#   derived  = computed exactly from reported statistics (e.g. r from t, df)
+#   imputed  = estimated (e.g. r from β via P&B) — sensitivity only
+SourceProvenance = Literal["reported", "derived", "imputed"]
 
 
 # ---------------------------------------------------------------------------
@@ -122,6 +130,22 @@ class ExtractedEffect(BaseModel):
             "at Gate 2."
         ),
     )
+    r_source: SourceProvenance | None = Field(
+        None,
+        description=(
+            "Origin of the canonical r: reported (verbatim) | derived (exact "
+            "conversion from t, df) | imputed (P&B from β; sensitivity only)"
+        ),
+    )
+    n_source: SourceProvenance | None = Field(
+        None,
+        description=(
+            "Origin of sample_n. Must be 'reported' with verbatim evidence for "
+            "any record entering pooling: a guessed n is a guessed WEIGHT and "
+            "distorts every other study in the model. Records whose true n "
+            "cannot be recovered are excluded, never filled with an estimate."
+        ),
+    )
     evidence_page: int | None = Field(
         None,
         ge=1,
@@ -133,6 +157,18 @@ class ExtractedEffect(BaseModel):
             "Verbatim sentence (or table caption row) containing the focal "
             "statistic. MANDATORY whenever statistics are present: a record "
             "without evidence is rejected at extraction, never created (E1)."
+        ),
+    )
+    n_evidence_page: int | None = Field(
+        None,
+        ge=1,
+        description="1-based page where the sample size is stated",
+    )
+    n_evidence_quote: str | None = Field(
+        None,
+        description=(
+            "Verbatim sentence containing the sample size. n passes the same "
+            "evidence gate as r: sample_n without evidence is rejected."
         ),
     )
     estimand_source: EstimandSource | None = Field(
