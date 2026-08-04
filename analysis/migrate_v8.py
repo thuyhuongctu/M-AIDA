@@ -273,13 +273,31 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
         "delta_nonzero": sum(1 for d in deltas if abs(d) > 1e-12),
         "excluded_detail": excluded,
     }
+    def _pool_legacy(subset):
+        """Cùng tập bản ghi, cùng n, cùng mô hình DL — chỉ đổi công thức về
+        bản cũ (r_legacy = r_v8 − delta_r). var_z không phụ thuộc r nên
+        trọng số giữ nguyên: mọi chênh lệch với pool mới là HIỆU ỨNG CÔNG
+        THỨC THUẦN, đã tách khỏi hiệu ứng thành phần mẫu và hiệu ứng mô hình."""
+        import math
+        legacy_rows = []
+        for r in subset:
+            if r.get("r_v8") in ("", None) or r.get("delta_r") in ("", None):
+                continue
+            r_old = float(r["r_v8"]) - float(r["delta_r"])
+            if not -1.0 < r_old < 1.0:
+                continue
+            legacy_rows.append({**r, "fisher_z": math.atanh(r_old)})
+        return _pool_dl(legacy_rows)
+
     main_rows = [r for r in rows if r.get("estimand_source") == "observed"]
     sens_rows = [r for r in rows if r.get("estimand_source")
                  in ("observed", "imputed_pb2005")]
     pool_main = _pool_dl(main_rows)
     pool_sens = _pool_dl(sens_rows)
+    pool_main_legacy = _pool_legacy(main_rows)
     report["pool_main"] = pool_main
     report["pool_sens"] = pool_sens
+    report["pool_main_legacy"] = pool_main_legacy
 
     def _fmt(p):
         if p is None:
@@ -307,6 +325,32 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
             f"Bị loại trừ                     : {report['excluded']} bản ghi "
             "(danh sách ở trên)\n"
         )
+        if pool_main and pool_main_legacy:
+            eff = pool_main["r"] - pool_main_legacy["r"]
+            f.write(
+                "\n== PHÂN RÃ (cùng tập, cùng n, cùng mô hình DL) ==\n"
+                f"r̄ công thức CŨ trên cùng tập    : {pool_main_legacy['r']:+.4f}\n"
+                f"r̄ công thức MỚI trên cùng tập   : {pool_main['r']:+.4f}\n"
+                f"HIỆU ỨNG CÔNG THỨC THUẦN        : {eff:+.4f}\n"
+                "Mọi chênh lệch khác so với .074 công bố là hiệu ứng thành phần "
+                "mẫu (tập bản ghi khác) và hiệu ứng mô hình (DL hai cấp so ba "
+                "cấp) — KHÔNG so trực tiếp hai con số đó với nhau.\n"
+            )
+        recovered_rows = [r for r in rows if r.get("stat_type")
+                          and r.get("derived_from", "").startswith("v7.1.1:")
+                          and r.get("estimand_source") in ("observed", "imputed_pb2005")
+                          and r.get("r_source") in ("derived", "imputed")]
+        if recovered_rows:
+            by_stat = {}
+            for r in recovered_rows:
+                by_stat[r["stat_type"]] = by_stat.get(r["stat_type"], 0) + 1
+            f.write(
+                "\n== PHÂN LOẠI NHÓM THU HỒI THEO stat_type ==\n"
+                "(t -> quay lại MÔ HÌNH CHÍNH, còn dịch r̄; "
+                "beta -> chỉ độ nhạy, không dịch r̄ chính)\n"
+            )
+            for k, v in sorted(by_stat.items()):
+                f.write(f"  {k:6}: {v}\n")
         if report["pending_recovery"]:
             f.write(
                 f"CHÚ Ý: còn {report['pending_recovery']} bản ghi chờ thu hồi — "
