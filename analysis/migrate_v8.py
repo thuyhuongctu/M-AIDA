@@ -132,6 +132,36 @@ def _fill_from_conversion(row: dict, stat_type: str, value: float,
     })
 
 
+def _pool_dl(rows: list[dict]) -> dict | None:
+    """Gộp nhanh DerSimonian–Laird hai cấp trên thang Fisher z.
+
+    Chỉ để ĐỊNH HƯỚNG phần thảo luận ngay khi mã lại xong; con số chính
+    thức lấy từ metafor ba cấp (bước 5). Giả định độc lập giữa các hiệu
+    ứng — với 1,21 hiệu ứng/nghiên cứu, sai số của giả định này nhỏ.
+    """
+    import math
+    pts = [(float(r["fisher_z"]), float(r["var_z"]), r["study_id"])
+           for r in rows if r.get("fisher_z") not in ("", None)
+           and r.get("var_z") not in ("", None)]
+    if len(pts) < 2:
+        return None
+    w = [1.0 / v for _, v, _ in pts]
+    ybar_fe = sum(wi * y for wi, (y, _, _) in zip(w, pts)) / sum(w)
+    q = sum(wi * (y - ybar_fe) ** 2 for wi, (y, _, _) in zip(w, pts))
+    c = sum(w) - sum(wi * wi for wi in w) / sum(w)
+    tau2 = max(0.0, (q - (len(pts) - 1)) / c) if c > 0 else 0.0
+    ws = [1.0 / (v + tau2) for _, v, _ in pts]
+    ybar = sum(wi * y for wi, (y, _, _) in zip(ws, pts)) / sum(ws)
+    se = (1.0 / sum(ws)) ** 0.5
+    return {
+        "r": math.tanh(ybar),
+        "ci_lo": math.tanh(ybar - 1.96 * se),
+        "ci_hi": math.tanh(ybar + 1.96 * se),
+        "k_studies": len({sid for _, _, sid in pts}),
+        "K_effects": len(pts),
+    }
+
+
 def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
     os.makedirs(out_dir, exist_ok=True)
 
@@ -243,6 +273,20 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
         "delta_nonzero": sum(1 for d in deltas if abs(d) > 1e-12),
         "excluded_detail": excluded,
     }
+    main_rows = [r for r in rows if r.get("estimand_source") == "observed"]
+    sens_rows = [r for r in rows if r.get("estimand_source")
+                 in ("observed", "imputed_pb2005")]
+    pool_main = _pool_dl(main_rows)
+    pool_sens = _pool_dl(sens_rows)
+    report["pool_main"] = pool_main
+    report["pool_sens"] = pool_sens
+
+    def _fmt(p):
+        if p is None:
+            return "chưa tính được"
+        return (f"{p['r']:+.4f}  95% CI [{p['ci_lo']:+.4f}, {p['ci_hi']:+.4f}]  "
+                f"(k = {p['k_studies']} nghiên cứu, K = {p['K_effects']} hiệu ứng)")
+
     with open(os.path.join(out_dir, "bao_cao_di_tru.txt"), "w", encoding="utf-8") as f:
         f.write(
             f"Di trú v7.1.1 -> {LOCK_GENERATION}\n"
@@ -254,6 +298,20 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
         )
         for eid, why in excluded:
             f.write(f"  {eid}: {why}\n")
+        f.write(
+            "\n== BA CON SỐ CHO THẢO LUẬN P6 "
+            "(ước lượng nhanh DL hai cấp trên thang z — chỉ để định hướng; "
+            "con số chính thức từ metafor ba cấp, bước 5) ==\n"
+            f"r̄ mô hình chính (observed)      : {_fmt(pool_main)}\n"
+            f"r̄ độ nhạy (+ imputed_pb2005)    : {_fmt(pool_sens)}\n"
+            f"Bị loại trừ                     : {report['excluded']} bản ghi "
+            "(danh sách ở trên)\n"
+        )
+        if report["pending_recovery"]:
+            f.write(
+                f"CHÚ Ý: còn {report['pending_recovery']} bản ghi chờ thu hồi — "
+                "ba con số trên CHƯA phải bản cuối.\n"
+            )
     return report
 
 
@@ -269,4 +327,8 @@ if __name__ == "__main__":
           f"chờ thu hồi: {rep['pending_recovery']} · loại trừ: {rep['excluded']}")
     if rep["pending_recovery"]:
         print("Điền bảng thu_hoi_thong_ke_nguon_47.csv rồi chạy lại với --recovered")
+    p = rep.get("pool_main")
+    if p:
+        print(f"r̄ định hướng (observed): {p['r']:+.4f} "
+              f"[k = {p['k_studies']}, K = {p['K_effects']}] — xem bao_cao_di_tru.txt")
     sys.exit(0)
