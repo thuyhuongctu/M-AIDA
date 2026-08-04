@@ -60,8 +60,12 @@ V8_FIELDS = [
 RECOVERY_FIELDS = [
     "study_id", "effect_id", "author", "year", "country", "n_v711",
     "r_v711", "notes_v711",
-    # người thu hồi điền từ hồ sơ mã hóa gốc hoặc bài gốc:
-    "stat_type",        # t | beta | r
+    # người thu hồi điền từ hồ sơ mã hóa gốc hoặc bài gốc.
+    # KIỂM BẢNG TƯƠNG QUAN TRƯỚC: nghiên cứu hồi quy vẫn thường in bảng
+    # tương quan mô tả — nếu có, lấy r bậc không trực tiếp (vào thẳng mô
+    # hình chính, không quy đổi, không đụng A1/A2). Chỉ lấy hệ số hồi quy
+    # (t hoặc beta) khi bài KHÔNG có bảng tương quan.
+    "stat_type",        # r | t | beta  (ưu tiên theo đúng thứ tự này)
     "source_value",     # giá trị t hoặc beta như bài báo cáo
     "n_reported",       # CỠ MẪU THẬT từ bài — BẮT BUỘC. n của v7.1.1 trong
                         # nhóm này 91% chia hết cho 10, tức là điền ước lượng;
@@ -332,9 +336,13 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 f"r̄ công thức CŨ trên cùng tập    : {pool_main_legacy['r']:+.4f}\n"
                 f"r̄ công thức MỚI trên cùng tập   : {pool_main['r']:+.4f}\n"
                 f"HIỆU ỨNG CÔNG THỨC THUẦN        : {eff:+.4f}\n"
-                "Mọi chênh lệch khác so với .074 công bố là hiệu ứng thành phần "
-                "mẫu (tập bản ghi khác) và hiệu ứng mô hình (DL hai cấp so ba "
-                "cấp) — KHÔNG so trực tiếp hai con số đó với nhau.\n"
+                "ĐỌC CHO ĐÚNG: trên tập chỉ gồm r báo cáo trực tiếp, A1/A2 "
+                "không có gì để chạm — nên +0.0000 là kiểm tra KHÔNG TÁC DỤNG "
+                "PHỤ lên nhóm không liên quan, KHÔNG phải bằng chứng bản sửa "
+                "không đổi gì. Sức mạnh của bản sửa chỉ đo được trên nhóm thu "
+                "hồi (delta_r từng bản ghi). Mọi chênh lệch khác so với .074 "
+                "công bố là hiệu ứng thành phần mẫu và hiệu ứng mô hình (DL "
+                "hai cấp so ba cấp) — KHÔNG so trực tiếp hai con số đó.\n"
             )
         recovered_rows = [r for r in rows if r.get("stat_type")
                           and r.get("derived_from", "").startswith("v7.1.1:")
@@ -346,8 +354,9 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 by_stat[r["stat_type"]] = by_stat.get(r["stat_type"], 0) + 1
             f.write(
                 "\n== PHÂN LOẠI NHÓM THU HỒI THEO stat_type ==\n"
-                "(t -> quay lại MÔ HÌNH CHÍNH, còn dịch r̄; "
-                "beta -> chỉ độ nhạy, không dịch r̄ chính)\n"
+                "(r    -> MÔ HÌNH CHÍNH, không quy đổi, không đụng A1/A2 — đường tốt nhất;\n"
+                " t    -> MÔ HÌNH CHÍNH, có quy đổi, còn dịch r̄;\n"
+                " beta -> CHỈ ĐỘ NHẠY, không dịch r̄ chính)\n"
             )
             for k, v in sorted(by_stat.items()):
                 f.write(f"  {k:6}: {v}\n")
