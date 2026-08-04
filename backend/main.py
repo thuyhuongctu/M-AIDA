@@ -34,9 +34,8 @@ from fastapi import FastAPI, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
-from demo_fallback import build_fallback_entry
 from engines import make_engine
-from extractor import StatisticalExtractor
+from extractor import EvidenceMissingError, StatisticalExtractor
 from models import ExtractedEffect, ExtractionRequest, StudyDatabaseEntry, VerificationDecision
 from notion_sync import NotionSync
 from settings import get_settings
@@ -130,11 +129,8 @@ def health_check() -> dict[str, Any]:
         # The mode the next upload will actually take.
         "llm_ready": llm_ready,
         "demo_mode": settings.maida_demo_mode,
-        "extraction_mode": (
-            "live"
-            if llm_ready
-            else ("rehearsed_fallback" if settings.maida_demo_mode else "unavailable")
-        ),
+        # No fallback mode exists: extraction is live or plainly unavailable.
+        "extraction_mode": "live" if llm_ready else "unavailable",
     }
 
 
@@ -163,11 +159,11 @@ def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
     StatisticalExtractor LLM pipeline produces an ExtractedEffect.  The result
     is persisted in the study store and returned to the caller.
 
-    When live extraction is unavailable (no API key, no network, or a provider
-    error) and demo mode is enabled, a rehearsed fallback record is returned
-    instead of an error so a defence walkthrough survives a dead connection.
-    The fallback is stamped as such and always requires human verification;
-    with demo mode off, the original error propagates unchanged.
+    There is NO fallback path: when live extraction is unavailable (no API
+    key, no network, provider error) the error surfaces as a visible status,
+    demo mode or not. A tool whose contribution is data integrity must never
+    answer a real upload with an invented record (finding E1). Records whose
+    statistics arrive without verbatim evidence are rejected with 422.
     """
     # Decode PDF bytes
     try:
@@ -193,14 +189,15 @@ def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
         effect: ExtractedEffect = extractor.extract_from_text(
             full_text, request.paper_metadata
         )
+    except EvidenceMissingError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "Extraction rejected: the model proposed statistics without "
+                f"verbatim evidence from the paper ({exc}). No record was created."
+            ),
+        ) from exc
     except Exception as exc:
-        if settings.maida_demo_mode:
-            logger.warning(
-                "Live extraction unavailable (%s); returning rehearsed fallback "
-                "because demo mode is on.",
-                exc,
-            )
-            return _studies.put(build_fallback_entry(request.paper_metadata))
         if isinstance(exc, HTTPException):
             raise
         logger.exception("Extraction failed")

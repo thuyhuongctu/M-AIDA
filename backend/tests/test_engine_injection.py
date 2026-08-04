@@ -44,6 +44,8 @@ class TestEngineInjection:
                 "effect_df": 100,
                 "doi_measure": "FSTS",
                 "performance_measure": "ACC",
+                "evidence_page": 5,
+                "evidence_quote": "Model 2 reports t = 2.5 for FSTS (n = 102).",
             }
         )
         extractor = StatisticalExtractor(engine=engine)

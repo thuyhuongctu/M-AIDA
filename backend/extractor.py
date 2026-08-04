@@ -59,6 +59,10 @@ Extract ONLY the following statistics:
 - F  : F-statistic (for context; not directly convertible)
 - p  : reported p-value (exact or inequality, e.g. p < 0.05)
 - CI : 95 % confidence interval for r if reported
+- evidence_page  : 1-based page number where the focal statistic appears
+- evidence_quote : the VERBATIM sentence (or table caption row) from the text
+                   that contains the focal statistic. Copy it exactly; do not
+                   paraphrase. If you cannot quote it, return null statistics.
 
 Also classify the study on these two text-determinable dimensions, and report
 the data window:
@@ -89,6 +93,8 @@ Return a single JSON object - no markdown, no prose - with exactly these keys:
   "p_value": <float|null>,
   "ci_lower": <float|null>,
   "ci_upper": <float|null>,
+  "evidence_page": <int|null>,
+  "evidence_quote": <string|null>,
   "doi_measure": <"FSTS"|"GEO"|"EXP"|"FDI"|"COMP"|"OTH"|null>,
   "performance_measure": <"ACC"|"MKT"|"LAB"|"MIX"|null>
 }
@@ -100,7 +106,18 @@ Rules:
    boundary value (0.001).
 4. If the paper reports a negative t or β, preserve the sign.
 5. Never hallucinate statistics; return null for any field not found.
+6. evidence_quote is MANDATORY whenever any statistic is non-null: a record
+   without verbatim evidence will be rejected by the pipeline.
 """
+
+
+class EvidenceMissingError(ValueError):
+    """The model proposed statistics without verbatim evidence (finding E1).
+
+    A record whose numbers cannot be traced to a page and sentence in the
+    source PDF is indistinguishable from a default; it is rejected at the
+    gate, not created-and-flagged.
+    """
 
 
 class StatisticalExtractor:
@@ -398,6 +415,19 @@ class StatisticalExtractor:
             )
             variance_formula = "(1 - r^2)^2 / (n - 1)"
 
+        evidence_page_raw = raw.get("evidence_page")
+        evidence_page: int | None = (
+            int(evidence_page_raw) if evidence_page_raw is not None else None
+        )
+        evidence_quote: str | None = (raw.get("evidence_quote") or "").strip() or None
+        if computed_r is not None and not evidence_quote:
+            # E1 gate: statistics with no verbatim evidence are rejected
+            # outright — an unevidenced number is indistinguishable from a
+            # default value.
+            raise EvidenceMissingError(
+                "statistics proposed with no evidence_quote"
+            )
+
         requires_verification = (
             confidence < CONFIDENCE_REVIEW_THRESHOLD
             or beta_outside_pb_domain
@@ -451,6 +481,8 @@ class StatisticalExtractor:
             cdai_score=cdai_score,
             dpl_phase=dpl_phase,
             n_predictors=n_predictors,
+            evidence_page=evidence_page,
+            evidence_quote=evidence_quote,
             metric_type=metric_type,
             estimand_source=estimand_source,
             source_controls=source_controls,

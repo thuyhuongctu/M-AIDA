@@ -1,25 +1,24 @@
 """
-Regression tests for the defence-demo hardening.
+Regression tests for extraction integrity (finding E1) and persistence.
 
-Three properties are pinned here because each one, if it silently broke, would
-break in front of an audience rather than in development:
+Pinned properties:
 
 1. Verified and locked records survive a backend restart.
-2. The rehearsed fallback is reachable ONLY in demo mode, is stamped as a
-   fallback, and can never arrive pre-verified.
-3. /api/health reports the mode the next upload will actually take, which is
-   what the on-screen status strip renders.
-
-The presenter-facing reset route lives in ``demo/run_defense.py`` behind a PIN
-and is covered by ``demo/smoke_test.py``; it is deliberately not duplicated in
-the API layer, because two implementations of the same path would shadow each
-other at registration time.
+2. There is NO fallback path: with no API key, /api/extract surfaces an
+   error in demo mode and production alike. A tool whose contribution is
+   data integrity must never answer a real upload with an invented record.
+3. /api/health reports extraction as live or plainly unavailable - no
+   third mode exists.
+4. Two different PDFs must never yield identical records (the E1 failure
+   shape), and statistics without verbatim evidence are rejected with 422.
 """
 
 from __future__ import annotations
 
 import base64
 import importlib
+import json
+import re
 import sys
 from pathlib import Path
 
@@ -29,13 +28,13 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
-def _make_pdf() -> str:
+def _make_pdf(marker: str = "t = 2.40, df = 248") -> str:
     """Return a Base64 one-page PDF so the route reaches the extractor stage."""
     import fitz
 
     doc = fitz.open()
     page = doc.new_page()
-    page.insert_text((72, 72), "Rehearsal paper. t = 2.40, df = 248.")
+    page.insert_text((72, 72), f"Rehearsal paper. {marker}.")
     data = doc.tobytes()
     doc.close()
     return base64.b64encode(data).decode()
@@ -56,12 +55,56 @@ def _client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, demo: bool) -> T
     return TestClient(main.app)
 
 
+class EchoEngine:
+    """Engine whose output depends on the input text.
+
+    Parses "r = <value> (n = <n>)" out of the user prompt, so different PDFs
+    produce different records - the property E1 violated.
+    """
+
+    provider = "echo"
+    model = "echo-1"
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> str:
+        m = re.search(r"r = (-?[\d.]+) \(n = (\d+)\)", user)
+        if not m:
+            return json.dumps({})
+        return json.dumps({
+            "effect_r": float(m.group(1)),
+            "sample_n": int(m.group(2)),
+            "evidence_page": 1,
+            "evidence_quote": m.group(0),
+        })
+
+
+class NoEvidenceEngine:
+    """Engine that proposes statistics but never quotes the source (E1 gate)."""
+
+    provider = "noev"
+    model = "noev-1"
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> str:
+        return json.dumps({"effect_r": 0.25, "sample_n": 50})
+
+
+def _inject(main_module, engine) -> None:
+    from extractor import StatisticalExtractor
+
+    main_module._get_extractor = lambda: StatisticalExtractor(engine=engine)
+
+
 def test_records_survive_a_restart(tmp_path, monkeypatch):
     """A locked record must still be there after the process is replaced."""
-    client = _client(tmp_path, monkeypatch, demo=True)
+    client = _client(tmp_path, monkeypatch, demo=False)
+    import main as main_module
+
+    _inject(main_module, EchoEngine())
     entry = client.post(
         "/api/extract",
-        json={"pdf_content": _make_pdf(), "paper_metadata": {"title": "Rehearsal"}},
+        json={
+            "pdf_content": _make_pdf("r = 0.24 (n = 231)"),
+            "paper_metadata": {"title": "Rehearsal"},
+        },
     ).json()
     study_id = entry["study_id"]
 
@@ -72,40 +115,60 @@ def test_records_survive_a_restart(tmp_path, monkeypatch):
     assert client.post(f"/api/studies/{study_id}/lock").status_code == 200
 
     # Same database file, brand-new app instance: this is the restart.
-    restarted = _client(tmp_path, monkeypatch, demo=True)
+    restarted = _client(tmp_path, monkeypatch, demo=False)
     reloaded = restarted.get(f"/api/studies/{study_id}")
     assert reloaded.status_code == 200
     assert reloaded.json()["pi_locked"] is True
     assert restarted.get("/api/studies/export/csv").status_code == 200
 
 
-def test_fallback_is_demo_only_and_clearly_stamped(tmp_path, monkeypatch):
-    """With no API key: demo mode yields a stamped fallback, production a 503."""
-    demo_client = _client(tmp_path / "demo", monkeypatch, demo=True)
-    entry = demo_client.post(
-        "/api/extract", json={"pdf_content": _make_pdf(), "paper_metadata": {}}
-    ).json()
-    assert entry["machine_proposal"]["extraction_source"] == "rehearsed_fallback"
-    assert "NOT A LIVE EXTRACTION" in entry["pi_notes"]
-    # A fallback record must always pass through a human decision.
-    assert entry["requires_verification"] is True
-    assert entry["pi_locked"] is False
-
-    prod_client = _client(tmp_path / "prod", monkeypatch, demo=False)
-    assert (
-        prod_client.post(
+def test_no_fallback_in_any_mode(tmp_path, monkeypatch):
+    """With no API key, demo mode and production both surface the error."""
+    for label, demo in (("demo", True), ("prod", False)):
+        client = _client(tmp_path / label, monkeypatch, demo=demo)
+        res = client.post(
             "/api/extract", json={"pdf_content": _make_pdf(), "paper_metadata": {}}
-        ).status_code
-        == 503
+        )
+        assert res.status_code == 503, f"{label}: expected plain 503, got {res.status_code}"
+
+
+def test_health_never_reports_a_fallback_mode(tmp_path, monkeypatch):
+    for label, demo in (("demo", True), ("prod", False)):
+        health = _client(tmp_path / label, monkeypatch, demo=demo).get("/api/health").json()
+        assert health["storage"] == "sqlite"
+        assert health["llm_ready"] is False
+        assert health["extraction_mode"] == "unavailable"
+
+
+def test_two_different_pdfs_give_two_different_records(tmp_path, monkeypatch):
+    """The E1 regression: identical outputs for different inputs = defect."""
+    client = _client(tmp_path, monkeypatch, demo=False)
+    import main as main_module
+
+    _inject(main_module, EchoEngine())
+    a = client.post(
+        "/api/extract",
+        json={"pdf_content": _make_pdf("r = 0.24 (n = 231)"), "paper_metadata": {}},
+    ).json()
+    b = client.post(
+        "/api/extract",
+        json={"pdf_content": _make_pdf("r = -0.05 (n = 88)"), "paper_metadata": {}},
+    ).json()
+    assert a["effect_r"] != b["effect_r"]
+    assert a["sample_n"] != b["sample_n"]
+    assert a["evidence_quote"] != b["evidence_quote"]
+
+
+def test_statistics_without_evidence_are_rejected(tmp_path, monkeypatch):
+    """The E1 gate: an unevidenced record is refused, not created-and-flagged."""
+    client = _client(tmp_path, monkeypatch, demo=False)
+    import main as main_module
+
+    _inject(main_module, NoEvidenceEngine())
+    res = client.post(
+        "/api/extract", json={"pdf_content": _make_pdf(), "paper_metadata": {}}
     )
-
-
-def test_health_reports_the_mode_the_next_upload_will_take(tmp_path, monkeypatch):
-    """The status strip depends on these fields, so pin their contract."""
-    demo_health = _client(tmp_path / "demo", monkeypatch, demo=True).get("/api/health").json()
-    assert demo_health["storage"] == "sqlite"
-    assert demo_health["llm_ready"] is False
-    assert demo_health["extraction_mode"] == "rehearsed_fallback"
-
-    prod_health = _client(tmp_path / "prod", monkeypatch, demo=False).get("/api/health").json()
-    assert prod_health["extraction_mode"] == "unavailable"
+    assert res.status_code == 422
+    assert "evidence" in res.json()["detail"].lower()
+    # And nothing was persisted.
+    assert client.get("/api/health").json()["study_count"] == 0

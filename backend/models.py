@@ -122,6 +122,19 @@ class ExtractedEffect(BaseModel):
             "at Gate 2."
         ),
     )
+    evidence_page: int | None = Field(
+        None,
+        ge=1,
+        description="1-based page in the source PDF where the focal statistic appears",
+    )
+    evidence_quote: str | None = Field(
+        None,
+        description=(
+            "Verbatim sentence (or table caption row) containing the focal "
+            "statistic. MANDATORY whenever statistics are present: a record "
+            "without evidence is rejected at extraction, never created (E1)."
+        ),
+    )
     estimand_source: EstimandSource | None = Field(
         None,
         description=(

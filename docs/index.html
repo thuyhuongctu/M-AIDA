@@ -1637,18 +1637,20 @@ a{color:var(--brand);text-decoration:none;}
   <div class="wrap">
       <!-- STEP 1: UPLOAD -->
     <section class="card" id="uploadCard">
-      <h2 data-i18n data-en="1 · Upload a full-text PDF" data-vi="1 · Tải lên tệp PDF toàn văn">1 · Upload a full-text PDF</h2>
-      <div class="sub" data-i18n data-en="The full tool extracts these fields from the PDF with a language model. For this offline demo you can also drop a CSV with columns: author, year, stat_type (r, t or beta), value, n, df, country, moderator." data-vi="Công cụ đầy đủ dùng mô hình ngôn ngữ để trích các trường này từ PDF. Với bản demo ngoại tuyến, bạn cũng có thể thả một tệp CSV gồm các cột: author, year, stat_type (r, t hoặc beta), value, n, df, country, moderator.">The full tool extracts these fields from the PDF with a language model. For this offline demo you can also drop a CSV with columns: author, year, stat_type (r, t or beta), value, n, df, country, moderator.</div>
+      <h2 data-i18n data-en="1 · Pick a sample paper or drop a statistics CSV" data-vi="1 · Chọn bài mẫu hoặc thả CSV thống kê">1 · Pick a sample paper or drop a statistics CSV</h2>
+      <div class="sub" data-i18n data-en="Reading a PDF needs the local M-AIDA backend with a model key; this offline demo does not read PDFs and will say so if you drop one. Pick a sample paper below - each shows one conversion path - or drop a CSV with columns: author, year, stat_type (r, t or beta), value, n, n_predictors, df, country, moderator." data-vi="Đọc PDF cần backend M-AIDA cục bộ có khóa mô hình; bản demo ngoại tuyến này không đọc PDF và sẽ nói thẳng nếu bạn thả vào. Hãy chọn một bài mẫu bên dưới - mỗi bài minh họa một đường chuyển đổi - hoặc thả CSV gồm các cột: author, year, stat_type (r, t hoặc beta), value, n, n_predictors, df, country, moderator.">Reading a PDF needs the local M-AIDA backend with a model key; this offline demo does not read PDFs and will say so if you drop one. Pick a sample paper below - each shows one conversion path - or drop a CSV with columns: author, year, stat_type (r, t or beta), value, n, n_predictors, df, country, moderator.</div>
 
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload PDF or CSV">
         <div class="ic">&#8682;</div>
-        <div class="big" data-i18n data-en="Drop a PDF here (or a CSV of statistics), or click to choose" data-vi="Thả tệp PDF vào đây (hoặc CSV thống kê), hoặc bấm để chọn">Drop a PDF here (or a CSV of statistics), or click to choose</div>
+        <div class="big" data-i18n data-en="Drop a statistics CSV here, or click to choose (PDFs are refused, not faked)" data-vi="Thả tệp CSV thống kê vào đây, hoặc bấm để chọn (PDF sẽ bị từ chối, không bịa kết quả)">Drop a statistics CSV here, or click to choose (PDFs are refused, not faked)</div>
         <div class="small" id="dropName">PDF &middot; CSV</div>
       </div>
       <input type="file" id="fileIn" accept=".pdf,.csv,application/pdf,text/csv" style="display:none">
 
       <div class="rowbtns">
-        <button class="btn" id="sampleBtn" data-i18n data-en="Load a sample dataset" data-vi="Nạp bộ dữ liệu mẫu">Load a sample dataset</button>
+        <button class="btn" id="sampleR" data-i18n data-en="Sample A · direct r" data-vi="Mẫu A · r trực tiếp">Sample A · direct r</button>
+        <button class="btn" id="sampleT" data-i18n data-en="Sample B · t &#8594; r, df = n &#8722; p &#8722; 1" data-vi="Mẫu B · t &#8594; r, df = n &#8722; p &#8722; 1">Sample B · t &#8594; r, df = n &#8722; p &#8722; 1</button>
+        <button class="btn" id="sampleB" data-i18n data-en="Sample C · &#946; (sensitivity only)" data-vi="Mẫu C · &#946; (chỉ độ nhạy)">Sample C · &#946; (sensitivity only)</button>
         <button class="btn ghost" id="tplBtn" data-i18n data-en="Download the CSV template" data-vi="Tải mẫu CSV trống">Download the CSV template</button>
       </div>
     </section>
@@ -1678,7 +1680,7 @@ a{color:var(--brand);text-decoration:none;}
           <tbody id="tbody"></tbody>
         </table>
       </div>
-      <div class="empty" id="emptyMsg" data-i18n data-en="No records yet. Upload a PDF or CSV, or load the sample dataset above." data-vi="Chưa có bản ghi. Hãy tải lên PDF hoặc CSV, hoặc nạp bộ dữ liệu mẫu ở trên.">No records yet. Upload a PDF or CSV, or load the sample dataset above.</div>
+      <div class="empty" id="emptyMsg" data-i18n data-en="No records yet. Pick a sample paper above or drop a statistics CSV." data-vi="Chưa có bản ghi. Hãy chọn một bài mẫu ở trên hoặc thả CSV thống kê.">No records yet. Upload a PDF or CSV, or load the sample dataset above.</div>
 
       <div class="method" data-i18n data-en="Conversions: r is taken directly (confidence 1.0). t becomes r = t / sqrt(t^2 + df); when df is absent it is derived as n - p - 1 from the model's predictor count, never as a bare n - 2 (confidence 0.8, Cohen 1988). beta becomes r = 0.98 * beta + 0.05 * lambda, lambda = 1 when beta >= 0 (Peterson and Brown 2005, valid for |beta| <= 0.5; outside that domain no conversion is made). Zero-order and partial correlations carry different variance formulas and are coded separately. Any record below 0.70 is flagged." data-vi="Chuyển đổi: r lấy trực tiếp (độ tin cậy 1,0). t thành r = t / sqrt(t^2 + df); khi thiếu df thì suy ra bằng n - p - 1 từ số biến giải thích của mô hình, không bao giờ lấy mặc định n - 2 (độ tin cậy 0,8, Cohen 1988). beta thành r = 0,98 * beta + 0,05 * lambda, lambda = 1 khi beta >= 0 (Peterson và Brown 2005, chỉ hợp lệ khi |beta| <= 0,5; ngoài khoảng đó không quy đổi). Tương quan bậc không và tương quan riêng phần dùng công thức phương sai khác nhau và được mã riêng. Bản ghi dưới 0,70 được gắn cờ.">Conversions: r is taken directly (confidence 1.0). t becomes r = t / sqrt(t^2 + df); when df is absent it is derived as n - p - 1 from the model's predictor count, never as a bare n - 2 (confidence 0.8, Cohen 1988). beta becomes r = 0.98 * beta + 0.05 * lambda, lambda = 1 when beta >= 0 (Peterson and Brown 2005, valid for |beta| <= 0.5; outside that domain no conversion is made). Zero-order and partial correlations carry different variance formulas and are coded separately. Any record below 0.70 is flagged.</div>
     </section>
@@ -2368,12 +2370,12 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
     var need=['author','year','stat_type','value'];
     var hasHeader=need.every(function(k){return idx[k]!=null;});
     var start=hasHeader?1:0;
-    var cols=hasHeader?idx:{author:0,year:1,stat_type:2,value:3,n:4,df:5,country:6,moderator:7};
+    var cols=hasHeader?idx:{author:0,year:1,stat_type:2,value:3,n:4,n_predictors:5,df:6,country:7,moderator:8};
     var out=[];
     for(var r=start;r<rows.length;r++){
       var a=rows[r];
       function g(k){return cols[k]!=null&&a[cols[k]]!=null?a[cols[k]].trim():'';}
-      var rec={author:g('author'),year:g('year'),stat_type:g('stat_type'),value:g('value'),n:g('n'),df:g('df'),country:g('country'),moderator:g('moderator')};
+      var rec={author:g('author'),year:g('year'),stat_type:g('stat_type'),value:g('value'),n:g('n'),n_predictors:g('n_predictors'),df:g('df'),country:g('country'),moderator:g('moderator')};
       if(!rec.author&&!rec.value)continue;
       var cv=convert(rec);
       rec.status='proposed';
@@ -2451,22 +2453,31 @@ const LAND_D = "M334.5,453.4 333.7,454.8 332.9,456.0 327.1,455.6 320.9,455.8 317
   drop.addEventListener('dragleave',function(){drop.classList.remove('over');});
   drop.addEventListener('drop',function(e){e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);});
   fileIn.onchange=function(){if(fileIn.files[0])readFile(fileIn.files[0]);};
-  function readFile(f){var isPdf=/\.pdf$/i.test(f.name)||f.type==='application/pdf';if(isPdf){document.getElementById('dropName').textContent=f.name+' · '+(isVI()?'demo: mẫu đã trích (cần backend để đọc PDF thật)':'demo: sample extraction (real PDF reading needs the backend)');loadCSV(SAMPLE);return;}document.getElementById('dropName').textContent=f.name+' · '+(f.size/1024).toFixed(1)+' KB';var rd=new FileReader();rd.onload=function(){loadCSV(rd.result);};rd.readAsText(f);}
+  function readFile(f){var isPdf=/\.pdf$/i.test(f.name)||f.type==='application/pdf';if(isPdf){document.getElementById('dropName').textContent=f.name+' · '+(isVI()?'KHÔNG ĐỌC: bản demo này không đọc PDF. Đọc PDF cần backend cục bộ có khóa mô hình — chọn một bài mẫu bên dưới hoặc thả CSV thống kê.':'NOT READ: this demo does not read PDFs. PDF reading needs the local backend with a model key - pick a sample paper below or drop a statistics CSV.');return;}document.getElementById('dropName').textContent=f.name+' · '+(f.size/1024).toFixed(1)+' KB';var rd=new FileReader();rd.onload=function(){loadCSV(rd.result);};rd.readAsText(f);}
 
   // --- sample + template + export ---
-  var SAMPLE='author,year,stat_type,value,n,df,country,moderator\n'+
-    'Lu & Beamish,2004,t,3.21,164,,Multi,manufacturing\n'+
-    'Contractor et al.,2003,beta,0.14,88,,Multi,services\n'+
-    'Chiao & Yang,2011,r,-0.022,320,,Taiwan,SME\n'+
-    'Pangarkar,2008,r,0.08,150,,Singapore,\n'+
-    'Xiao et al.,2013,beta,-0.034,1408,,China,listed\n'+
-    'Kotabe et al.,2002,t,2.05,180,,Multi,\n'+
-    'Thi Ngoc Huynh et al.,2018,r,-0.051,270,,Vietnam,non-state\n'+
-    'Denis Denis & Yost,2002,beta,-0.06,540,,United States,\n';
-  var TEMPLATE='author,year,stat_type,value,n,df,country,moderator\n'+
-    'Example Author,2020,t,2.5,120,,Country,moderator\n';
+  // Ba bài mẫu đã trích sẵn (minh họa, không phải kho P6): mỗi bộ trình
+  // diễn một đường chuyển đổi. PDF thật chỉ đọc được ở backend cục bộ.
+  var HEAD='author,year,stat_type,value,n,n_predictors,df,country,moderator\n';
+  var SAMPLE_R=HEAD+
+    'Lu & Beamish,2004,r,0.24,231,,,Multi,manufacturing\n'+
+    'Kotabe et al.,2002,r,0.15,175,,,Multi,\n'+
+    'Chiao & Yang,2011,r,-0.022,320,,,Taiwan,SME\n';
+  var SAMPLE_T=HEAD+
+    'Contractor et al.,2003,t,2.14,231,10,,Multi,services\n'+
+    'Pangarkar,2008,t,1.98,142,9,,Singapore,\n'+
+    'Kotabe et al.,2002,t,2.05,180,,178,Multi,\n';
+  var SAMPLE_B=HEAD+
+    'Chiao & Yang,2011,beta,0.18,268,11,,Taiwan,SME\n'+
+    'Denis Denis & Yost,2002,beta,-0.22,310,13,,United States,\n'+
+    'Xiao et al.,2013,beta,-0.031,198,8,,China,listed\n';
+  var TEMPLATE='author,year,stat_type,value,n,n_predictors,df,country,moderator\n'+
+    'Example Author,2020,t,2.5,120,8,,Country,moderator\n';
   function download(name,text){var blob=new Blob([text],{type:'text/csv;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},1500);}
-  document.getElementById('sampleBtn').onclick=function(){document.getElementById('dropName').textContent='sample_statistics.csv · demo';loadCSV(SAMPLE);};
+  function loadSample(name,csv){document.getElementById('dropName').textContent=name+' · '+(isVI()?'bản ghi đã trích sẵn (minh họa)':'pre-extracted records (illustrative)');loadCSV(csv);}
+  document.getElementById('sampleR').onclick=function(){loadSample('sample_direct_r.csv',SAMPLE_R);};
+  document.getElementById('sampleT').onclick=function(){loadSample('sample_t_to_r.csv',SAMPLE_T);};
+  document.getElementById('sampleB').onclick=function(){loadSample('sample_beta.csv',SAMPLE_B);};
   document.getElementById('tplBtn').onclick=function(){download('maida_template.csv',TEMPLATE);};
   document.getElementById('exportBtn').onclick=function(){
     var locked=RECS.filter(function(r){return r.status==='locked'&&!r.conv.error;});

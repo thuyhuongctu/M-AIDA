@@ -54,6 +54,34 @@ lại (bước 2) trước khi chạy lại mô hình gộp.
   khai hạ `r̄ = .074` xuống trạng thái tạm thời (thuộc v7.1.1, chờ thế hệ
   khóa v8.0.0) ở ô KPI, đoạn phương pháp và chú thích biểu đồ rừng.
 
+## Chưa phát hành: E1 — không bao giờ bịa kết quả trích xuất (04/08/2026)
+
+Sổ đăng ký vấn đề E1: đường tải PDF trả về cùng một kết quả cho mọi tệp,
+mâu thuẫn với chính tuyên bố "không có khóa thì nói thẳng, không bịa".
+
+- Demo trong trình duyệt (index.html + docs/index.html): PDF thả vào bị
+  TỪ CHỐI tường minh kèm lời giải thích, không nạp mẫu ngầm nữa; thay
+  bằng ba bài mẫu bấm chọn minh họa đúng ba đường chuyển đổi (r trực
+  tiếp / t → r suy df = n − p − 1 / β chỉ độ nhạy); CSV thêm cột
+  n_predictors; toàn bộ nhãn nói rõ "bản ghi đã trích sẵn (minh họa)".
+- Backend: GỠ BỎ hoàn toàn đường fallback diễn tập (demo_fallback.py và
+  nhánh trả fallback trong /api/extract) — trích xuất lỗi thì lỗi hiện
+  lên thành trạng thái, demo mode hay không; /api/health chỉ còn hai chế
+  độ live / unavailable.
+- Cổng dẫn chứng: hai trường mới `evidence_page` + `evidence_quote`
+  (câu nguyên văn chứa thống kê tiêu điểm) bắt buộc trong prompt và lược
+  đồ; thống kê không kèm dẫn chứng bị TỪ CHỐI 422, không tạo bản ghi
+  (EvidenceMissingError).
+- Kiểm thử hồi quy E1: hai PDF khác nhau phải cho hai bản ghi khác nhau;
+  không khóa thì 503 ở mọi chế độ; thiếu dẫn chứng thì 422 và store
+  trống. 62 test đạt.
+
+Rà soát E2 kèm theo (kho 236 có nhiễm bản ghi mặc định không?): 0 khớp
+với bản ghi diễn tập; 12 cụm trùng (r, n) khác study — 22/26 thành viên
+là is_estimated=1 thuộc dải S190+ với n tròn, trùng đúng nhóm 47 bản ghi
+phải thu hồi thống kê nguồn. Báo cáo và bảng đối chiếu ngược nằm ở
+p6/data/v8/ (kho luận án).
+
 ## Chưa phát hành: bộ trình diễn `demo/` (15/07/2026)
 
 Đóng gói trình diễn, KHÔNG thay đổi mã lõi 7.1.x: `demo/run_defense.py`

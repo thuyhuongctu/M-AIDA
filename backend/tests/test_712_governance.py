@@ -32,8 +32,16 @@ class FakeEngine:
         return json.dumps(self._payload)
 
 
+DEFAULT_EVIDENCE = {
+    "evidence_page": 7,
+    "evidence_quote": "Table 3 reports the focal coefficient for DOI.",
+}
+
+
 def _extract(payload: dict):
-    ex = StatisticalExtractor(engine=FakeEngine(payload))
+    # Evidence is mandatory whenever statistics are present (E1); tests that
+    # probe the missing-evidence gate override these defaults explicitly.
+    ex = StatisticalExtractor(engine=FakeEngine({**DEFAULT_EVIDENCE, **payload}))
     return ex.extract_from_text("dummy", {"title": "T", "authors": "A", "year": 2020, "country": "VN"})
 
 
@@ -134,7 +142,7 @@ class TestGovernanceApi:
             app_module,
             "_get_extractor",
             lambda: StatisticalExtractor(
-                engine=FakeEngine({"effect_r": 0.25, "sample_n": 50})
+                engine=FakeEngine({"effect_r": 0.25, "sample_n": 50, **DEFAULT_EVIDENCE})
             ),
         )
         return TestClient(app_module.app)
