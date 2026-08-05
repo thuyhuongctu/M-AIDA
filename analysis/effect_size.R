@@ -207,3 +207,13 @@ if (sys.nframe() == 0) {
 ## sc <- rma.mv(yi, vi, mods = ~ intl_level + I(intl_level^2) + I(intl_level^3),
 ##              random = ~ 1 | study_id/effect_id, data = datp)
 ## ## Dấu kỳ vọng theo Contractor et al. (2003) và Lu & Beamish (2004): - + -
+##
+## ## 8. Dạng hàm của nghiên cứu gốc — BIẾN ĐIỀU TIẾT, không phải kiểm độ vững
+## ## Tỷ lệ báo cáo phi tuyến khác hẳn giữa nhóm con (Wu 2022, EMNE: 47,7%;
+## ## Y&D 2012, toàn cầu tới 2011: 18,6%) — tức functional_form đồng biến với
+## ## chính các biến điều tiết P6 quan tâm (chế độ thể chế, mới nổi/phát
+## ## triển). Vì vậy nó vào mô hình như một moderator được ước lượng:
+## ff <- rma.mv(yi, vi, mods = ~ factor(functional_form),
+##              random = ~ 1 | study_id/effect_id, data = datp)
+## ## và kiểm tương tác với bối cảnh thể chế nếu đủ ô:
+## ## rma.mv(yi, vi, mods = ~ factor(functional_form) * icrv, ...)

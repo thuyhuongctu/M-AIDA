@@ -46,7 +46,8 @@ V8_FIELDS = [
     # biến điều tiết đã có ở v7.1.1 (đổi tên theo lược đồ mới)
     "icrv", "cdai", "dpl", "intl_measure", "perf_measure", "include_flag",
     # thống kê
-    "n", "stat_type", "source_value", "r_v711", "r_v8", "delta_r",
+    "n", "stat_type", "effect_extracted_from", "source_value",
+    "r_v711", "r_v8", "delta_r",
     "metric_type", "estimand_source", "source_controls", "r_source", "n_source",
     "variance", "variance_formula", "fisher_z", "var_z",
     "df", "df_source", "n_predictors", "lambda_applied", "beta_in_range",
@@ -54,6 +55,12 @@ V8_FIELDS = [
     # trường mã hóa mới — PI điền, script không đoán
     "selection_rule", "sample_id", "sample_id_suggested",
     "coder_1", "coder_2", "model_version", "prompt_hash", "intl_level",
+    # dạng hàm mà NGHIÊN CỨU GỐC báo cáo (linear/quadratic/cubic/other) —
+    # BIẾN ĐIỀU TIẾT trong meta-regression, không phải kiểm tra độ vững:
+    # tỷ lệ phi tuyến khác hẳn giữa các nhóm con (Wu 2022 EMNE 47,7% so với
+    # Y&D 2012 toàn cầu 18,6%), tức nó đồng biến với chính các biến điều
+    # tiết P6 quan tâm.
+    "functional_form",
     "notes",
 ]
 
@@ -66,6 +73,15 @@ RECOVERY_FIELDS = [
     # hình chính, không quy đổi, không đụng A1/A2). Chỉ lấy hệ số hồi quy
     # (t hoặc beta) khi bài KHÔNG có bảng tương quan.
     "stat_type",        # r | t | beta  (ưu tiên theo đúng thứ tự này)
+    # QUAN TRỌNG HƠN CẢ stat_type: con số được lấy từ ĐẶC TẢ NÀO của bài?
+    #   bivariate                      — bảng tương quan / thống kê hai biến
+    #   linear_term_in_linear_model    — hệ số DOI trong mô hình chỉ có bậc nhất
+    #   linear_term_in_quadratic_model — hệ số bậc nhất trong mô hình CÓ bậc hai
+    #                                    -> KHÔNG phải tương quan theo bất kỳ
+    #                                    nghĩa nào (là độ dốc tại một điểm);
+    #                                    script LOẠI khỏi gộp, không quy đổi
+    #   other                          — ghi rõ ở recovery_source, chờ rà
+    "effect_extracted_from",
     "source_value",     # giá trị t hoặc beta như bài báo cáo
     "n_reported",       # CỠ MẪU THẬT từ bài — BẮT BUỘC. n của v7.1.1 trong
                         # nhóm này 91% chia hết cho 10, tức là điền ước lượng;
@@ -220,6 +236,24 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 continue
 
             n_true = int(n_rep_raw)
+            eff_from = (rec.get("effect_extracted_from") or "").strip().lower()
+            row["effect_extracted_from"] = eff_from
+            if eff_from == "linear_term_in_quadratic_model":
+                # Độ dốc tại một điểm (thường DOI = 0 hoặc tại trung bình),
+                # không phải liên hệ trung bình — gộp vào r̄ là vô nghĩa,
+                # không phải nhiễu. Không quy đổi, không vào cả độ nhạy.
+                why = ("hệ số bậc nhất trích từ mô hình có số hạng bậc hai — "
+                       "không phải tương quan, loại khỏi gộp (PRISMA D1)")
+                row["stat_type"] = rec.get("stat_type", "")
+                row["source_value"] = rec.get("source_value", "")
+                row["n"] = n_true
+                row["n_source"] = "reported"
+                row["flagged"] = True
+                row["notes"] = (row["notes"] + "; " if row["notes"] else "") + \
+                    f"LOẠI TRỪ KHỎI GỘP: {why}"
+                rows.append(row)
+                excluded.append((src["effect_id"], why))
+                continue
             try:
                 _fill_from_conversion(
                     row,
