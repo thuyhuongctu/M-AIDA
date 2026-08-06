@@ -111,10 +111,6 @@
   header.site .wrap { display:flex; align-items:center; gap:1rem 1.2rem; padding:0.7rem 1.5rem; flex-wrap:wrap; }
   .brand { display:inline-flex; align-items:center; gap:0.6rem; color:var(--ink); }
   .brand:hover { text-decoration:none; }
-  .brand-mark {
-    position:relative; width:1.05rem; height:1.05rem; border-radius:50%; background:var(--brand);
-    box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--brand),0 0 0 5px var(--brand-soft); flex:none;
-  }
   .brand-name { font-family:var(--mono); font-weight:600; letter-spacing:0.01em; font-size:1rem; }
   .brand-sub { font-family:var(--mono); font-size:0.55rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--faint); }
   .hdr-right { display:flex; align-items:center; gap:0.7rem; }
@@ -1058,7 +1054,7 @@ a{color:var(--brand);text-decoration:none;}
 <header class="site">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="M-AIDA home">
-      <span class="brand-mark" aria-hidden="true"></span>
+      <svg class="brand-mark-svg" width="44" height="21" viewBox="179.0 188.8 38.0 18.5" aria-hidden="true" style="flex:none"><path fill="none" stroke-width="1.6" stroke-linecap="round" stroke="var(--line-2)" stroke-miterlimit="4" d="M 1.00001 24.000011 L 10.00001 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill="none" stroke-width="1.6" stroke-linecap="round" stroke="var(--line-2)" stroke-miterlimit="4" d="M 38.000012 24.000011 L 47.000012 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill="none" stroke-width="2" stroke-linecap="butt" stroke-linejoin="round" stroke="var(--ink)" stroke-miterlimit="4" d="M 10.00001 24.000011 L 24.000011 14.000011 L 24.000011 34.000011 Z M 10.00001 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill-rule="nonzero" fill="var(--amber)" d="M 198 190.5 L 208.5 198 L 198 205.5 Z M 198 190.5 "/></svg>
       <span style="display:inline-flex; flex-direction:column; line-height:1.05;">
         <span style="display:inline-flex; align-items:center; gap:0.35rem;">
           <span class="brand-name">M-AIDA</span>
