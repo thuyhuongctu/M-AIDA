@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import os
 import sys
 
@@ -399,6 +400,37 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 f"CHÚ Ý: còn {report['pending_recovery']} bản ghi chờ thu hồi — "
                 "ba con số trên CHƯA phải bản cuối.\n"
             )
+
+    # MỘT nguồn con số cho mọi nơi hiển thị (bản thảo, trang công khai, sơ đồ
+    # PRISMA, console) — cập nhật tay nhiều chỗ thì chắc chắn sót. Chừng nào
+    # official=false, các con số gộp chỉ để định hướng; metafor ba cấp
+    # (bước 5) mới ghi đè thành bản chính thức.
+    def _pool_json(p):
+        if p is None:
+            return None
+        return {"r": round(p["r"], 4), "ci_lo": round(p["ci_lo"], 4),
+                "ci_hi": round(p["ci_hi"], 4), "k_studies": p["k_studies"],
+                "K_effects": p["K_effects"]}
+
+    figures = {
+        "lock_generation": LOCK_GENERATION,
+        "derived_from": "v7.1.1",
+        "official": False,
+        "estimator": "DL hai cấp trên thang Fisher z — chỉ định hướng",
+        "total_records": report["total"],
+        "computed": report["computed"],
+        "pending_recovery": report["pending_recovery"],
+        "excluded": report["excluded"],
+        "excluded_detail": [{"effect_id": e, "reason": w} for e, w in excluded],
+        "pool_main_observed": _pool_json(pool_main),
+        "pool_sensitivity": _pool_json(pool_sens),
+        "formula_effect_on_observed": (
+            round(pool_main["r"] - pool_main_legacy["r"], 4)
+            if pool_main and pool_main_legacy else None),
+    }
+    with open(os.path.join(out_dir, "figures.json"), "w", encoding="utf-8") as f:
+        json.dump(figures, f, ensure_ascii=False, indent=2)
+        f.write("\n")
     return report
 
 
