@@ -140,3 +140,37 @@ Cách thứ nhất dễ hơn và đọc tốt hơn.
 Nếu bản tiếng Việt chưa đạt chất lượng công bố, **để bản tiếng Anh là bản chính và ghi rõ bản tiếng Việt đang hoàn thiện** vẫn tốt hơn là phát hành một bản dịch tối nghĩa. Trang này hướng tới người đọc quốc tế, và một bản tiếng Việt kém làm giảm uy tín nhiều hơn là không có bản tiếng Việt.
 
 Nhưng nếu bản sắc Việt Nam là một phần chủ ý của dự án — mà nó đúng là vậy — thì bản tiếng Việt xứng đáng được viết như một bản gốc, không phải một bản dịch. Đó là công việc vài buổi, không phải vài giờ, và nên xếp vào sau Cổng 1 chứ không phải trước.
+
+---
+
+## Phụ lục (04/08/2026) — bốn mẫu đã duyệt và ba mẫu hình áp cho phần còn lại
+
+Bốn đoạn dưới đây do chủ dự án viết lại làm chuẩn giọng; đã áp vào trang.
+
+1. **Câu kết dòng thời gian:** «Từ những ghi chép y án thời cổ đại, qua các
+   ước lượng hình thức, đến hồi quy tổng hợp trong kinh tế học năm 1989 —
+   dòng phát triển ấy kéo dài hàng thế kỷ. M-AIDA đứng ở khâu cuối: khâu
+   trích xuất, nơi quyết định cả chuỗi có kiểm toán được hay không.»
+2. **Chú thích Hình 1:** «Dòng thời gian của tổng hợp nghiên cứu định lượng:
+   từ ghi chép y án thời cổ đại, đến hồi quy tổng hợp trong kinh tế học
+   (Stanley và Jarrell, 1989), và tới trích xuất bằng AI có người kiểm chứng
+   ngày nay.»
+3. **Khử «được» bị động:** «Trang này chỉ gồm tệp tĩnh nên không chạy được
+   máy chủ Python. […] Vì vậy bảng điều khiển phân phối dưới dạng mã nguồn,
+   người dùng tự chạy trên máy mình.»
+4. **Tiêu đề viết lại từ ý:** «Bảng điều khiển đã dựng nên bộ dữ liệu này.»
+   (nối phần mềm với dữ liệu — đúng đóng góp thật; bản dịch sát về laptop vô
+   tình nhấn vào giới hạn.)
+
+Ba mẫu hình:
+
+- **«từ việc + động từ»** → danh từ trần: *từ việc thu thập ghi chép* → *từ
+  những ghi chép*.
+- **Chuỗi tính từ ghép tiếng Anh** (*AI-assisted, human-verified*) → mở thành
+  cụm động từ: *trích xuất bằng AI có người kiểm chứng*.
+- **Mệnh đề quan hệ nối đuôi** → tách đôi câu; dấu gạch ngang hoặc hai chấm
+  gánh phần nối.
+
+Ghi chú công cụ: chỉ số mật độ «việc/được/sự» dùng để **xếp hạng ưu tiên**,
+không đặt ngưỡng cứng — «được» nghĩa khả năng (*kiểm toán được*, *chạy được*)
+là tự nhiên, không đếm là lỗi.
