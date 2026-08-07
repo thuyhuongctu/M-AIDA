@@ -33,3 +33,27 @@ là tạm thời. Gỡ các câu đó đi để "trông sẵn sàng" là giả v
 
 Tóm lại: thứ tự đúng là **bảng thu hồi 47 dòng → v8.0.0 → cập nhật số + gỡ ghi
 chú tạm thời → merge → công bố**, không phải sửa câu chữ trước.
+
+## Cập nhật 04/08 (đợt 2) — bốn chốt chặn mới đã cài
+
+1. **Ghi chú tạm thời do dữ liệu điều khiển**: `site-metrics.json` mang
+   `generation` + `provisional: true`; hai ghi chú trên index/docs giờ là phần
+   tử `provisional-note` riêng, trang tự gỡ khi JSON đổi `provisional: false`
+   (fetch lúc chạy; fetch hỏng thì ghi chú Ở LẠI — chiều an toàn).
+2. **Guard chặn cả hai chiều**: provisional=true mà thiếu ghi chú → fail
+   (chống gỡ non); provisional=false mà còn ghi chú → fail (chống caveat thừa).
+3. **Guard bắt chuỗi thoát lọt ra HTML** (ngoài script/style) — vừa cài đã bắt
+   thêm một `\n` thứ hai trên commercial.html mà mắt bỏ sót; đã sửa cả hai.
+4. **Guard bắt dấu phẩy thập phân trong chuỗi tiếng Việt** (quy tắc xuất xứ,
+   THUAT_NGU §4); toàn bộ data-vi đã chuyển về dấu chấm, kèm câu quy ước đặt
+   một lần ở chú thích biểu đồ rừng.
+
+BizOn: hai câu "coming soon" (EN+VI) đã đổi thành mô tả hiện trạng — sửa câu
+chữ, không phải phát triển thêm, không vi phạm đóng băng.
+
+## Xếp sau Cổng 1: viết lại bản tiếng Việt như bản gốc
+
+Theo `THUAT_NGU_VA_QUY_TAC_TIENG_VIET.md` (đã đưa vào kho): viết lại toàn bộ
+data-vi như bản gốc song song (tiêu đề viết lại không dịch; tách câu; bớt
+«việc/được»; thống nhất bảng thuật ngữ; xử lý eyebrow chữ hoa có dấu). Công
+việc vài buổi, không chặn Cổng 1, không làm trước Cổng 1.
