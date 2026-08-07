@@ -136,20 +136,43 @@ confirmed for every PRIMARY study; the freeze command enforces both gates.
    coefficient (not interactions or controls). Moderators (ICRV, DPL, cDAI) are left
    blank for the principal investigator to assign from external lookup tables.
 3. **Convert**: the canonical target is Pearson r. When only a derived statistic is
-   reported, r is computed from t using Cohen (1988), or from a standardized beta
-   using Peterson and Brown (2005). A three-level confidence score is attached.
-4. **Verify**: the principal investigator reviews each field; any record with
+   reported, r is computed from t using Cohen (1988) with df = n − p − 1 taken from
+   the model's predictor count, or from a standardized beta using Peterson and
+   Brown (2005) — full formula r = 0.98β + 0.05λ, valid only for |β| ≤ 0.5;
+   out-of-domain betas are rejected, never approximated. Each record carries
+   `metric_type`, `estimand_source`, and `source_controls`, so beta-derived values
+   enter sensitivity analysis only, and a three-level confidence score is attached.
+4. **Evidence gate**: a record is created only with page-and-quote evidence for
+   **both** the statistic and the sample size (`evidence_page`/`evidence_quote`,
+   `n_evidence_page`/`n_evidence_quote`). Missing evidence raises HTTP 422 and no
+   record is stored — the system has no default or fallback output path for any
+   input.
+5. **Verify**: the principal investigator reviews each field; any record with
    confidence below 0.70 is flagged for mandatory review.
-5. **Lock**: an approved record is permanently locked with a UTC timestamp and can no
+6. **Lock**: an approved record is permanently locked with a UTC timestamp and can no
    longer be edited. Only locked records enter the analysis export.
+
+## Effect-size recoding and lock generations (`analysis/`)
+
+The [`analysis/`](analysis/) package is the canonical, self-tested implementation
+of the conversion layer (`effect_size.py` with hand-computed unit tests, plus an
+R twin `effect_size.R` feeding the metafor pipeline). `migrate_v8.py` derives a
+new lock generation from a released dataset without ever editing it: v7.1.1
+(DOI-pinned) stays immutable, every derived record carries a `derived_from`
+pointer, and excluded records keep a written reason (PRISMA-ready). Each run
+emits `figures.json` — the single source every display surface reads its
+headline numbers from. Policy details are in
+[`analysis/README.md`](analysis/README.md).
 
 ## Live web pages (GitHub Pages)
 
 The repository is also served as a static site (GitHub Pages):
 
 - **Main page** ([index.html](https://thuyhuongctu.github.io/M-AIDA/)): overview,
-  positioning, the interactive atlas of 236 studies, the in-browser extraction
-  console, and the Huong AI tour guide. Bilingual EN/VI.
+  positioning, the interactive atlas of the locked study corpus, the in-browser
+  extraction console (three sample papers — r, t, standardized beta — walked
+  through the same convert/verify/lock/export gates; it refuses PDFs, which need
+  the backend), and the Huong AI tour guide. Bilingual EN/VI.
 - **Defense App** ([defense.html](https://thuyhuongctu.github.io/M-AIDA/defense.html)):
   public explanation of the presenter-controlled local application, its
   Academic Demo / Defense App / Cloud boundaries, rehearsal flow, and launch
@@ -198,6 +221,17 @@ uses the realistic 3D Huong character in high resolution; cross-page links
 carry the selected language (`?lang=`), and Data & Melody opens in French by
 default with VI / EN / FR toggles.
 
+**Brand and design system.** The official brand kit lives in
+[`assets/brand/`](assets/brand/) (diamond mark, lockups, favicon, og-image, and
+usage rules including the two-design-system boundary with the institutional
+identity); the page headers render the official mark bound to theme tokens.
+Design tokens and components are canonical in [`css/tokens.css`](css/tokens.css)
+and [`css/components.css`](css/components.css), documented in
+[`styleguide.html`](styleguide.html) (plus a fully offline
+`styleguide-standalone.html`). Fonts are self-hosted woff2 subsets
+([`assets/fonts/`](assets/fonts/), SIL OFL — see `THIRD_PARTY_LICENSES.md`);
+no external font CDN is called.
+
 **Data consistency.** Every headline research number on the site (studies,
 effect sizes, economies, pooled and bias-adjusted *r*, I²) has a single source
 of truth in [`assets/data/site-metrics.json`](assets/data/site-metrics.json),
@@ -205,6 +239,11 @@ mirrored from the locked P6 corpus (`p6/results/table1_baseline.csv` in the
 dissertation repo). A guard, [`scripts/check_site_metrics.py`](scripts/check_site_metrics.py),
 runs in the GitHub Pages workflow and **fails the deploy** if any page drifts
 from those numbers, so the published pages cannot show stale statistics.
+
+The narration layer follows the same discipline from the other side: the Huong
+AI voice guide never speaks a research number. She explains the process; the
+numbers stay on screen, read from the single source. Recordings therefore never
+go stale when the dataset moves to a new lock generation.
 
 ## Citation
 
