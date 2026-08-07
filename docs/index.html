@@ -935,7 +935,7 @@ a{color:var(--brand);text-decoration:none;}
   .convcap{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;}
   .convgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;flex:1;}
   .fcard{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:1rem .95rem .85rem;}
-  .fcard .frm-big{font-family:var(--serif);font-size:1.18rem;font-weight:600;color:var(--ink);margin:.15rem 0 .4rem;}
+  .fcard .frm-big{font-family:var(--serif);font-size:clamp(.98rem,4.2vw,1.18rem);font-weight:600;color:var(--ink);margin:.15rem 0 .4rem;white-space:nowrap;}
   .fcard p{margin:0;font-size:.78rem;color:var(--muted);line-height:1.45;}
   .fbadge{position:absolute;top:-.6rem;right:.7rem;font-family:var(--mono);font-size:.62rem;font-weight:700;padding:.12rem .5rem;border-radius:999px;border:1px solid;}
   .fbadge.ok{background:#e7f2ea;color:#1e6b3a;border-color:#bcd9c5;}
@@ -1310,7 +1310,7 @@ a{color:var(--brand);text-decoration:none;}
         </div>
         <div class="convgrid">
           <div class="fcard"><span class="fbadge ok">1.0</span><div class="frm-big">r</div><p data-i18n data-en="Reported directly: kept as published." data-vi="Báo cáo trực tiếp: giữ nguyên như công bố.">Reported directly: kept as published.</p></div>
-          <div class="fcard"><span class="fbadge mid">0.8</span><div class="frm-big">r = &#8730;( t&#178; / (t&#178; + df) )</div><p data-i18n data-en="From a t statistic; df = n &#8722; 2 when unreported (Cohen, 1988)." data-vi="Từ thống kê t; df = n &#8722; 2 khi không báo cáo (Cohen, 1988).">From a t statistic; df = n &#8722; 2 when unreported (Cohen, 1988).</p></div>
+          <div class="fcard"><span class="fbadge mid">0.8</span><div class="frm-big">r = &#8730;(t&#178;/(t&#178;+df))</div><p data-i18n data-en="From a t statistic; df as reported, or n &#8722; p &#8722; 1 from the predictor count &#8212; never a bare n &#8722; 2 default (Cohen, 1988)." data-vi="Từ thống kê t; df theo bài, hoặc n &#8722; p &#8722; 1 theo số biến giải thích &#8212; không mặc định n &#8722; 2 (Cohen, 1988).">From a t statistic; df as reported, or n &#8722; p &#8722; 1 from the predictor count &#8212; never a bare n &#8722; 2 default (Cohen, 1988).</p></div>
           <div class="fcard"><span class="fbadge low">0.6</span><div class="frm-big">r = 0.98&#183;&#946; + 0.05&#183;&#955;</div><p data-i18n data-en="From a standardized beta via r = 0.98·β + 0.05·λ, always flagged (Peterson &amp; Brown, 2005; |β| ≤ 0.5 only). Anything below 0.70 waits for human review." data-vi="Từ hệ số beta chuẩn hóa qua r = 0,98·β + 0,05·λ, luôn gắn cờ (Peterson &amp; Brown, 2005; chỉ khi |β| ≤ 0,5). Dưới 0,70 phải chờ con người duyệt.">From a standardized beta via r = 0.98·β + 0.05·λ, always flagged (Peterson &amp; Brown, 2005; |β| ≤ 0.5 only). Anything below 0.70 waits for human review.</p></div>
         </div>
       </div>
