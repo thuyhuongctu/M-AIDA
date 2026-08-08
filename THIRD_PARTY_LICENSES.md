@@ -37,3 +37,18 @@ PyMuPDF phát hành theo giấy phép **AGPL-3.0**, là giấy phép copyleft m�
 
 Khi thêm hoặc nâng cấp phụ thuộc ở các phiên bản 7.1.2 trở lên, phải cập nhật
 bảng này và kiểm tra tương thích giấy phép trước khi phát hành.
+
+## Self-hosted web fonts (added 2026-08-04)
+
+Bundled in `assets/fonts/` (woff2, latin + vietnamese subsets) and embedded
+as base64 in `styleguide-standalone.html`. All three are licensed under the
+SIL Open Font License 1.1, which permits bundling and redistribution:
+
+| Font | Copyright | License |
+|---|---|---|
+| Source Serif 4 | Adobe Systems Incorporated | SIL OFL 1.1 |
+| Inter | The Inter Project Authors (Rasmus Andersson) | SIL OFL 1.1 |
+| JetBrains Mono | JetBrains s.r.o. | SIL OFL 1.1 |
+
+Fonts are self-hosted so brand and defense pages render identically with no
+CDN dependency and no third-party requests — including fully offline.

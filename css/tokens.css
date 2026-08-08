@@ -1,0 +1,184 @@
+/* ============================================================
+   M-AIDA · tokens.css
+   Tầng biến gốc. Nạp TRƯỚC mọi tệp CSS khác.
+   Sau khi nạp tệp này, không viết mã màu trực tiếp ở bất kỳ đâu.
+   ============================================================ */
+
+:root {
+  /* ---------- 1. NỀN GIẤY ---------- */
+  --canvas:            #f6f1e7;
+  --surface-1:         #fbf8f1;
+  --surface-2:         #efe8da;
+  --surface-raised:    #ffffff;
+  --hairline:          #ded5c4;
+  --hairline-strong:   #c4b8a1;
+
+  /* ---------- 2. MỰC ---------- */
+  --ink:               #1a1714;
+  --ink-muted:         #5c554b;
+  --ink-subtle:        #8b8377;
+
+  /* ---------- 3. VÒNG ĐỜI BẢN GHI ----------
+     Bốn màu này KHÔNG dùng cho bất cứ việc gì khác. */
+  --state-proposed:    #8b8377;
+  --state-verified:    #3f7a5a;
+  --state-locked:      #c0862a;
+  --state-flagged:     #a8452a;
+
+  /* nền nhạt của nhãn trạng thái */
+  --state-proposed-bg: rgba(139, 131, 119, .14);
+  --state-verified-bg: rgba( 63, 122,  90, .12);
+  --state-locked-bg:   rgba(192, 134,  42, .12);
+  --state-flagged-bg:  rgba(168,  69,  42, .12);
+
+  /* ---------- 4. NHẤN ----------
+     Hổ phách nghĩa là ĐÃ KHÓA VÀ ĐÃ GỘP. Không dùng cho hover,
+     cho liên kết, cho chuỗi biểu đồ hay cho biểu tượng trang trí. */
+  --primary:           var(--state-locked);
+  --primary-hover:     #a97321;
+  --primary-soft:      #f0e2c4;
+  --on-primary:        #ffffff;
+
+  /* ---------- 5. QUỐC GIA ----------
+     Chỉ dùng cho ghim cờ, huy hiệu bản đồ Việt Nam, dấu ngôn ngữ VI. */
+  --accent-national:   #c8102e;
+
+  /* ---------- 6. THANH GHI CONSOLE ----------
+     Không phải chế độ tối. Đây là tín hiệu ngữ nghĩa:
+     "bạn đang nhìn cỗ máy, không phải trang giấy". */
+  --console-canvas:    #171a19;
+  --console-surface:   #202523;
+  --console-ink:       #e8e4d9;
+  --console-ink-muted: #a8a396;
+  --console-hairline:  #333a37;
+
+  /* ---------- 7. PHÔNG ----------
+     Mọi phông dự phòng đều phải phủ được dấu tiếng Việt. */
+  --font-display: "Source Serif 4", "Noto Serif", Georgia,
+                  "Times New Roman", serif;
+  --font-body:    Inter, "Be Vietnam Pro", -apple-system,
+                  "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", "SFMono-Regular", Consolas,
+                  "Liberation Mono", monospace;
+
+  /* ---------- 8. THANG CHỮ ---------- */
+  --fs-display-xl: clamp(32px, 5vw, 60px);
+  --fs-display-lg: clamp(26px, 3.6vw, 42px);
+  --fs-display-md: 30px;
+  --fs-headline:   22px;
+  --fs-body-lg:    18px;
+  --fs-body:       16px;
+  --fs-body-sm:    14px;
+  --fs-caption:    13px;
+  --fs-eyebrow:    11px;
+  --fs-stat:       38px;
+  --fs-data:       14px;
+  --fs-data-sm:    11px;
+
+  /* Không hạ line-height tiêu đề xuống dưới 1.08:
+     dấu chồng tiếng Việt (ế, ộ, ữ, ỡ) sẽ bị cắt ngọn. */
+  --lh-display:    1.12;
+  --lh-headline:   1.28;
+  --lh-body:       1.62;
+  --lh-tight:      1.40;
+
+  --tr-display-xl: -1.2px;
+  --tr-display-lg: -0.8px;
+  --tr-headline:   -0.2px;
+  --tr-eyebrow:     1.8px;
+
+  /* ---------- 9. NHỊP 4px ---------- */
+  --sp-1:  4px;  --sp-2:  8px;  --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 24px;  --sp-6: 32px;  --sp-7: 48px;  --sp-8: 64px;
+  --sp-9: 96px;  --sp-10:128px;
+
+  --container:     1180px;
+  --measure:       68ch;
+  --gutter:        32px;
+
+  /* ---------- 10. HÌNH ----------
+     Đây là tài liệu, và tài liệu thì có góc. */
+  --r-none:  0px;
+  --r-chip:  9999px;
+  --r-input: 2px;
+  --r-card:  3px;
+  --r-image: 6px;
+
+  /* Bóng đổ chỉ tồn tại ở MỘT chỗ: khung ảnh chụp console. */
+  --shadow-console: 0 24px 48px rgba(23, 26, 25, .18);
+
+  /* ---------- 11. CHUYỂN ĐỘNG ---------- */
+  --dur-state:  160ms;
+  --dur-enter:  240ms;
+  --dur-story:  600ms;
+  --ease:       cubic-bezier(.2, .6, .2, 1);
+
+  /* ---------- 12. TIÊU ĐIỂM ---------- */
+  --focus-ring:   2px solid var(--primary);
+  --focus-offset: 3px;
+  --touch-min:    44px;
+}
+
+/* ============================================================
+   THANH GHI CONSOLE
+   Không định nghĩa lại thành phần. Chỉ tráo giá trị của cùng
+   một bộ biến, nên mọi thành phần tự đảo màu mà không cần
+   viết thêm một dòng CSS nào.
+   ============================================================ */
+[data-register="console"] {
+  --canvas:          var(--console-canvas);
+  --surface-1:       var(--console-surface);
+  --surface-2:       #1b201e;
+  --surface-raised:  var(--console-surface);
+  --ink:             #ffffff;
+  --ink-muted:       var(--console-ink-muted);
+  --ink-subtle:      #8e8a7e;
+  --hairline:        var(--console-hairline);
+  --hairline-strong: #4a524e;
+
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+/* ============================================================
+   TẮT CHUYỂN ĐỘNG
+   Hệ thống có hai công tắc độc lập và phải tôn trọng cả hai:
+   thiết lập của hệ điều hành, và nút Motion Off trên trang.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-state: 0ms; --dur-enter: 0ms; --dur-story: 0ms; }
+}
+[data-motion="off"] {
+  --dur-state: 0ms; --dur-enter: 0ms; --dur-story: 0ms;
+}
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ============================================================
+   BẢN IN
+   Phụ lục luận án có thể in đen trắng, nên trạng thái phải
+   đọc được mà không cần màu. Nhãn trạng thái luôn có chữ,
+   nên chỉ cần chuyển sang viền.
+   ============================================================ */
+@media print {
+  :root {
+    --canvas: #ffffff;
+    --surface-1: #ffffff;
+    --surface-2: #ffffff;
+    --hairline: #999999;
+    --hairline-strong: #666666;
+    --ink: #000000;
+    --ink-muted: #333333;
+    --ink-subtle: #555555;
+    --state-proposed-bg: transparent;
+    --state-verified-bg: transparent;
+    --state-locked-bg:   transparent;
+    --state-flagged-bg:  transparent;
+  }
+}

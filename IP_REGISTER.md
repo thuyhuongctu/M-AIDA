@@ -15,7 +15,7 @@ tác giả; khi có khác biệt, văn bản đã nộp chính thức là căn c
 | Kho mã nguồn (repository) | https://github.com/thuyhuongctu/M-AIDA |
 | DOI Zenodo, concept (mọi phiên bản) | 10.5281/zenodo.21282516 |
 | DOI Zenodo, version (bản v7.1.1) | 10.5281/zenodo.21282517 |
-| Giấy phép phân phối (license) | M-AIDA Academic Source-Available License v1.0 (xem `LICENSE`) |
+| Giấy phép phân phối (license) | AGPL-3.0-only + giấy phép thương mại song song (xem `LICENSE`, `COMMERCIAL-LICENSE.md`) — sửa 04/08/2026, xem ghi chú cuối sổ |
 
 ## 2. Tác giả (Authors)
 
@@ -106,3 +106,14 @@ mâu thuẫn:
   thái: sau khi thay tag, Release chuyển về bản nháp theo cơ chế của GitHub; bước còn
   lại là chủ sở hữu bấm Publish (Edit, chọn tag `v7.1.1`, Publish release) và đính kèm
   gói `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.zip` vào mục Assets.
+
+## Ghi chú sửa đổi 04/08/2026 — đồng bộ giấy phép
+
+Dòng "Giấy phép phân phối" trước đây ghi "M-AIDA Academic Source-Available
+License v1.0" — lỗi thời so với quyết định chuyển sang **AGPL-3.0-only kèm
+giấy phép thương mại song song** đã áp dụng ở README. Theo mục 2 checklist hồ
+sơ quyền tác giả (dist/HO_SO_QUYEN_TAC_GIA/09), các tệp `LICENSE`,
+`CITATION.cff`, `COMMERCIAL-LICENSE.md` và mục License của `README.md` đã được
+đồng bộ cùng ngày. Việc đổi giấy phép phân phối không ảnh hưởng nội dung đăng
+ký quyền tác giả: đối tượng đăng ký là tác phẩm phần mềm (mã nguồn), không
+phải điều khoản phân phối.

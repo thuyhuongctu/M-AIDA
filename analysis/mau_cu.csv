@@ -1,0 +1,11 @@
+author,year,stat_type,value,n,n_predictors,df
+Lu & Beamish,2004,r,0.24,231,,
+Kotabe et al.,2002,r,0.15,175,,
+Contractor et al.,2003,t,2.14,231,10,
+Pangarkar,2008,t,1.98,142,9,
+Chiao & Yang,2011,beta,0.18,268,11,
+Denis et al.,2002,beta,-0.22,310,13,
+Xiao et al.,2013,beta,-0.031,198,8,
+Nghien cuu X,2015,beta,0.34,96,12,
+Nghien cuu Y,2018,t,2.5,80,12,
+Nghien cuu Z,2020,beta,0.62,150,7,

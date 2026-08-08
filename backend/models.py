@@ -41,6 +41,33 @@ IcrvRegime = Literal["I", "II", "III", "FR", "MX"]
 # DPL phase, assigned by the PI from the study's median data year:
 #   PRE = Precede, SPN = Span, FOL = Follow.
 DplPhase = Literal["PRE", "SPN", "FOL"]
+# What kind of correlation the canonical r is. Zero-order and partial
+# correlations answer different questions AND have different sampling
+# variances, so they must never be pooled under one formula:
+#   zero_order  = bivariate Pearson r (correlation-matrix value)
+#   partial     = from a coefficient in a multiple regression (t → r)
+#   semipartial = semipartial correlation, kept separate; not poolable with
+#                 either of the above without an explicit decision
+MetricType = Literal["zero_order", "partial", "semipartial"]
+# Provenance of the degrees of freedom paired with a t-statistic:
+#   reported = taken verbatim from the paper
+#   derived  = computed as n − p − 1 from sample_n and n_predictors
+DfSource = Literal["reported", "derived"]
+# Whether the canonical r is an observed statistic or an imputed estimate.
+# metric_type describes the ESTIMAND; estimand_source describes the ORIGIN —
+# two different things that must never be conflated:
+#   observed       = reported r, or r computed exactly from t and df
+#   imputed_pb2005 = estimated from β via Peterson & Brown (2005); feeds
+#                    sensitivity analyses only, never the main model
+EstimandSource = Literal["observed", "imputed_pb2005"]
+# Per-quantity provenance. is_estimated of v7.1.1 conflated the origin of r
+# with the origin of n; they are tracked separately because a fabricated n
+# fabricates the WEIGHT of the record and distorts every other study in the
+# pooled model:
+#   reported = taken verbatim from the paper (with evidence)
+#   derived  = computed exactly from reported statistics (e.g. r from t, df)
+#   imputed  = estimated (e.g. r from β via P&B) — sensitivity only
+SourceProvenance = Literal["reported", "derived", "imputed"]
 
 
 # ---------------------------------------------------------------------------
@@ -86,6 +113,101 @@ class ExtractedEffect(BaseModel):
     )
     effect_df: int | None = Field(
         None, description="Degrees of freedom paired with t-statistic"
+    )
+    n_predictors: int | None = Field(
+        None,
+        ge=1,
+        description=(
+            "Number of predictors p in the regression model supplying t or β "
+            "(focal variable plus controls, excluding intercept); df = n − p − 1"
+        ),
+    )
+    metric_type: MetricType | None = Field(
+        None,
+        description=(
+            "Kind of correlation the canonical r is: zero_order | partial | "
+            "semipartial. Determines the sampling-variance formula; PI-confirmed "
+            "at Gate 2."
+        ),
+    )
+    r_source: SourceProvenance | None = Field(
+        None,
+        description=(
+            "Origin of the canonical r: reported (verbatim) | derived (exact "
+            "conversion from t, df) | imputed (P&B from β; sensitivity only)"
+        ),
+    )
+    n_source: SourceProvenance | None = Field(
+        None,
+        description=(
+            "Origin of sample_n. Must be 'reported' with verbatim evidence for "
+            "any record entering pooling: a guessed n is a guessed WEIGHT and "
+            "distorts every other study in the model. Records whose true n "
+            "cannot be recovered are excluded, never filled with an estimate."
+        ),
+    )
+    evidence_page: int | None = Field(
+        None,
+        ge=1,
+        description="1-based page in the source PDF where the focal statistic appears",
+    )
+    evidence_quote: str | None = Field(
+        None,
+        description=(
+            "Verbatim sentence (or table caption row) containing the focal "
+            "statistic. MANDATORY whenever statistics are present: a record "
+            "without evidence is rejected at extraction, never created (E1)."
+        ),
+    )
+    n_evidence_page: int | None = Field(
+        None,
+        ge=1,
+        description="1-based page where the sample size is stated",
+    )
+    n_evidence_quote: str | None = Field(
+        None,
+        description=(
+            "Verbatim sentence containing the sample size. n passes the same "
+            "evidence gate as r: sample_n without evidence is rejected."
+        ),
+    )
+    estimand_source: EstimandSource | None = Field(
+        None,
+        description=(
+            "observed = reported r or exact t→r conversion; imputed_pb2005 = "
+            "estimated from β via Peterson & Brown (2005) — sensitivity "
+            "analyses only, never the main pooling model"
+        ),
+    )
+    source_controls: bool | None = Field(
+        None,
+        description=(
+            "True when the source statistic came from a model controlling for "
+            "other variables (t from multiple regression, standardised β); "
+            "False for a plain correlation-matrix r"
+        ),
+    )
+    df_source: DfSource | None = Field(
+        None,
+        description="Whether effect_df was reported verbatim or derived as n − p − 1",
+    )
+    lambda_applied: bool = Field(
+        False,
+        description=(
+            "True when the +0.05·λ term of Peterson & Brown (2005) was applied "
+            "in the β → r conversion (λ = 1 for β ≥ 0, else 0)"
+        ),
+    )
+    variance_r: float | None = Field(
+        None,
+        description=(
+            "Sampling variance of r: (1 − r²)²/(n − 1) for zero-order, "
+            "(1 − r²)²/df for partial correlations"
+        ),
+    )
+    variance_formula: str | None = Field(
+        None,
+        description="Exact variance formula applied to this record, for audit",
     )
     p_value: float | None = Field(None, description="Reported p-value")
     ci_lower: float | None = Field(
@@ -139,11 +261,18 @@ class ExtractedEffect(BaseModel):
     )
     df_imputed: bool = Field(
         False,
-        description="True when df was unreported and imputed as n - 2 per the documented protocol (7.1.2)",
+        description=(
+            "True when df was unreported and derived as n − p − 1 from "
+            "sample_n and n_predictors (never as a bare n − 2)"
+        ),
     )
     beta_outside_pb_domain: bool = Field(
         False,
-        description="True when |beta| > 0.5, outside the Peterson & Brown (2005) derivation domain (7.1.2)",
+        description=(
+            "True when |beta| > 0.5, outside the Peterson & Brown (2005) "
+            "derivation domain; such records receive no converted r and are "
+            "excluded from pooling"
+        ),
     )
     requires_verification: bool = Field(
         ...,
@@ -151,6 +280,15 @@ class ExtractedEffect(BaseModel):
     )
     pi_locked: bool = Field(
         False, description="True after Principal Investigator permanently locks entry"
+    )
+    derived_from: str | None = Field(
+        None,
+        description=(
+            "study_id/effect_id of the prior-generation locked record this one "
+            "was re-coded from. Locked records are never edited in place: a "
+            "formula correction produces a NEW lock generation whose records "
+            "point back to their v7.1.1 originals via this field."
+        ),
     )
     extracted_at: datetime = Field(default_factory=datetime.utcnow)
     locked_at: datetime | None = None

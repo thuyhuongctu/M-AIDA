@@ -54,6 +54,53 @@ for tok in REQUIRED_INDEX:
     if tok not in index_html:
         errors.append(f"index.html: required canonical token missing -> {tok!r}")
 
+# --- Provisional flag must match what pages display, BOTH directions. ---
+# provisional=true: the caveat note must be present (removing it early would
+# fake readiness while numbers still match the old JSON). provisional=false:
+# the caveat must be gone (stale caveat over locked numbers).
+import re as _re
+for page in ("index.html", "docs/index.html"):
+    p = os.path.join(ROOT, page)
+    if not os.path.exists(p):
+        continue
+    with open(p, encoding="utf-8") as f:
+        h = f.read()
+    has_note = 'class="provisional-note"' in h
+    if M.get("provisional") and not has_note:
+        errors.append(f"{page}: metrics are provisional but the provisional "
+                      "note is missing — do not un-caveat before the data is ready")
+    if M.get("provisional") is False and (has_note or "provisional: they belong" in h):
+        errors.append(f"{page}: metrics are final but a provisional caveat "
+                      "is still displayed")
+
+# --- Escaped sequences leaking into rendered HTML (e.g. a literal \n between
+# CTAs, found 2026-08-04 on commercial.html). Scan markup outside script/style. ---
+_STRIP = _re.compile(r"<script\b.*?</script>|<style\b.*?</style>", _re.S | _re.I)
+for page in PAGES + ["docs/index.html", "docs/commercial.html"]:
+    p = os.path.join(ROOT, page)
+    if not os.path.exists(p):
+        continue
+    with open(p, encoding="utf-8") as f:
+        body = _STRIP.sub("", f.read())
+    for m in _re.finditer(r"\\[ntr]\b", body):
+        ctx = body[max(0, m.start() - 40):m.start() + 10].replace("\n", " ")
+        errors.append(f"{page}: literal escape sequence in rendered markup "
+                      f"near ...{ctx!r}")
+
+# --- Decimal commas in Vietnamese strings: displayed numbers must match the
+# locked dataset character-for-character in every language (provenance rule,
+# THUAT_NGU_VA_QUY_TAC_TIENG_VIET.md §4). ---
+for page in ("index.html", "docs/index.html", "commercial.html",
+             "docs/commercial.html", "defense.html", "library.html"):
+    p = os.path.join(ROOT, page)
+    if not os.path.exists(p):
+        continue
+    with open(p, encoding="utf-8") as f:
+        h = f.read()
+    for m in _re.finditer(r'data-vi="([^"]*\d,\d[^"]*)"', h):
+        errors.append(f"{page}: decimal comma in Vietnamese string -> "
+                      f"{m.group(1)[:70]!r}")
+
 if errors:
     print("SITE METRICS CHECK FAILED:", file=sys.stderr)
     for e in errors:

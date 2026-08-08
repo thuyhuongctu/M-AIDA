@@ -3,6 +3,85 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## Chưa phát hành: sửa ba công thức A1–A3 theo bản rà soát Paper 6 (04/08/2026)
+
+Bước 1 trong bảy bước chạy lại. Ba lỗi tầng công thức được sửa đồng bộ ở
+backend Python, máy tính demo trong trình duyệt, phần mô tả phương pháp
+trên trang, và module R mới `analysis/effect_sizes.R` (kèm testthat).
+LƯU Ý: các bản ghi P6 đã khóa suy từ beta hoặc từ t thiếu df PHẢI được mã
+lại (bước 2) trước khi chạy lại mô hình gộp.
+
+- A1 — Peterson & Brown (2005) đầy đủ: `r = 0.98·β + 0.05·λ`, λ = 1 khi
+  β ≥ 0. Bản cũ bỏ số hạng λ nên mọi hiệu ứng dương suy từ β bị hạ thấp
+  đúng 0,05. Ngoài khoảng |β| ≤ 0,5 nay KHÔNG quy đổi (trả về None/NA và
+  loại khỏi gộp) thay vì chặn về ±1.
+- A2 — Bậc tự do cho t từ hồi quy bội: `df = n − p − 1` với trường mới
+  `n_predictors`; không còn mặc định `n − 2`. Thiếu số biến giải thích thì
+  bản ghi không quy đổi và gắn cờ chờ PI, kèm `df_source` (reported/derived).
+- A3 — Tách loại thước đo bằng trường `metric_type` (zero_order / partial /
+  semipartial) và tính phương sai đúng theo loại:
+  bậc không `(1−r²)²/(n−1)`, riêng phần `(1−r²)²/df`; lưu `variance_r` và
+  `variance_formula` trên từng bản ghi để kiểm toán.
+- Kiểm thử: viết lại `test_effect_size_conversions.py` với ví dụ tính tay
+  cho cả ba công thức; cập nhật `test_712_governance.py` theo hành vi mới
+  (58 test đạt). Test R: `analysis/test_effect_sizes.R`.
+- Gói chuẩn độc lập `analysis/effect_size.py` (v8.0.0): thêm Fisher z +
+  var_z (A4), `legacy_r` đo chênh lệch với cách tính cũ, và `recode_csv`
+  mã lại CSV kèm cột `r_legacy`/`delta_r`; 19 kiểm thử tính tay
+  (`analysis/test_effect_size.py`, chạy được không cần pytest); bộ mẫu
+  `mau_cu.csv` → `mau_moi.csv` làm kiểm thử hồi quy (khớp từng byte —
+  chứng minh mã ổn định; tính đúng đắn nằm ở 19 test tính tay). Backend
+  đồng bộ theo ngữ nghĩa gói: bản ghi suy từ β mang `metric_type =
+  partial` (β đã kiểm soát các biến khác), df suy được cả cho đường β khi
+  có `n_predictors`.
+- Bản R chuẩn `analysis/effect_size.R` (thay `effect_sizes.R` +
+  `test_effect_sizes.R` tạm thời): tự kiểm tra khi chạy
+  `Rscript analysis/effect_size.R`, kèm khung quy trình metafor bước 3–7
+  (ba cấp/hai cấp, phương sai vững theo cụm, khoảng dự báo, PET-PEESE,
+  giả thuyết chữ S).
+- QUYẾT ĐỊNH CHỐT (04/08/2026): bản ghi suy từ β mang `metric_type =
+  zero_order` — P&B hiệu chuẩn công thức để khôi phục r bậc không; nguồn
+  gốc tách sang hai trường mới `estimand_source` (observed /
+  imputed_pb2005) và `source_controls`. Ba lớp: r báo cáo (zero_order ·
+  observed), t hồi quy (partial · observed), β quy đổi (zero_order ·
+  imputed — chỉ phân tích độ nhạy, không vào mô hình chính vì phương sai
+  bậc không bỏ qua sai số quy đổi). Đồng bộ Python + R + backend +
+  migrate_v8; test đảo lại tương ứng (20 test tay + 60 test backend).
+- CHÍNH SÁCH THẾ HỆ KHÓA: tập khóa v7.1.1 (đã có DOI) giữ nguyên, không
+  ghi đè; việc mã lại theo công thức mới sinh tập v8.0.0 như một lần khóa
+  độc lập, mỗi bản ghi mang trường mới `derived_from` trỏ về bản gốc,
+  phát hành DOI phiên bản mới và ghi nhật ký sai lệch OSF. Trang công
+  khai hạ `r̄ = .074` xuống trạng thái tạm thời (thuộc v7.1.1, chờ thế hệ
+  khóa v8.0.0) ở ô KPI, đoạn phương pháp và chú thích biểu đồ rừng.
+
+## Chưa phát hành: E1 — không bao giờ bịa kết quả trích xuất (04/08/2026)
+
+Sổ đăng ký vấn đề E1: đường tải PDF trả về cùng một kết quả cho mọi tệp,
+mâu thuẫn với chính tuyên bố "không có khóa thì nói thẳng, không bịa".
+
+- Demo trong trình duyệt (index.html + docs/index.html): PDF thả vào bị
+  TỪ CHỐI tường minh kèm lời giải thích, không nạp mẫu ngầm nữa; thay
+  bằng ba bài mẫu bấm chọn minh họa đúng ba đường chuyển đổi (r trực
+  tiếp / t → r suy df = n − p − 1 / β chỉ độ nhạy); CSV thêm cột
+  n_predictors; toàn bộ nhãn nói rõ "bản ghi đã trích sẵn (minh họa)".
+- Backend: GỠ BỎ hoàn toàn đường fallback diễn tập (demo_fallback.py và
+  nhánh trả fallback trong /api/extract) — trích xuất lỗi thì lỗi hiện
+  lên thành trạng thái, demo mode hay không; /api/health chỉ còn hai chế
+  độ live / unavailable.
+- Cổng dẫn chứng: hai trường mới `evidence_page` + `evidence_quote`
+  (câu nguyên văn chứa thống kê tiêu điểm) bắt buộc trong prompt và lược
+  đồ; thống kê không kèm dẫn chứng bị TỪ CHỐI 422, không tạo bản ghi
+  (EvidenceMissingError).
+- Kiểm thử hồi quy E1: hai PDF khác nhau phải cho hai bản ghi khác nhau;
+  không khóa thì 503 ở mọi chế độ; thiếu dẫn chứng thì 422 và store
+  trống. 62 test đạt.
+
+Rà soát E2 kèm theo (kho 236 có nhiễm bản ghi mặc định không?): 0 khớp
+với bản ghi diễn tập; 12 cụm trùng (r, n) khác study — 22/26 thành viên
+là is_estimated=1 thuộc dải S190+ với n tròn, trùng đúng nhóm 47 bản ghi
+phải thu hồi thống kê nguồn. Báo cáo và bảng đối chiếu ngược nằm ở
+p6/data/v8/ (kho luận án).
+
 ## Chưa phát hành: bộ trình diễn `demo/` (15/07/2026)
 
 Đóng gói trình diễn, KHÔNG thay đổi mã lõi 7.1.x: `demo/run_defense.py`

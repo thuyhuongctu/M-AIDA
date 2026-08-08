@@ -1,0 +1,271 @@
+/* ============================================================
+   M-AIDA · components.css
+   Nạp SAU tokens.css. Không có mã màu nào trong tệp này.
+   ============================================================ */
+
+/* ---------- NỀN ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+body, h1, h2, h3, h4, p, figure, ul, ol, table { margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.container { max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+@media (max-width: 600px) { .container { padding-inline: 20px; } }
+
+/* Văn xuôi luôn bị giới hạn bề rộng, kể cả trong khung rộng. */
+.measure { max-width: var(--measure); }
+
+/* ---------- CHỮ ---------- */
+h1, h2, h3, h4, .stat {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+h1 { font-size: var(--fs-display-xl); line-height: var(--lh-display); letter-spacing: var(--tr-display-xl); }
+h2 { font-size: var(--fs-display-lg); line-height: var(--lh-display); letter-spacing: var(--tr-display-lg); }
+h3 { font-size: var(--fs-headline);   line-height: var(--lh-headline); letter-spacing: var(--tr-headline); }
+h4 { font-size: 17px;                 line-height: var(--lh-headline); }
+
+p { color: var(--ink-muted); }
+p + p { margin-top: var(--sp-3); }
+.lede { font-size: var(--fs-body-lg); color: var(--ink-muted); }
+
+/* Eyebrow đặt tên LOẠI nội dung phía sau. Mục không gọi tên
+   được loại của mình thì không được dùng eyebrow. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+}
+
+.mono { font-family: var(--font-mono); font-size: var(--fs-data); }
+.stat-sym { font-style: italic; }   /* r, I², k, n, df, p */
+
+/* ---------- MỤC ---------- */
+.section {
+  padding-block: var(--sp-9);
+  border-top: 1px solid var(--hairline);
+}
+@media (max-width: 600px) { .section { padding-block: var(--sp-8); } }
+
+/* ---------- XUẤT XỨ CON SỐ ----------
+   Thành phần quan trọng nhất của hệ thống: người đọc phân biệt
+   được ba loại số mà không cần đọc chú thích. */
+[data-prov="locked"] {
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 2px;
+}
+[data-prov="derived"] { color: var(--ink-muted); }
+[data-prov="illustrative"] {
+  font-style: italic;
+  background: var(--surface-2);
+  padding-inline: var(--sp-1);
+}
+
+/* ---------- NHÃN TRẠNG THÁI ----------
+   Luôn có chữ đi kèm màu: phụ lục luận án có thể in đen trắng. */
+.chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-data-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  padding: 3px 9px;
+  border-radius: var(--r-chip);
+  border: 1px solid transparent;
+}
+.chip[data-state="proposed"] { background: var(--state-proposed-bg); color: var(--state-proposed); }
+.chip[data-state="verified"] { background: var(--state-verified-bg); color: var(--state-verified); }
+.chip[data-state="locked"]   { background: var(--state-locked-bg);   color: var(--state-locked); }
+.chip[data-state="flagged"]  { background: var(--state-flagged-bg);  color: var(--state-flagged); }
+
+@media print {
+  .chip { border-color: currentColor; }
+}
+
+/* ---------- BỘ BỐN SỐ ---------- */
+.statquad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-block: 1px solid var(--hairline);
+}
+.statquad > * {
+  padding: var(--sp-5) var(--sp-4);
+  border-left: 1px solid var(--hairline);
+}
+.statquad > *:first-child { border-left: none; padding-left: 0; }
+.statquad b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-stat);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.statquad span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-data-sm);
+  color: var(--ink-subtle);
+  margin-top: var(--sp-2);
+  letter-spacing: .3px;
+}
+@media (max-width: 760px) {
+  .statquad { grid-template-columns: 1fr 1fr; }
+  .statquad > *:nth-child(3) { border-left: none; padding-left: 0; }
+  .statquad > *:nth-child(3), .statquad > *:nth-child(4) { border-top: 1px solid var(--hairline); }
+}
+
+/* ---------- THẺ CỔNG ----------
+   Bước không nêu được điều kiện vượt cổng thì không phải cổng
+   và không được dùng thành phần này. */
+.gate {
+  background: var(--surface-1);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  padding: var(--sp-5);
+}
+.gate__idx {
+  font-family: var(--font-mono);
+  font-size: var(--fs-data-sm);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: var(--ink-subtle);
+}
+.gate h4 { margin-top: var(--sp-2); }
+.gate p  { margin-top: var(--sp-2); font-size: var(--fs-body-sm); }
+.gate__line {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .4px;
+  color: var(--ink-subtle);
+  text-transform: uppercase;
+}
+
+/* ---------- NÚT ----------
+   Hổ phách chỉ dành cho hành động niêm phong bản ghi. */
+.btn {
+  font-family: var(--font-body);
+  font-size: var(--fs-body-sm);
+  font-weight: 600;
+  padding: 10px 18px;
+  min-height: var(--touch-min);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-input);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--dur-state) var(--ease),
+              color var(--dur-state) var(--ease);
+}
+.btn:hover { background: var(--ink); color: var(--canvas); }
+
+.btn--lock {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+.btn--lock:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: var(--on-primary); }
+
+.btn--quiet { border-color: var(--hairline-strong); color: var(--ink-muted); min-height: 0; padding: 6px 14px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ---------- TRÍCH DẪN ----------
+   DOI luôn hiện đủ chuỗi. Có cả DOI khái niệm và DOI phiên bản
+   thì luôn hiện thành cặp. */
+.cite { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.doi {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-input);
+  padding: 5px 10px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.doi:hover { border-color: var(--ink); color: var(--ink); }
+
+/* ---------- BẢNG BẢN GHI ----------
+   Không bao giờ gập bảng dữ liệu thành thẻ trên di động:
+   so sánh giữa các hàng chính là mục đích của bảng. */
+.tablewrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: var(--fs-body-sm); min-width: 640px; }
+.table th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
+  border-bottom: 2px solid var(--ink);
+  white-space: nowrap;
+}
+.table td {
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: top;
+  color: var(--ink-muted);
+}
+.table td:first-child { color: var(--ink); font-weight: 600; }
+.table td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- HÌNH ----------
+   Mọi biểu đồ chống đỡ một luận điểm đều là hình có số. */
+.figure { margin-block: var(--sp-5); }
+.figure figcaption {
+  font-size: var(--fs-caption);
+  color: var(--ink-muted);
+  margin-top: var(--sp-4);
+  max-width: 78ch;
+}
+.figure figcaption b { color: var(--ink); font-weight: 700; }
+.figure figcaption .note { display: block; margin-top: var(--sp-2); font-style: italic; }
+
+/* ---------- CHUYỂN NGÔN NGỮ ----------
+   Hai ngôn ngữ luôn cùng hiện. Trạng thái hiện hành đánh dấu
+   bằng độ đậm và gạch chân, không bằng nền tô. */
+.lang { display: inline-flex; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-data-sm); }
+.lang button {
+  background: none; border: none; cursor: pointer; padding: 4px 2px;
+  color: var(--ink-subtle); font: inherit; letter-spacing: 1px;
+  border-bottom: 2px solid transparent;
+}
+.lang button[aria-current="true"] { color: var(--ink); font-weight: 700; border-bottom-color: var(--primary); }
+
+/* ---------- ẢNH CHỤP CONSOLE ----------
+   Chỗ DUY NHẤT được dùng bóng đổ trong toàn hệ thống. */
+.console-shot { border-radius: var(--r-image); box-shadow: var(--shadow-console); display: block; max-width: 100%; }
+
+/* ---------- NHÂN VẬT ----------
+   Chỉ xuất hiện ở bốn khe ngữ nghĩa đã định. Không quá một lần
+   trong một khung nhìn, không đè lên hình hay lên số. */
+.character { display: block; max-width: 100%; }
+@media (max-width: 480px) { .character:not([data-slot="hero"]) { display: none; } }
+
+/* ---------- MỤC TIÊU CHẠM ---------- */
+button, a.btn, [role="button"] { min-height: var(--touch-min); }
+.chip { min-height: 0; }   /* chỉ để đọc, không phải điều khiển */
