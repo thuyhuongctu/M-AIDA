@@ -16,6 +16,16 @@ exports a reproducible effect-size dataset for three-level meta-analytic regress
 Built to support the P6 (meta-analysis) component of the first author's doctoral
 dissertation on the internationalization-performance relationship.
 
+**Scope — which kinds of literature review this serves.** M-AIDA is an
+extraction-and-verification engine at the data-collection stage of PRISMA; it
+does not search the literature, does not screen records, and does not run the
+final statistical model. It serves a **meta-analysis** in full (its design
+target), the **data-extraction stage of a systematic review** (evidence-gated
+coding, recorded exclusion reasons, two independent coders), and **small-scale
+evidence tables** that ground the hypotheses of a proposal. It is of partial
+use for scoping reviews, marginal use for narrative reviews, and no use for
+bibliometric analysis, which is a different class of tool.
+
 ## System Architecture
 
 ```text
