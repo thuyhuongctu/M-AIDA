@@ -16,9 +16,9 @@
       "affiliation": "Can Tho University"
     }
   ],
-  "access_right": "open",
+  "access_right": "restricted",
   "license": "AGPL-3.0-only",
-  "notes": "License: GNU Affero General Public License v3.0 (AGPL-3.0-only); see the LICENSE file. Separate commercial terms are available from the copyright holders (dual licensing); see COMMERCIAL-LICENSE.md.",
+  "notes": "License: GNU Affero General Public License v3.0 (AGPL-3.0-only); see the LICENSE file. Separate commercial terms are available from the copyright holders (dual licensing); see COMMERCIAL-LICENSE.md. Economic rights are jointly held by Can Tho University and the two authors.",
   "related_identifiers": [
     {
       "identifier": "10.5281/zenodo.21282516",
@@ -38,5 +38,6 @@
     "large language models",
     "reproducible research",
     "PRISMA"
-  ]
+  ],
+  "access_conditions": "Source files are under controlled access while the joint copyright registration with Can Tho University completes. The software itself is licensed AGPL-3.0-only and the full source is public at https://github.com/thuyhuongctu/M-AIDA"
 }

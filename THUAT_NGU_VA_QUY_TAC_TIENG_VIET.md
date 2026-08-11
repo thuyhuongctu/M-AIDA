@@ -95,7 +95,9 @@ Ba nguyên nhân, không phải một.
 | source-available | mã nguồn công khai | mã nguồn mở |
 | dual licensing | cấp phép kép | |
 
-**Lưu ý riêng về hai dòng cuối.** «Mã nguồn công khai» và «mã nguồn mở» là hai chế độ pháp lý khác nhau, và giấy phép của M-AIDA thuộc loại thứ nhất. Gọi nhầm không chỉ là lỗi dịch — nó là một tuyên bố sai về quyền.
+**Lưu ý riêng về hai dòng cuối (sửa 09/08/2026).** «Mã nguồn công khai» và «mã nguồn mở» là hai chế độ pháp lý khác nhau, nên dịch nhầm là một tuyên bố sai về quyền. Quy tắc dịch giữ nguyên: gặp từ *source-available* thì dịch «mã nguồn công khai», không bao giờ dịch thành «mã nguồn mở».
+
+Nhưng **bản thân M-AIDA không thuộc loại đó**. Theo quyết định ngày 04/08/2026 ghi trong `IP_REGISTER.md`, M-AIDA phát hành theo **AGPL-3.0-only**, một giấy phép mã nguồn mở được OSI công nhận, kèm giấy phép thương mại song song. Vậy khi viết về M-AIDA thì «mã nguồn mở» mới là từ đúng. Chú thích cũ ở đây ghi ngược, và đã kéo theo nhãn sai trên trang chủ cùng siêu dữ liệu Zenodo cho tới khi rà lại ngày 09/08/2026.
 
 ---
 

@@ -297,3 +297,26 @@ version's source.
 The authors also offer **commercial (dual) licensing** for closed-source or
 proprietary use, see [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md). Contact
 thuyhuongctu@gmail.com or patu@ctu.edu.vn.
+
+AGPL-3.0-only supersedes the earlier "M-AIDA Academic Source-Available License
+v1.0", retired on 4 August 2026. Any document still carrying that name is out of
+date; `LICENSE` in this repository is the operative text.
+
+### Ownership, and why the Zenodo files are restricted
+
+Economic rights in M-AIDA are held **jointly by Can Tho University and the two
+authors**, under Article 71 of the university's science and technology management
+regulation (Decision 5152/QD-DHCT of 6 October 2023). The copyright registration
+is filed through the university and is still in process.
+
+Because of that, the archived deposit at
+[10.5281/zenodo.21282516](https://doi.org/10.5281/zenodo.21282516) keeps its
+**files under restricted access** while the record itself, its metadata and its
+DOIs stay public and citable. This does not conflict with the AGPL: the AGPL
+governs what a recipient of the software may do with it, and obliges the authors
+to supply corresponding source to those recipients. It does not oblige anyone to
+publish files in any particular archive. The complete source is public in this
+repository, so the AGPL grant is fully effective today.
+
+When the registration completes, opening the deposit is a decision for the joint
+owners, not for either author alone.
