@@ -97,19 +97,26 @@ sai sót đã tồn tại:
 5. **Không hồi tố:** giấy phép AGPL-3.0 đã cấp cho bất kỳ bên nào vẫn giữ nguyên
    hiệu lực. Đính chính này chỉ sửa **khai báo**, không thu hồi quyền đã trao.
 6. **Chưa giải quyết:** việc xác định quyền sở hữu bằng văn bản từ Nhà trường.
-   Chừng nào chưa có, mọi hoạt động thương mại hóa, kể cả phát hành trên chợ
-   ứng dụng, vẫn bị chặn.
+   Chừng nào chưa có, mọi hoạt động thương mại hóa — kể cả phát hành trên chợ
+   ứng dụng — vẫn bị chặn.
 
-   **Việc chặn này hiện thuần túy là một quyết định quản trị; chưa có cổng kỹ
-   thuật nào cưỡng chế nó.** Bản đầu của mục 5bis dẫn một cổng
-   `MAIDA_RIGHTS_STATUS` đặt trong `frontend/.env.store.example`. Rà kho ngày
-   13/08/2026 xác nhận cả biến lẫn tệp đó **đều không tồn tại**, ở kho M-AIDA
-   lẫn bản sao `p6/tools/maida/` trong kho luận án; kho chỉ có
-   `frontend/.env.example`, `backend/.env.example` và
-   `backend/.env.production.example`. Câu dẫn đó đã được gỡ, theo đúng nguyên
-   tắc mà chính mục này đặt ra: không khẳng định một thực trạng không kiểm
-   chứng được. Nếu về sau cần một cổng cưỡng chế thật thì phải dựng riêng, và
-   chỉ ghi vào đây sau khi nó đã chạy.
+   **Cơ chế chặn, mô tả theo nhánh (rà ngày 13/08/2026, quét toàn bộ ref):**
+
+   | Nhánh | Cổng kỹ thuật | Bản chất việc chặn |
+   |---|---|---|
+   | `main` | không có | thuần quyết định quản trị |
+   | `feat/app-store-readiness-v1` | có, fail-closed | được cưỡng chế khi dựng bản phát hành |
+   | `feat/ui-integration-v1` | có, fail-closed (bản sao trùng khớp) | như trên |
+
+   Trên hai nhánh nêu trên, tệp `frontend/.env.store.example` khai
+   `MAIDA_RIGHTS_STATUS=pending-ctu-agreement`; tệp
+   `frontend/scripts/validate-mobile-release.mjs` (dòng 68) đọc biến này và yêu
+   cầu giá trị `ctu-agreement-signed`, nếu không đạt thì ghi vào danh sách lỗi
+   và đặt `process.exitCode = 1`. Lệnh `npm run mobile:prepare:store` chạy
+   `mobile:release-check` trước rồi mới `build` và `cap sync`, nối bằng `&&`,
+   nên không thể dựng gói nộp chợ ứng dụng khi chưa có văn bản của Nhà trường.
+   Hai tệp cổng trên hai nhánh trùng khớp từng byte. Cổng chỉ có hiệu lực trên
+   các nhánh nêu trên; **cả hai đều chưa được gộp** vào `main`.
 
 ## 6. Quy tắc sau đóng băng (Post-freeze rules)
 
@@ -129,6 +136,9 @@ sai sót đã tồn tại:
 | 13/07/2026 | Lập bản ghi; ấn định 7.1.1 là bản chuẩn tham chiếu đã đăng ký; ghi chú đối chiếu 7.1.0/7.1.1 |
 | 13/08/2026 | Đính chính khai báo giấy phép sang AGPL-3.0-only; gỡ khẳng định "full copyright" trong `COMMERCIAL-LICENSE.md`; bổ sung mục 5bis |
 | 13/08/2026 | Gỡ câu dẫn cổng `MAIDA_RIGHTS_STATUS` khỏi mục 5bis điểm 6: rà kho xác nhận biến và tệp `frontend/.env.store.example` không tồn tại. Việc chặn thương mại hóa được ghi lại đúng bản chất là quyết định quản trị, không phải cổng kỹ thuật |
+| 13/08/2026 | Đợt 2: đính chính chính điểm 6 của mục 5bis. Bản đợt 1 khẳng định biến `MAIDA_RIGHTS_STATUS` và tệp `frontend/.env.store.example` "không tồn tại" và "chưa có cổng kỹ thuật nào cưỡng chế". Khẳng định đó sai: cả hai đều tồn tại trên nhánh `feat/app-store-readiness-v1`, và cổng có cưỡng chế thật, fail-closed. Nguyên nhân: đợt rà chỉ quét `main`, không quét nhánh, nên kết luận "không tồn tại" được rút ra từ một phạm vi hẹp hơn phạm vi mà câu văn tuyên bố. Đã thay bằng mô tả theo từng nhánh. |
+| 13/08/2026 | Bổ sung khi kiểm chứng đợt 2 bằng `git for-each-ref` trên mọi ref: cổng còn tồn tại trên nhánh thứ hai `feat/ui-integration-v1`, hai tệp cổng trùng khớp từng byte với `feat/app-store-readiness-v1`. Bảng theo nhánh đã ghi cả hai; cả hai đều chưa gộp vào `main`. |
+| 13/08/2026 | Sửa `commercial.html`: gỡ ba lời mời liên hệ mua gói (Pro, Team/Lab, Enterprise), đổi gói "Free" thành "Open source / tự triển khai AGPL-3.0" (bản cũ mô tả hạn mức theo tháng và tài khoản — dịch vụ chưa tồn tại), bổ sung khối cảnh báo trạng thái quyền ở đầu mục bảng giá, viết lại ghi chú minh bạch cho khớp `COMMERCIAL-LICENSE.md`. Lý do: trang đang chào bán dịch vụ trong khi văn bản cấp phép khai chưa thể cấp phép thương mại. |
 
 ## Định danh commit của bản chuẩn tham chiếu (bổ sung 13/07/2026)
 
