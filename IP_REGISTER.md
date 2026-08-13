@@ -97,9 +97,19 @@ sai sót đã tồn tại:
 5. **Không hồi tố:** giấy phép AGPL-3.0 đã cấp cho bất kỳ bên nào vẫn giữ nguyên
    hiệu lực. Đính chính này chỉ sửa **khai báo**, không thu hồi quyền đã trao.
 6. **Chưa giải quyết:** việc xác định quyền sở hữu bằng văn bản từ Nhà trường.
-   Chừng nào chưa có, mọi hoạt động thương mại hóa — kể cả phát hành trên chợ
-   ứng dụng — vẫn bị chặn. Cổng `MAIDA_RIGHTS_STATUS` trong
-   `frontend/.env.store.example` giữ giá trị `pending-ctu-agreement`.
+   Chừng nào chưa có, mọi hoạt động thương mại hóa, kể cả phát hành trên chợ
+   ứng dụng, vẫn bị chặn.
+
+   **Việc chặn này hiện thuần túy là một quyết định quản trị; chưa có cổng kỹ
+   thuật nào cưỡng chế nó.** Bản đầu của mục 5bis dẫn một cổng
+   `MAIDA_RIGHTS_STATUS` đặt trong `frontend/.env.store.example`. Rà kho ngày
+   13/08/2026 xác nhận cả biến lẫn tệp đó **đều không tồn tại**, ở kho M-AIDA
+   lẫn bản sao `p6/tools/maida/` trong kho luận án; kho chỉ có
+   `frontend/.env.example`, `backend/.env.example` và
+   `backend/.env.production.example`. Câu dẫn đó đã được gỡ, theo đúng nguyên
+   tắc mà chính mục này đặt ra: không khẳng định một thực trạng không kiểm
+   chứng được. Nếu về sau cần một cổng cưỡng chế thật thì phải dựng riêng, và
+   chỉ ghi vào đây sau khi nó đã chạy.
 
 ## 6. Quy tắc sau đóng băng (Post-freeze rules)
 
@@ -118,6 +128,7 @@ sai sót đã tồn tại:
 |---|---|
 | 13/07/2026 | Lập bản ghi; ấn định 7.1.1 là bản chuẩn tham chiếu đã đăng ký; ghi chú đối chiếu 7.1.0/7.1.1 |
 | 13/08/2026 | Đính chính khai báo giấy phép sang AGPL-3.0-only; gỡ khẳng định "full copyright" trong `COMMERCIAL-LICENSE.md`; bổ sung mục 5bis |
+| 13/08/2026 | Gỡ câu dẫn cổng `MAIDA_RIGHTS_STATUS` khỏi mục 5bis điểm 6: rà kho xác nhận biến và tệp `frontend/.env.store.example` không tồn tại. Việc chặn thương mại hóa được ghi lại đúng bản chất là quyết định quản trị, không phải cổng kỹ thuật |
 
 ## Định danh commit của bản chuẩn tham chiếu (bổ sung 13/07/2026)
 
