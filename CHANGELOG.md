@@ -109,7 +109,12 @@ không thay đổi kết quả của các bản ghi P6 đã khóa.
 ## [Unreleased]
 - Web: unified public web app (overview, method, positioning, forest plot,
   interactive study atlas, in-browser demo tool) served via GitHub Pages at
-  https://thuyhuongctu.github.io/M-AIDA/ from the repository root and `docs/`.
+  https://thuyhuongctu.github.io/M-AIDA/ from the repository root.
+  (Corrected 2026-08-13: this line previously said "and `docs/`". The Pages
+  workflow stages `_site` from root `*.html` plus `assets/`, `icons/` and
+  `voice/`; it never reads `docs/`. The stale claim is the likely reason a
+  superseded copy of the site sat under `docs/` for months without anyone
+  correcting it. Those two dead pages were removed on the same date.)
 
 ## [7.1.1] - 2026-07-09
 - Documentation: revised public-facing wording to describe the extraction layer
