@@ -294,9 +294,13 @@ v3.0 (AGPL-3.0-only)**, see [`LICENSE`](LICENSE). The AGPL's Section 13 covers
 network use: running a modified version as a service requires publishing that
 version's source.
 
-The authors also offer **commercial (dual) licensing** for closed-source or
-proprietary use, see [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md). Contact
-thuyhuongctu@gmail.com or patu@ctu.edu.vn.
+Using M-AIDA under the AGPL requires no contact and no fee.
+
+**Commercial licensing is not currently available.** Granting terms other than
+the AGPL requires holding, or being authorised by all co-holders to grant, the
+economic rights in the work. Those rights are not yet formally settled (see the
+next section), so no such grant can be made today. The position is stated in
+full in [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md).
 
 AGPL-3.0-only supersedes the earlier "M-AIDA Academic Source-Available License
 v1.0", retired on 4 August 2026. Any document still carrying that name is out of

@@ -15,7 +15,8 @@ tác giả; khi có khác biệt, văn bản đã nộp chính thức là căn c
 | Kho mã nguồn (repository) | https://github.com/thuyhuongctu/M-AIDA |
 | DOI Zenodo, concept (mọi phiên bản) | 10.5281/zenodo.21282516 |
 | DOI Zenodo, version (bản v7.1.1) | 10.5281/zenodo.21282517 |
-| Giấy phép phân phối (license) | AGPL-3.0-only + giấy phép thương mại song song (xem `LICENSE`, `COMMERCIAL-LICENSE.md`) — sửa 04/08/2026, xem ghi chú cuối sổ |
+| Giấy phép phân phối (license) | **AGPL-3.0-only** (xem `LICENSE`; SPDX: `AGPL-3.0-only`). Xem mục 5bis về việc đính chính. |
+| Cấp phép thương mại (commercial) | **Chưa khả dụng**, do quyền tài sản chưa xác lập (xem `COMMERCIAL-LICENSE.md`) |
 
 ## 2. Tác giả (Authors)
 
@@ -72,6 +73,34 @@ mâu thuẫn:
    df = n - 2 kèm cờ df_imputed; trường machine_proposal bất biến.
    Không thay đổi giá trị bất kỳ bản ghi P6 đã khóa nào. Xem CHANGELOG.md.
 
+## 5bis. Đính chính khai báo giấy phép (Licence declaration correction)
+
+Ghi nhận để hội đồng và cơ quan đăng ký thấy rõ quá trình, không nhằm che giấu
+sai sót đã tồn tại:
+
+1. **Sai sót:** bản ghi này trước đây khai giấy phép phân phối là *"M-AIDA
+   Academic Source-Available License v1.0"*, trong khi tệp `LICENSE` mà chính
+   dòng đó trỏ tới đã mang `SPDX-License-Identifier: AGPL-3.0-only`. Hai khai
+   báo mâu thuẫn nhau.
+2. **Phạm vi lan ra:** cùng chuỗi sai xuất hiện trên trang công bố
+   (`index.html`, `docs/index.html`), nơi người dùng được cho biết bản mã nguồn
+   chỉ miễn phí cho học thuật phi thương mại. Đó là **tuyên bố sai về quyền**
+   hiển thị công khai.
+3. **Khắc phục:** đính chính bản ghi này; sửa `COMMERCIAL-LICENSE.md` (xem mục
+   4 dưới đây); sửa hai trang HTML trong đợt gộp PR #86.
+4. **`COMMERCIAL-LICENSE.md`:** bản trước khẳng định *"the authors hold the full
+   copyright in M-AIDA"* và mời liên hệ để cấp phép thương mại. Khẳng định này
+   **mâu thuẫn với `AUTHORS_AND_OWNERSHIP.md`** (quyền tài sản dự kiến đồng sở
+   hữu với Nhà trường theo Điều 71 Quy chế 5152/QĐ-ĐHCT) và **không có căn cứ**
+   khi thỏa thuận đồng sở hữu chưa ký. Đã thay bằng bản khai đúng hiện trạng:
+   chưa cấp phép thương mại.
+5. **Không hồi tố:** giấy phép AGPL-3.0 đã cấp cho bất kỳ bên nào vẫn giữ nguyên
+   hiệu lực. Đính chính này chỉ sửa **khai báo**, không thu hồi quyền đã trao.
+6. **Chưa giải quyết:** việc xác định quyền sở hữu bằng văn bản từ Nhà trường.
+   Chừng nào chưa có, mọi hoạt động thương mại hóa — kể cả phát hành trên chợ
+   ứng dụng — vẫn bị chặn. Cổng `MAIDA_RIGHTS_STATUS` trong
+   `frontend/.env.store.example` giữ giá trị `pending-ctu-agreement`.
+
 ## 6. Quy tắc sau đóng băng (Post-freeze rules)
 
 - **Không sửa trực tiếp** mã nguồn, kiến trúc, chức năng hay giao diện của bản
@@ -88,6 +117,7 @@ mâu thuẫn:
 | Ngày | Nội dung |
 |---|---|
 | 13/07/2026 | Lập bản ghi; ấn định 7.1.1 là bản chuẩn tham chiếu đã đăng ký; ghi chú đối chiếu 7.1.0/7.1.1 |
+| 13/08/2026 | Đính chính khai báo giấy phép sang AGPL-3.0-only; gỡ khẳng định "full copyright" trong `COMMERCIAL-LICENSE.md`; bổ sung mục 5bis |
 
 ## Định danh commit của bản chuẩn tham chiếu (bổ sung 13/07/2026)
 
@@ -106,14 +136,3 @@ mâu thuẫn:
   thái: sau khi thay tag, Release chuyển về bản nháp theo cơ chế của GitHub; bước còn
   lại là chủ sở hữu bấm Publish (Edit, chọn tag `v7.1.1`, Publish release) và đính kèm
   gói `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.zip` vào mục Assets.
-
-## Ghi chú sửa đổi 04/08/2026 — đồng bộ giấy phép
-
-Dòng "Giấy phép phân phối" trước đây ghi "M-AIDA Academic Source-Available
-License v1.0" — lỗi thời so với quyết định chuyển sang **AGPL-3.0-only kèm
-giấy phép thương mại song song** đã áp dụng ở README. Theo mục 2 checklist hồ
-sơ quyền tác giả (dist/HO_SO_QUYEN_TAC_GIA/09), các tệp `LICENSE`,
-`CITATION.cff`, `COMMERCIAL-LICENSE.md` và mục License của `README.md` đã được
-đồng bộ cùng ngày. Việc đổi giấy phép phân phối không ảnh hưởng nội dung đăng
-ký quyền tác giả: đối tượng đăng ký là tác phẩm phần mềm (mã nguồn), không
-phải điều khoản phân phối.
