@@ -1,11 +1,11 @@
 # Chính sách nhánh
 
 Cập nhật: 2026-08-04 · Trạng thái: **chờ điền nhánh đích** (quyết định của
-chủ kho — xem mục đầu tiên; các quy tắc còn lại áp dụng được ngay).
+chủ kho: xem mục đầu tiên; các quy tắc còn lại áp dụng được ngay).
 
 ## Nhánh đích
 
-Nhánh đích duy nhất của kho này là: `[TÊN NHÁNH — chủ kho điền, quyết định
+Nhánh đích duy nhất của kho này là: `[TÊN NHÁNH, chủ kho điền, quyết định
 5 phút, không chờ dọn xong nhánh cũ]`
 
 Mọi thay đổi đi vào kho qua nhánh này. Các nhánh hợp nhất khác được tuyên
@@ -31,7 +31,7 @@ git branch feat/xyz archive/feat-xyz
 
 Thẻ giữ nguyên lịch sử và luôn nhìn thấy được, nhưng danh sách nhánh sạch
 đi. Với cách này, bản sao `--mirror` là lớp an toàn **thứ hai**, không phải
-lớp duy nhất — nỗi lo mất việc khi phân loại gần như biến mất.
+lớp duy nhất: nỗi lo mất việc khi phân loại gần như biến mất.
 
 ## Bản sao lưu trước khi dọn
 
@@ -60,5 +60,5 @@ Mọi thao tác dọn dẹp sau ngày này đều đảo ngược được từ 
 ## Thứ tự
 
 Chạy lệnh sao lưu → **chọn nhánh đích (làm ngay, việc 5 phút)** → điền tệp
-này → rồi mới dọn 56 nhánh (việc nhiều giờ, làm song song hoặc sau — không
+này → rồi mới dọn 56 nhánh (việc nhiều giờ, làm song song hoặc sau, không
 để nó chặn các việc khác).

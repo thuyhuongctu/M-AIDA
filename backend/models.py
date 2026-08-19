@@ -54,7 +54,7 @@ MetricType = Literal["zero_order", "partial", "semipartial"]
 #   derived  = computed as n − p − 1 from sample_n and n_predictors
 DfSource = Literal["reported", "derived"]
 # Whether the canonical r is an observed statistic or an imputed estimate.
-# metric_type describes the ESTIMAND; estimand_source describes the ORIGIN —
+# metric_type describes the ESTIMAND; estimand_source describes the ORIGIN,
 # two different things that must never be conflated:
 #   observed       = reported r, or r computed exactly from t and df
 #   imputed_pb2005 = estimated from β via Peterson & Brown (2005); feeds
@@ -66,7 +66,7 @@ EstimandSource = Literal["observed", "imputed_pb2005"]
 # pooled model:
 #   reported = taken verbatim from the paper (with evidence)
 #   derived  = computed exactly from reported statistics (e.g. r from t, df)
-#   imputed  = estimated (e.g. r from β via P&B) — sensitivity only
+#   imputed  = estimated (e.g. r from β via P&B), sensitivity only
 SourceProvenance = Literal["reported", "derived", "imputed"]
 
 
@@ -175,7 +175,7 @@ class ExtractedEffect(BaseModel):
         None,
         description=(
             "observed = reported r or exact t→r conversion; imputed_pb2005 = "
-            "estimated from β via Peterson & Brown (2005) — sensitivity "
+            "estimated from β via Peterson & Brown (2005): sensitivity "
             "analyses only, never the main pooling model"
         ),
     )

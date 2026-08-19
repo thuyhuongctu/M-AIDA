@@ -51,4 +51,4 @@ SIL Open Font License 1.1, which permits bundling and redistribution:
 | JetBrains Mono | JetBrains s.r.o. | SIL OFL 1.1 |
 
 Fonts are self-hosted so brand and defense pages render identically with no
-CDN dependency and no third-party requests — including fully offline.
+CDN dependency and no third-party requests: including fully offline.

@@ -1,5 +1,5 @@
 """
-test_effect_size.py — Kiểm thử đơn vị.
+test_effect_size.py: Kiểm thử đơn vị.
 
 Mọi giá trị kỳ vọng đều tính tay và ghi rõ phép tính trong chú thích,
 để hội đồng có thể kiểm lại bằng máy tính bỏ túi.
@@ -24,14 +24,14 @@ def close(a, b, tol=TOL):
 
 
 # =========================================================================
-# A1 · Peterson & Brown — số hạng lambda
+# A1 · Peterson & Brown: số hạng lambda
 # =========================================================================
 
 def test_A1_beta_duong_cong_them_005():
     """
     beta = 0.30, lambda = 1
     r = .98 * 0.30 + .05 * 1 = 0.294 + 0.05 = 0.344
-    Cách cũ cho 0.294 — thấp hơn đúng 0.05.
+    Cách cũ cho 0.294: thấp hơn đúng 0.05.
     """
     rec = from_beta(0.30, n=200, n_predictors=8)
     close(rec.r, 0.344)

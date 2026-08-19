@@ -1,5 +1,5 @@
 ## ===========================================================================
-## effect_size.R — Chuyển đổi cỡ ảnh hưởng cho M-AIDA (bản đã sửa A1–A3)
+## effect_size.R: Chuyển đổi cỡ ảnh hưởng cho M-AIDA (bản đã sửa A1–A3)
 ##
 ##   A1  r = .98*beta + .05*lambda   (lambda = 1 nếu beta >= 0, 0 nếu beta < 0)
 ##       chỉ hợp lệ khi -0.5 <= beta <= 0.5
@@ -112,7 +112,7 @@ legacy_r <- function(stat_type, value, n) {
 }
 
 ## ===========================================================================
-## KIỂM TRA — cùng ví dụ tính tay như bản Python
+## KIỂM TRA: cùng ví dụ tính tay như bản Python
 ## ===========================================================================
 if (sys.nframe() == 0) {
   ok <- function(a, b, lab, tol = 1e-9) {
@@ -164,7 +164,7 @@ if (sys.nframe() == 0) {
 }
 
 ## ===========================================================================
-## QUY TRÌNH GỘP — dán vào script phân tích, cần metafor
+## QUY TRÌNH GỘP: dán vào script phân tích, cần metafor
 ## ===========================================================================
 ## library(metafor); library(clubSandwich)
 ##
@@ -189,12 +189,12 @@ if (sys.nframe() == 0) {
 ## m3 <- rma.mv(yi, vi, random = ~ 1 | study_id/effect_id, data = datp, method = "REML")
 ## m2 <- rma.mv(yi, vi, random = ~ 1 | study_id,           data = datp, method = "REML")
 ## anova(m3, m2)          # ba cấp có thêm được gì không?
-## m3$sigma2              # phân rã phương sai từng cấp — phải báo cáo
+## m3$sigma2              # phân rã phương sai từng cấp: phải báo cáo
 ##
 ## ## 4. Phương sai vững theo cụm, gộp cả mẫu dùng chung (B4)
 ## coef_test(m3, vcov = "CR2", cluster = datp$sample_id)
 ##
-## ## 5. Khoảng dự báo (C4) — với I² cao, đây mới là con số nói đúng sự thật
+## ## 5. Khoảng dự báo (C4): với I² cao, đây mới là con số nói đúng sự thật
 ## predict(m3, transf = transf.ztor)
 ##
 ## ## 6. Thiên lệch công bố: một bảng nhiều ước lượng, không một con số (C3)
@@ -203,14 +203,14 @@ if (sys.nframe() == 0) {
 ## peese <- rma.mv(yi, vi, mods = ~ I(sei^2), random = ~1|study_id/effect_id, data = datp)
 ## ## PET-PEESE: nếu PET bác bỏ H0 hiệu ứng bằng 0 thì lấy PEESE, ngược lại lấy PET.
 ##
-## ## 7. Giả thuyết chữ S (C1) — đóng góp lớn nhất của bài
+## ## 7. Giả thuyết chữ S (C1): đóng góp lớn nhất của bài
 ## sc <- rma.mv(yi, vi, mods = ~ intl_level + I(intl_level^2) + I(intl_level^3),
 ##              random = ~ 1 | study_id/effect_id, data = datp)
 ## ## Dấu kỳ vọng theo Contractor et al. (2003) và Lu & Beamish (2004): - + -
 ##
-## ## 8. Dạng hàm của nghiên cứu gốc — BIẾN ĐIỀU TIẾT, không phải kiểm độ vững
+## ## 8. Dạng hàm của nghiên cứu gốc: BIẾN ĐIỀU TIẾT, không phải kiểm độ vững
 ## ## Tỷ lệ báo cáo phi tuyến khác hẳn giữa nhóm con (Wu 2022, EMNE: 47,7%;
-## ## Y&D 2012, toàn cầu tới 2011: 18,6%) — tức functional_form đồng biến với
+## ## Y&D 2012, toàn cầu tới 2011: 18,6%), tức functional_form đồng biến với
 ## ## chính các biến điều tiết P6 quan tâm (chế độ thể chế, mới nổi/phát
 ## ## triển). Vì vậy nó vào mô hình như một moderator được ước lượng:
 ## ff <- rma.mv(yi, vi, mods = ~ factor(functional_form),

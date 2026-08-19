@@ -65,7 +65,7 @@ class TestConvertBetaToR:
             (0.50, 0.540),    # 0.98·0.50 + 0.05·1 = 0.490 + 0.05 (domain edge)
             (0.10, 0.148),    # 0.98·0.10 + 0.05·1 = 0.098 + 0.05
             (0.0, 0.050),     # λ = 1 at β = 0 (β non-negative)
-            (-0.30, -0.294),  # 0.98·(−0.30) + 0.05·0 — no λ term for β < 0
+            (-0.30, -0.294),  # 0.98·(−0.30) + 0.05·0: no λ term for β < 0
             (-0.50, -0.490),  # 0.98·(−0.50) + 0.05·0 (domain edge)
         ],
     )
@@ -121,7 +121,7 @@ class TestDegreesOfFreedom:
 
 
 # --------------------------------------------------------------------------- #
-# Sampling variance by metric type — the two denominators differ:
+# Sampling variance by metric type, the two denominators differ:
 #   zero-order: (1 − r²)² / (n − 1)      partial: (1 − r²)² / df
 # --------------------------------------------------------------------------- #
 class TestVarianceOfR:
@@ -149,7 +149,7 @@ class TestVarianceOfR:
     def test_same_r_same_n_different_variance_by_type(self):
         # The heart of finding A3: with r = .30 and n = 114 the zero-order
         # denominator is n − 1 = 113 but the partial denominator (13
-        # predictors) is df = 100 — the partial variance must be larger.
+        # predictors) is df = 100: the partial variance must be larger.
         v_zero = StatisticalExtractor.variance_of_r(
             0.30, sample_n=114, metric_type="zero_order"
         )

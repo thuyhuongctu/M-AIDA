@@ -220,7 +220,7 @@ class StatisticalExtractor:
         Returns ``None`` when |β| > 0.5: the approximation was derived only
         for that domain, so such records carry no usable effect size and are
         excluded from conversion (they surface as flagged, unconverted
-        records — not as clamped numbers).
+        records: not as clamped numbers).
         """
         if abs(beta) > StatisticalExtractor.PB_BETA_DOMAIN:
             return None
@@ -257,7 +257,7 @@ class StatisticalExtractor:
 
         The two denominators differ, so pooling weights computed with the
         zero-order formula are wrong for partial correlations. ``metric_type``
-        is therefore required — there is no silent default across types.
+        is therefore required: there is no silent default across types.
         """
         if metric_type == "zero_order":
             if sample_n is None or sample_n <= 1:
@@ -436,7 +436,7 @@ class StatisticalExtractor:
         )
         if computed_r is not None and not evidence_quote:
             # E1 gate: statistics with no verbatim evidence are rejected
-            # outright — an unevidenced number is indistinguishable from a
+            # outright: an unevidenced number is indistinguishable from a
             # default value.
             raise EvidenceMissingError(
                 "statistics proposed with no evidence_quote"

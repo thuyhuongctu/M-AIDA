@@ -1,6 +1,6 @@
 # THUẬT NGỮ VÀ QUY TẮC VIẾT BẢN TIẾNG VIỆT
 
-**M-AIDA · Paper 6** — dùng chung cho trang web, luận án, bài báo và tài liệu
+**M-AIDA · Paper 6**: dùng chung cho trang web, luận án, bài báo và tài liệu
 
 ---
 
@@ -8,9 +8,9 @@
 
 Ba nguyên nhân, không phải một.
 
-**Bản tiếng Việt đang là bản dịch, không phải bản gốc song song.** Câu tiếng Anh viết theo lối chồng danh từ — "random-effects pooled estimate", "human-verified record lock" — dịch sát sẽ thành chuỗi danh từ dài mà tiếng Việt không có cấu trúc để đỡ. Tiếng Việt cần động từ ở chỗ tiếng Anh dùng danh từ.
+**Bản tiếng Việt đang là bản dịch, không phải bản gốc song song.** Câu tiếng Anh viết theo lối chồng danh từ, "random-effects pooled estimate", "human-verified record lock", dịch sát sẽ thành chuỗi danh từ dài mà tiếng Việt không có cấu trúc để đỡ. Tiếng Việt cần động từ ở chỗ tiếng Anh dùng danh từ.
 
-**Thuật ngữ không nhất quán giữa các trang.** Cùng một khái niệm xuất hiện hai ba cách gọi khác nhau vì mỗi trang dịch một lần. Người đọc chuyên ngành sẽ tưởng đó là hai khái niệm khác nhau — đây là kiểu mơ hồ tệ nhất trong văn bản học thuật.
+**Thuật ngữ không nhất quán giữa các trang.** Cùng một khái niệm xuất hiện hai ba cách gọi khác nhau vì mỗi trang dịch một lần. Người đọc chuyên ngành sẽ tưởng đó là hai khái niệm khác nhau, đây là kiểu mơ hồ tệ nhất trong văn bản học thuật.
 
 **Tiêu đề dịch sát mất hết lực.** "The same pipeline, running on a laptop" dịch sát thành một câu vừa dài vừa không nói gì. Tiêu đề phải viết lại từ đầu trong tiếng Việt, không dịch.
 
@@ -18,16 +18,16 @@ Ba nguyên nhân, không phải một.
 
 ## 2. Bốn quy tắc viết
 
-**Quy tắc 1 — Tiêu đề viết lại, không dịch.** Mỗi tiêu đề tiếng Việt phải là một câu khẳng định độc lập, tự nó đứng được. Đọc bản tiếng Việt mà không nhìn bản tiếng Anh vẫn phải thấy tự nhiên.
+**Quy tắc 1: Tiêu đề viết lại, không dịch.** Mỗi tiêu đề tiếng Việt phải là một câu khẳng định độc lập, tự nó đứng được. Đọc bản tiếng Việt mà không nhìn bản tiếng Anh vẫn phải thấy tự nhiên.
 
-**Quy tắc 2 — Tách câu.** Một câu tiếng Anh dài thường phải thành hai hoặc ba câu tiếng Việt. Tiếng Việt không có mệnh đề quan hệ lồng nhau như tiếng Anh; cố giữ một câu sẽ ra câu tối nghĩa.
+**Quy tắc 2: Tách câu.** Một câu tiếng Anh dài thường phải thành hai hoặc ba câu tiếng Việt. Tiếng Việt không có mệnh đề quan hệ lồng nhau như tiếng Anh; cố giữ một câu sẽ ra câu tối nghĩa.
 
-**Quy tắc 3 — Bớt «được» và «việc».** Tiếng Anh học thuật dùng nhiều thể bị động và danh từ hóa. Dịch sát sẽ ra chuỗi «việc… được…» dày đặc. Đổi sang chủ động và dùng động từ.
+**Quy tắc 3: Bớt «được» và «việc».** Tiếng Anh học thuật dùng nhiều thể bị động và danh từ hóa. Dịch sát sẽ ra chuỗi «việc… được…» dày đặc. Đổi sang chủ động và dùng động từ.
 
 > Kém: *Việc kiểm chứng bản ghi được thực hiện bởi nhà nghiên cứu trước khi việc khóa dữ liệu được tiến hành.*
 > Tốt: *Nhà nghiên cứu kiểm chứng từng bản ghi rồi mới khóa.*
 
-**Quy tắc 4 — Một khái niệm, một từ.** Chọn một cách gọi trong bảng dưới và dùng thống nhất ở mọi nơi. Không thay đổi để tránh lặp — trong văn bản học thuật, lặp đúng thuật ngữ là ưu điểm, không phải nhược điểm.
+**Quy tắc 4, Một khái niệm, một từ.** Chọn một cách gọi trong bảng dưới và dùng thống nhất ở mọi nơi. Không thay đổi để tránh lặp, trong văn bản học thuật, lặp đúng thuật ngữ là ưu điểm, không phải nhược điểm.
 
 ---
 
@@ -115,7 +115,7 @@ Ký hiệu thống kê giữ nguyên và in nghiêng: *r*, *I²*, *k*, *K*, *n*,
 
 ## 5. Chữ hoa và dấu
 
-Eyebrow trong hệ thiết kế là chữ hoa, giãn chữ, phông mono. Tiếng Việt viết hoa toàn bộ với dấu chồng — Ế, Ộ, Ữ, Ằ — dễ bị cắt ngọn ở dòng chật và khó đọc khi giãn chữ.
+Eyebrow trong hệ thiết kế là chữ hoa, giãn chữ, phông mono. Tiếng Việt viết hoa toàn bộ với dấu chồng, Ế, Ộ, Ữ, Ằ, dễ bị cắt ngọn ở dòng chật và khó đọc khi giãn chữ.
 
 Hai cách xử lý, chọn một và dùng nhất quán:
 
@@ -131,7 +131,7 @@ Cách thứ nhất dễ hơn và đọc tốt hơn.
 - Đọc to toàn bộ trang tiếng Việt. Chỗ nào phải đọc lại mới hiểu thì viết lại chỗ đó.
 - Tìm mọi cụm «việc … được». Gần như tất cả đều sửa được thành câu chủ động.
 - Đối chiếu bảng thuật ngữ: mỗi khái niệm chỉ được xuất hiện dưới một tên.
-- Kiểm chuỗi dài nhất trong nút và nhãn — tiếng Việt dài hơn tiếng Anh khoảng 25–30%.
+- Kiểm chuỗi dài nhất trong nút và nhãn: tiếng Việt dài hơn tiếng Anh khoảng 25–30%.
 - Kiểm mọi eyebrow chữ hoa xem dấu có bị cắt ngọn không.
 - Kiểm mọi con số: dấu thập phân giống hệt bản tiếng Anh.
 
@@ -141,16 +141,16 @@ Cách thứ nhất dễ hơn và đọc tốt hơn.
 
 Nếu bản tiếng Việt chưa đạt chất lượng công bố, **để bản tiếng Anh là bản chính và ghi rõ bản tiếng Việt đang hoàn thiện** vẫn tốt hơn là phát hành một bản dịch tối nghĩa. Trang này hướng tới người đọc quốc tế, và một bản tiếng Việt kém làm giảm uy tín nhiều hơn là không có bản tiếng Việt.
 
-Nhưng nếu bản sắc Việt Nam là một phần chủ ý của dự án — mà nó đúng là vậy — thì bản tiếng Việt xứng đáng được viết như một bản gốc, không phải một bản dịch. Đó là công việc vài buổi, không phải vài giờ, và nên xếp vào sau Cổng 1 chứ không phải trước.
+Nhưng nếu bản sắc Việt Nam là một phần chủ ý của dự án, mà nó đúng là vậy, thì bản tiếng Việt xứng đáng được viết như một bản gốc, không phải một bản dịch. Đó là công việc vài buổi, không phải vài giờ, và nên xếp vào sau Cổng 1 chứ không phải trước.
 
 ---
 
-## Phụ lục (04/08/2026) — bốn mẫu đã duyệt và ba mẫu hình áp cho phần còn lại
+## Phụ lục (04/08/2026): bốn mẫu đã duyệt và ba mẫu hình áp cho phần còn lại
 
 Bốn đoạn dưới đây do chủ dự án viết lại làm chuẩn giọng; đã áp vào trang.
 
 1. **Câu kết dòng thời gian:** «Từ những ghi chép y án thời cổ đại, qua các
-   ước lượng hình thức, đến hồi quy tổng hợp trong kinh tế học năm 1989 —
+   ước lượng hình thức, đến hồi quy tổng hợp trong kinh tế học năm 1989,
    dòng phát triển ấy kéo dài hàng thế kỷ. M-AIDA đứng ở khâu cuối: khâu
    trích xuất, nơi quyết định cả chuỗi có kiểm toán được hay không.»
 2. **Chú thích Hình 1:** «Dòng thời gian của tổng hợp nghiên cứu định lượng:
@@ -161,7 +161,7 @@ Bốn đoạn dưới đây do chủ dự án viết lại làm chuẩn giọng;
    máy chủ Python. […] Vì vậy bảng điều khiển phân phối dưới dạng mã nguồn,
    người dùng tự chạy trên máy mình.»
 4. **Tiêu đề viết lại từ ý:** «Bảng điều khiển đã dựng nên bộ dữ liệu này.»
-   (nối phần mềm với dữ liệu — đúng đóng góp thật; bản dịch sát về laptop vô
+   (nối phần mềm với dữ liệu: đúng đóng góp thật; bản dịch sát về laptop vô
    tình nhấn vào giới hạn.)
 
 Ba mẫu hình:
@@ -174,5 +174,5 @@ Ba mẫu hình:
   gánh phần nối.
 
 Ghi chú công cụ: chỉ số mật độ «việc/được/sự» dùng để **xếp hạng ưu tiên**,
-không đặt ngưỡng cứng — «được» nghĩa khả năng (*kiểm toán được*, *chạy được*)
+không đặt ngưỡng cứng: «được» nghĩa khả năng (*kiểm toán được*, *chạy được*)
 là tự nhiên, không đếm là lỗi.

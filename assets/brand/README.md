@@ -1,4 +1,4 @@
-# M-AIDA — Bộ tệp nhận diện
+# M-AIDA: Bộ tệp nhận diện
 
 Hướng A: hình thoi gộp chia đôi. Nửa trái rỗng viền mực là bản ghi máy đề xuất,
 nửa phải đặc hổ phách là bản ghi người đã khóa, trục ngang là đường không hiệu
@@ -39,7 +39,7 @@ cả khi máy người xem không có phông Source Serif 4 hay JetBrains Mono.
 | Vai trò | Mã |
 |---|---|
 | Mực | `#1a1714` |
-| Hổ phách — đã khóa và đã gộp | `#c0862a` |
+| Hổ phách: đã khóa và đã gộp | `#c0862a` |
 | Trục, đường kẻ mảnh | `#c4b8a1` |
 | Nền giấy | `#f6f1e7` |
 | Nền console | `#171a19` |
@@ -53,11 +53,11 @@ cả khi máy người xem không có phông Source Serif 4 hay JetBrains Mono.
 - Không tô hổ phách cả hai nửa. Không xoay hình thoi. Không đổi màu hổ phách
   sang màu khác.
 - Không đặt logo lên ảnh chụp; chỉ đặt trên nền giấy hoặc nền console.
-- Không dùng logo thay cho hình thoi gộp trong biểu đồ rừng thật — dữ liệu và
+- Không dùng logo thay cho hình thoi gộp trong biểu đồ rừng thật, dữ liệu và
   nhận diện phải tách bạch.
 - Bản dưới 16px là tệp riêng, không phải bản thu nhỏ tự động.
 
-## Hai hệ thiết kế — lằn ranh theo bên phát hành
+## Hai hệ thiết kế: lằn ranh theo bên phát hành
 
 Hệ sinh thái có hai hệ thiết kế **có chủ ý**, và lằn ranh nằm ở bên phát
 hành, không nằm ở loại nội dung:
@@ -71,7 +71,7 @@ hội thảo và trang bảo vệ luận án là M-AIDA (thứ đang được b�
 công trình). Hai ràng buộc cứng:
 
 - Hai hệ **không bao giờ dùng chung một tệp token**.
-- **Màu hổ phách không xuất hiện trong hệ thể chế** — hổ phách là dấu hiệu
+- **Màu hổ phách không xuất hiện trong hệ thể chế**, hổ phách là dấu hiệu
   "đã khóa và đã gộp" của M-AIDA; để nó rò sang tài liệu thể chế là làm
   loãng đúng thứ khó bắt chước nhất.
 

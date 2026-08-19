@@ -1,4 +1,4 @@
-# M-AIDA — production compose for a single host (VPS / container host).
+# M-AIDA: production compose for a single host (VPS / container host).
 # See DEPLOY.md for the full runbook.
 #
 #   cp backend/.env.production.example backend/.env    # fill in real secrets
@@ -30,7 +30,7 @@ services:
         VITE_API_URL: ""            # same-origin; nginx proxies /api/ to backend
     restart: unless-stopped
     ports:
-      - "80:3000"                   # host:container — front this with Caddy/Traefik for TLS
+      - "80:3000"                   # host:container, front this with Caddy/Traefik for TLS
     depends_on:
       backend:
         condition: service_healthy

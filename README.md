@@ -16,7 +16,7 @@ exports a reproducible effect-size dataset for three-level meta-analytic regress
 Built to support the P6 (meta-analysis) component of the first author's doctoral
 dissertation on the internationalization-performance relationship.
 
-**Scope — which kinds of literature review this serves.** M-AIDA is an
+**Scope: which kinds of literature review this serves.** M-AIDA is an
 extraction-and-verification engine at the data-collection stage of PRISMA; it
 does not search the literature, does not screen records, and does not run the
 final statistical model. It serves a **meta-analysis** in full (its design
@@ -148,14 +148,14 @@ confirmed for every PRIMARY study; the freeze command enforces both gates.
 3. **Convert**: the canonical target is Pearson r. When only a derived statistic is
    reported, r is computed from t using Cohen (1988) with df = n − p − 1 taken from
    the model's predictor count, or from a standardized beta using Peterson and
-   Brown (2005) — full formula r = 0.98β + 0.05λ, valid only for |β| ≤ 0.5;
+   Brown (2005): full formula r = 0.98β + 0.05λ, valid only for |β| ≤ 0.5;
    out-of-domain betas are rejected, never approximated. Each record carries
    `metric_type`, `estimand_source`, and `source_controls`, so beta-derived values
    enter sensitivity analysis only, and a three-level confidence score is attached.
 4. **Evidence gate**: a record is created only with page-and-quote evidence for
    **both** the statistic and the sample size (`evidence_page`/`evidence_quote`,
    `n_evidence_page`/`n_evidence_quote`). Missing evidence raises HTTP 422 and no
-   record is stored — the system has no default or fallback output path for any
+   record is stored: the system has no default or fallback output path for any
    input.
 5. **Verify**: the principal investigator reviews each field; any record with
    confidence below 0.70 is flagged for mandatory review.
@@ -170,7 +170,7 @@ R twin `effect_size.R` feeding the metafor pipeline). `migrate_v8.py` derives a
 new lock generation from a released dataset without ever editing it: v7.1.1
 (DOI-pinned) stays immutable, every derived record carries a `derived_from`
 pointer, and excluded records keep a written reason (PRISMA-ready). Each run
-emits `figures.json` — the single source every display surface reads its
+emits `figures.json`: the single source every display surface reads its
 headline numbers from. Policy details are in
 [`analysis/README.md`](analysis/README.md).
 
@@ -180,7 +180,7 @@ The repository is also served as a static site (GitHub Pages):
 
 - **Main page** ([index.html](https://thuyhuongctu.github.io/M-AIDA/)): overview,
   positioning, the interactive atlas of the locked study corpus, the in-browser
-  extraction console (three sample papers — r, t, standardized beta — walked
+  extraction console (three sample papers, r, t, standardized beta, walked
   through the same convert/verify/lock/export gates; it refuses PDFs, which need
   the backend), and the Huong AI tour guide. Bilingual EN/VI.
 - **Defense App** ([defense.html](https://thuyhuongctu.github.io/M-AIDA/defense.html)):
@@ -223,7 +223,7 @@ Data & Melody page carries the full song cover: the author's ao dai portrait on 
 floral backdrop with animated falling music notes and a Vietnam map watermark.
 
 **Design.** The main and commercial pages ship a premium editorial design in the
-*"Je m'appelle Hương"* brand palette — a warm ivory default theme with a
+*"Je m'appelle Hương"* brand palette: a warm ivory default theme with a
 dusty-mauve primary and a warm-gold accent, a rosewood dark theme behind the
 toggle, glass cards, scroll-reveal animations, and a scroll progress bar. The
 academic `asia-*` atlas pages keep their own terracotta/ochre/green data theme. All character artwork
@@ -239,7 +239,7 @@ Design tokens and components are canonical in [`css/tokens.css`](css/tokens.css)
 and [`css/components.css`](css/components.css), documented in
 [`styleguide.html`](styleguide.html) (plus a fully offline
 `styleguide-standalone.html`). Fonts are self-hosted woff2 subsets
-([`assets/fonts/`](assets/fonts/), SIL OFL — see `THIRD_PARTY_LICENSES.md`);
+([`assets/fonts/`](assets/fonts/), SIL OFL: see `THIRD_PARTY_LICENSES.md`);
 no external font CDN is called.
 
 **Data consistency.** Every headline research number on the site (studies,

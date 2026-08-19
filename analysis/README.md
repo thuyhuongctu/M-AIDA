@@ -1,4 +1,4 @@
-# M-AIDA · Bước 1 — Sửa ba công thức A1–A3
+# M-AIDA · Bước 1: Sửa ba công thức A1–A3
 
 Gói mã thay thế cho tầng chuyển đổi cỡ ảnh hưởng của M-AIDA v7.1.1.
 Bản backend (`backend/extractor.py`) đã được đồng bộ theo đúng ngữ nghĩa
@@ -15,27 +15,27 @@ dữ liệu và cho pipeline R.
 
 ## Ba lỗi được sửa
 
-**A1 — công thức Peterson & Brown thiếu số hạng λ.**
+**A1: công thức Peterson & Brown thiếu số hạng λ.**
 Bản cũ: `r = .98·β`. Đúng: `r = .98·β + .05·λ` với λ = 1 khi β ≥ 0 và
 λ = 0 khi β < 0. Phép quy đổi chỉ hợp lệ trong khoảng β từ −0,50 đến 0,50;
 ngoài khoảng đó bản ghi bị **loại trừ**, không phải chỉ gắn cờ.
 Điểm quan trọng nhất: vì λ chỉ cộng cho β không âm, việc bỏ quên nó gây
-**lệch một chiều** — chỉ hạ thấp các hiệu ứng dương. Sai số không tự triệt
+**lệch một chiều**: chỉ hạ thấp các hiệu ứng dương. Sai số không tự triệt
 tiêu khi lấy trung bình.
 
-**A2 — bậc tự do.**
+**A2: bậc tự do.**
 Bản cũ: `df = n − 2`. Đúng cho thống kê t lấy từ hồi quy bội:
 `df = n − p − 1`. Thiếu p thì hàm ném lỗi thay vì lấy mặc định, để bản ghi
 rơi vào hàng chờ rà soát.
 
-**A3 — hai đại lượng, hai công thức phương sai.**
+**A3: hai đại lượng, hai công thức phương sai.**
 Tương quan bậc không: `Var(r) = (1 − r²)² / (n − 1)`.
 Tương quan riêng phần: `Var(r_p) = (1 − r_p²)² / df`.
 Dùng nhầm công thức nghĩa là trọng số của nghiên cứu trong mô hình gộp sai,
 và ước lượng gộp sai theo.
 
 **Quyết định đã chốt (04/08/2026): bản ghi suy từ β mang
-`metric_type = zero_order`** — Peterson & Brown hiệu chuẩn công thức bằng
+`metric_type = zero_order`**: Peterson & Brown hiệu chuẩn công thức bằng
 cách khớp với r bậc không quan sát được (số hạng `.05·λ` tồn tại vì phép
 khớp đó). `metric_type` mô tả *đại lượng cần ước lượng*; nguồn gốc con số
 nằm ở hai trường riêng, tách thành ba lớp:
@@ -44,10 +44,10 @@ nằm ở hai trường riêng, tách thành ba lớp:
 |---|---|---|---|---|
 | r báo cáo | `zero_order` | `observed` | False | có |
 | t hồi quy | `partial` | `observed` | True | có |
-| β quy đổi | `zero_order` | `imputed_pb2005` | True | **không — chỉ độ nhạy** |
+| β quy đổi | `zero_order` | `imputed_pb2005` | True | **không: chỉ độ nhạy** |
 
 Bản ghi suy ra không vào mô hình chính vì `(1−r²)²/(n−1)` coi giá trị suy
-ra như quan sát trực tiếp — bỏ qua sai số quy đổi nên trọng số vốn đã lớn
+ra như quan sát trực tiếp: bỏ qua sai số quy đổi nên trọng số vốn đã lớn
 hơn mức đáng có. Trong R: β vào nhóm `ZCOR` nhưng mô hình chính lọc
 `estimand_source == "observed"`.
 
@@ -75,21 +75,21 @@ CSV đầu vào cần các cột `author, year, stat_type, value, n` và nên c�
 | Chiao & Yang | β 0.18 | 0.1764 | 0.2264 | +0.0500 | zero_order (imputed) |
 | Denis et al. | β −0.22 | −0.2156 | −0.2156 | +0.0000 | zero_order (imputed) |
 | Nghien cuu Y | t 2.5 | 0.2724 | 0.2921 | +0.0197 | partial |
-| Nghien cuu Z | β 0.62 | — | loại trừ | — | ngoài khoảng hợp lệ |
+| Nghien cuu Z | β 0.62 |   | loại trừ |   | ngoài khoảng hợp lệ |
 
 **5 bản ghi tăng, 0 bản ghi giảm.** Đây chính là dấu hiệu của lệch một
 chiều: sai số cũ chỉ đẩy theo một hướng, nên ước lượng gộp bị hạ thấp một
 cách có hệ thống chứ không phải nhiễu ngẫu nhiên.
 
 Lưu ý về vai trò của bộ mẫu: phép so khớp từng byte giữa đầu ra
-`recode_csv` và `mau_moi.csv` là **kiểm thử hồi quy** — nó chứng minh mã
+`recode_csv` và `mau_moi.csv` là **kiểm thử hồi quy**: nó chứng minh mã
 chạy ổn định giữa các lần sửa, không chứng minh công thức đúng. Tính đúng
 đắn nằm ở 20 kiểm thử tính tay; khi viết bài, dẫn các ví dụ tính tay chứ
 không dẫn phép so khớp byte.
 
-## Thế hệ khóa v8.0.0 — không ghi đè tập khóa v7.1.1
+## Thế hệ khóa v8.0.0: không ghi đè tập khóa v7.1.1
 
-Sửa công thức nghĩa là các bản ghi đã khóa cho giá trị `r` khác — nhưng
+Sửa công thức nghĩa là các bản ghi đã khóa cho giá trị `r` khác, nhưng
 tập v7.1.1 đã phát hành kèm DOI và tuyên bố cốt lõi của M-AIDA là bản ghi
 khóa rồi thì không sửa. Vì vậy việc mã lại được xử lý như **một thế hệ
 khóa mới**, không phải một bản sửa tại chỗ:

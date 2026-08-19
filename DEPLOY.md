@@ -8,12 +8,12 @@ only service you expose.
 > **LLM key is optional for a demo.** Live PDF extraction needs `LLM_API_KEY`;
 > without it `/api/extract` returns an explicit `503` and every other feature
 > (verify, lock, CSV export, forest data) still works. For a **thesis defense**
-> use the offline harness instead — see [`demo/HUONG_DAN_BAO_VE.md`](demo/HUONG_DAN_BAO_VE.md)
+> use the offline harness instead: see [`demo/HUONG_DAN_BAO_VE.md`](demo/HUONG_DAN_BAO_VE.md)
 > (`python demo/run_defense.py`), which needs no host and no network.
 
 ---
 
-## Option A — Single host / VPS (recommended, matches the app design)
+## Option A: Single host / VPS (recommended, matches the app design)
 
 Requirements: a Linux host with Docker + Docker Compose.
 
@@ -34,15 +34,15 @@ docker run -d --name caddy --network host \
 
 Update to a new version: `git pull && docker compose -f docker-compose.prod.yml up -d --build`.
 
-## Option B — Prebuilt images (GHCR)
+## Option B: Prebuilt images (GHCR)
 
 Tagging a release (`git tag v7.1.x && git push --tags`) runs
 [`.github/workflows/deploy-ghcr.yml`](.github/workflows/deploy-ghcr.yml), which
 publishes `ghcr.io/<owner>/M-AIDA/maida-backend` and `…/maida-frontend`. A host
-can then `docker pull` those images instead of building — point a compose file
+can then `docker pull` those images instead of building, point a compose file
 at the image tags rather than `build:`.
 
-## Option C — Managed host (Render / Fly.io / Railway)
+## Option C: Managed host (Render / Fly.io / Railway)
 
 Deploy the two Dockerfiles as two services and set the LLM secrets in the host
 dashboard. Because the services are then on **separate origins**, build the
@@ -80,7 +80,7 @@ On hosts that inject their own `$PORT`, override the backend start command to
 Studies are now persisted in SQLite, so they survive a process restart; that is
 sufficient for single-researcher and demo use but not for multi-tenant service.
 Before paid/commercial use, add PostgreSQL persistence, authentication +
-multi-tenancy, upload limits with server-side type checking, and billing — see
+multi-tenancy, upload limits with server-side type checking, and billing, see
 the staged plan in
 [`../p6/tools/maida/KE_HOACH_TRIEN_KHAI_APP_vi.md`](KE_HOACH_TRIEN_KHAI_APP_vi.md)
 (Part B) in the dissertation repo.

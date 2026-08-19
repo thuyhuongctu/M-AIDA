@@ -1,5 +1,5 @@
 """
-effect_size.py — Chuyển đổi cỡ ảnh hưởng cho M-AIDA.
+effect_size.py: Chuyển đổi cỡ ảnh hưởng cho M-AIDA.
 
 Sửa ba lỗi trong bản v7.1.1:
 
@@ -42,7 +42,7 @@ PARTIAL = "partial"
 
 # estimand_source: đại lượng là quan sát trực tiếp hay suy ra qua P&B (2005).
 # metric_type mô tả ĐẠI LƯỢNG CẦN ƯỚC LƯỢNG; estimand_source mô tả NGUỒN GỐC
-# con số — hai thứ khác nhau và không được lẫn.
+# con số: hai thứ khác nhau và không được lẫn.
 OBSERVED = "observed"
 IMPUTED_PB2005 = "imputed_pb2005"
 
@@ -55,17 +55,17 @@ class ConversionError(ValueError):
 class Record:
     """Một bản ghi cỡ ảnh hưởng đã chuyển đổi, đủ trường để tái lập."""
     r: float
-    metric_type: str                 # A3 — đại lượng cần ước lượng
+    metric_type: str                 # A3, đại lượng cần ước lượng
     estimand_source: str             # observed | imputed_pb2005
     source_controls: bool            # thống kê nguồn có kiểm soát biến khác không
-    variance: float                  # A3 — phương sai trên thang r
+    variance: float                  # A3, phương sai trên thang r
     fisher_z: float                  # A4
-    var_z: float                     # A4 — phương sai trên thang z
+    var_z: float                     # A4, phương sai trên thang z
     df: Optional[int]                # A2
     df_source: str                   # "reported" | "derived" | "not_applicable"
     n: int
     n_predictors: Optional[int]      # A2
-    variance_formula: str            # A3 — ghi rõ công thức đã dùng
+    variance_formula: str            # A3, ghi rõ công thức đã dùng
     lambda_applied: Optional[bool]   # A1
     beta_in_range: Optional[bool]    # A1
     confidence: float
@@ -111,7 +111,7 @@ def degrees_of_freedom(n: int, n_predictors: Optional[int],
 
 
 # --------------------------------------------------------------------------
-# Phương sai — A3
+# Phương sai: A3
 # --------------------------------------------------------------------------
 
 def variance_zero_order(r: float, n: int) -> float:
@@ -129,7 +129,7 @@ def variance_partial(r: float, df: int) -> float:
 
 
 # --------------------------------------------------------------------------
-# Fisher z — A4
+# Fisher z: A4
 # --------------------------------------------------------------------------
 
 def fisher_z(r: float) -> float:
@@ -213,11 +213,11 @@ def from_beta(beta: float, n: int, n_predictors: Optional[int] = None,
     MỘT CHIỀU: chỉ hạ thấp các hiệu ứng dương.
 
     Đại lượng cần ước lượng là TƯƠNG QUAN BẬC KHÔNG: P&B hiệu chuẩn công
-    thức bằng cách khớp với r bậc không quan sát được — số hạng .05*lambda
+    thức bằng cách khớp với r bậc không quan sát được, số hạng .05*lambda
     tồn tại chính vì phép khớp đó. metric_type mô tả đại lượng cần ước
     lượng, không mô tả nguồn gốc con số; nguồn gốc (suy ra, thống kê nguồn
     có kiểm soát biến khác) nằm ở estimand_source và source_controls.
-    Bản ghi suy ra KHÔNG vào mô hình chính — chỉ phân tích độ nhạy: công
+    Bản ghi suy ra KHÔNG vào mô hình chính, chỉ phân tích độ nhạy: công
     thức phương sai bậc không coi giá trị suy ra như quan sát trực tiếp,
     tức bỏ qua sai số quy đổi, nên trọng số vốn đã lớn hơn mức đáng có.
     """
@@ -232,7 +232,7 @@ def from_beta(beta: float, n: int, n_predictors: Optional[int] = None,
     lam = 1.0 if beta >= 0 else 0.0
     r = 0.98 * beta + 0.05 * lam
 
-    # df vẫn ghi lại nếu suy được — phục vụ kiểm toán, không dùng cho
+    # df vẫn ghi lại nếu suy được: phục vụ kiểm toán, không dùng cho
     # phương sai (đại lượng đích là bậc không).
     try:
         df, df_source = degrees_of_freedom(n, n_predictors, df_reported)

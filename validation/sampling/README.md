@@ -1,4 +1,4 @@
-# Sampling frame v1 — provisional, not yet locked
+# Sampling frame v1: provisional, not yet locked
 
 `candidate_sample_v1.csv` contains **40 PRIMARY studies and 10 RESERVE
 studies** selected deterministically from the P6 study database. The sampling

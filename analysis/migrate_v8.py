@@ -1,5 +1,5 @@
 """
-migrate_v8.py — Bước 2: di trú lược đồ và sinh thế hệ khóa v8.0.0 (bản nháp).
+migrate_v8.py, Bước 2: di trú lược đồ và sinh thế hệ khóa v8.0.0 (bản nháp).
 
 Nguyên tắc thế hệ khóa (xem README.md):
   - KHÔNG đụng vào tệp v7.1.1. Script chỉ ĐỌC nó.
@@ -7,10 +7,10 @@ Nguyên tắc thế hệ khóa (xem README.md):
     trỏ về effect_id gốc của v7.1.1.
   - Tập v7.1.1 chỉ lưu r cuối cùng, nên:
       * 239 bản ghi r trực tiếp (is_estimated = 0): tính lại đầy đủ ngay
-        bằng analysis/effect_size.py — A1/A2 không chạm tới chúng, chỉ
+        bằng analysis/effect_size.py: A1/A2 không chạm tới chúng, chỉ
         bổ sung phương sai, Fisher z và metric_type (A3/A4).
       * 47 bản ghi suy từ thống kê khác (is_estimated = 1): KHÔNG thể
-        tính lại từ CSV — thống kê nguồn (t hay β, giá trị, df, số biến
+        tính lại từ CSV: thống kê nguồn (t hay β, giá trị, df, số biến
         giải thích) phải thu hồi từ hồ sơ mã hóa gốc. Script sinh bảng
         thu hồi riêng; điền xong chạy lại script với --recovered để hoàn
         tất các bản ghi này.
@@ -21,9 +21,9 @@ Dùng:
             --recovered <bảng_thu_hồi_đã_điền.csv>
 
 Sinh ra trong <thư_mục_ra>:
-    p6_study_database_v8_draft.csv   — 286 bản ghi, lược đồ mở rộng
-    thu_hoi_thong_ke_nguon_47.csv    — bảng thu hồi (chỉ khi chưa --recovered)
-    bao_cao_di_tru.txt               — tóm tắt: đã tính / chờ thu hồi / chênh lệch
+    p6_study_database_v8_draft.csv: 286 bản ghi, lược đồ mở rộng
+    thu_hoi_thong_ke_nguon_47.csv: bảng thu hồi (chỉ khi chưa --recovered)
+    bao_cao_di_tru.txt, tóm tắt: đã tính / chờ thu hồi / chênh lệch
 """
 
 from __future__ import annotations
@@ -53,10 +53,10 @@ V8_FIELDS = [
     "variance", "variance_formula", "fisher_z", "var_z",
     "df", "df_source", "n_predictors", "lambda_applied", "beta_in_range",
     "confidence", "flagged",
-    # trường mã hóa mới — PI điền, script không đoán
+    # trường mã hóa mới: PI điền, script không đoán
     "selection_rule", "sample_id", "sample_id_suggested",
     "coder_1", "coder_2", "model_version", "prompt_hash", "intl_level",
-    # dạng hàm mà NGHIÊN CỨU GỐC báo cáo (linear/quadratic/cubic/other) —
+    # dạng hàm mà NGHIÊN CỨU GỐC báo cáo (linear/quadratic/cubic/other),
     # BIẾN ĐIỀU TIẾT trong meta-regression, không phải kiểm tra độ vững:
     # tỷ lệ phi tuyến khác hẳn giữa các nhóm con (Wu 2022 EMNE 47,7% so với
     # Y&D 2012 toàn cầu 18,6%), tức nó đồng biến với chính các biến điều
@@ -70,21 +70,21 @@ RECOVERY_FIELDS = [
     "r_v711", "notes_v711",
     # người thu hồi điền từ hồ sơ mã hóa gốc hoặc bài gốc.
     # KIỂM BẢNG TƯƠNG QUAN TRƯỚC: nghiên cứu hồi quy vẫn thường in bảng
-    # tương quan mô tả — nếu có, lấy r bậc không trực tiếp (vào thẳng mô
+    # tương quan mô tả: nếu có, lấy r bậc không trực tiếp (vào thẳng mô
     # hình chính, không quy đổi, không đụng A1/A2). Chỉ lấy hệ số hồi quy
     # (t hoặc beta) khi bài KHÔNG có bảng tương quan.
     "stat_type",        # r | t | beta  (ưu tiên theo đúng thứ tự này)
     # QUAN TRỌNG HƠN CẢ stat_type: con số được lấy từ ĐẶC TẢ NÀO của bài?
-    #   bivariate                      — bảng tương quan / thống kê hai biến
-    #   linear_term_in_linear_model    — hệ số DOI trong mô hình chỉ có bậc nhất
-    #   linear_term_in_quadratic_model — hệ số bậc nhất trong mô hình CÓ bậc hai
+    #   bivariate: bảng tương quan / thống kê hai biến
+    #   linear_term_in_linear_model: hệ số DOI trong mô hình chỉ có bậc nhất
+    #   linear_term_in_quadratic_model: hệ số bậc nhất trong mô hình CÓ bậc hai
     #                                    -> KHÔNG phải tương quan theo bất kỳ
     #                                    nghĩa nào (là độ dốc tại một điểm);
     #                                    script LOẠI khỏi gộp, không quy đổi
-    #   other                          — ghi rõ ở recovery_source, chờ rà
+    #   other: ghi rõ ở recovery_source, chờ rà
     "effect_extracted_from",
     "source_value",     # giá trị t hoặc beta như bài báo cáo
-    "n_reported",       # CỠ MẪU THẬT từ bài — BẮT BUỘC. n của v7.1.1 trong
+    "n_reported",       # CỠ MẪU THẬT từ bài: BẮT BUỘC. n của v7.1.1 trong
                         # nhóm này 91% chia hết cho 10, tức là điền ước lượng;
                         # n bịa là TRỌNG SỐ bịa. Không hồi được thì ghi
                         # KHONG_HOI_DUOC -> bản ghi bị loại, không điền ước lượng
@@ -96,7 +96,7 @@ RECOVERY_FIELDS = [
 ]
 
 # r_source theo loại thống kê nguồn: reported (nguyên văn) / derived (tính
-# chính xác từ t, df) / imputed (P&B từ beta — chỉ độ nhạy)
+# chính xác từ t, df) / imputed (P&B từ beta, chỉ độ nhạy)
 R_SOURCE_BY_STAT = {"r": "reported", "t": "derived", "beta": "imputed"}
 
 
@@ -121,7 +121,7 @@ def _base_row(src: dict) -> dict:
         "include_flag": src["include_flag"],
         "n": src["n"],
         "r_v711": src["r"],
-        # gợi ý cụm mẫu để dò mẫu dùng chung (B4) — PI xác nhận vào sample_id
+        # gợi ý cụm mẫu để dò mẫu dùng chung (B4), PI xác nhận vào sample_id
         "sample_id_suggested": f"{src['country']}_{src['sample_start']}_{src['sample_end']}",
         "notes": src["notes"],
     }
@@ -158,7 +158,7 @@ def _pool_dl(rows: list[dict]) -> dict | None:
 
     Chỉ để ĐỊNH HƯỚNG phần thảo luận ngay khi mã lại xong; con số chính
     thức lấy từ metafor ba cấp (bước 5). Giả định độc lập giữa các hiệu
-    ứng — với 1,21 hiệu ứng/nghiên cứu, sai số của giả định này nhỏ.
+    ứng: với 1,21 hiệu ứng/nghiên cứu, sai số của giả định này nhỏ.
     """
     import math
     pts = [(float(r["fisher_z"]), float(r["var_z"]), r["study_id"])
@@ -224,7 +224,7 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
             if not n_rep_raw.isdigit():
                 # Không hồi được n thật thì LOẠI: một n điền tay là một trọng
                 # số đặt ngầm không ai kiểm được.
-                why = ("không hồi được n thật (n v7.1.1 = %s là ước lượng) — "
+                why = ("không hồi được n thật (n v7.1.1 = %s là ước lượng), "
                        "loại, không điền ước lượng" % src["n"])
                 row["stat_type"] = rec.get("stat_type", "")
                 row["source_value"] = rec.get("source_value", "")
@@ -241,9 +241,9 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
             row["effect_extracted_from"] = eff_from
             if eff_from == "linear_term_in_quadratic_model":
                 # Độ dốc tại một điểm (thường DOI = 0 hoặc tại trung bình),
-                # không phải liên hệ trung bình — gộp vào r̄ là vô nghĩa,
+                # không phải liên hệ trung bình: gộp vào r̄ là vô nghĩa,
                 # không phải nhiễu. Không quy đổi, không vào cả độ nhạy.
-                why = ("hệ số bậc nhất trích từ mô hình có số hạng bậc hai — "
+                why = ("hệ số bậc nhất trích từ mô hình có số hạng bậc hai, "
                        "không phải tương quan, loại khỏi gộp (PRISMA D1)")
                 row["stat_type"] = rec.get("stat_type", "")
                 row["source_value"] = rec.get("source_value", "")
@@ -313,7 +313,7 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
         "excluded_detail": excluded,
     }
     def _pool_legacy(subset):
-        """Cùng tập bản ghi, cùng n, cùng mô hình DL — chỉ đổi công thức về
+        """Cùng tập bản ghi, cùng n, cùng mô hình DL, chỉ đổi công thức về
         bản cũ (r_legacy = r_v8 − delta_r). var_z không phụ thuộc r nên
         trọng số giữ nguyên: mọi chênh lệch với pool mới là HIỆU ỨNG CÔNG
         THỨC THUẦN, đã tách khỏi hiệu ứng thành phần mẫu và hiệu ứng mô hình."""
@@ -357,7 +357,7 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
             f.write(f"  {eid}: {why}\n")
         f.write(
             "\n== BA CON SỐ CHO THẢO LUẬN P6 "
-            "(ước lượng nhanh DL hai cấp trên thang z — chỉ để định hướng; "
+            "(ước lượng nhanh DL hai cấp trên thang z, chỉ để định hướng; "
             "con số chính thức từ metafor ba cấp, bước 5) ==\n"
             f"r̄ mô hình chính (observed)      : {_fmt(pool_main)}\n"
             f"r̄ độ nhạy (+ imputed_pb2005)    : {_fmt(pool_sens)}\n"
@@ -372,12 +372,12 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 f"r̄ công thức MỚI trên cùng tập   : {pool_main['r']:+.4f}\n"
                 f"HIỆU ỨNG CÔNG THỨC THUẦN        : {eff:+.4f}\n"
                 "ĐỌC CHO ĐÚNG: trên tập chỉ gồm r báo cáo trực tiếp, A1/A2 "
-                "không có gì để chạm — nên +0.0000 là kiểm tra KHÔNG TÁC DỤNG "
+                "không có gì để chạm, nên +0.0000 là kiểm tra KHÔNG TÁC DỤNG "
                 "PHỤ lên nhóm không liên quan, KHÔNG phải bằng chứng bản sửa "
                 "không đổi gì. Sức mạnh của bản sửa chỉ đo được trên nhóm thu "
                 "hồi (delta_r từng bản ghi). Mọi chênh lệch khác so với .074 "
                 "công bố là hiệu ứng thành phần mẫu và hiệu ứng mô hình (DL "
-                "hai cấp so ba cấp) — KHÔNG so trực tiếp hai con số đó.\n"
+                "hai cấp so ba cấp): KHÔNG so trực tiếp hai con số đó.\n"
             )
         recovered_rows = [r for r in rows if r.get("stat_type")
                           and r.get("derived_from", "").startswith("v7.1.1:")
@@ -389,7 +389,7 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 by_stat[r["stat_type"]] = by_stat.get(r["stat_type"], 0) + 1
             f.write(
                 "\n== PHÂN LOẠI NHÓM THU HỒI THEO stat_type ==\n"
-                "(r    -> MÔ HÌNH CHÍNH, không quy đổi, không đụng A1/A2 — đường tốt nhất;\n"
+                "(r    -> MÔ HÌNH CHÍNH, không quy đổi, không đụng A1/A2, đường tốt nhất;\n"
                 " t    -> MÔ HÌNH CHÍNH, có quy đổi, còn dịch r̄;\n"
                 " beta -> CHỈ ĐỘ NHẠY, không dịch r̄ chính)\n"
             )
@@ -397,12 +397,12 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
                 f.write(f"  {k:6}: {v}\n")
         if report["pending_recovery"]:
             f.write(
-                f"CHÚ Ý: còn {report['pending_recovery']} bản ghi chờ thu hồi — "
+                f"CHÚ Ý: còn {report['pending_recovery']} bản ghi chờ thu hồi, "
                 "ba con số trên CHƯA phải bản cuối.\n"
             )
 
     # MỘT nguồn con số cho mọi nơi hiển thị (bản thảo, trang công khai, sơ đồ
-    # PRISMA, console) — cập nhật tay nhiều chỗ thì chắc chắn sót. Chừng nào
+    # PRISMA, console): cập nhật tay nhiều chỗ thì chắc chắn sót. Chừng nào
     # official=false, các con số gộp chỉ để định hướng; metafor ba cấp
     # (bước 5) mới ghi đè thành bản chính thức.
     def _pool_json(p):
@@ -416,7 +416,7 @@ def migrate(path_v711: str, out_dir: str, path_recovered: str | None) -> dict:
         "lock_generation": LOCK_GENERATION,
         "derived_from": "v7.1.1",
         "official": False,
-        "estimator": "DL hai cấp trên thang Fisher z — chỉ định hướng",
+        "estimator": "DL hai cấp trên thang Fisher z, chỉ định hướng",
         "total_records": report["total"],
         "computed": report["computed"],
         "pending_recovery": report["pending_recovery"],
@@ -449,5 +449,5 @@ if __name__ == "__main__":
     p = rep.get("pool_main")
     if p:
         print(f"r̄ định hướng (observed): {p['r']:+.4f} "
-              f"[k = {p['k_studies']}, K = {p['K_effects']}] — xem bao_cao_di_tru.txt")
+              f"[k = {p['k_studies']}, K = {p['K_effects']}]: xem bao_cao_di_tru.txt")
     sys.exit(0)

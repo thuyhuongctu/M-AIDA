@@ -4,7 +4,7 @@ Pins the fixes that align the code with the corrected protocol:
 (1) defensive clamp of r into [-1, 1]; (2) a beta outside the Peterson &
 Brown (2005) derivation domain |beta| <= 0.5 yields NO converted r and is
 excluded, not clamped; (3) df is only ever derived as n − p − 1 when a
-predictor count is known — records missing both df and n_predictors stay
+predictor count is known: records missing both df and n_predictors stay
 unconverted and flagged; (4) the machine's original proposal is stored per
 record and survives PI overrides, and locked records reject changes with
 HTTP 409.
@@ -97,7 +97,7 @@ class TestBetaDomain:
 
     def test_three_layer_separation(self):
         # r reported: zero_order · observed; t from regression: partial ·
-        # observed; β: zero_order · imputed — only observed feeds the main model.
+        # observed; β: zero_order · imputed, only observed feeds the main model.
         r_eff = _extract({"effect_r": 0.24, "sample_n": 231})
         t_eff = _extract({"effect_t": 2.14, "effect_df": 220, "sample_n": 231,
                           "n_predictors": 10})

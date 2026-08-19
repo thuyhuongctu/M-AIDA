@@ -1,11 +1,11 @@
-# M-AIDA — Commercial licensing status
+# M-AIDA: Commercial licensing status
 
 > **Current status: commercial licensing is NOT available.**
 > Economic rights in M-AIDA are not yet formally settled. Until they are, the
 > authors cannot grant commercial licenses. See §2 below.
 
 M-AIDA is released as free/open-source software under the **GNU Affero General
-Public License v3.0 (AGPL-3.0-only)** — see [`LICENSE`](LICENSE).
+Public License v3.0 (AGPL-3.0-only)**: see [`LICENSE`](LICENSE).
 
 Using M-AIDA under the AGPL-3.0 requires **no** contact and **no** fee.
 
@@ -39,7 +39,7 @@ For M-AIDA that condition is **not yet satisfied**:
   management office; no determination has been received.
 
 Institutional silence does not constitute a waiver of institutional rights.
-Accordingly, no party — including the authors — is currently in a position to
+Accordingly, no party, including the authors, is currently in a position to
 offer M-AIDA on terms other than the AGPL-3.0.
 
 ## 3. What happens when the position is settled
@@ -57,7 +57,7 @@ choose them instead of the AGPL.
 ## 4. Enquiries
 
 Parties interested in future commercial terms may register interest with
-**Đỗ Thùy Hương — thuyhuongctu@gmail.com**. Please note that:
+**Đỗ Thùy Hương: thuyhuongctu@gmail.com**. Please note that:
 
 - registering interest creates **no** licence, option, or commitment of any kind;
 - no timeline can be given, because the determination rests with CTU;
@@ -71,14 +71,14 @@ Parties interested in future commercial terms may register interest with
 
 ---
 
-# M-AIDA — Tình trạng cấp phép thương mại (bản tiếng Việt)
+# M-AIDA: Tình trạng cấp phép thương mại (bản tiếng Việt)
 
 > **Hiện trạng: CHƯA cấp phép thương mại.**
 > Quyền tài sản đối với M-AIDA chưa được xác lập chính thức. Chừng nào chưa xác
 > lập, nhóm tác giả không thể cấp phép thương mại. Xem mục 2.
 
 M-AIDA được phát hành dưới giấy phép **GNU Affero General Public License v3.0
-(AGPL-3.0-only)** — xem [`LICENSE`](LICENSE). Sử dụng theo AGPL-3.0 **không** cần
+(AGPL-3.0-only)**: xem [`LICENSE`](LICENSE). Sử dụng theo AGPL-3.0 **không** cần
 liên hệ và **không** mất phí.
 
 ## 1. AGPL yêu cầu gì
@@ -111,7 +111,7 @@ Với M-AIDA, điều kiện đó **chưa được đáp ứng**:
   trả lời.
 
 Việc Nhà trường chưa trả lời **không** đồng nghĩa với việc từ bỏ quyền của Nhà
-trường. Do đó, hiện không bên nào — kể cả nhóm tác giả — ở vị thế có thể cấp
+trường. Do đó, hiện không bên nào, kể cả nhóm tác giả, ở vị thế có thể cấp
 phép M-AIDA theo điều khoản khác ngoài AGPL-3.0.
 
 ## 3. Khi quyền sở hữu được xác lập
@@ -129,7 +129,7 @@ cho AGPL.
 ## 4. Liên hệ
 
 Bên quan tâm đến điều khoản thương mại trong tương lai có thể đăng ký quan tâm
-với **Đỗ Thùy Hương — thuyhuongctu@gmail.com**. Lưu ý:
+với **Đỗ Thùy Hương: thuyhuongctu@gmail.com**. Lưu ý:
 
 - việc đăng ký quan tâm **không** tạo ra bất kỳ giấy phép, quyền chọn hay cam
   kết nào;
