@@ -180,7 +180,7 @@ The repository is also served as a static site (GitHub Pages):
 
 - **Main page** ([index.html](https://thuyhuongctu.github.io/M-AIDA/)): overview,
   positioning, the interactive atlas of the locked study corpus, the in-browser
-  extraction console (three sample papers, r, t, standardized beta, walked
+  extraction console (three sample papers: r, t, standardized beta, walked
   through the same convert/verify/lock/export gates; it refuses PDFs, which need
   the backend), and the Huong AI tour guide. Bilingual EN/VI.
 - **Defense App** ([defense.html](https://thuyhuongctu.github.io/M-AIDA/defense.html)):
