@@ -22,12 +22,20 @@ Final Drop và Chant · Outro (tiếng nước xa dần).
 
 ## Trạng thái phần lời trên trang
 
-`songs.html` hiện chỉ chạy khối lời đồng bộ (`.lblk`) cho bài chủ đề: điều kiện
-kích hoạt trong `timeupdate` gắn cứng với tên tệp `maida_song_official`. Muốn
-hiện lời cho bài này thì phải chuyển phần lời sang cấu trúc theo từng bài rồi
-chọn khối lời theo bài đang phát, chứ không chỉ thêm khối mới vào trang. Đây là
-việc UI riêng, chưa làm trong lần cập nhật này; hai bản ghi đã phát được bình
-thường trong danh sách.
+`songs.html` chạy khối lời đồng bộ (`.lblk`) cho bản được đánh dấu `lyr:true`
+trong mảng `TRACKS`; điều kiện kích hoạt trong `timeupdate` đọc cờ đó. Hiện chỉ
+tác phẩm chính mang cờ. Muốn hiện lời cho bài này thì phải chuyển phần lời sang
+cấu trúc theo từng bài rồi chọn khối lời theo bài đang phát, chứ không chỉ thêm
+khối mới vào trang. Đây là việc UI riêng, chưa làm; hai bản ghi đã phát được
+bình thường trong danh sách.
+
+> **Đính chính 22/08/2026.** Đoạn trên trước đây viết rằng điều kiện kích hoạt
+> "gắn cứng với tên tệp `maida_song_official`". Câu đó mô tả phiên bản mã cũ
+> (`TRACKS[cur].f.indexOf('maida_song_official')>=0`) và **sai ngay từ lúc tệp
+> này được tạo**: commit `2c19f90` ngày 02/08/2026 vừa thêm tài liệu này vừa đổi
+> mã sang đọc cờ `lyr`, nên câu mô tả đã lỗi thời trong chính commit sinh ra nó.
+> `la-recherche-lyrics.md`, tệp tài liệu bài hát còn lại, mô tả đúng cơ chế cờ
+> `lyr` từ đầu; chỉ tệp này lệch.
 
 ## Ghi chú bản quyền
 
