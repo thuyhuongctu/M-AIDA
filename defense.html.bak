@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6b3543">
+<meta name="description" content="M-AIDA Defense App: a presenter-controlled, offline-ready demonstration of the human-verified effect-size workflow used in the P6 dissertation study.">
+<title>M-AIDA Defense App · Live research workflow</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--paper:#f6f1e7;--surface:#fffdf8;--ink:#201b1c;--muted:#6c6263;--line:#ded2c7;--brand:#6b3543;--rose:#9b6070;--gold:#b8873f;--ok:#2e6b46;--soft:#f0e4e6;--serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#f9f4eb,#efe4e4);color:var(--ink);font:16px/1.65 var(--sans)}a{color:inherit}.wrap{width:min(1120px,calc(100% - 36px));margin:auto}
+nav{position:sticky;top:0;z-index:5;background:rgba(246,241,231,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}nav .wrap{display:flex;align-items:center;gap:18px;min-height:64px}.brand{font-weight:850;letter-spacing:.08em}.navlinks{display:flex;gap:16px;margin-left:auto;align-items:center}.navlinks a{text-decoration:none;color:var(--muted);font-size:14px}.navlinks .cta{padding:9px 14px;border-radius:999px;background:var(--brand);color:white}
+.hero{padding:78px 0 42px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:var(--rose);font-size:12px;font-weight:800}.hero h1{font:clamp(42px,7vw,78px)/.98 var(--serif);max-width:900px;margin:14px 0 22px}.lead{max-width:790px;color:var(--muted);font-size:19px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:750;border:1px solid var(--line);background:var(--surface)}.btn.primary{background:var(--brand);border-color:var(--brand);color:white}.btn.dark{background:var(--ink);border-color:var(--ink);color:white}
+.metrics,.modes,.steps{display:grid;gap:14px}.metrics{grid-template-columns:repeat(4,1fr);margin:26px 0 58px}.metric,.card{background:rgba(255,253,248,.88);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 35px rgba(55,35,40,.05)}.metric b{display:block;font:34px/1 var(--serif);color:var(--brand)}.metric span{font-size:13px;color:var(--muted)}
+section{padding:38px 0}h2{font:clamp(30px,4vw,46px)/1.1 var(--serif);margin:0 0 12px}.sub{color:var(--muted);max-width:760px;margin:0 0 24px}.modes{grid-template-columns:repeat(3,1fr)}.card h3{margin:6px 0 8px;font-size:18px}.card p{color:var(--muted);margin:0}.status{display:inline-block;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;background:#e5f0e8;color:var(--ok)}.status.pilot{background:#f3e6cf;color:#81571d}.steps{grid-template-columns:repeat(4,1fr);counter-reset:step}.step{counter-increment:step}.step:before{content:counter(step);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--brand);font-weight:850;margin-bottom:12px}.notice{margin:30px 0;background:#2b2224;color:#f9f0e9;border-radius:22px;padding:26px}.notice strong{color:#efc88c}.code{background:#171315;color:#f9ede8;border-radius:14px;padding:16px 18px;overflow:auto;font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}.footer{border-top:1px solid var(--line);margin-top:44px;padding:30px 0 50px;color:var(--muted);font-size:13px}
+@media(max-width:820px){.metrics{grid-template-columns:1fr 1fr}.modes,.steps{grid-template-columns:1fr}.navlinks a:not(.cta){display:none}.hero{padding-top:48px}}
+</style>
+<meta property="og:image" content="https://thuyhuongctu.github.io/M-AIDA/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+</head>
+<body>
+<nav><div class="wrap"><a class="brand" href="index.html" style="display:inline-flex;align-items:center;gap:.5rem"><svg class="brand-mark-svg" width="40" height="19.5" viewBox="179.0 188.8 38.0 18.5" aria-hidden="true" style="flex:none;vertical-align:middle"><path fill="none" stroke-width="1.6" stroke-linecap="round" stroke="var(--line-2, var(--line, #c4b8a1))" d="M 1.00001 24.000011 L 10.00001 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill="none" stroke-width="1.6" stroke-linecap="round" stroke="var(--line-2, var(--line, #c4b8a1))" d="M 38.000012 24.000011 L 47.000012 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill="none" stroke-width="2" stroke-linecap="butt" stroke-linejoin="round" stroke="var(--ink, #1a1714)" d="M 10.00001 24.000011 L 24.000011 14.000011 L 24.000011 34.000011 Z M 10.00001 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill-rule="nonzero" fill="var(--amber, #b3701a)" d="M 198 190.5 L 208.5 198 L 198 205.5 Z M 198 190.5 "/></svg><span>M-AIDA</span></a><div class="navlinks"><a href="index.html#tool">Academic demo</a><a href="commercial.html">M-AIDA Cloud</a><a href="library.html">Library</a><a class="cta" href="https://github.com/thuyhuongctu/M-AIDA/tree/main/demo">Run locally</a></div></div></nav>
+<main>
+<header class="hero wrap">
+<div class="eyebrow">Defense App · Human-verified research software</div>
+<h1>AI proposes.<br>Researchers verify.</h1>
+<p class="lead">Bản trình diễn có kiểm soát của quy trình M-AIDA dùng trong nghiên cứu P6: đọc bằng chứng thống kê, kiểm tra đề xuất của máy, phê duyệt, khóa bất biến và xuất dữ liệu tái lập. Backend FastAPI thật chạy cục bộ; không có phản hồi nghiên cứu được mô phỏng.</p>
+<div class="actions"><a class="btn primary" href="https://github.com/thuyhuongctu/M-AIDA/tree/main/demo">Tải và chạy Defense App</a><a class="btn" href="index.html#tool">Mở demo công khai</a><a class="btn dark" href="commercial.html">Xem bản thương mại</a></div>
+<div class="metrics"><div class="metric"><b>236</b><span>nghiên cứu trong corpus P6 đã khóa</span></div><div class="metric"><b>286</b><span>effect sizes</span></div><div class="metric"><b>35</b><span>backend tests</span></div><div class="metric"><b>Offline</b><span>Verify · Lock · Export không cần live LLM</span></div></div>
+</header>
+<section class="wrap"><h2>Một hệ sinh thái, ba chế độ</h2><p class="sub">Các phiên bản phục vụ mục đích khác nhau và không được trình bày như một SaaS đã hoàn thiện khi hạ tầng thương mại còn ở giai đoạn pilot.</p>
+<div class="modes"><article class="card"><span class="status">Available</span><h3>Academic Demo</h3><p>Bản công khai trên GitHub Pages để giới thiệu phương pháp, dữ liệu tổng hợp và trải nghiệm nghiên cứu.</p></article><article class="card"><span class="status">Operational</span><h3>Defense App</h3><p>Ứng dụng cục bộ có Presenter PIN, lưu trạng thái, reset seed, API thật và quy trình Verify–Lock–Export.</p></article><article class="card"><span class="status pilot">Pilot</span><h3>M-AIDA Cloud</h3><p>Định hướng thương mại hóa, dual licensing và các gói cá nhân, nhóm nghiên cứu, tổ chức.</p></article></div></section>
+<section class="wrap"><h2>Kiểm định không vòng lặp</h2><p class="sub">M-AIDA là công cụ chuẩn bị dữ liệu hỗ trợ P6, không phải bằng chứng thay thế cho P6. Một benchmark độc lập 30–50 bài được khóa trước theo tuyến direct r, t→r và beta→r.</p>
+<div class="modes"><article class="card"><span class="status">Ready</span><h3>Protocol và mã phân tích</h3><p>Schema chuẩn vàng hai coder, script tính precision/recall/F1, sai số r, correction, provenance và thời gian đã có trong repository.</p></article><article class="card"><span class="status pilot">Provisional</span><h3>Mẫu 40 + 10 dự phòng</h3><p>Sampling frame đã tạo theo DPL × ICRV nhưng chưa khóa; còn phải xác nhận full text và loại mọi bài từng dùng để chỉnh M-AIDA.</p></article><article class="card"><span class="status">Boundary</span><h3>Không thay thế luận án</h3><p>Chưa công bố accuracy/time-saving. Benchmark không đánh giá screening, risk-of-bias, mô hình meta-analysis hoặc diễn giải kết quả P6.</p></article></div>
+<div class="actions"><a class="btn" href="https://github.com/thuyhuongctu/M-AIDA/blob/main/VALIDATION_PROTOCOL.md">Xem validation protocol</a><a class="btn" href="https://github.com/thuyhuongctu/M-AIDA/tree/main/validation">Mở analysis package</a></div></section>
+<figure style="margin:2.2rem auto 0;max-width:1100px;padding:0 1.2rem">
+  <img src="assets/img/defense-app-screenshot.png" width="2880" height="1800" loading="lazy" decoding="async"
+       style="width:100%;max-width:100%;height:auto;display:block;border:1px solid rgba(0,0,0,.10);border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,.10)"
+       alt="M-AIDA live verification console: 18 effect records, 15 locked, 3 awaiting human review, above a table of studies with country, sample size, correlation and conversion route." />
+  <figcaption style="margin-top:.7rem;font-size:.9rem;line-height:1.55;opacity:.78">
+    Bảng điều khiển chạy thật với một mẫu của bộ dữ liệu đã kiểm chứng: 18 mức độ ảnh hưởng, 15 đã khóa, 3 còn chờ người kiểm tra. Ảnh chụp trực tiếp từ bản đang chạy, không phải ảnh dựng.
+  </figcaption>
+</figure>
+
+<section class="wrap"><h2>Luồng trình diễn trước hội đồng</h2><p class="sub">Một kịch bản sáu phút, có đường lui khi mạng hoặc nhà cung cấp LLM không khả dụng.</p>
+<div class="steps"><article class="card step"><h3>Khám phá dữ liệu</h3><p>Lọc bản ghi locked và pending trong bộ P6 mẫu đã kiểm chứng.</p></article><article class="card step"><h3>Đối chiếu</h3><p>So sánh machine proposal với giá trị hiện hành và nguồn thống kê.</p></article><article class="card step"><h3>Xác minh và khóa</h3><p>Nhập ghi chú PI, phê duyệt và chứng minh khóa bất biến bằng phản hồi API.</p></article><article class="card step"><h3>Xuất tái lập</h3><p>Xuất CSV chỉ gồm các bản ghi đã khóa và mở OpenAPI documentation.</p></article></div>
+<div class="notice"><strong>Ranh giới minh bạch:</strong> GitHub Pages chỉ hiển thị trang giới thiệu này và academic demo. Presenter PIN, Reset, Verify và Lock không được mở trên website công khai. Chúng chạy trong Defense App cục bộ để bảo vệ tính toàn vẹn dữ liệu.</div></section>
+<section class="wrap"><h2>Chạy nhanh</h2><p class="sub">Windows có launcher một lần nhấp. macOS và Linux sử dụng script đi kèm.</p>
+<div class="code">Windows: demo\start_defense_windows.bat
+macOS/Linux: sh demo/start_defense_unix.sh
+Manual: python demo/run_defense.py
+Open: http://localhost:8765/</div>
+<div class="actions"><a class="btn primary" href="https://github.com/thuyhuongctu/M-AIDA/blob/main/demo/HUONG_DAN_BAO_VE.md">Hướng dẫn bảo vệ</a><a class="btn" href="https://github.com/thuyhuongctu/M-AIDA">Mã nguồn và citation</a></div></section>
+</main>
+<footer class="footer"><div class="wrap">M-AIDA · Meta-Analysis Intelligent Data Assistant · Do Thuy Huong &amp; Phan Anh Tu · Version 7.1.1 · DOI 10.5281/zenodo.21282516</div></footer>
+</body>
+</html>
