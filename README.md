@@ -1,6 +1,6 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21282516.svg)](https://doi.org/10.5281/zenodo.21282516)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21850575.svg)](https://doi.org/10.5281/zenodo.21850575)
 ![version](https://img.shields.io/badge/version-7.2.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
@@ -271,21 +271,31 @@ If you use M-AIDA, please cite it (GitHub renders a "Cite this repository" butto
 from `CITATION.cff`):
 
 > Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.2.1)
-> [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21282516
+> [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21850575
 
-Zenodo mints two identifiers: the concept DOI `10.5281/zenodo.21282516` always
-resolves to the latest version, while a version DOI pins one release:
-`10.5281/zenodo.22260059` for v7.2.1 (tag `v7.2.1`, commit `d2ea8e3`, the current
-release), `10.5281/zenodo.22259090` for v7.2.0 (tag `v7.2.0`, commit `3ff42c4`,
-the first release after the 31 August 2026 code review) and
-`10.5281/zenodo.21282517` for v7.1.1. Cite the concept DOI for the software in
-general and the version DOI for an exact reproducible build.
+Zenodo mints two kinds of identifier. The **concept DOI**
+`10.5281/zenodo.21850575` always resolves to the latest release; cite it for the
+software in general. A **version DOI** pins one release, for an exact
+reproducible build: `10.5281/zenodo.22260059` for v7.2.1 (tag `v7.2.1`, commit
+`d2ea8e3`, the current release), `10.5281/zenodo.22259090` for v7.2.0 (tag
+`v7.2.0`, commit `3ff42c4`, the first release after the 31 August 2026 code
+review), `10.5281/zenodo.21926336` for v7.1.1 and `10.5281/zenodo.21850576` for
+v7.1.2.
+
+A **separate Zenodo deposit of v7.1.1**, made by hand on 9 July 2026
+(concept `10.5281/zenodo.21282516`, version `10.5281/zenodo.21282517`), also
+remains published. It is the record cited by the first author's dissertation and
+by the copyright-registration dossier, and it always resolves to v7.1.1. It is
+not part of the GitHub-archived series above, so it never advances to a newer
+release; new citations of the software as a whole should use
+`10.5281/zenodo.21850575`.
 
 Three Zenodo records minted on 3 September 2026 are **superseded and must not be
-cited**, because the GitHub releases behind them carried tags that pointed at
-earlier commits than their labels claim: `10.5281/zenodo.22258783` and
-`10.5281/zenodo.22258977` (labelled `v.7.2.0`, archived the unpatched commit
-`3c8de32`) and `10.5281/zenodo.22259684` (labelled `v7.2.1`, archived the 7.2.0
+cited**, because the GitHub releases behind them carried tags pointing at
+earlier commits than the release title claimed: `10.5281/zenodo.22258783` and
+`10.5281/zenodo.22258977` (from a release titled `v.7.2.0`, archiving the
+unpatched commit `3c8de32`, and carrying the metadata version 7.1.1) and
+`10.5281/zenodo.22259684` (from a release titled `v7.2.1`, archiving the 7.2.0
 commit `3ff42c4`). The authors have asked Zenodo to withdraw them.
 
 ## Authorship, license, and research-integrity note
@@ -333,10 +343,12 @@ authors**, under Article 71 of the university's science and technology managemen
 regulation (Decision 5152/QD-DHCT of 6 October 2023). The copyright registration
 is filed through the university and is still in process.
 
-Because of that, the archived deposit at
-[10.5281/zenodo.21282516](https://doi.org/10.5281/zenodo.21282516) keeps its
-**files under restricted access** while the record itself, its metadata and its
-DOIs stay public and citable. This does not conflict with the AGPL: the AGPL
+Because of that, the Zenodo deposits (the GitHub-archived series at
+[10.5281/zenodo.21850575](https://doi.org/10.5281/zenodo.21850575) and the
+manual v7.1.1 deposit at
+[10.5281/zenodo.21282516](https://doi.org/10.5281/zenodo.21282516)) keep their
+**files under restricted access** while the records themselves, their metadata
+and their DOIs stay public and citable. This does not conflict with the AGPL: the AGPL
 governs what a recipient of the software may do with it, and obliges the authors
 to supply corresponding source to those recipients. It does not oblige anyone to
 publish files in any particular archive. The complete source is public in this

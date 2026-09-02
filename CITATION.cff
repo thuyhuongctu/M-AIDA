@@ -12,20 +12,26 @@ version: "7.2.1"
 date-released: "2026-09-03"
 license: AGPL-3.0-only
 repository-code: "https://github.com/thuyhuongctu/M-AIDA"
-doi: "10.5281/zenodo.21282516"
+doi: "10.5281/zenodo.21850575"
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.21282516"
-    description: "Zenodo concept DOI (all versions)"
-  - type: doi
-    value: "10.5281/zenodo.21282517"
-    description: "Zenodo version DOI (release v7.1.1)"
+    value: "10.5281/zenodo.21850575"
+    description: "Zenodo concept DOI - always resolves to the latest release (GitHub-archived series)"
   - type: doi
     value: "10.5281/zenodo.22260059"
-    description: "Zenodo version DOI (release v7.2.1, tag v7.2.1 = d2ea8e3) - cite this for 7.2.1"
+    description: "Zenodo version DOI - release v7.2.1, tag v7.2.1 = d2ea8e3 (current release; cite this for an exact build)"
   - type: doi
     value: "10.5281/zenodo.22259090"
-    description: "Zenodo version DOI (release v7.2.0, tag v7.2.0 = 3ff42c4)"
+    description: "Zenodo version DOI - release v7.2.0, tag v7.2.0 = 3ff42c4"
+  - type: doi
+    value: "10.5281/zenodo.21926336"
+    description: "Zenodo version DOI - release v7.1.1"
+  - type: doi
+    value: "10.5281/zenodo.21850576"
+    description: "Zenodo version DOI - release v7.1.2"
+  - type: doi
+    value: "10.5281/zenodo.21282516"
+    description: "Zenodo deposit of v7.1.1 made manually on 2026-07-09 (separate concept; version DOI 10.5281/zenodo.21282517). This is the record cited by the first author's dissertation and by the copyright-registration dossier; it stays published and always resolves to v7.1.1."
 authors:
   - family-names: "Do"
     given-names: "Thuy Huong"
