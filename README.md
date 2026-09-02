@@ -1,7 +1,7 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21282516.svg)](https://doi.org/10.5281/zenodo.21282516)
-![version](https://img.shields.io/badge/version-7.2.0-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+![version](https://img.shields.io/badge/version-7.2.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
 academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop
@@ -270,13 +270,18 @@ go stale when the dataset moves to a new lock generation.
 If you use M-AIDA, please cite it (GitHub renders a "Cite this repository" button
 from `CITATION.cff`):
 
-> Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.1.1)
+> Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.2.0)
 > [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21282516
 
 Zenodo mints two identifiers: the concept DOI `10.5281/zenodo.21282516` always
-resolves to the latest version, while the version DOI `10.5281/zenodo.21282517`
-pins release v7.1.1. Cite the concept DOI for the software in general and the
-version DOI for an exact reproducible build.
+resolves to the latest version, while a version DOI pins one release:
+`10.5281/zenodo.22259090` for v7.2.0 (tag `v7.2.0`, commit `3ff42c4`, the first
+release after the 31 August 2026 code review) and `10.5281/zenodo.21282517` for
+v7.1.1. Cite the concept DOI for the software in general and the version DOI for
+an exact reproducible build. Two Zenodo records labelled `v.7.2.0`
+(10.5281/zenodo.22258783, 10.5281/zenodo.22258977) were minted on 3 September
+2026 from a mis-tagged GitHub release that pointed at the unpatched commit
+`3c8de32`; they are superseded and must not be cited.
 
 ## Authorship, license, and research-integrity note
 
