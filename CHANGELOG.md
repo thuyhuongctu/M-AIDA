@@ -47,7 +47,15 @@ Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đ�
   phát hành. Ba bản ghi Zenodo ngày 03/09/2026 là bản thay thế, KHÔNG trích dẫn:
   `22258783` và `22258977` (nhãn `v.7.2.0`, lưu commit `3c8de32` chưa vá) và
   `22259684` (nhãn `v7.2.1`, lưu commit `3ff42c4` tức mã 7.2.0). Tác giả đã yêu
-  cầu Zenodo gỡ ba bản ghi này. Hai bản ghi Zenodo gắn nhãn `v.7.2.0`
+  cầu Zenodo gỡ ba bản ghi này.
+- DOI khái niệm: M-AIDA có **hai chuỗi Zenodo song song**. Chuỗi lưu tự động từ
+  GitHub có DOI khái niệm `10.5281/zenodo.21850575` (luôn trỏ tới bản phát hành
+  mới nhất); bản nộp tay ngày 09/07/2026 là một chuỗi riêng
+  (`10.5281/zenodo.21282516`, phiên bản `.21282517`) và mãi trỏ tới v7.1.1.
+  CITATION.cff, README và trang web trước đây ghi `21282516` là "DOI mọi phiên
+  bản" — không đúng với chuỗi đang chạy. Nay: DOI khái niệm = `21850575`; bản
+  nộp tay giữ nguyên, ghi rõ là bản lưu trữ v7.1.1 mà luận án và hồ sơ đăng ký
+  bản quyền trích dẫn. Hai bản ghi Zenodo gắn nhãn `v.7.2.0`
   (22258783, 22258977) sinh ra từ release gắn sai tag (trỏ `3c8de32` chưa vá)
   là bản thay thế, không trích dẫn.
 
