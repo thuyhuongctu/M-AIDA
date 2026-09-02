@@ -173,6 +173,8 @@ class TestGovernanceApi:
         entry = self._make_entry(client)
         assert entry["machine_proposal"]["effect_r"] == 0.25
         sid = entry["study_id"]
+        # 7.2.0: touching machine_proposal is rejected outright (422), no
+        # longer silently ignored; a clean override still leaves it intact.
         res = client.patch(
             f"/api/studies/{sid}/verify",
             json={
@@ -182,10 +184,21 @@ class TestGovernanceApi:
                 "pi_approved": True,
             },
         )
+        assert res.status_code == 422, res.text
+        res = client.patch(
+            f"/api/studies/{sid}/verify",
+            json={
+                "study_id": sid,
+                "field_overrides": {"effect_r": 0.30},
+                "pi_notes": "corrected against source table 3",
+                "pi_approved": True,
+            },
+        )
         assert res.status_code == 200, res.text
         body = res.json()
         assert body["effect_r"] == 0.30
         assert body["machine_proposal"]["effect_r"] == 0.25
+        assert body["pi_edited_fields"] == ["effect_r"]
 
     def test_locked_record_rejects_override_with_409(self, client):
         entry = self._make_entry(client)

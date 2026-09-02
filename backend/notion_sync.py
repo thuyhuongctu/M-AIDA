@@ -9,7 +9,7 @@ the StudyDatabaseEntry schema; see the README for the required schema.
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from notion_client import Client
@@ -152,7 +152,7 @@ def _properties_to_entry(
         requires_verification=_bool("requires_verification"),
         pi_locked=_bool("pi_locked"),
         pi_notes=_extract_text(props.get("pi_notes", {})),
-        extracted_at=_dt("extracted_at") or datetime.utcnow(),
+        extracted_at=_dt("extracted_at") or datetime.now(timezone.utc),
         locked_at=_dt("locked_at"),
         notion_page_id=page_id,
     )

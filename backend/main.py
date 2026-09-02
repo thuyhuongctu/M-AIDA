@@ -26,7 +26,8 @@ import base64
 import csv
 import io
 import logging
-from datetime import datetime
+import json
+from datetime import datetime, timezone
 from typing import Any
 
 import fitz  # PyMuPDF
@@ -35,11 +36,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from engines import make_engine
-from extractor import EvidenceMissingError, StatisticalExtractor
+from extractor import (
+    PRIMARY_STAT_FIELDS,
+    EvidenceMissingError,
+    MalformedLLMOutputError,
+    StatisticalExtractor,
+)
 from models import ExtractedEffect, ExtractionRequest, StudyDatabaseEntry, VerificationDecision
 from notion_sync import NotionSync
 from settings import get_settings
 from store import StudyStore
+
+#: Fields a Principal Investigator may correct through PATCH /verify (7.2.0).
+#: Primary statistics trigger a full re-derivation; the rest are coding
+#: decisions and bibliographic metadata. Governance fields (pi_locked,
+#: locked_at, study_id, machine_proposal, extraction_confidence, evidence_*)
+#: and every derived quantity are deliberately absent.
+PI_EDITABLE_FIELDS: frozenset[str] = frozenset({
+    "effect_r", "effect_t", "effect_df", "effect_beta", "n_predictors",
+    "sample_n", "sample_start", "sample_end", "p_value", "ci_lower", "ci_upper",
+    "doi_measure", "performance_measure", "icrv_regime", "dpl_phase", "cdai_score",
+    "country", "year", "paper_title", "authors",
+})
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -51,7 +69,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="M-AIDA v7.1.1",
     description="Meta-Analysis Intelligent Data Assistant - I→P research pipeline",
-    version="7.1.1",
+    version="7.2.0",
 )
 
 settings = get_settings()
@@ -197,6 +215,13 @@ def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
                 f"verbatim evidence from the paper ({exc}). No record was created."
             ),
         ) from exc
+    except MalformedLLMOutputError as exc:
+        # C1 (7.2.0): untrusted model output that is not a well-typed JSON
+        # object is a visible 422, never a 500 and never an empty record.
+        raise HTTPException(
+            status_code=422,
+            detail=f"Extraction rejected: malformed model output ({exc}). No record was created.",
+        ) from exc
     except Exception as exc:
         if isinstance(exc, HTTPException):
             raise
@@ -287,36 +312,19 @@ def export_csv() -> StreamingResponse:
         )
 
     buf = io.StringIO()
-    # Field order is chosen to match the dissertation data matrix convention
-    fieldnames = [
-        "study_id",
-        "paper_title",
-        "authors",
-        "year",
-        "country",
-        "sample_n",
-        "sample_start",
-        "sample_end",
-        "effect_r",
-        "effect_t",
-        "effect_beta",
-        "effect_df",
-        "p_value",
-        "ci_lower",
-        "ci_upper",
-        "doi_measure",
-        "performance_measure",
-        "icrv_regime",
-        "dpl_phase",
-        "cdai_score",
-        "extraction_confidence",
-        "pi_notes",
-        "locked_at",
-    ]
-    writer = csv.DictWriter(buf, fieldnames=fieldnames, extrasaction="ignore")
+    # 7.2.0 (finding A4): export EVERY field of the record, in model order, so
+    # the hand-off carries variance_r, variance_z, metric_type, estimand_source
+    # and the evidence trail. Nested values (machine_proposal, pi_edited_fields)
+    # are serialised as JSON strings.
+    fieldnames = list(StudyDatabaseEntry.model_fields.keys())
+    writer = csv.DictWriter(buf, fieldnames=fieldnames, extrasaction="raise")
     writer.writeheader()
     for study in locked:
-        writer.writerow(study.model_dump())
+        row = study.model_dump()
+        for key, val in row.items():
+            if isinstance(val, (dict, list)):
+                row[key] = json.dumps(val, ensure_ascii=False, default=str)
+        writer.writerow(row)
 
     buf.seek(0)
     return StreamingResponse(
@@ -366,26 +374,60 @@ def verify_study(study_id: str, decision: VerificationDecision) -> StudyDatabase
             detail="Study is already locked; overrides are not permitted.",
         )
 
-    # Apply overrides to a mutable copy
-    overrides = decision.field_overrides
+    # 7.2.0 (findings B1–B3): a WHITELIST of PI-editable fields. Everything
+    # else (pi_locked, locked_at, study_id, machine_proposal,
+    # extraction_confidence, evidence_*, every derived quantity) is rejected
+    # with 422 rather than silently ignored or silently applied.
+    overrides = dict(decision.field_overrides)
+    rejected = sorted(k for k in overrides if k not in PI_EDITABLE_FIELDS)
+    if rejected:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                "field_overrides may only touch PI-editable fields; rejected: "
+                + ", ".join(rejected)
+                + ". Editable: " + ", ".join(sorted(PI_EDITABLE_FIELDS))
+            ),
+        )
     data = entry.model_dump()
     for field, value in overrides.items():
-        if field == "machine_proposal":
-            logger.warning("machine_proposal is immutable; override ignored")
-        elif field in data:
-            data[field] = value
-        else:
-            logger.warning("Ignoring unknown field override %r", field)
+        data[field] = value
 
-    # Recompute the canonical Pearson r when the PI corrects an upstream
-    # statistic (t/df or β) but does not override effect_r directly, so the
-    # meta-analysis never uses a stale correlation. An explicit effect_r
-    # override always wins.
-    data["effect_r"] = StatisticalExtractor.resolve_overridden_r(data, overrides)
+    # Any change to a primary statistic re-derives EVERY dependent quantity
+    # (r, df, variance_r, variance_z, metric_type, estimand_source,
+    # source_controls, df_source, lambda_applied, r_source,
+    # beta_outside_pb_domain) through the same function live extraction uses,
+    # so a PI correction can never leave a stale variance or a mislabelled
+    # estimand behind (findings A1–A3). Precedence follows extraction
+    # (r > t > beta); a PI who supplies t/df or beta WITHOUT a new r is asking
+    # for the conversion, so the previous r is dropped from the inputs.
+    touched = [k for k in overrides if k in PRIMARY_STAT_FIELDS]
+    if touched:
+        primary = {k: data.get(k) for k in PRIMARY_STAT_FIELDS}
+        if "effect_r" not in overrides:
+            if any(k in overrides for k in ("effect_t", "effect_df")) and \
+                    data.get("effect_t") is not None:
+                primary["effect_r"] = None
+            elif "effect_beta" in overrides and data.get("effect_beta") is not None:
+                primary["effect_r"] = None
+                primary["effect_t"] = None
+        derived = StatisticalExtractor.derive_from_primary(primary)
+        confidence = derived.pop("confidence")  # machine score is NOT overwritten
+        del confidence
+        data.update(derived)
+        data["pi_edited_fields"] = sorted(set(data.get("pi_edited_fields") or []) | set(overrides))
+        data["pi_override_at"] = datetime.now(timezone.utc)
+    elif overrides:
+        data["pi_edited_fields"] = sorted(set(data.get("pi_edited_fields") or []) | set(overrides))
+        data["pi_override_at"] = datetime.now(timezone.utc)
 
     data["pi_notes"] = decision.pi_notes
-    # Approval clears the requires_verification flag
-    if decision.pi_approved:
+    # Approval clears the flag only for a record that actually carries an
+    # effect size; a record without r (beta outside the P&B domain) stays
+    # flagged whatever the PI ticked (finding A3).
+    if data.get("effect_r") is None:
+        data["requires_verification"] = True
+    elif decision.pi_approved:
         data["requires_verification"] = False
 
     updated = StudyDatabaseEntry(**data)
@@ -424,10 +466,17 @@ def lock_study(study_id: str) -> StudyDatabaseEntry:
                 "approve via PATCH /verify before locking."
             ),
         )
+    if entry.effect_r is None or entry.variance_r is None:
+        # 7.2.0 (finding A3): final data must carry an effect size AND its
+        # sampling variance; a record without either cannot be pooled.
+        raise HTTPException(
+            status_code=422,
+            detail="Study has no usable effect size / variance; it cannot be locked.",
+        )
 
     data = entry.model_dump()
     data["pi_locked"] = True
-    data["locked_at"] = datetime.utcnow()
+    data["locked_at"] = datetime.now(timezone.utc)
     locked = StudyDatabaseEntry(**data)
     _studies.put(locked)
     return locked

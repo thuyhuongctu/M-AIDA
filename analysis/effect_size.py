@@ -245,7 +245,7 @@ def from_beta(beta: float, n: int, n_predictors: Optional[int] = None,
         fisher_z=fisher_z(r), var_z=variance_z(ZERO_ORDER, n, None),
         df=df, df_source=df_source, n=n, n_predictors=n_predictors,
         variance_formula="(1-r^2)^2/(n-1)",
-        lambda_applied=True, beta_in_range=True,
+        lambda_applied=(beta >= 0), beta_in_range=True,  # 7.2.0 (C2): True only when +0.05·λ was added
         confidence=0.60, flagged=True,  # 0.60 < 0.70 -> luôn chờ rà soát
         source_stat="beta", source_value=beta,
         notes=["Suy từ beta (imputed_pb2005): KHÔNG vào mô hình chính, chỉ "
