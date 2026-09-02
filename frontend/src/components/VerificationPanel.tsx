@@ -3,6 +3,13 @@
  *
  * Allows the PI to inspect each extracted field, override incorrect values,
  * add notes, then either approve+lock the record or flag it for re-extraction.
+ *
+ * 7.2.1: the panel now shows what the server derives from the primary
+ * statistics (metric type, variance, formula, λ, provenance) and the machine's
+ * own evidence (confidence, quotes, truncation), so the PI can see why a
+ * record is or is not lockable. Only the 7.2.0 whitelist of fields is sent as
+ * overrides; derived fields are read-only here because the backend recomputes
+ * them on every override (findings A1–A3 of the 31/08/2026 review).
  */
 
 import React, { useCallback, useState } from "react";
@@ -15,6 +22,23 @@ import {
   PerformanceMeasure,
   StudyDatabaseEntry,
 } from "../types";
+
+// Fields the backend accepts in `field_overrides` (PI_EDITABLE_FIELDS, 7.2.0).
+// Anything else is rejected with 422, so the panel never sends it.
+const PI_EDITABLE_FIELDS: ReadonlySet<keyof ExtractedEffect> = new Set<keyof ExtractedEffect>([
+  "effect_r", "effect_t", "effect_df", "effect_beta", "n_predictors", "sample_n",
+  "sample_start", "sample_end", "p_value", "ci_lower", "ci_upper",
+  "doi_measure", "performance_measure", "icrv_regime", "dpl_phase", "cdai_score",
+  "country", "year", "paper_title", "authors",
+]);
+
+function fmt(v: unknown, digits = 6): string {
+  if (v === null || v === undefined) return "-";
+  if (typeof v === "number") return Number.isInteger(v) ? String(v) : v.toFixed(digits);
+  if (typeof v === "boolean") return v ? "yes" : "no";
+  if (Array.isArray(v)) return v.length ? v.join(", ") : "-";
+  return String(v);
+}
 
 // ---------------------------------------------------------------------------
 // Editable field row
@@ -116,9 +140,15 @@ export default function VerificationPanel({
     setError(null);
     try {
       // Step 1: apply overrides + approval
+      const fieldOverrides: Partial<ExtractedEffect> = {};
+      for (const [k, v] of Object.entries(overrides)) {
+        if (v !== undefined && PI_EDITABLE_FIELDS.has(k as keyof ExtractedEffect)) {
+          (fieldOverrides as Record<string, unknown>)[k] = v;
+        }
+      }
       const verified = await verifyStudy(study.study_id, {
         study_id: study.study_id,
-        field_overrides: overrides,
+        field_overrides: fieldOverrides,
         pi_approved: true,
         pi_notes: piNotes,
       });
@@ -226,6 +256,14 @@ export default function VerificationPanel({
             inputType="number"
           />
           <FieldRow
+            label="Predictors p (for t/β from a regression; df = n − p − 1)"
+            fieldKey="n_predictors"
+            original={study.n_predictors}
+            override={overrides.n_predictors}
+            onOverride={setOverride}
+            inputType="number"
+          />
+          <FieldRow
             label="N (sample size)"
             fieldKey="sample_n"
             original={study.sample_n}
@@ -301,6 +339,51 @@ export default function VerificationPanel({
             onOverride={setOverride}
             inputType="number"
           />
+        </tbody>
+      </table>
+
+      {/* Derived by the server (7.2.0): recomputed on every override, read-only here */}
+      <h3 className="panel-subtitle">Derived by the server (recomputed after each override)</h3>
+      {study.effect_r === null && (
+        <div className="alert alert-warning">
+          This record has no effect size
+          {study.beta_outside_pb_domain ? " (β outside the Peterson–Brown domain |β| ≤ 0.5)" : ""}
+          , so it cannot be locked. Correct the primary statistic or flag it for re-extraction.
+        </div>
+      )}
+      <table className="field-table derived-table">
+        <tbody>
+          <tr><td className="field-label">Metric type</td><td>{fmt(study.metric_type)}</td>
+              <td className="field-label">Estimand source</td><td>{fmt(study.estimand_source)}</td></tr>
+          <tr><td className="field-label">r source</td><td>{fmt(study.r_source)}</td>
+              <td className="field-label">df source</td><td>{fmt(study.df_source)}{study.df_imputed ? " (imputed)" : ""}</td></tr>
+          <tr><td className="field-label">Variance of r</td><td>{fmt(study.variance_r)}</td>
+              <td className="field-label">Formula</td><td><code>{fmt(study.variance_formula)}</code></td></tr>
+          <tr><td className="field-label">Variance of z</td><td>{fmt(study.variance_z)}</td>
+              <td className="field-label">Source controls</td><td>{fmt(study.source_controls)}</td></tr>
+          <tr><td className="field-label">λ term applied (β ≥ 0)</td><td>{fmt(study.lambda_applied)}</td>
+              <td className="field-label">β outside P&amp;B domain</td><td>{fmt(study.beta_outside_pb_domain)}</td></tr>
+        </tbody>
+      </table>
+
+      {/* Machine evidence: immutable, never overridable */}
+      <h3 className="panel-subtitle">Machine proposal (immutable)</h3>
+      <table className="field-table derived-table">
+        <tbody>
+          <tr><td className="field-label">Extraction confidence</td><td>{fmt(study.extraction_confidence, 3)}</td>
+              <td className="field-label">Requires verification</td><td>{fmt(study.requires_verification)}</td></tr>
+          <tr><td className="field-label">Evidence (effect)</td>
+              <td colSpan={3}>{study.evidence_quote ? `“${study.evidence_quote}”` : "-"}{study.evidence_page !== null ? ` (p. ${study.evidence_page})` : ""}</td></tr>
+          <tr><td className="field-label">Evidence (N)</td>
+              <td colSpan={3}>{study.n_evidence_quote ? `“${study.n_evidence_quote}”` : "-"}{study.n_evidence_page !== null ? ` (p. ${study.n_evidence_page})` : ""}</td></tr>
+          {study.text_truncated && (
+            <tr><td className="field-label">PDF text</td>
+                <td colSpan={3} className="text-warning">Truncated before extraction (PDF_TEXT_LIMIT) — statistics reported after the cut were not seen by the model.</td></tr>
+          )}
+          {study.pi_edited_fields.length > 0 && (
+            <tr><td className="field-label">PI edits</td>
+                <td colSpan={3}>{study.pi_edited_fields.join(", ")}{study.pi_override_at ? ` · ${study.pi_override_at}` : ""}</td></tr>
+          )}
         </tbody>
       </table>
 

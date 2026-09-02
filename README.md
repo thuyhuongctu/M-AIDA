@@ -1,7 +1,7 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21282516.svg)](https://doi.org/10.5281/zenodo.21282516)
-![version](https://img.shields.io/badge/version-7.2.0-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+![version](https://img.shields.io/badge/version-7.2.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
 academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop

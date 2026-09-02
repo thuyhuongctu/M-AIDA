@@ -1,5 +1,5 @@
 /**
- * TypeScript interfaces matching the M-AIDA v7.1.1 backend Pydantic models.
+ * TypeScript interfaces matching the M-AIDA backend Pydantic models (7.2.x).
  *
  * Keep in sync with backend/models.py.
  */
