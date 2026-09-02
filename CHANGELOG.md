@@ -28,6 +28,10 @@ Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đ�
   "Request failed with status code 422".
 - Kiểm thử: 76 test backend, 20 test `analysis/` đạt; `tsc --noEmit` và
   `vite build` sạch.
+- DOI: ghi DOI phiên bản Zenodo của v7.2.0 (`10.5281/zenodo.22259090`) vào
+  CITATION.cff và README. Hai bản ghi Zenodo gắn nhãn `v.7.2.0`
+  (22258783, 22258977) sinh ra từ release gắn sai tag (trỏ `3c8de32` chưa vá)
+  là bản thay thế, không trích dẫn.
 
 ## [7.2.0] - 2026-09-03: đường sau trích xuất (PI sửa, khóa, xuất) và số hiệu cho A1–A3
 
