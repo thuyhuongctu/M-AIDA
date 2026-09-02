@@ -3,6 +3,49 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## [7.2.1] - 2026-09-03: một số hiệu phiên bản duy nhất; giao diện hiển thị trường dẫn xuất
+
+Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đồ dữ liệu, không
+đụng bản ghi đã khóa.
+
+- Số hiệu: `/api/health` của 7.2.0 vẫn trả `"version": "7.1.1"` trong khi
+  tài liệu OpenAPI ghi 7.2.0. Nay backend có một hằng `APP_VERSION` duy nhất
+  (tiêu đề ứng dụng, OpenAPI, `/api/health` đều đọc từ đó); giao diện lấy số
+  hiệu từ `/api/health` thay vì ghi cứng; test
+  `test_721_version_consistency.py` khóa `APP_VERSION` = `backend/pyproject.toml`
+  = `CITATION.cff` = `.zenodo.json`.
+- Giao diện xác minh (`VerificationPanel`): thêm ô sửa `n_predictors` (cần cho
+  t/β từ hồi quy, df = n − p − 1); hiển thị chỉ đọc các trường máy chủ dẫn xuất
+  (`metric_type`, `estimand_source`, `r_source`, `df_source`, `variance_r`,
+  `variance_formula`, `variance_z`, `source_controls`, `lambda_applied`,
+  `beta_outside_pb_domain`), khối "Machine proposal" bất biến
+  (`extraction_confidence`, trích dẫn bằng chứng và trang, cảnh báo
+  `text_truncated`), và dòng `pi_edited_fields` / `pi_override_at`. Cảnh báo
+  rõ khi bản ghi không có r nên không khóa được. Chỉ gửi các trường trong
+  danh sách trắng `PI_EDITABLE_FIELDS` làm `field_overrides`.
+- Trình khách API: thông điệp lỗi hiển thị trường `detail` của FastAPI
+  (ví dụ lý do 422 của danh sách trắng hay cổng khóa) thay vì
+  "Request failed with status code 422".
+- Kiểm thử: 76 test backend, 20 test `analysis/` đạt; `tsc --noEmit` và
+  `vite build` sạch.
+- Bản ghi cũ (trước 7.2.0) không có phương sai: `/verify` nay tự dẫn xuất
+  `variance_r`, `variance_z`, `metric_type`… từ thống kê sơ cấp ngay lần xác
+  minh đầu (không cần sửa trường nào), nên bản ghi nhập từ CSV hay từ kho SQLite
+  cũ khoá được thay vì kẹt 422 vĩnh viễn. Ứng dụng bảo vệ (`demo/run_defense.py`)
+  gieo bản ghi qua cùng hàm dẫn xuất, nên 18 bản ghi mẫu đều có phương sai và
+  người trình bày xác minh + khoá được bản ghi chờ; `demo/smoke_test.py` kiểm
+  đúng đường này.
+- Trang web (GitHub Pages): số hiệu và DOI phiên bản lấy từ 7.2.0
+  (`assets/data/site-metrics.json` là nguồn duy nhất: `version`, `version_doi`,
+  và `generation` = thế hệ khoá dữ liệu v7.1.1 tách riêng); ghi chú "tạm thời"
+  nói rõ 7.2.0 là bản phần mềm, không khoá lại kho dữ liệu; các trang
+  commercial, defense, huong, asia, asia-maida-paper, styleguide cập nhật theo;
+  `scripts/check_site_metrics.py` đạt trên 24 trang.
+- DOI: ghi DOI phiên bản Zenodo của v7.2.0 (`10.5281/zenodo.22259090`) vào
+  CITATION.cff và README. Hai bản ghi Zenodo gắn nhãn `v.7.2.0`
+  (22258783, 22258977) sinh ra từ release gắn sai tag (trỏ `3c8de32` chưa vá)
+  là bản thay thế, không trích dẫn.
+
 ## [7.2.0] - 2026-09-03: đường sau trích xuất (PI sửa, khóa, xuất) và số hiệu cho A1–A3
 
 Phát hành gộp ba mục "Chưa phát hành" bên dưới (A1–A3, E1, demo) cùng bản vá

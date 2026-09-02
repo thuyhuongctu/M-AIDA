@@ -39,4 +39,19 @@ studies = client.get("/api/studies")
 assert studies.status_code == 200
 assert any(item["pi_locked"] for item in studies.json())
 
+# 7.2.1: every seeded record carries a variance (7.2.0 lock gate), and the
+# presenter can verify and lock a pending record during the demo.
+assert all(item["variance_r"] is not None for item in studies.json() if item["effect_r"] is not None)
+pending = [item for item in studies.json() if not item["pi_locked"]]
+assert pending, "the seed must leave at least one pending record for the demo"
+sid = pending[0]["study_id"]
+pin = {"X-MAIDA-Demo-PIN": "ci-presenter-pin"}
+verified = client.patch(f"/api/studies/{sid}/verify", headers=pin,
+                        json={"study_id": sid, "pi_approved": True, "pi_notes": "smoke",
+                              "field_overrides": {}})
+assert verified.status_code == 200, verified.text
+assert client.post(f"/api/studies/{sid}/lock", headers=pin).status_code == 200
+header = client.get("/api/studies/export/csv").text.splitlines()[0].split(",")
+assert "variance_r" in header and "metric_type" in header
+
 print("Defense App smoke test passed.")

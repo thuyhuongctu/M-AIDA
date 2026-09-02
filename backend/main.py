@@ -1,5 +1,5 @@
 """
-M-AIDA v7.1.1 - FastAPI application entry point.
+M-AIDA - FastAPI application entry point (version: see APP_VERSION below).
 
 Routes
 ------
@@ -66,10 +66,15 @@ logger = logging.getLogger(__name__)
 # App & middleware
 # ---------------------------------------------------------------------------
 
+#: Single source of the running version. /api/health, the OpenAPI document
+#: and the tests read this constant; backend/pyproject.toml must match it
+#: (test_721_version_consistency).
+APP_VERSION = "7.2.1"
+
 app = FastAPI(
-    title="M-AIDA v7.1.1",
+    title=f"M-AIDA v{APP_VERSION}",
     description="Meta-Analysis Intelligent Data Assistant - I→P research pipeline",
-    version="7.2.0",
+    version=APP_VERSION,
 )
 
 settings = get_settings()
@@ -135,7 +140,7 @@ def health_check() -> dict[str, Any]:
     llm_ready = bool(settings.anthropic_api_key)
     return {
         "status": "ok",
-        "version": "7.1.1",
+        "version": APP_VERSION,
         "study_count": len(_studies),
         "anthropic_configured": llm_ready,
         "notion_configured": bool(
@@ -402,9 +407,15 @@ def verify_study(study_id: str, decision: VerificationDecision) -> StudyDatabase
     # (r > t > beta); a PI who supplies t/df or beta WITHOUT a new r is asking
     # for the conversion, so the previous r is dropped from the inputs.
     touched = [k for k in overrides if k in PRIMARY_STAT_FIELDS]
-    if touched:
+    # 7.2.1: a record written before 7.2.0 (an imported or demo-seeded row, or a
+    # row from an older SQLite store) carries a primary statistic but no
+    # variance. Derive it on the first verification so the record can pass the
+    # lock gate, instead of being stuck behind a 422 forever.
+    legacy = data.get("variance_r") is None and any(
+        data.get(k) is not None for k in ("effect_r", "effect_t", "effect_beta"))
+    if touched or legacy:
         primary = {k: data.get(k) for k in PRIMARY_STAT_FIELDS}
-        if "effect_r" not in overrides:
+        if touched and "effect_r" not in overrides:
             if any(k in overrides for k in ("effect_t", "effect_df")) and \
                     data.get("effect_t") is not None:
                 primary["effect_r"] = None
@@ -415,8 +426,9 @@ def verify_study(study_id: str, decision: VerificationDecision) -> StudyDatabase
         confidence = derived.pop("confidence")  # machine score is NOT overwritten
         del confidence
         data.update(derived)
-        data["pi_edited_fields"] = sorted(set(data.get("pi_edited_fields") or []) | set(overrides))
-        data["pi_override_at"] = datetime.now(timezone.utc)
+        if overrides:
+            data["pi_edited_fields"] = sorted(set(data.get("pi_edited_fields") or []) | set(overrides))
+            data["pi_override_at"] = datetime.now(timezone.utc)
     elif overrides:
         data["pi_edited_fields"] = sorted(set(data.get("pi_edited_fields") or []) | set(overrides))
         data["pi_override_at"] = datetime.now(timezone.utc)

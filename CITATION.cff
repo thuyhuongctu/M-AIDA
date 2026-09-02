@@ -8,7 +8,7 @@ abstract: >-
   dashboard for the principal investigator and an immutable data-lock workflow
   that exports a reproducible effect-size dataset for three-level meta-analysis.
 type: software
-version: "7.2.0"
+version: "7.2.1"
 date-released: "2026-09-03"
 license: AGPL-3.0-only
 repository-code: "https://github.com/thuyhuongctu/M-AIDA"
@@ -20,6 +20,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.21282517"
     description: "Zenodo version DOI (release v7.1.1)"
+  - type: doi
+    value: "10.5281/zenodo.22259090"
+    description: "Zenodo version DOI (release v7.2.0, tag v7.2.0 = 3ff42c4)"
 authors:
   - family-names: "Do"
     given-names: "Thuy Huong"

@@ -420,3 +420,10 @@ body {
   .status-pill-label { color: #94a3b8; }
   .status-banner-note { color: #fbbf24; }
 }
+
+/* 7.2.1: read-only derived / machine blocks in the verification panel */
+.panel-subtitle { font-size: 0.9rem; font-weight: 600; margin: 1rem 0 0.4rem; color: #334155; }
+.derived-table td { font-variant-numeric: tabular-nums; }
+.derived-table code { font-size: 0.8rem; }
+.alert-warning { background: #fffbeb; border: 1px solid #f59e0b; color: #92400e; padding: 0.6rem 0.8rem; border-radius: 6px; margin-bottom: 0.6rem; font-size: 0.86rem; }
+.text-warning { color: #92400e; }

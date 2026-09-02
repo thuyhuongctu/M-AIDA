@@ -1,5 +1,5 @@
 /**
- * M-AIDA v7.1.1 API client.
+ * M-AIDA API client.
  *
  * All routes proxied from the React dev server to the FastAPI backend
  * (default: http://localhost:8765).  Set VITE_API_URL in .env.local
@@ -23,6 +23,28 @@ const http: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
+
+// 7.2.1: FastAPI puts the human-readable reason in `detail` (e.g. the 422 from
+// the PI-editable whitelist, or the lock gate refusing a record without an
+// effect size). Surface it as the Error message instead of axios's generic
+// "Request failed with status code 422".
+http.interceptors.response.use(
+  (res) => res,
+  (err: unknown) => {
+    if (axios.isAxiosError(err) && err.response) {
+      const data = err.response.data as { detail?: unknown } | undefined;
+      const detail = data?.detail;
+      const text =
+        typeof detail === "string"
+          ? detail
+          : detail !== undefined
+            ? JSON.stringify(detail)
+            : err.message;
+      return Promise.reject(new Error(`${err.response.status}: ${text}`));
+    }
+    return Promise.reject(err);
+  }
+);
 
 // ---------------------------------------------------------------------------
 // Health
