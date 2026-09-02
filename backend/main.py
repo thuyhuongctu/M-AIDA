@@ -1,5 +1,5 @@
 """
-M-AIDA v7.1.1 - FastAPI application entry point.
+M-AIDA - FastAPI application entry point (version: see APP_VERSION below).
 
 Routes
 ------
@@ -66,10 +66,15 @@ logger = logging.getLogger(__name__)
 # App & middleware
 # ---------------------------------------------------------------------------
 
+#: Single source of the running version. /api/health, the OpenAPI document
+#: and the tests read this constant; backend/pyproject.toml must match it
+#: (test_721_version_consistency).
+APP_VERSION = "7.2.1"
+
 app = FastAPI(
-    title="M-AIDA v7.1.1",
+    title=f"M-AIDA v{APP_VERSION}",
     description="Meta-Analysis Intelligent Data Assistant - I→P research pipeline",
-    version="7.2.0",
+    version=APP_VERSION,
 )
 
 settings = get_settings()
@@ -135,7 +140,7 @@ def health_check() -> dict[str, Any]:
     llm_ready = bool(settings.anthropic_api_key)
     return {
         "status": "ok",
-        "version": "7.1.1",
+        "version": APP_VERSION,
         "study_count": len(_studies),
         "anthropic_configured": llm_ready,
         "notion_configured": bool(

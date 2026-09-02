@@ -3,6 +3,32 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## [7.2.1] - 2026-09-03: một số hiệu phiên bản duy nhất; giao diện hiển thị trường dẫn xuất
+
+Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đồ dữ liệu, không
+đụng bản ghi đã khóa.
+
+- Số hiệu: `/api/health` của 7.2.0 vẫn trả `"version": "7.1.1"` trong khi
+  tài liệu OpenAPI ghi 7.2.0. Nay backend có một hằng `APP_VERSION` duy nhất
+  (tiêu đề ứng dụng, OpenAPI, `/api/health` đều đọc từ đó); giao diện lấy số
+  hiệu từ `/api/health` thay vì ghi cứng; test
+  `test_721_version_consistency.py` khóa `APP_VERSION` = `backend/pyproject.toml`
+  = `CITATION.cff` = `.zenodo.json`.
+- Giao diện xác minh (`VerificationPanel`): thêm ô sửa `n_predictors` (cần cho
+  t/β từ hồi quy, df = n − p − 1); hiển thị chỉ đọc các trường máy chủ dẫn xuất
+  (`metric_type`, `estimand_source`, `r_source`, `df_source`, `variance_r`,
+  `variance_formula`, `variance_z`, `source_controls`, `lambda_applied`,
+  `beta_outside_pb_domain`), khối "Machine proposal" bất biến
+  (`extraction_confidence`, trích dẫn bằng chứng và trang, cảnh báo
+  `text_truncated`), và dòng `pi_edited_fields` / `pi_override_at`. Cảnh báo
+  rõ khi bản ghi không có r nên không khóa được. Chỉ gửi các trường trong
+  danh sách trắng `PI_EDITABLE_FIELDS` làm `field_overrides`.
+- Trình khách API: thông điệp lỗi hiển thị trường `detail` của FastAPI
+  (ví dụ lý do 422 của danh sách trắng hay cổng khóa) thay vì
+  "Request failed with status code 422".
+- Kiểm thử: 76 test backend, 20 test `analysis/` đạt; `tsc --noEmit` và
+  `vite build` sạch.
+
 ## [7.2.0] - 2026-09-03: đường sau trích xuất (PI sửa, khóa, xuất) và số hiệu cho A1–A3
 
 Phát hành gộp ba mục "Chưa phát hành" bên dưới (A1–A3, E1, demo) cùng bản vá
