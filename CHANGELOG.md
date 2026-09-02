@@ -28,6 +28,19 @@ Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đ�
   "Request failed with status code 422".
 - Kiểm thử: 76 test backend, 20 test `analysis/` đạt; `tsc --noEmit` và
   `vite build` sạch.
+- Bản ghi cũ (trước 7.2.0) không có phương sai: `/verify` nay tự dẫn xuất
+  `variance_r`, `variance_z`, `metric_type`… từ thống kê sơ cấp ngay lần xác
+  minh đầu (không cần sửa trường nào), nên bản ghi nhập từ CSV hay từ kho SQLite
+  cũ khoá được thay vì kẹt 422 vĩnh viễn. Ứng dụng bảo vệ (`demo/run_defense.py`)
+  gieo bản ghi qua cùng hàm dẫn xuất, nên 18 bản ghi mẫu đều có phương sai và
+  người trình bày xác minh + khoá được bản ghi chờ; `demo/smoke_test.py` kiểm
+  đúng đường này.
+- Trang web (GitHub Pages): số hiệu và DOI phiên bản lấy từ 7.2.0
+  (`assets/data/site-metrics.json` là nguồn duy nhất: `version`, `version_doi`,
+  và `generation` = thế hệ khoá dữ liệu v7.1.1 tách riêng); ghi chú "tạm thời"
+  nói rõ 7.2.0 là bản phần mềm, không khoá lại kho dữ liệu; các trang
+  commercial, defense, huong, asia, asia-maida-paper, styleguide cập nhật theo;
+  `scripts/check_site_metrics.py` đạt trên 24 trang.
 - DOI: ghi DOI phiên bản Zenodo của v7.2.0 (`10.5281/zenodo.22259090`) vào
   CITATION.cff và README. Hai bản ghi Zenodo gắn nhãn `v.7.2.0`
   (22258783, 22258977) sinh ra từ release gắn sai tag (trỏ `3c8de32` chưa vá)

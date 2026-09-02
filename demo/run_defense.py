@@ -8,7 +8,7 @@ import json
 import os
 import secrets
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +20,7 @@ from fastapi import Request  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse  # noqa: E402
 
 import main  # noqa: E402
+from extractor import StatisticalExtractor  # noqa: E402
 from models import StudyDatabaseEntry  # noqa: E402
 
 SEED_CSV = Path(os.environ.get("MAIDA_SEED_CSV", ROOT / "demo" / "demo_seed.csv"))
@@ -51,13 +52,23 @@ def _entry_from_row(row: dict[str, str]) -> StudyDatabaseEntry:
         notes.append(f"CDAI class in source CSV: {row['cdai'].strip()}.")
     if row.get("notes", "").strip():
         notes.append(f"Coder note: {row['notes'].strip()}")
+    # 7.2.1: seeded rows carry r and n only; derive the variance and the
+    # provenance fields through the same function the extraction path uses, so
+    # a seeded record is lockable and exports with a variance (7.2.0 lock gate).
+    derived = StatisticalExtractor.derive_from_primary(
+        {"effect_r": float(row["r"]), "sample_n": _to_int(row["n"])})
+    derived.pop("confidence", None)
+    if estimated:
+        # r in the seed CSV was itself converted from t or beta by the coder;
+        # label it as derived rather than as a reported zero-order r.
+        derived["r_source"] = "derived"
     entry = StudyDatabaseEntry(
         study_id=row["effect_id"].strip(),
         paper_title=f"{row['author'].strip()} ({row['year'].strip()})",
         authors=row["author"].strip(),
         year=int(row["year"]), country=row["country"].strip(),
         sample_n=_to_int(row["n"]), sample_start=_to_int(row["sample_start"]),
-        sample_end=_to_int(row["sample_end"]), effect_r=float(row["r"]),
+        sample_end=_to_int(row["sample_end"]),
         doi_measure=row["doi_type"].strip() or None,
         performance_measure=row["fp_type"].strip() or None,
         icrv_regime=row["icrv"].strip() or None,
@@ -65,7 +76,8 @@ def _entry_from_row(row: dict[str, str]) -> StudyDatabaseEntry:
         extraction_confidence=0.6 if estimated else 1.0,
         requires_verification=pending, pi_locked=not pending,
         pi_notes="" if pending else " ".join(notes),
-        locked_at=None if pending else datetime.utcnow(),
+        locked_at=None if pending else datetime.now(timezone.utc),
+        **derived,
     )
     if pending:
         entry.machine_proposal = main._machine_proposal_snapshot(entry)
