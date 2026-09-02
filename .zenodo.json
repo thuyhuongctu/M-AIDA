@@ -1,8 +1,8 @@
 {
   "title": "M-AIDA: Meta-Analysis Intelligent Data Assistant",
-  "version": "7.1.1",
+  "version": "7.2.0",
   "upload_type": "software",
-  "publication_date": "2026-07-09",
+  "publication_date": "2026-09-03",
   "description": "Research software for international-business meta-analysis: semi-automated effect-size extraction from academic PDFs through a vendor-neutral large-language-model adapter, human-in-the-loop verification by the principal investigator, and an immutable data-lock workflow that exports a reproducible effect-size dataset for three-level meta-analytic regression. Built to support the P6 (meta-analysis) component of the first author's doctoral dissertation on the internationalization-performance relationship.",
   "creators": [
     {
