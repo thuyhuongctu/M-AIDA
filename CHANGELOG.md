@@ -42,7 +42,12 @@ Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đ�
   commercial, defense, huong, asia, asia-maida-paper, styleguide cập nhật theo;
   `scripts/check_site_metrics.py` đạt trên 24 trang.
 - DOI: ghi DOI phiên bản Zenodo của v7.2.0 (`10.5281/zenodo.22259090`) vào
-  CITATION.cff và README. Hai bản ghi Zenodo gắn nhãn `v.7.2.0`
+  CITATION.cff và README. **DOI phiên bản của chính bản 7.2.1 là
+  `10.5281/zenodo.22260059`** (tag `v7.2.1` = `d2ea8e3`), ghi bổ sung sau khi
+  phát hành. Ba bản ghi Zenodo ngày 03/09/2026 là bản thay thế, KHÔNG trích dẫn:
+  `22258783` và `22258977` (nhãn `v.7.2.0`, lưu commit `3c8de32` chưa vá) và
+  `22259684` (nhãn `v7.2.1`, lưu commit `3ff42c4` tức mã 7.2.0). Tác giả đã yêu
+  cầu Zenodo gỡ ba bản ghi này. Hai bản ghi Zenodo gắn nhãn `v.7.2.0`
   (22258783, 22258977) sinh ra từ release gắn sai tag (trỏ `3c8de32` chưa vá)
   là bản thay thế, không trích dẫn.
 
