@@ -8,7 +8,7 @@ Notion-synchronized study database entries.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -198,6 +198,34 @@ class ExtractedEffect(BaseModel):
             "in the β → r conversion (λ = 1 for β ≥ 0, else 0)"
         ),
     )
+    variance_z: float | None = Field(
+        None,
+        description=(
+            "Sampling variance on the Fisher-z scale, the weight the "
+            "three-level model uses: 1/(n-3) for zero-order, 1/(df-1) for "
+            "partial correlations (7.2.0). Recomputed together with "
+            "variance_r whenever a primary statistic changes."
+        ),
+    )
+    text_truncated: bool = Field(
+        False,
+        description=(
+            "True when the PDF text exceeded the prompt limit (40,000 "
+            "characters) and was cut before being sent to the model; an empty "
+            "record may then reflect the cut, not the paper (7.2.0)."
+        ),
+    )
+    pi_edited_fields: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Names of fields the PI has corrected via PATCH /verify (union over "
+            "all decisions). The machine's proposal and extraction_confidence "
+            "are never edited; human corrections are logged here instead (7.2.0)."
+        ),
+    )
+    pi_override_at: datetime | None = Field(
+        None, description="UTC time of the most recent PI field correction (7.2.0)"
+    )
     variance_r: float | None = Field(
         None,
         description=(
@@ -290,7 +318,7 @@ class ExtractedEffect(BaseModel):
             "point back to their v7.1.1 originals via this field."
         ),
     )
-    extracted_at: datetime = Field(default_factory=datetime.utcnow)
+    extracted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     locked_at: datetime | None = None
 
 

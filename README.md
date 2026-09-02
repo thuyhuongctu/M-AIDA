@@ -1,7 +1,7 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21282516.svg)](https://doi.org/10.5281/zenodo.21282516)
-![version](https://img.shields.io/badge/version-7.1.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+![version](https://img.shields.io/badge/version-7.2.0-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
 academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop
@@ -142,6 +142,9 @@ confirmed for every PRIMARY study; the freeze command enforces both gates.
 ## Extraction Workflow
 
 1. **Parse**: PDF text is extracted with MuPDF and segmented into statistical regions.
+   At most 40,000 characters of text are sent to the model (`PDF_TEXT_LIMIT`); when a
+   paper is longer the record carries `text_truncated = true`, so an empty proposal
+   can be told apart from a paper that reports no statistic.
 2. **Identify**: the LLM adapter proposes the focal internationalization-performance
    coefficient (not interactions or controls). Moderators (ICRV, DPL, cDAI) are left
    blank for the principal investigator to assign from external lookup tables.
@@ -158,9 +161,16 @@ confirmed for every PRIMARY study; the freeze command enforces both gates.
    record is stored: the system has no default or fallback output path for any
    input.
 5. **Verify**: the principal investigator reviews each field; any record with
-   confidence below 0.70 is flagged for mandatory review.
-6. **Lock**: an approved record is permanently locked with a UTC timestamp and can no
-   longer be edited. Only locked records enter the analysis export.
+   confidence below 0.70 is flagged for mandatory review. Corrections go through a
+   whitelist of PI-editable fields (`PI_EDITABLE_FIELDS`, 7.2.0); a change to any
+   primary statistic re-derives r, the variances (`variance_r`, `variance_z`),
+   `metric_type` and the provenance fields through the same function live
+   extraction uses. The machine's proposal, its confidence score and the evidence
+   quotes are never editable; human edits are logged in `pi_edited_fields`.
+6. **Lock**: an approved record that carries an effect size and its variance is
+   permanently locked with a UTC timestamp and can no longer be edited; `pi_locked`
+   and `locked_at` cannot be set by any other route. Only locked records enter the
+   analysis export, which carries every field of the record.
 
 ## Effect-size recoding and lock generations (`analysis/`)
 

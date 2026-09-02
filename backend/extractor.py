@@ -16,7 +16,7 @@ import json
 import logging
 import math
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from engines import EngineError, ExtractionEngine, make_engine
@@ -37,6 +37,7 @@ CONFIDENCE_DIRECT_R: float = 1.0   # Pearson r reported directly
 CONFIDENCE_FROM_T: float = 0.8     # Derived from t-statistic + df
 CONFIDENCE_FROM_BETA: float = 0.6  # Derived from standardised β coefficient
 CONFIDENCE_REVIEW_THRESHOLD: float = 0.7  # Flag for PI review if below this
+PDF_TEXT_LIMIT: int = 40_000  # characters of PDF text sent to the model (documented, 7.2.0)
 
 # ---------------------------------------------------------------------------
 # Extraction system prompt
@@ -118,6 +119,60 @@ Rules:
 """
 
 
+class MalformedLLMOutputError(ValueError):
+    """The model's reply is not a JSON object with the expected field types.
+
+    LLM output is untrusted input. A reply that is not JSON, or that carries a
+    non-numeric value where a number is required, is rejected with a visible
+    error (HTTP 422) instead of silently producing an empty record or an
+    internal server error (7.2.0, findings C1).
+    """
+
+
+#: Fields the model must return as numbers (or null). Numeric strings such as
+#: "0.35" are coerced; anything else is a MalformedLLMOutputError.
+NUMERIC_LLM_FIELDS: tuple[str, ...] = (
+    "effect_r", "effect_t", "effect_beta", "effect_df", "sample_n",
+    "sample_start", "sample_end", "p_value", "ci_lower", "ci_upper",
+    "n_predictors", "evidence_page", "n_evidence_page",
+)
+
+#: Primary statistics a PI may correct; every derived quantity (r, variance,
+#: metric_type, estimand_source, source_controls, df_source, lambda_applied,
+#: r_source, beta_outside_pb_domain) is recomputed from them, never edited.
+PRIMARY_STAT_FIELDS: tuple[str, ...] = (
+    "effect_r", "effect_t", "effect_df", "effect_beta", "n_predictors", "sample_n",
+)
+
+
+def coerce_numeric_fields(raw: dict[str, Any]) -> dict[str, Any]:
+    """Return a copy of ``raw`` with NUMERIC_LLM_FIELDS parsed to numbers.
+
+    ``None``/"" stay ``None``; numeric strings are parsed; booleans and other
+    types raise MalformedLLMOutputError naming the field.
+    """
+    out = dict(raw)
+    for key in NUMERIC_LLM_FIELDS:
+        if key not in out:
+            continue
+        val = out[key]
+        if val is None or (isinstance(val, str) and not val.strip()):
+            out[key] = None
+            continue
+        if isinstance(val, bool):
+            raise MalformedLLMOutputError(f"{key}: boolean where a number is required")
+        if isinstance(val, (int, float)):
+            continue
+        if isinstance(val, str):
+            try:
+                out[key] = float(val.strip().replace(",", ""))
+                continue
+            except ValueError:
+                pass
+        raise MalformedLLMOutputError(f"{key}: {val!r} is not numeric")
+    return out
+
+
 class EvidenceMissingError(ValueError):
     """The model proposed statistics without verbatim evidence (finding E1).
 
@@ -176,7 +231,11 @@ class StatisticalExtractor:
             An ``ExtractedEffect`` with all parseable fields populated.
         """
         raw = self._call_llm(text, metadata)
-        return self._build_effect(raw, metadata)
+        effect = self._build_effect(raw, metadata)
+        # The prompt carries at most PDF_TEXT_LIMIT characters; a table that
+        # sits beyond the cut is invisible to the model, so the record says so.
+        effect.text_truncated = len(text) > PDF_TEXT_LIMIT
+        return effect
 
     # ------------------------------------------------------------------
     # Effect-size conversion formulas
@@ -270,6 +329,98 @@ class StatisticalExtractor:
         raise ValueError(f"unsupported metric_type: {metric_type!r}")
 
     @staticmethod
+    def variance_of_z(
+        *, sample_n: int | None = None, df: int | None = None, metric_type: str = "zero_order"
+    ) -> float | None:
+        """Sampling variance on the Fisher-z scale, the quantity the three-level
+        model actually weights with (7.2.0; same formulas as analysis/effect_size.py):
+
+            zero-order: Var(z)   = 1 / (n − 3)
+            partial:    Var(z_p) = 1 / (df − 1)
+
+        Returns ``None`` when the denominator is not positive.
+        """
+        if metric_type == "zero_order":
+            return 1.0 / (sample_n - 3) if sample_n is not None and sample_n > 3 else None
+        if metric_type == "partial":
+            return 1.0 / (df - 1) if df is not None and df > 1 else None
+        return None
+
+    @staticmethod
+    def derive_from_primary(fields: dict[str, Any]) -> dict[str, Any]:
+        """Re-derive every derived quantity from the primary statistics.
+
+        Input keys: effect_r, effect_t, effect_df, effect_beta, n_predictors,
+        sample_n (any may be None). Precedence r > t > beta, as at extraction.
+        Output keys: effect_r (canonical), effect_df, df_source, df_imputed,
+        metric_type, estimand_source, source_controls, lambda_applied,
+        beta_outside_pb_domain, variance_r, variance_formula, variance_z,
+        r_source, confidence. Used by both live extraction and PI overrides so
+        the two paths cannot drift (7.2.0, findings A1–A3).
+        """
+        S = StatisticalExtractor
+        effect_r = fields.get("effect_r")
+        effect_t = fields.get("effect_t")
+        effect_beta = fields.get("effect_beta")
+        effect_df = fields.get("effect_df")
+        n_predictors = fields.get("n_predictors")
+        n_predictors = int(n_predictors) if n_predictors is not None else None
+        sample_n = fields.get("sample_n")
+        sample_n = int(sample_n) if sample_n is not None else None
+        effect_df = int(effect_df) if effect_df is not None else None
+
+        df_source: str | None = "reported" if effect_df is not None else None
+        df_imputed = False
+        if (
+            (effect_t is not None or effect_beta is not None)
+            and effect_df is None
+            and sample_n is not None
+            and n_predictors is not None
+            and sample_n - n_predictors - 1 > 0
+        ):
+            effect_df = S.degrees_of_freedom(sample_n, n_predictors)
+            df_source = "derived"
+            df_imputed = True
+
+        out: dict[str, Any] = dict(
+            effect_r=None, effect_df=effect_df, df_source=df_source, df_imputed=df_imputed,
+            metric_type=None, estimand_source=None, source_controls=None,
+            lambda_applied=False, beta_outside_pb_domain=False,
+            variance_r=None, variance_formula=None, variance_z=None,
+            r_source=None, confidence=0.0,
+        )
+        if effect_r is not None:
+            out.update(effect_r=S.clamp_r(float(effect_r)), confidence=CONFIDENCE_DIRECT_R,
+                       metric_type="zero_order", estimand_source="observed",
+                       source_controls=False, r_source="reported")
+        elif effect_t is not None and effect_df is not None:
+            mt = "zero_order" if n_predictors is not None and n_predictors <= 1 else "partial"
+            out.update(effect_r=S.compute_r_from_t(float(effect_t), effect_df),
+                       confidence=CONFIDENCE_FROM_T, metric_type=mt, estimand_source="observed",
+                       source_controls=(mt == "partial"), r_source="derived")
+        elif effect_beta is not None:
+            r = S.convert_beta_to_r(float(effect_beta))
+            if r is None:
+                out.update(beta_outside_pb_domain=True)
+            else:
+                # lambda_applied records whether the +0.05·λ term was actually
+                # added, i.e. only for non-negative beta (7.2.0, finding C2).
+                out.update(effect_r=r, confidence=CONFIDENCE_FROM_BETA,
+                           lambda_applied=float(effect_beta) >= 0,
+                           metric_type="zero_order", estimand_source="imputed_pb2005",
+                           source_controls=True, r_source="imputed")
+        r = out["effect_r"]
+        if r is not None and out["metric_type"] == "partial" and effect_df:
+            out.update(variance_r=S.variance_of_r(r, df=effect_df, metric_type="partial"),
+                       variance_formula="(1 - r^2)^2 / df",
+                       variance_z=S.variance_of_z(df=effect_df, metric_type="partial"))
+        elif r is not None and out["metric_type"] == "zero_order" and sample_n is not None and sample_n > 1:
+            out.update(variance_r=S.variance_of_r(r, sample_n=sample_n, metric_type="zero_order"),
+                       variance_formula="(1 - r^2)^2 / (n - 1)",
+                       variance_z=S.variance_of_z(sample_n=sample_n, metric_type="zero_order"))
+        return out
+
+    @staticmethod
     def resolve_overridden_r(
         data: dict[str, Any], overridden_keys: Any
     ) -> float | None:
@@ -298,7 +449,7 @@ class StatisticalExtractor:
         """Send the extraction prompt to the engine and parse the JSON response."""
         user_content = (
             f"Paper metadata provided by the researcher:\n{json.dumps(metadata)}\n\n"
-            f"---BEGIN PDF TEXT---\n{text[:40_000]}\n---END PDF TEXT---\n\n"
+            f"---BEGIN PDF TEXT---\n{text[:PDF_TEXT_LIMIT]}\n---END PDF TEXT---\n\n"
             "Extract the statistical parameters as described and return valid JSON."
         )
 
@@ -317,110 +468,47 @@ class StatisticalExtractor:
                 raw_text = raw_text[4:]
 
         try:
-            return json.loads(raw_text)
+            parsed = json.loads(raw_text)
         except json.JSONDecodeError as exc:
             logger.error("Failed to parse LLM JSON output: %s\n%s", exc, raw_text)
-            return {}
+            raise MalformedLLMOutputError(f"model reply is not JSON: {exc}") from exc
+        if not isinstance(parsed, dict):
+            raise MalformedLLMOutputError("model reply is not a JSON object")
+        return coerce_numeric_fields(parsed)
 
     def _build_effect(
         self, raw: dict[str, Any], metadata: dict[str, Any]
     ) -> ExtractedEffect:
         """Resolve the canonical Pearson r and compute confidence / verification flag."""
+        raw = coerce_numeric_fields(raw)
         effect_r: float | None = raw.get("effect_r")
         effect_t: float | None = raw.get("effect_t")
         effect_beta: float | None = raw.get("effect_beta")
-        effect_df: int | None = raw.get("effect_df")
-
-        confidence: float
-        computed_r: float | None = None
-
+        effect_df_raw = raw.get("effect_df")
         n_predictors_raw = raw.get("n_predictors")
         n_predictors: int | None = (
             int(n_predictors_raw) if n_predictors_raw is not None else None
         )
-
         sample_n_for_df = raw.get("sample_n")
-        df_source: str | None = "reported" if effect_df is not None else None
-        df_imputed = False
-        if (
-            (effect_t is not None or effect_beta is not None)
-            and effect_df is None
-            and sample_n_for_df is not None
-            and n_predictors is not None
-            and int(sample_n_for_df) - n_predictors - 1 > 0
-        ):
-            # df = n − p − 1. Without a predictor count there is no valid
-            # imputation: the record stays unconverted and flagged instead
-            # of silently receiving the bivariate n − 2.
-            effect_df = self.degrees_of_freedom(int(sample_n_for_df), n_predictors)
-            df_source = "derived"
-            df_imputed = True
 
-        beta_outside_pb_domain = False
-        lambda_applied = False
-        metric_type: str | None = None
-        estimand_source: str | None = None
-        source_controls: bool | None = None
-
-        if effect_r is not None:
-            computed_r = self.clamp_r(effect_r)
-            confidence = CONFIDENCE_DIRECT_R
-            # Directly reported r in this literature is normally the
-            # correlation-matrix (zero-order) value; the PI confirms at Gate 2.
-            metric_type = "zero_order"
-            estimand_source = "observed"
-            source_controls = False
-        elif effect_t is not None and effect_df is not None:
-            computed_r = self.compute_r_from_t(effect_t, effect_df)
-            confidence = CONFIDENCE_FROM_T
-            # A t taken from a coefficient in a multiple regression yields a
-            # partial correlation; only the bivariate p = 1 case is zero-order.
-            metric_type = (
-                "zero_order"
-                if n_predictors is not None and n_predictors <= 1
-                else "partial"
-            )
-            estimand_source = "observed"
-            source_controls = metric_type == "partial"
-        elif effect_beta is not None:
-            computed_r = self.convert_beta_to_r(effect_beta)
-            beta_outside_pb_domain = computed_r is None
-            if computed_r is not None:
-                confidence = CONFIDENCE_FROM_BETA
-                lambda_applied = True
-                # Peterson & Brown calibrated the imputation against observed
-                # ZERO-ORDER correlations (the .05·λ term exists because of
-                # that fit), so the estimand is zero-order. The imputed origin
-                # lives in estimand_source; such records feed sensitivity
-                # analyses only, never the main model.
-                metric_type = "zero_order"
-                estimand_source = "imputed_pb2005"
-                source_controls = True
-            else:
-                confidence = 0.0
-        else:
-            computed_r = None
-            confidence = 0.0
-
-        variance_r: float | None = None
-        variance_formula: str | None = None
-        if computed_r is not None and metric_type == "partial" and effect_df:
-            variance_r = self.variance_of_r(
-                computed_r, df=effect_df, metric_type="partial"
-            )
-            variance_formula = "(1 - r^2)^2 / df"
-        elif (
-            computed_r is not None
-            and metric_type == "zero_order"
-            and sample_n_for_df is not None
-            and int(sample_n_for_df) > 1
-        ):
-            variance_r = self.variance_of_r(
-                computed_r,
-                sample_n=int(sample_n_for_df),
-                metric_type="zero_order",
-            )
-            variance_formula = "(1 - r^2)^2 / (n - 1)"
+        d = self.derive_from_primary({
+            "effect_r": effect_r, "effect_t": effect_t, "effect_beta": effect_beta,
+            "effect_df": int(effect_df_raw) if effect_df_raw is not None else None,
+            "n_predictors": n_predictors, "sample_n": sample_n_for_df,
+        })
+        computed_r: float | None = d["effect_r"]
+        effect_df: int | None = d["effect_df"]
+        df_source: str | None = d["df_source"]
+        df_imputed: bool = d["df_imputed"]
+        confidence: float = d["confidence"]
+        beta_outside_pb_domain: bool = d["beta_outside_pb_domain"]
+        lambda_applied: bool = d["lambda_applied"]
+        metric_type: str | None = d["metric_type"]
+        estimand_source: str | None = d["estimand_source"]
+        source_controls: bool | None = d["source_controls"]
+        variance_r: float | None = d["variance_r"]
+        variance_formula: str | None = d["variance_formula"]
+        variance_z: float | None = d["variance_z"]
 
         evidence_page_raw = raw.get("evidence_page")
         evidence_page: int | None = (
@@ -448,15 +536,9 @@ class StatisticalExtractor:
                 "sample_n proposed with no n_evidence_quote"
             )
 
-        # Per-quantity provenance: r by conversion path; n is always reported
-        # at live extraction (the evidence gate above guarantees it).
-        r_source: str | None = None
-        if effect_r is not None:
-            r_source = "reported"
-        elif computed_r is not None and effect_t is not None:
-            r_source = "derived"
-        elif computed_r is not None and effect_beta is not None:
-            r_source = "imputed"
+        # Per-quantity provenance: r by conversion path (from derive_from_primary);
+        # n is always reported at live extraction (the evidence gate guarantees it).
+        r_source: str | None = d["r_source"]
         n_source: str | None = "reported" if sample_n_for_df is not None else None
 
         requires_verification = (
@@ -525,12 +607,13 @@ class StatisticalExtractor:
             lambda_applied=lambda_applied,
             variance_r=variance_r,
             variance_formula=variance_formula,
+            variance_z=variance_z,
             extraction_confidence=confidence,
             requires_verification=requires_verification,
             df_imputed=df_imputed,
             beta_outside_pb_domain=beta_outside_pb_domain,
             pi_locked=False,
-            extracted_at=datetime.utcnow(),
+            extracted_at=datetime.now(timezone.utc),
             locked_at=None,
         )
 

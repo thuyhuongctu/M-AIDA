@@ -3,6 +3,47 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## [7.2.0] - 2026-09-03: đường sau trích xuất (PI sửa, khóa, xuất) và số hiệu cho A1–A3
+
+Phát hành gộp ba mục "Chưa phát hành" bên dưới (A1–A3, E1, demo) cùng bản vá
+cho mười phát hiện của `CODE_REVIEW_2026-08-31.md` (ca tái hiện:
+`verify_findings.py`). Không đụng vào bản ghi P6 đã khóa. Bộ dữ liệu P6 của
+luận án không bị ảnh hưởng bởi các lỗi này (bảng 17 cột do tác giả quản lý,
+phương sai tính trong R từ n bằng `escalc(ZCOR)`), nhưng mọi tuyên bố về công
+cụ từ nay dẫn 7.2.0.
+
+- A1/A2/A3 (PI sửa số): mọi sửa trên `effect_r`, `effect_t`, `effect_df`,
+  `effect_beta`, `n_predictors`, `sample_n` đi qua đúng hàm dẫn xuất của đường
+  trích xuất (`StatisticalExtractor.derive_from_primary`), nên `variance_r`,
+  `variance_z`, `variance_formula`, `metric_type`, `estimand_source`,
+  `source_controls`, `df_source`, `lambda_applied`, `r_source`,
+  `beta_outside_pb_domain` được tính lại cùng lúc. Bản ghi mất r (β ngoài
+  khoảng) tự bật `requires_verification` và `POST /lock` từ chối (422).
+- A4 (xuất CSV): `/api/studies/export/csv` xuất **mọi** trường của bản ghi
+  theo thứ tự model (kể cả `variance_r`, `variance_z`, `metric_type`,
+  `evidence_quote`, `machine_proposal` dạng JSON).
+- B1/B2/B3 (khóa bất biến): `field_overrides` chuyển sang **danh sách trắng**
+  `PI_EDITABLE_FIELDS` (20 trường: sáu thống kê sơ cấp, mã điều tiết, siêu dữ
+  liệu). `pi_locked`, `locked_at`, `study_id`, `machine_proposal`,
+  `extraction_confidence`, `evidence_*` và mọi trường dẫn xuất bị từ chối 422
+  thay vì bị bỏ qua hay áp lặng lẽ. Sửa của người ghi ở `pi_edited_fields`
+  (danh sách tên trường) và `pi_override_at`; `extraction_confidence` là điểm
+  của máy, không bao giờ bị ghi đè.
+- C1 (đầu ra LLM): kiểm kiểu; chuỗi số được ép kiểu, giá trị không phải số
+  và JSON hỏng trả 422 (`MalformedLLMOutputError`), không còn 500 và không còn
+  bản ghi rỗng.
+- C2: `lambda_applied = (β ≥ 0)` ở cả backend lẫn `analysis/effect_size.py`.
+- C3: `variance_z` (1/(n − 3) bậc không; 1/(df − 1) riêng phần) nay được
+  sinh trong đường chạy thật; test `test_C3_backend_agrees_with_analysis_module`
+  khóa hai cài đặt khớp nhau trên r, `variance_r`, `variance_z`, `lambda_applied`.
+- D: xóa 129 tệp `.bak` khỏi kho và thêm `*.bak` vào `.gitignore`; giới hạn
+  40.000 ký tự văn bản PDF ghi thành hằng `PDF_TEXT_LIMIT` và trường
+  `text_truncated` trên bản ghi; `datetime.utcnow()` → `datetime.now(timezone.utc)`;
+  `frontend/src/types.ts` khai đủ trường của backend (giao diện hiển thị các
+  trường mới là việc của 7.2.1).
+- Kiểm thử: `backend/tests/test_720_post_extraction.py` (11 test, mỗi test ghim
+  một phát hiện); toàn bộ 74 test backend và 20 test `analysis/` đạt.
+
 ## Chưa phát hành: sửa ba công thức A1–A3 theo bản rà soát Paper 6 (04/08/2026)
 
 Bước 1 trong bảy bước chạy lại. Ba lỗi tầng công thức được sửa đồng bộ ở
