@@ -52,10 +52,35 @@ export interface ExtractedEffect {
   cdai_score: number | null;
   dpl_phase: DplPhase | null;
 
+  // Derivation and weighting (7.1.2 formula fixes; exported since 7.2.0)
+  n_predictors: number | null;
+  metric_type: "zero_order" | "partial" | null;
+  estimand_source: "observed" | "imputed_pb2005" | null;
+  source_controls: boolean | null;
+  df_source: "reported" | "derived" | null;
+  df_imputed: boolean;
+  lambda_applied: boolean;
+  beta_outside_pb_domain: boolean;
+  variance_r: number | null;
+  variance_formula: string | null;
+  variance_z: number | null;
+  r_source: "reported" | "derived" | "imputed" | null;
+  n_source: "reported" | null;
+
+  // Evidence trail (gate E1)
+  evidence_page: number | null;
+  evidence_quote: string | null;
+  n_evidence_page: number | null;
+  n_evidence_quote: string | null;
+  text_truncated: boolean;
+
   // Provenance
   extraction_confidence: number;
   requires_verification: boolean;
   pi_locked: boolean;
+  pi_edited_fields: string[];
+  pi_override_at: string | null; // ISO 8601 or null
+  derived_from: string | null;
   extracted_at: string; // ISO 8601
   locked_at: string | null; // ISO 8601 or null
 }
@@ -67,6 +92,7 @@ export interface ExtractedEffect {
 export interface StudyDatabaseEntry extends ExtractedEffect {
   notion_page_id: string | null;
   pi_notes: string;
+  machine_proposal: Record<string, unknown> | null;
 }
 
 // ---------------------------------------------------------------------------

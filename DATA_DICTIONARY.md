@@ -34,6 +34,31 @@ hình dữ liệu Pydantic trong `backend/models.py` và thứ tự cột xuất
 | `pi_notes` | chuỗi | Ghi chú xác minh của người nghiên cứu chính (xem mục 3) |
 | `locked_at` | thời điểm UTC | Dấu thời gian khóa bất biến |
 
+### 1b. Các cột bổ sung trong tệp xuất từ 7.2.0
+
+Từ 7.2.0 tệp xuất mang **mọi** trường của bản ghi (thứ tự theo model backend), không chỉ 23 cột trên.
+
+| Cột | Kiểu | Mô tả |
+|---|---|---|
+| `n_predictors` | số nguyên | Số biến giải thích của mô hình nguồn (p), dùng cho df = n − p − 1 |
+| `metric_type` | `zero_order` / `partial` | Đại lượng ước lượng: tương quan bậc không hay riêng phần |
+| `estimand_source` | `observed` / `imputed_pb2005` | Nguồn gốc: quan sát trực tiếp (r, t) hay suy từ β theo Peterson & Brown |
+| `source_controls` | lôgic | Thống kê nguồn có kiểm soát biến khác không |
+| `df_source` | `reported` / `derived` | df báo cáo hay suy từ n − p − 1 |
+| `lambda_applied` | lôgic | True chỉ khi số hạng +0,05·λ đã được cộng (β ≥ 0) |
+| `beta_outside_pb_domain` | lôgic | True khi \|β\| > 0,5: không có r, không được khóa |
+| `variance_r` | số thực | Phương sai thang r: (1 − r²)²/(n − 1) bậc không; (1 − r²)²/df riêng phần |
+| `variance_formula` | chuỗi | Công thức phương sai đã dùng |
+| `variance_z` | số thực | Phương sai thang Fisher z: 1/(n − 3) bậc không; 1/(df − 1) riêng phần |
+| `r_source`, `n_source` | chuỗi | Xuất xứ của r (reported/derived/imputed) và n |
+| `evidence_page`, `evidence_quote`, `n_evidence_page`, `n_evidence_quote` | số / chuỗi | Trích dẫn nguyên văn của cổng E1 (bất biến sau trích xuất) |
+| `text_truncated` | lôgic | True khi văn bản PDF vượt 40.000 ký tự và bị cắt trước khi gửi mô hình |
+| `requires_verification`, `df_imputed` | lôgic | Cờ rà soát |
+| `pi_edited_fields` | JSON (danh sách) | Tên các trường PI đã sửa qua `/verify` |
+| `pi_override_at` | thời điểm UTC | Lần sửa gần nhất của PI |
+| `machine_proposal` | JSON | Ảnh chụp đề xuất của máy trước mọi sửa đổi (bất biến) |
+| `derived_from`, `notion_page_id` | chuỗi | Liên kết thế hệ khóa trước; trang Notion |
+
 ## 2. Đối chiếu với các trường phân tích khái niệm
 
 | Trường khái niệm | Hiện thực trong 7.1.1 |
