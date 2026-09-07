@@ -1,0 +1,28 @@
+# Chuẩn hoá xuống dòng: repo lưu LF, mỗi HĐH checkout theo kiểu của nó.
+# Từ nay `git diff` không còn hiện nhiễu CRLF nữa.
+* text=auto
+
+# Script chạy trên Linux/Docker phải giữ LF kể cả khi checkout trên Windows:
+*.sh   text eol=lf
+
+# Batch của Windows giữ CRLF:
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Tệp nhị phân — không bao giờ đụng vào:
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.eps  binary
+*.tif  binary
+*.tiff binary
+*.pdf  binary
+*.zip  binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.db   binary
