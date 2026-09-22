@@ -43,14 +43,26 @@ class Settings(BaseSettings):
     notion_database_id: str = ""
     maida_port: int = 8765
 
+    # Shared secret required on every mutating request (POST/PATCH/PUT/DELETE),
+    # checked by the X-MAIDA-Admin-Key header (see main.py:admin_key_guard).
+    # Left empty here on purpose: main.py generates and logs a random one at
+    # startup when unset, so a deployment is never silently wide open, and a
+    # fresh `docker compose up` still works without extra setup (the operator
+    # reads the key from the container logs). Set this explicitly in
+    # production so the key survives a restart.
+    maida_admin_key: str = ""
+
     # Path of the SQLite file backing the study store. Records used to live in
     # a module-level dict and were lost on every restart; a file-backed store
     # means a crashed or reloaded process no longer destroys verified work.
     maida_db_path: str = "maida.db"
 
-    # Demo mode enables two presentation-only behaviours, both off by default
-    # so a production deployment is unaffected: a rehearsed fallback record
-    # when live extraction is unavailable, and a demo-reset route.
+    # Demo mode, off by default. Reported via /api/health; also tells the
+    # admin-key guard in main.py to stand down, since demo/run_defense.py
+    # already protects every mutation with its own presenter PIN. (The
+    # rehearsed-fallback-on-no-LLM behaviour once gated by this flag was
+    # removed in the E1 fix - extraction has exactly two modes now, live or
+    # unavailable, demo or not; see main.py:health_check.)
     maida_demo_mode: bool = False
 
     # Allowed CORS origins (comma-separated in env; pydantic-settings handles list)

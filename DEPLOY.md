@@ -20,9 +20,18 @@ Requirements: a Linux host with Docker + Docker Compose.
 ```bash
 git clone https://github.com/thuyhuongctu/M-AIDA.git && cd M-AIDA
 cp backend/.env.production.example backend/.env      # fill in LLM_API_KEY etc.
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"   # -> MAIDA_ADMIN_KEY
 docker compose -f docker-compose.prod.yml up -d --build
 # app on http://<host>/   (health: http://<host>/api/health via the proxy)
 ```
+
+> **Set `MAIDA_ADMIN_KEY` before going live.** nginx proxies every `/api/`
+> request to the backend, verify/lock/extract/Notion-sync included, so
+> without this key any site visitor could edit or lock studies. Left unset,
+> the backend still starts (a fresh key is generated and printed to the
+> container log on every restart) so a quick local check never breaks, but a
+> real deployment needs the key set explicitly to stay stable across
+> restarts and to actually keep visitors out.
 
 For HTTPS put a TLS reverse proxy in front (one-liner with Caddy):
 
@@ -65,6 +74,7 @@ On hosts that inject their own `$PORT`, override the backend start command to
 | Secret | Where | Needed for |
 |---|---|---|
 | `LLM_API_KEY` (+ `LLM_PROVIDER`, `LLM_MODEL`) | `backend/.env` / host secret | live PDF extraction |
+| `MAIDA_ADMIN_KEY` | `backend/.env` / host secret | blocks visitors from editing/locking studies (see above) |
 | `NOTION_TOKEN`, `NOTION_DATABASE_ID` | `backend/.env` | optional Notion sync |
 | TLS certificate | reverse proxy (Caddy auto-provisions) | HTTPS |
 
@@ -73,14 +83,16 @@ On hosts that inject their own `$PORT`, override the backend start command to
 | Variable | Default | Meaning |
 |---|---|---|
 | `MAIDA_DB_PATH` | `maida.db` | SQLite file backing the study store. Point it at a mounted volume in containers; `docker-compose.yml` already maps `/data`. |
-| `MAIDA_DEMO_MODE` | `false` | Presentation-only behaviours. When on, extraction falls back to a clearly-stamped rehearsed record if the LLM is unreachable, and `POST /api/demo/reset?confirm=true` can clear the store. **Keep this off wherever real research data lives.** |
+| `MAIDA_DEMO_MODE` | `false` | Presentation-only: reported via `/api/health`, and stands down the `MAIDA_ADMIN_KEY` guard because `demo/run_defense.py` already protects every mutation with its own presenter PIN. **Keep this off wherever real research data lives** - it is not a general-purpose way to disable the admin key. |
 
 ## Production hardening still on the roadmap
 
-Studies are now persisted in SQLite, so they survive a process restart; that is
-sufficient for single-researcher and demo use but not for multi-tenant service.
-Before paid/commercial use, add PostgreSQL persistence, authentication +
-multi-tenancy, upload limits with server-side type checking, and billing, see
-the staged plan in
+Studies are now persisted in SQLite, so they survive a process restart, and a
+`MAIDA_ADMIN_KEY` (above) keeps an anonymous visitor from editing or locking
+them - sufficient for single-researcher and demo use but not for
+multi-tenant service, where different users need different access rather
+than one shared secret. Before paid/commercial use, add PostgreSQL
+persistence, per-user authentication + multi-tenancy, upload limits with
+server-side type checking, and billing, see the staged plan in
 [`../p6/tools/maida/KE_HOACH_TRIEN_KHAI_APP_vi.md`](KE_HOACH_TRIEN_KHAI_APP_vi.md)
 (Part B) in the dissertation repo.
