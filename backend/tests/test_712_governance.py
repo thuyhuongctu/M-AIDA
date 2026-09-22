@@ -19,6 +19,7 @@ from fastapi.testclient import TestClient
 
 import main as app_module
 from extractor import StatisticalExtractor
+from conftest import ADMIN_HEADERS
 
 
 class FakeEngine:
@@ -147,7 +148,7 @@ class TestGovernanceApi:
                 engine=FakeEngine({"effect_r": 0.25, "sample_n": 50, **DEFAULT_EVIDENCE})
             ),
         )
-        return TestClient(app_module.app)
+        return TestClient(app_module.app, headers=ADMIN_HEADERS)
 
     def _make_entry(self, client):
         import base64

@@ -27,13 +27,14 @@ import csv
 import io
 import logging
 import json
+import secrets
 from datetime import datetime, timezone
 from typing import Any
 
 import fitz  # PyMuPDF
-from fastapi import FastAPI, HTTPException, Query, UploadFile
+from fastapi import FastAPI, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from engines import make_engine
 from extractor import (
@@ -86,6 +87,54 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------------------------------------------------------------------
+# Admin-key guard
+# ---------------------------------------------------------------------------
+# In the production deployment (DEPLOY.md), nginx publishes ONLY the frontend
+# and proxies every /api/* request to this backend on the internal network —
+# so without a check here, any site visitor could call PATCH /verify,
+# POST /lock, POST /extract (burning the owner's LLM budget) or
+# POST /notion/sync directly, bypassing the human-in-the-loop design the rest
+# of this file exists to enforce. Mirrors the presenter-PIN guard already
+# used by demo/run_defense.py: gate every mutating method behind a shared
+# secret. If MAIDA_ADMIN_KEY is not set, generate one and print it once at
+# startup rather than defaulting to open, so `docker compose up` still works
+# for a solo operator without extra setup.
+_ADMIN_KEY = settings.maida_admin_key or secrets.token_urlsafe(16)
+if not settings.maida_admin_key:
+    logger.warning(
+        "MAIDA_ADMIN_KEY not set; generated a temporary admin key for this "
+        "process. It will change on restart - set MAIDA_ADMIN_KEY in "
+        "backend/.env for a stable key. Admin key: %s",
+        _ADMIN_KEY,
+    )
+    print(f"Generated MAIDA admin key (unset in .env): {_ADMIN_KEY}")
+
+_MUTATING_METHODS = frozenset({"POST", "PATCH", "PUT", "DELETE"})
+
+
+@app.middleware("http")
+async def admin_key_guard(request: Request, call_next):
+    """Require X-MAIDA-Admin-Key on every mutating request.
+
+    Read-only routes (GET /api/studies, /api/studies/{id},
+    /api/studies/export/csv, /api/health) stay public: they serve the
+    published, locked dataset the project is built to make transparent.
+
+    Skipped in demo mode: demo/run_defense.py wraps this same app with its
+    own presenter-PIN middleware (X-MAIDA-Demo-PIN) for exactly this purpose,
+    and demo mode is documented as presentation-only, never for real data
+    (see MAIDA_DEMO_MODE in settings.py) - a live audience only needs the one
+    PIN printed at startup, not a second secret.
+    """
+    if settings.maida_demo_mode:
+        return await call_next(request)
+    if request.method in _MUTATING_METHODS and not secrets.compare_digest(
+        request.headers.get("X-MAIDA-Admin-Key", ""), _ADMIN_KEY
+    ):
+        return JSONResponse({"detail": "Admin key required."}, status_code=401)
+    return await call_next(request)
 
 # ---------------------------------------------------------------------------
 # Persistent study store (SQLite; see backend/store.py)

@@ -55,6 +55,15 @@ docker compose up
 open http://localhost:3000
 ```
 
+Extracting, verifying, locking, and Notion sync all require an admin key
+(`X-MAIDA-Admin-Key`), so a visitor can never mutate studies through the API
+alone. `MAIDA_ADMIN_KEY` is unset above on purpose for a fast local start: the
+backend generates one and prints it to the console on every startup instead.
+Paste that value into the "Admin key" field in the app header once per
+browser (kept only in `localStorage`, never in the built JS). Set
+`MAIDA_ADMIN_KEY` in `backend/.env` for a key that survives a restart, and
+always set it before a real deployment - see **Production deployment** below.
+
 ## One-command live demo (no Docker, no Node)
 
 For demonstrations (e.g. a thesis defense) the repository ships a packaging
@@ -127,17 +136,22 @@ confirmed for every PRIMARY study; the freeze command enforces both gates.
 
 ## API Routes
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/extract` | Base64 PDF body to an extracted effect size |
-| POST | `/api/extract/upload` | Multipart PDF upload to an extracted effect size |
-| GET | `/api/studies` | List studies (filter: icrv, dpl, verified, locked) |
-| GET | `/api/studies/{id}` | Single study detail |
-| PATCH | `/api/studies/{id}/verify` | PI field overrides and approval |
-| POST | `/api/studies/{id}/lock` | Irreversible PI data lock |
-| GET | `/api/studies/export/csv` | Export locked studies as CSV |
-| POST | `/api/notion/sync` | Push locked studies to Notion |
-| GET | `/api/health` | Health check and service configuration flags |
+| Method | Path | Description | Admin key? |
+|--------|------|-------------|:---:|
+| POST | `/api/extract` | Base64 PDF body to an extracted effect size | required |
+| POST | `/api/extract/upload` | Multipart PDF upload to an extracted effect size | required |
+| GET | `/api/studies` | List studies (filter: icrv, dpl, verified, locked) | - |
+| GET | `/api/studies/{id}` | Single study detail | - |
+| PATCH | `/api/studies/{id}/verify` | PI field overrides and approval | required |
+| POST | `/api/studies/{id}/lock` | Irreversible PI data lock | required |
+| GET | `/api/studies/export/csv` | Export locked studies as CSV | - |
+| POST | `/api/notion/sync` | Push locked studies to Notion | required |
+| GET | `/api/health` | Health check and service configuration flags | - |
+
+"Admin key" means the request must carry `X-MAIDA-Admin-Key: <MAIDA_ADMIN_KEY>`
+or the backend refuses it with 401, whatever the caller's origin - see
+**Security** below. In demo mode (`demo/run_defense.py`) this check stands
+down in favour of that app's own presenter-PIN middleware.
 
 ## Extraction Workflow
 
@@ -315,7 +329,19 @@ run the meta-analysis, write interpretive content, or hold authorship or ownersh
 the software. Scientific responsibility remains with the named human authors.
 
 **Security:** copy `backend/.env.example` to `backend/.env` and supply your own keys;
-never commit a real `.env` (it is git-ignored).
+never commit a real `.env` (it is git-ignored). In the recommended deployment
+(DEPLOY.md), nginx is the only published service and proxies every `/api/`
+request straight to the backend; without a check there, any site visitor
+could call the same mutating routes the UI uses. Every extract/verify/lock/
+Notion-sync request (7.2.1) is therefore gated on the `X-MAIDA-Admin-Key`
+header, checked against `MAIDA_ADMIN_KEY` (`backend/main.py:admin_key_guard`).
+Read-only routes (list/get studies, CSV export, health) stay public, since
+they serve the published, locked dataset this project exists to make
+transparent. Set `MAIDA_ADMIN_KEY` explicitly in production; left unset, the
+backend still starts but generates and logs a new key on every restart. This
+is single-shared-secret protection, appropriate for one PI's own deployment -
+see **Production hardening still on the roadmap** in DEPLOY.md for the
+per-user auth planned before any multi-tenant or paid use.
 
 ## License
 

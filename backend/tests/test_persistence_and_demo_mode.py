@@ -25,6 +25,8 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from conftest import ADMIN_HEADERS
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
@@ -52,7 +54,7 @@ def _client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, demo: bool) -> T
     settings_module._settings = None  # drop the cached singleton
     main = importlib.import_module("main")
     importlib.reload(main)
-    return TestClient(main.app)
+    return TestClient(main.app, headers=ADMIN_HEADERS)
 
 
 class EchoEngine:
