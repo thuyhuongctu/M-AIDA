@@ -24,6 +24,34 @@ const http: AxiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// 7.2.1: the backend rejects every mutating request (extract/verify/lock/
+// Notion-sync) without X-MAIDA-Admin-Key (main.py:admin_key_guard), since
+// nginx proxies /api/ publicly in the production deployment. The key is
+// entered once by the PI (see the header input in App.tsx), kept only in
+// this browser's localStorage, and never baked into the built JS bundle -
+// a build-time env var would ship it to every visitor.
+const ADMIN_KEY_STORAGE_KEY = "maida_admin_key";
+
+export function getAdminKey(): string {
+  try {
+    return localStorage.getItem(ADMIN_KEY_STORAGE_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function setAdminKey(key: string): void {
+  try {
+    if (key) localStorage.setItem(ADMIN_KEY_STORAGE_KEY, key);
+    else localStorage.removeItem(ADMIN_KEY_STORAGE_KEY);
+  } catch {
+    // localStorage unavailable (private mode, etc.) - key just won't persist.
+  }
+  http.defaults.headers.common["X-MAIDA-Admin-Key"] = key;
+}
+
+setAdminKey(getAdminKey());
+
 // 7.2.1: FastAPI puts the human-readable reason in `detail` (e.g. the 422 from
 // the PI-editable whitelist, or the lock gate refusing a record without an
 // effect size). Surface it as the Error message instead of axios's generic

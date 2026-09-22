@@ -28,6 +28,7 @@ from fastapi.testclient import TestClient
 
 import main as app_module
 from extractor import StatisticalExtractor
+from conftest import ADMIN_HEADERS
 
 EV = {
     "evidence_page": 7,
@@ -59,7 +60,7 @@ def _pdf_b64(text: str = "dummy") -> str:
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("MAIDA_DB_PATH", str(tmp_path / "t.db"))
     app_module._studies = app_module.StudyStore(str(tmp_path / "t.db")) if hasattr(app_module, "StudyStore") else app_module._studies
-    return TestClient(app_module.app)
+    return TestClient(app_module.app, headers=ADMIN_HEADERS)
 
 
 def make_study(client, payload, raw: str | None = None):

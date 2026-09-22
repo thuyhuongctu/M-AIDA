@@ -13,6 +13,7 @@ import re
 from fastapi.testclient import TestClient
 
 import main as app_module
+from conftest import ADMIN_HEADERS
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -25,7 +26,7 @@ def _read(rel: str) -> str:
 
 def test_health_reports_app_version(tmp_path, monkeypatch):
     monkeypatch.setenv("MAIDA_DB_PATH", str(tmp_path / "v.db"))
-    health = TestClient(app_module.app).get("/api/health").json()
+    health = TestClient(app_module.app, headers=ADMIN_HEADERS).get("/api/health").json()
     assert health["version"] == app_module.APP_VERSION
     assert app_module.app.version == app_module.APP_VERSION
     assert app_module.app.title.endswith(app_module.APP_VERSION)
@@ -53,7 +54,7 @@ def test_legacy_record_without_variance_is_derived_on_verify(tmp_path, monkeypat
     )
     assert legacy.variance_r is None
     app_module._studies.put(legacy)
-    client = TestClient(app_module.app)
+    client = TestClient(app_module.app, headers=ADMIN_HEADERS)
     v = client.patch("/api/studies/legacy-1/verify",
                      json={"study_id": "legacy-1", "pi_approved": True, "pi_notes": "ok",
                            "field_overrides": {}}).json()
