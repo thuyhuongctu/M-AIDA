@@ -8,7 +8,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from "react";
-import { fetchHealth } from "./api";
+import { fetchHealth, getAdminKey, setAdminKey } from "./api";
 import ExportPanel from "./components/ExportPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
 import StatusBanner from "./components/StatusBanner";
@@ -31,6 +31,19 @@ export default function App() {
       .catch(() => setVersion("?"));
   }, []);
 
+  // 7.2.1: the PI's admin key, kept only in this browser (see api.ts). Every
+  // extract/verify/lock/Notion-sync call fails with 401 until this is set to
+  // the value printed in the backend's startup log / MAIDA_ADMIN_KEY.
+  const [adminKey, setAdminKeyField] = useState<string>(getAdminKey);
+  const handleAdminKeyChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setAdminKeyField(value);
+      setAdminKey(value);
+    },
+    []
+  );
+
   const handleExtracted = useCallback((_entry: StudyDatabaseEntry) => {
     setExtractionCount((c) => c + 1);
   }, []);
@@ -50,6 +63,17 @@ export default function App() {
         <p className="app-subtitle">
           Meta-Analysis Intelligent Data Assistant - Internationalization &amp; Performance
         </p>
+        <div className="admin-key-field">
+          <label htmlFor="admin-key-input">Admin key</label>
+          <input
+            id="admin-key-input"
+            type="password"
+            autoComplete="off"
+            placeholder="required to extract / verify / lock"
+            value={adminKey}
+            onChange={handleAdminKeyChange}
+          />
+        </div>
       </header>
 
       {/* Live status strip: backend, data, extraction mode, network */}

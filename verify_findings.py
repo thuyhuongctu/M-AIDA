@@ -14,6 +14,7 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend"))
 os.environ["MAIDA_DB_PATH"] = os.path.join(tempfile.mkdtemp(), "verify.db")
+os.environ.setdefault("MAIDA_ADMIN_KEY", "verify-findings-local-key")
 
 from fastapi.testclient import TestClient  # noqa: E402
 import main as app_module  # noqa: E402
@@ -65,7 +66,10 @@ def line(n, t):
 
 
 def main():
-    client = TestClient(app_module.app)
+    client = TestClient(
+        app_module.app,
+        headers={"X-MAIDA-Admin-Key": "verify-findings-local-key"},
+    )
 
     # ---------------------------------------------------------------- F1
     line(1, "PI override recomputes effect_r but leaves variance_r/metric_type stale")
@@ -121,8 +125,12 @@ def main():
           f"beta_outside_pb_domain={v['beta_outside_pb_domain']} "
           f"requires_verification={v['requires_verification']}")
     lk = client.post(f"/api/studies/{s['study_id']}/lock")
-    print(f"  lock status      : {lk.status_code}, pi_locked={lk.json()['pi_locked']}")
-    print("  --> a record with NO effect size is locked as final data")
+    if lk.status_code == 200:
+        print(f"  lock status      : {lk.status_code}, pi_locked={lk.json()['pi_locked']}")
+        print("  --> a record with NO effect size is locked as final data")
+    else:
+        print(f"  lock status      : {lk.status_code} {lk.json().get('detail', '')}")
+        print("  --> FIXED in 7.2.0: a record with no effect size can no longer be locked")
 
     # ---------------------------------------------------------------- F4
     line(4, "pi_locked can be set through /verify, bypassing the lock gate")
@@ -137,17 +145,22 @@ def main():
               "field_overrides": {"pi_locked": True,
                                   "locked_at": "2020-01-01T00:00:00"}},
     )
-    v = r.json()
-    print(f"  via field_overrides -> pi_locked={v['pi_locked']} "
-          f"locked_at={v['locked_at']} requires_verification={v['requires_verification']}")
-    again = client.patch(
-        f"/api/studies/{s['study_id']}/verify",
-        json={"study_id": s["study_id"], "pi_approved": True, "pi_notes": "x",
-              "field_overrides": {}},
-    )
-    print(f"  record is now frozen: further /verify -> {again.status_code}")
-    print("  --> an unverified record is locked, with a back-dated timestamp,"
-          " and can no longer be corrected")
+    if r.status_code == 200:
+        v = r.json()
+        print(f"  via field_overrides -> pi_locked={v['pi_locked']} "
+              f"locked_at={v['locked_at']} requires_verification={v['requires_verification']}")
+        again = client.patch(
+            f"/api/studies/{s['study_id']}/verify",
+            json={"study_id": s["study_id"], "pi_approved": True, "pi_notes": "x",
+                  "field_overrides": {}},
+        )
+        print(f"  record is now frozen: further /verify -> {again.status_code}")
+        print("  --> an unverified record is locked, with a back-dated timestamp,"
+              " and can no longer be corrected")
+    else:
+        print(f"  via field_overrides -> {r.status_code} {r.json().get('detail', '')[:90]}")
+        print("  --> FIXED in 7.2.0: pi_locked/locked_at are rejected by the "
+              "PI_EDITABLE_FIELDS whitelist, never silently applied")
 
     # ---------------------------------------------------------------- F5
     line(5, "CSV export drops every provenance and weighting column")

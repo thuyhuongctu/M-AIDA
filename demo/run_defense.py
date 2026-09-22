@@ -16,6 +16,14 @@ BACKEND = ROOT / "backend"
 sys.path.insert(0, str(BACKEND))
 os.chdir(BACKEND)
 
+# 7.2.1: main.py's admin_key_guard middleware requires MAIDA_ADMIN_KEY on
+# every mutating request in a real deployment. This app is presentation-only
+# by nature and provides the equivalent protection itself (PRESENTER_PIN,
+# below); demo mode tells admin_key_guard to skip so a presenter needs only
+# the one PIN, not a second secret. setdefault: an operator's own .env value
+# still wins.
+os.environ.setdefault("MAIDA_DEMO_MODE", "true")
+
 from fastapi import Request  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse  # noqa: E402
 

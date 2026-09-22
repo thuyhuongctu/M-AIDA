@@ -38,6 +38,24 @@ body {
 }
 .app-subtitle { margin: 0.25rem 0 0; font-size: 0.82rem; opacity: 0.8; }
 
+.admin-key-field {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.admin-key-field label { font-size: 0.75rem; opacity: 0.8; }
+.admin-key-field input {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  width: 220px;
+}
+.admin-key-field input::placeholder { color: rgba(255,255,255,0.5); }
+
 .app-main { flex: 1; padding: 1.5rem 2rem; max-width: 1400px; width: 100%; margin: 0 auto; }
 
 .app-footer {
