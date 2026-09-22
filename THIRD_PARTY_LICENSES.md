@@ -52,3 +52,14 @@ SIL Open Font License 1.1, which permits bundling and redistribution:
 
 Fonts are self-hosted so brand and defense pages render identically with no
 CDN dependency and no third-party requests: including fully offline.
+
+## Claude Code skills under `.claude/skills/` (added 2026-08-30)
+
+Four Agent Skills copied from
+[K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills)
+(© K-Dense Inc., MIT License) to support the literature-review and
+effect-size-extraction workflow: `literature-review`, `citation-management`,
+`exploratory-data-analysis`, `statistical-analysis`. Each folder keeps its
+own `SKILL.md` with the original name, description, and MIT license tag
+unchanged. These are agent instructions and helper scripts consumed by
+Claude Code, not runtime dependencies of the FastAPI/React application.
