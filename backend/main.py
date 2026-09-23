@@ -70,7 +70,7 @@ logger = logging.getLogger(__name__)
 #: Single source of the running version. /api/health, the OpenAPI document
 #: and the tests read this constant; backend/pyproject.toml must match it
 #: (test_721_version_consistency).
-APP_VERSION = "7.2.1"
+APP_VERSION = "7.2.2"
 
 app = FastAPI(
     title=f"M-AIDA v{APP_VERSION}",
