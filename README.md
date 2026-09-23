@@ -1,7 +1,7 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21850575.svg)](https://doi.org/10.5281/zenodo.21850575)
-![version](https://img.shields.io/badge/version-7.2.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+![version](https://img.shields.io/badge/version-7.2.2-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
 academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop
@@ -284,14 +284,14 @@ go stale when the dataset moves to a new lock generation.
 If you use M-AIDA, please cite it (GitHub renders a "Cite this repository" button
 from `CITATION.cff`):
 
-> Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.2.1)
+> Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.2.2)
 > [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21850575
 
 Zenodo mints two kinds of identifier. The **concept DOI**
 `10.5281/zenodo.21850575` always resolves to the latest release; cite it for the
 software in general. A **version DOI** pins one release, for an exact
 reproducible build: `10.5281/zenodo.22260059` for v7.2.1 (tag `v7.2.1`, commit
-`d2ea8e3`, the current release), `10.5281/zenodo.22259090` for v7.2.0 (tag
+`d2ea8e3`; v7.2.2 receives its own version DOI once its GitHub release is archived), `10.5281/zenodo.22259090` for v7.2.0 (tag
 `v7.2.0`, commit `3ff42c4`, the first release after the 31 August 2026 code
 review), `10.5281/zenodo.21926336` for v7.1.1 and `10.5281/zenodo.21850576` for
 v7.1.2.
@@ -333,7 +333,7 @@ never commit a real `.env` (it is git-ignored). In the recommended deployment
 (DEPLOY.md), nginx is the only published service and proxies every `/api/`
 request straight to the backend; without a check there, any site visitor
 could call the same mutating routes the UI uses. Every extract/verify/lock/
-Notion-sync request (7.2.1) is therefore gated on the `X-MAIDA-Admin-Key`
+Notion-sync request (7.2.2) is therefore gated on the `X-MAIDA-Admin-Key`
 header, checked against `MAIDA_ADMIN_KEY` (`backend/main.py:admin_key_guard`).
 Read-only routes (list/get studies, CSV export, health) stay public, since
 they serve the published, locked dataset this project exists to make
