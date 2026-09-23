@@ -2,7 +2,7 @@
 
 Module-level code here runs before pytest imports any test_*.py file in this
 directory, so MAIDA_ADMIN_KEY is set before main.py resolves it into the
-admin_key_guard middleware (7.2.1). Test files send ADMIN_HEADERS on every
+admin_key_guard middleware (7.2.2). Test files send ADMIN_HEADERS on every
 TestClient(...) they build.
 """
 
