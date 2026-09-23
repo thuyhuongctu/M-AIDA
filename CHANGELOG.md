@@ -3,6 +3,25 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## [7.2.2] - 2026-09-23: khóa quản trị cho mọi yêu cầu ghi qua API
+
+Bản vá bảo mật sau 7.2.1, không đổi công thức, không đổi lược đồ dữ liệu, không
+đụng bản ghi đã khóa. Mã đã vào `main` qua PR #103; bản này chỉ gắn số hiệu để
+dựng lại ảnh container có kèm bản vá.
+
+- Bảo mật: nginx của bản triển khai chính chuyển mọi yêu cầu `/api/` sang
+  backend, nên trước bản này khách ghé bất kỳ có thể gọi thẳng
+  `PATCH /verify`, `POST /lock`, `POST /extract` (tốn ngân sách LLM) và
+  `POST /notion/sync`. Nay middleware `admin_key_guard` chặn mọi yêu cầu
+  POST/PATCH/PUT/DELETE thiếu header `X-MAIDA-Admin-Key` khớp
+  `MAIDA_ADMIN_KEY` (so sánh hằng thời gian); các tuyến chỉ đọc vẫn công
+  khai. Không đặt khóa thì backend tự sinh một khóa và in ra lúc khởi động,
+  không bao giờ mặc định mở. Defense App (`MAIDA_DEMO_MODE`) giữ PIN riêng.
+- Giao diện: ô "Admin key" ở đầu trang, khóa chỉ lưu trong `localStorage`,
+  không nhúng vào gói JS lúc build.
+- Ảnh `latest` trên GHCR trước bản này dựng từ 7.2.1, chưa có khóa quản trị;
+  máy chủ đang chạy ảnh cũ cần kéo lại ảnh và đặt `MAIDA_ADMIN_KEY`.
+
 ## [7.2.1] - 2026-09-03: một số hiệu phiên bản duy nhất; giao diện hiển thị trường dẫn xuất
 
 Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đồ dữ liệu, không
