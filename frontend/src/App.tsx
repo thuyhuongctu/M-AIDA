@@ -31,7 +31,7 @@ export default function App() {
       .catch(() => setVersion("?"));
   }, []);
 
-  // 7.2.1: the PI's admin key, kept only in this browser (see api.ts). Every
+  // 7.2.2: the PI's admin key, kept only in this browser (see api.ts). Every
   // extract/verify/lock/Notion-sync call fails with 401 until this is set to
   // the value printed in the backend's startup log / MAIDA_ADMIN_KEY.
   const [adminKey, setAdminKeyField] = useState<string>(getAdminKey);
