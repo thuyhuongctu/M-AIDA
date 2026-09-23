@@ -1,5 +1,5 @@
 {
-  "version": "7.2.1",
+  "version": "7.2.2",
   "generation": "v7.1.1",
   "provisional": true,
   "dataset": "P6 locked corpus (re-locked 2026-07-07 after cross-batch deduplication)",
@@ -24,16 +24,20 @@
   "q_df": 285,
   "search_window": "1977-2026",
   "concept_doi": "10.5281/zenodo.21850575",
-  "version_doi": "10.5281/zenodo.22260059",
+  "version_doi": "10.5281/zenodo.22920619",
   "source_of_truth": "p6/results/table1_baseline.csv (thesis repo), see CANONICAL_NUMBERS_P6.md",
-  "updated_at": "2026-09-03",
-  "software_release_date": "2026-09-03",
-  "lock_generation_note": "Pooled numbers belong to the v7.1.1 data lock (2026-07-07). Software releases 7.2.0 and 7.2.1 (2026-09-03) fix the post-extraction path; they do not re-lock the corpus. Re-coding of t/beta-derived records under formula corrections A1-A3 and the six provisional ICRV codes are pending; any re-issue is a new lock generation with a new version DOI.",
+  "updated_at": "2026-09-23",
+  "software_release_date": "2026-09-23",
+  "lock_generation_note": "Pooled numbers belong to the v7.1.1 data lock (2026-07-07). Software releases 7.2.0 to 7.2.2 (2026-09-03 to 2026-09-23) fix the post-extraction path and the API access control; they do not re-lock the corpus. Re-coding of t/beta-derived records under formula corrections A1-A3 and the six provisional ICRV codes are pending; any re-issue is a new lock generation with a new version DOI.",
   "superseded_version_dois": [
     "10.5281/zenodo.22258783",
     "10.5281/zenodo.22258977",
     "10.5281/zenodo.22259684"
   ],
+  "duplicate_version_dois": [
+    "10.5281/zenodo.22920581"
+  ],
+  "duplicate_version_note": "Zenodo archived v7.2.2 twice because the GitHub release was first published under the mistyped tag V7.2.2. Both records hold commit 8af4881; cite 10.5281/zenodo.22920619.",
   "manual_deposit_doi": "10.5281/zenodo.21282516",
   "manual_deposit_note": "Separate Zenodo deposit of v7.1.1 made by hand on 2026-07-09 (version DOI 10.5281/zenodo.21282517). Cited by the dissertation and by the copyright-registration dossier; stays published and always resolves to v7.1.1."
 }
