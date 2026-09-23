@@ -21,6 +21,13 @@ dựng lại ảnh container có kèm bản vá.
   không nhúng vào gói JS lúc build.
 - Ảnh `latest` trên GHCR trước bản này dựng từ 7.2.1, chưa có khóa quản trị;
   máy chủ đang chạy ảnh cũ cần kéo lại ảnh và đặt `MAIDA_ADMIN_KEY`.
+- DOI: **DOI phiên bản của 7.2.2 là `10.5281/zenodo.22920619`** (tag `v7.2.2`
+  = `8af4881`), ghi bổ sung sau khi phát hành. Bản phát hành GitHub lúc đầu
+  mang nhầm tag viết hoa `V7.2.2`, nên Zenodo lưu thêm một bản ghi trùng,
+  `10.5281/zenodo.22920581`, cùng commit `8af4881`: nội dung đúng nhưng KHÔNG
+  trích dẫn, để mọi trích dẫn trỏ về một bản ghi. Tag viết hoa cũng không kích
+  hoạt `deploy-ghcr.yml` (bộ lọc `v*` phân biệt hoa thường); ảnh GHCR 7.2.2 chỉ
+  được dựng sau khi gắn lại tag `v7.2.2`.
 
 ## [7.2.1] - 2026-09-03: một số hiệu phiên bản duy nhất; giao diện hiển thị trường dẫn xuất
 
