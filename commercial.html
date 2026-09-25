@@ -10,6 +10,10 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>M-AIDA Cloud: AI-assisted effect-size extraction with human verification</title>
+<!-- Phông tự lưu trữ có bộ ký tự tiếng Việt. Thiếu dòng này thì JetBrains Mono
+     không bao giờ được nạp và nhãn mono rơi về phông hệ thống, có máy đặt dấu
+     chồng (ồ, ế) lệch khỏi chữ cái. -->
+<link rel="stylesheet" href="css/fonts.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{--paper:#f4f1ea;--surface:#fffdf8;--surface-2:#faf7f0;--ink:#191f26;--muted:#54606b;--faint:#7d7767;
@@ -238,6 +242,13 @@
   .brand-lr:hover span{color:var(--amber);}
 
   .brand-lockup{display:block;width:min(430px,92%);margin:0 auto .5rem;}
+
+  /* Nhãn chữ hoa ở bản tiếng Việt: viết hoa toàn bộ bằng phông mono giãn chữ
+     thì dấu chồng (Ế, Ộ, Ữ, Ằ) lệch khỏi chữ cái, đọc thành "BẢN ĐỒ`". Nên khi
+     trang ở tiếng Việt, mọi nhãn giữ nguyên chữ như đã viết, không ép hoa
+     (THUAT_NGU_VA_QUY_TAC_TIENG_VIET.md, mục 5). Dùng !important vì các nhãn
+     chữ hoa khai ở nhiều bộ chọn có độ ưu tiên cao hơn. */
+  html[lang="vi"] body *{text-transform:none!important}
 </style>
 <style id="bgfix-2607">body{background:transparent !important;}html{background:var(--paper);}</style><meta property="og:image" content="https://thuyhuongctu.github.io/M-AIDA/og-image.png">
 <meta property="og:image:width" content="1200">
