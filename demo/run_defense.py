@@ -180,4 +180,8 @@ if __name__ == "__main__":
     print(f"M-AIDA Defense App: {locked} locked + {pending} pending records")
     print(f"Presenter PIN: {PRESENTER_PIN}")
     print(f"Open http://localhost:{port}/  (API docs: /docs)")
-    uvicorn.run(main.app, host="0.0.0.0", port=port)
+    # Mặc định vẫn mở ra mạng nội bộ (0.0.0.0) để khi bảo vệ còn bấm được từ
+    # điện thoại. CHAY_MAIDA_WINDOWS.bat đặt MAIDA_HOST=127.0.0.1: lúc ấy
+    # backend/.env chứa mã khoá Claude thật, không nên để máy khác cùng mạng
+    # Wi-Fi gọi vào và tiêu tiền API.
+    uvicorn.run(main.app, host=os.environ.get("MAIDA_HOST", "0.0.0.0"), port=port)
