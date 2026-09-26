@@ -10,6 +10,9 @@ only service you expose.
 > (verify, lock, CSV export, forest data) still works. For a **thesis defense**
 > use the offline harness instead: see [`demo/HUONG_DAN_BAO_VE.md`](demo/HUONG_DAN_BAO_VE.md)
 > (`python demo/run_defense.py`), which needs no host and no network.
+>
+> **Real extraction on your own Windows PC, no server:** double-click
+> `CHAY_MAIDA_WINDOWS.bat`; see [`demo/HUONG_DAN_CHAY_THAT.md`](demo/HUONG_DAN_CHAY_THAT.md).
 
 ---
 
