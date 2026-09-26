@@ -38,7 +38,12 @@ class AnthropicEngine:
     """Adapter for an Anthropic-compatible Messages API endpoint."""
 
     provider = "anthropic"
-    DEFAULT_MODEL = "provider-default-model"
+    # Mô hình dùng khi LLM_MODEL để trống. Trước đây là chuỗi giữ chỗ
+    # "provider-default-model" — không phải mã mô hình thật, nên ai chỉ điền
+    # LLM_API_KEY mà quên LLM_MODEL thì mọi lượt trích xuất đều hỏng với lỗi
+    # "model not found" từ API. Sonnet: đủ chính xác cho việc đọc bảng số liệu
+    # và rẻ hơn Opus; muốn đổi thì đặt LLM_MODEL trong backend/.env.
+    DEFAULT_MODEL = "claude-sonnet-5"
 
     def __init__(self, api_key: str, model: str | None = None) -> None:
         import anthropic  # lazy: only this adapter needs the SDK
