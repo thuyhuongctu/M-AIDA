@@ -155,6 +155,8 @@ down in favour of that app's own presenter-PIN middleware.
 
 ## Extraction Workflow
 
+Interactive diagram of the extract → verify → lock path: [`assets/diagrams/maida-workflow.html`](https://thuyhuongctu.github.io/M-AIDA/assets/diagrams/maida-workflow.html) (source: `assets/diagrams/maida-workflow.workflow.json`, rendered with [Archify](https://github.com/tt-a1i/archify), MIT).
+
 1. **Parse**: PDF text is extracted with MuPDF and segmented into statistical regions.
    At most 40,000 characters of text are sent to the model (`PDF_TEXT_LIMIT`); when a
    paper is longer the record carries `text_truncated = true`, so an empty proposal

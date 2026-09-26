@@ -559,7 +559,11 @@ Chương trình máy tính đăng ký quyền tác giả.
     z-index: 1;
   }
 
-  .brand-text h1 {
+  /* Chữ «BizOn» ở thanh trên là nhãn thương hiệu, không phải tiêu đề trang: để
+     h1 thì nó luôn hiện cùng h1 của bảng đang mở, thành hai h1 một lúc. Tiêu
+     đề thật của từng bảng là .hero-title. */
+  .brand-text .brand-name {
+    margin: 0;
     font-family: var(--font-display);
     font-size: 20px;
     font-weight: 800;
@@ -1757,7 +1761,7 @@ Chương trình máy tính đăng ký quyền tác giả.
         </svg>
       </div>
       <div class="brand-text">
-        <h1>BizOn</h1>
+        <p class="brand-name">BizOn</p>
         <div class="tagline" data-i18n="tagline">Mô phỏng tình huống trong kinh doanh · 6 vòng · EC1314</div>
       </div>
     </div>
