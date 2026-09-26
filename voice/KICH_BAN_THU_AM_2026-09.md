@@ -1,6 +1,6 @@
 # Kịch bản thu âm: lời thoại tour tiếng Việt theo bảng thuật ngữ
 
-Ngày kịch bản: 25/09/2026 · Nguồn: mảng `TOUR` trong `index.html` (trích tự động bằng Node, không chép tay).
+Ngày kịch bản: 25/09/2026 · **Đã thu xong 26/09/2026:** cả 6 tệp tiếng Việt và 6 tệp tiếng Anh · Nguồn: mảng `TOUR` trong `index.html` (trích tự động bằng Node, không chép tay).
 
 **Cần thu: 6 tệp**, tất cả ở `voice/vi/` (`stop1.mp3` đến `stop6.mp3`). **Không thu lại bản tiếng Anh** (`voice/stop*.mp3`) và **không thu lại các tệp bản đồ** (`voice/atlas/`): lời của chúng không đổi.
 

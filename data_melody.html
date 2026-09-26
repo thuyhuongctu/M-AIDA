@@ -55,7 +55,10 @@
   .langtog{display:inline-flex;border:1px solid var(--rose);border-radius:999px;overflow:hidden;font-size:12px;font-weight:700}
   .langtog button{border:0;background:transparent;color:var(--rose);padding:5px 11px;cursor:pointer;font-weight:700}
   .langtog button.active{background:var(--rose);color:#fff}
-  @media(max-width:760px){.nav-links a:not(.back){display:none}}
+  /* Ở 390px thanh trên ép co mọi thứ vào một hàng: «M-AIDA» bị bẻ đôi và nút VI
+     bị cắt (có từ trước). Cho nhóm nút xuống hàng thứ hai, tên trang và nút
+     ngôn ngữ không co. */
+  @media(max-width:760px){.nav-links a:not(.back){display:none}.nav-links{gap:12px}.nav{flex-wrap:wrap;row-gap:10px}.nav .brand{white-space:nowrap;flex-shrink:0}.langtog{flex-shrink:0}}
 
   .hero{position:relative;overflow:hidden;padding:72px 0 80px;background:linear-gradient(180deg,#FDF8F2 0%,#F6E9DE 100%)}
   .hero-bg{position:absolute;inset:0;z-index:0;opacity:.9}
