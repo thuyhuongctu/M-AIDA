@@ -89,6 +89,12 @@ html:not([lang="en"]) .lang-en{display:none}
 /* ===== 3D depth (Concept A) ===== */
 @media (prefers-reduced-motion: no-preference){
   .wrap{perspective:1400px}
+/* Khối .reveal3d chưa hiện đang xoay rotateX trong khung phối cảnh của .wrap,
+   nên hình chiếu phình ra ngoài màn hình: lúc mới tải, trang cuộn ngang được
+   252px ở bề ngang 1280 (hết khi khối đã hiện). clip cắt phần chiếu ấy mà
+   không tạo khung cuộn mới, sticky vẫn chạy. Đặt ở body thì vô hiệu (đã thử):
+   giá trị ấy được đẩy lên khung nhìn và Chromium vẫn cho cuộn ngang. */
+.wrap{overflow-x:clip}
   .card,.about-fig{transition:transform .16s ease, box-shadow .16s ease;will-change:transform}
   .portrait{animation:floatY 6s ease-in-out infinite}
   @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -127,7 +133,7 @@ html:not([lang="en"]) .lang-en{display:none}
 <a class="brandmini" href="index.html" aria-label="M-AIDA home"><svg class="brand-mark-svg" width="40" height="19.5" viewBox="179.0 188.8 38.0 18.5" aria-hidden="true" style="flex:none;vertical-align:middle"><path fill="none" stroke-width="1.6" stroke-linecap="round" stroke="var(--line-2, var(--line, #c4b8a1))" d="M 1.00001 24.000011 L 10.00001 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill="none" stroke-width="1.6" stroke-linecap="round" stroke="var(--line-2, var(--line, #c4b8a1))" d="M 38.000012 24.000011 L 47.000012 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill="none" stroke-width="2" stroke-linecap="butt" stroke-linejoin="round" stroke="var(--ink, #1a1714)" d="M 10.00001 24.000011 L 24.000011 14.000011 L 24.000011 34.000011 Z M 10.00001 24.000011 " transform="matrix(0.75, 0, 0, 0.75, 179.999993, 179.999993)"/><path fill-rule="nonzero" fill="var(--amber, #b3701a)" d="M 198 190.5 L 208.5 198 L 198 205.5 Z M 198 190.5 "/></svg><span>M-AIDA</span></a>
 <div class="topctl"><span class="langtog"><button type="button" data-lang="vi" class="active">VI</button><button type="button" data-lang="en">EN</button></span><button class="toggle" id="tg"><span class="lang-vi">◐ Sáng / Tối</span><span class="lang-en">◐ Light / Dark</span></button></div>
 <div class="wrap">
-  <div style="background:var(--accent-soft);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;margin-bottom:22px;font-size:.9rem"><span class="lang-vi">📍 Trang cá nhân học thuật đã có địa chỉ độc lập mới: <a href="https://thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026/"><b>thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026</b></a>, nơi tập trung hồ sơ, hệ sinh thái số và luận án. Trang này vẫn hoạt động trong hệ thống M-AIDA.</span><span class="lang-en">📍 The academic homepage now lives at its own address: <a href="https://thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026/"><b>thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026</b></a>, profile, digital ecosystem and dissertation in one place. This page remains available within the M-AIDA site.</span></div>
+  <div style="background:var(--accent-soft);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:12px 16px;margin-bottom:22px;font-size:.9rem;overflow-wrap:anywhere"><span class="lang-vi">📍 Trang cá nhân học thuật đã có địa chỉ độc lập mới: <a href="https://thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026/"><b>thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026</b></a>, nơi tập trung hồ sơ, hệ sinh thái số và luận án. Trang này vẫn hoạt động trong hệ thống M-AIDA.</span><span class="lang-en">📍 The academic homepage now lives at its own address: <a href="https://thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026/"><b>thuyhuongctu.github.io/JESUISHUONG_WEBSITE_2026</b></a>, profile, digital ecosystem and dissertation in one place. This page remains available within the M-AIDA site.</span></div>
   <header class="hero">
     <img width="400" height="400" class="portrait" src="assets/img/huong/pro_aodai.png" alt="3D render portrait of Do Thuy Huong in a white ao dai">
     <div>

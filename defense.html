@@ -12,7 +12,9 @@
 <title>M-AIDA Defense App · Quy trình nghiên cứu chạy thật</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
-:root{--paper:#f6f1e7;--surface:#fffdf8;--ink:#201b1c;--muted:#6c6263;--line:#ded2c7;--brand:#6b3543;--rose:#9b6070;--gold:#b8873f;--ok:#2e6b46;--soft:#f0e4e6;--bg1:#f9f4eb;--bg2:#efe4e4;--glass:rgba(246,241,231,.92);--card:rgba(255,253,248,.88);--shadow:rgba(55,35,40,.05);--ok-bg:#e5f0e8;--pilot-bg:#f3e6cf;--pilot-ink:#81571d;--fill:#6b3543;--solid:#201b1c;--solid-ink:#fff;--notice:#2b2224;--notice-ink:#f9f0e9;--notice-hi:#efc88c;--code:#171315;--code-ink:#f9ede8;--img-line:rgba(0,0,0,.10);color-scheme:light;--serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+/* --rose nền sáng từ #9b6070 xuống #874e5e: dòng eyebrow 12px trên nền gradient
+   chỉ đạt 3,9:1, dưới mức 4,5:1 cho chữ nhỏ; nay 5,2:1 ở chỗ nền sáng nhất. */
+:root{--paper:#f6f1e7;--surface:#fffdf8;--ink:#201b1c;--muted:#6c6263;--line:#ded2c7;--brand:#6b3543;--rose:#874e5e;--gold:#b8873f;--ok:#2e6b46;--soft:#f0e4e6;--bg1:#f9f4eb;--bg2:#efe4e4;--glass:rgba(246,241,231,.92);--card:rgba(255,253,248,.88);--shadow:rgba(55,35,40,.05);--ok-bg:#e5f0e8;--pilot-bg:#f3e6cf;--pilot-ink:#81571d;--fill:#6b3543;--solid:#201b1c;--solid-ink:#fff;--notice:#2b2224;--notice-ink:#f9f0e9;--notice-hi:#efc88c;--code:#171315;--code-ink:#f9ede8;--img-line:rgba(0,0,0,.10);color-scheme:light;--serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 /* Nền tối khai ba lần như các trang khác: mặc định sáng, theo cài đặt máy khi
    khách chưa chọn, và theo nút đổi nền khi khách đã chọn (lưu ở localStorage). Nút
    «đậm» (.btn.dark) đảo màu theo --solid chứ không viết cứng trắng/đen, vì

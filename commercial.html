@@ -43,6 +43,9 @@
   nav.top a{font-family:var(--mono);font-size:.63rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:.4rem .6rem;border-radius:6px;white-space:nowrap;}
   nav.top a:hover{color:var(--brand);background:var(--brand-soft);}
   .ctrl{display:flex;align-items:center;gap:.45rem;}
+  /* Hàng nút đầu trang (hiệu ứng, nhạc, nền, EN/VI, hai nút gọi) rộng 402px mà
+     không được xuống dòng: ở 390px cả trang cuộn ngang được 28px. */
+  @media(max-width:560px){.ctrl{flex-wrap:wrap;row-gap:.45rem;}}
   .pill{border:1px solid var(--line-2);background:var(--surface);border-radius:999px;cursor:pointer;font-family:var(--mono);color:var(--muted);}
   .pill.icon{width:1.9rem;height:1.9rem;font-size:.85rem;}
   .lang{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden;background:var(--surface);}

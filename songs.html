@@ -75,6 +75,9 @@
   .album{display:flex;flex-direction:column;align-items:center;gap:1.4rem;animation:floaty 6s ease-in-out infinite}
   .discwrap{position:relative;width:min(78vw,360px);aspect-ratio:1;display:grid;place-items:center}
   .discwrap .ring{position:absolute;border-radius:50%}
+/* Vòng trang trí quanh đĩa lòi ra 3px ở bề ngang 390, đủ để cả trang cuộn ngang;
+   clip cắt phần ấy mà không tạo khung cuộn. */
+section.stage{overflow-x:clip}
   .discwrap .r1{inset:-6%;border:1px dashed rgba(125,165,195,.28)}
   .discwrap .r2{inset:-15%;border:1px solid rgba(138,74,88,.32)}
   .discwrap.spin .r1{animation:spin 22s linear infinite}
