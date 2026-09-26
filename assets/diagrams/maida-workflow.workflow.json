@@ -1,0 +1,219 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "M-AIDA: extract, verify, lock",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Source"
+        },
+        "backend": {
+          "label": "Software step"
+        },
+        "frontend": {
+          "label": "Human check"
+        },
+        "security": {
+          "label": "Gate"
+        },
+        "database": {
+          "label": "Locked data"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "source",
+      "label": "Extraction"
+    },
+    {
+      "id": "human",
+      "label": "Researcher (PI)"
+    },
+    {
+      "id": "review",
+      "label": "Low-confidence records",
+      "variant": "exception"
+    },
+    {
+      "id": "locked",
+      "label": "Locked dataset"
+    }
+  ],
+  "phases": [
+    {
+      "id": "extract",
+      "label": "Extract",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "verify",
+      "label": "Verify",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "lock",
+      "label": "Lock + export",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "pdf",
+    "llm",
+    "check",
+    "convert",
+    "lockrec",
+    "export"
+  ],
+  "nodes": [
+    {
+      "id": "pdf",
+      "lane": "source",
+      "col": 0,
+      "type": "external",
+      "label": "Full-text PDF",
+      "sublabel": "one study at a time",
+      "width": 160
+    },
+    {
+      "id": "llm",
+      "lane": "source",
+      "col": 1,
+      "type": "backend",
+      "label": "LLM proposal",
+      "sublabel": "n, r, t, beta",
+      "tag": "confidence score",
+      "width": 160
+    },
+    {
+      "id": "flag",
+      "lane": "review",
+      "col": 2,
+      "type": "security",
+      "label": "Flagged",
+      "sublabel": "below threshold",
+      "tag": "review required",
+      "width": 160
+    },
+    {
+      "id": "check",
+      "lane": "human",
+      "col": 2,
+      "type": "frontend",
+      "label": "Field check",
+      "sublabel": "against source page",
+      "width": 160
+    },
+    {
+      "id": "convert",
+      "lane": "human",
+      "col": 3,
+      "type": "backend",
+      "label": "Convert to r",
+      "sublabel": "published formulas",
+      "width": 160
+    },
+    {
+      "id": "lockrec",
+      "lane": "locked",
+      "col": 4,
+      "type": "database",
+      "label": "Lock record",
+      "sublabel": "immutable + timestamp",
+      "tag": "audit trail",
+      "width": 160
+    },
+    {
+      "id": "export",
+      "lane": "locked",
+      "col": 5,
+      "type": "database",
+      "label": "Export CSV",
+      "sublabel": "locked records only",
+      "width": 160
+    }
+  ],
+  "edges": [
+    {
+      "id": "read",
+      "from": "pdf",
+      "to": "llm",
+      "label": "read"
+    },
+    {
+      "id": "propose",
+      "from": "llm",
+      "to": "check",
+      "label": "propose",
+      "variant": "emphasis"
+    },
+    {
+      "id": "lowconf",
+      "from": "llm",
+      "to": "flag",
+      "label": "low confidence",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "manual",
+      "from": "flag",
+      "to": "check",
+      "label": "manual review",
+      "variant": "dashed",
+      "role": "return"
+    },
+    {
+      "id": "approved",
+      "from": "check",
+      "to": "convert"
+    },
+    {
+      "id": "approve",
+      "from": "convert",
+      "to": "lockrec",
+      "label": "approve",
+      "variant": "emphasis"
+    },
+    {
+      "id": "out",
+      "from": "lockrec",
+      "to": "export"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Machine proposes",
+      "items": [
+        "The LLM reads each full text and proposes statistics",
+        "Every proposal carries a confidence score"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Human decides",
+      "items": [
+        "Low-confidence records are flagged for mandatory review",
+        "The PI checks every field against the source page"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Nothing changes quietly",
+      "items": [
+        "t to r follows Cohen; beta to r follows Peterson and Brown",
+        "Locked records are immutable and timestamped"
+      ]
+    }
+  ]
+}
