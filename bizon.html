@@ -4,9 +4,9 @@
 BizOn: Mô phỏng tình huống trong kinh doanh
 Business Situation Simulation (EC1314)
 Phiên bản / Version: 2.5, 07/2026 (giao diện Gamified Arena + trợ lý AI Ms. Hương)
-Tác giả / Author: PhD Candidate Do Thuy Huong
-Bản quyền / Copyright © 2026 Do Thuy Huong. All rights reserved.
-Tác phẩm do tác giả tự sáng tạo, không sử dụng kinh phí tổ chức.
+Tác giả / Authors: PhD Candidate Do Thuy Huong & Assoc. Prof. Dr. Phan Anh Tu (patueconomics.com)
+Bản quyền / Copyright © 2026 Do Thuy Huong & Phan Anh Tu. All rights reserved.
+Tác phẩm do các đồng tác giả tự sáng tạo, không sử dụng kinh phí tổ chức.
 Chương trình máy tính đăng ký quyền tác giả.
 ============================================================
 -->
@@ -19,8 +19,8 @@ Chương trình máy tính đăng ký quyền tác giả.
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="application-name" content="BizOn">
 <meta name="version" content="2.4">
-<meta name="author" content="PhD Candidate Do Thuy Huong">
-<meta name="copyright" content="© 2026 Do Thuy Huong. All rights reserved.">
+<meta name="author" content="PhD Candidate Do Thuy Huong & Assoc. Prof. Dr. Phan Anh Tu">
+<meta name="copyright" content="© 2026 Do Thuy Huong & Phan Anh Tu. All rights reserved.">
 <meta name="theme-color" content="#2554F4">
 <meta name="description" content="BizOn · Hệ thống mô phỏng tình huống trong kinh doanh (EC1314): trò chơi mô phỏng 6 vòng cho 5 nhóm sinh viên với hàm cầu, biến cố ngẫu nhiên, bảng xếp hạng và lưu trữ cục bộ. Business situation simulation game for classroom use.">
 <title>BizOn · Mô phỏng tình huống trong kinh doanh | M-AIDA</title>
@@ -2158,7 +2158,8 @@ Chương trình máy tính đăng ký quyền tác giả.
     <div class="footer-text">
       <span>BizOn v2.5 · © 2026</span>
       <span class="divider">|</span>
-      <span class="accent-name">PhD Candidate Do Thuy Huong</span>
+      <span class="accent-name">PhD Candidate Do Thuy Huong</span> &amp;
+      <a class="accent-name" href="https://patueconomics.com/" target="_blank" rel="noopener noreferrer">Assoc. Prof. Dr. Phan Anh Tu</a>
       <span class="divider">|</span>
       <span>HK 2B · 2025–2026</span>
       <span class="divider">|</span>
@@ -3809,7 +3810,7 @@ function printReport() {
     <table><thead><tr><th>#</th><th>${t('th_team')}</th><th>${t('th_company')}</th><th>${t('th_revenue')}</th><th>${t('th_cost')}</th><th>${t('th_profit')}</th><th>${t('th_cash')}</th></tr></thead><tbody>${rows}</tbody></table>
     <h2>${t('chart_per_round')}</h2>
     <table><thead><tr><th>${t('th_round')}</th>${state.groups.map(g => `<th>${g.name}</th>`).join('')}</tr></thead><tbody>${roundRows || ''}</tbody></table>
-    <p style="margin-top:24px;">BizOn v2.5 · © 2026 Do Thuy Huong</p>`;
+    <p style="margin-top:24px;">BizOn v2.5 · © 2026 Do Thuy Huong &amp; Phan Anh Tu</p>`;
   window.print();
 }
 
