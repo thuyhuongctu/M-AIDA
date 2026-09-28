@@ -134,6 +134,13 @@ export default function App() {
           M-AIDA v{version} · PhD Dissertation Research Tool · Asia-Pacific I&rarr;P
           Meta-Analysis
         </p>
+        <p>
+          Do Thuy Huong &amp;{" "}
+          <a href="https://patueconomics.com/" target="_blank" rel="noopener noreferrer">
+            Phan Anh Tu
+          </a>{" "}
+          · School of Economics, Can Tho University
+        </p>
       </footer>
     </div>
   );
