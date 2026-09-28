@@ -11,7 +11,7 @@ exports a reproducible effect-size dataset for three-level meta-analytic regress
 **Authors**
 
 - Do Thuy Huong ([ORCID 0000-0002-7711-2487](https://orcid.org/0000-0002-7711-2487)), PhD Candidate, School of Economics, Can Tho University.
-- Phan Anh Tu ([ORCID 0000-0003-0667-3137](https://orcid.org/0000-0003-0667-3137)), School of Economics, Can Tho University.
+- Phan Anh Tu ([ORCID 0000-0003-0667-3137](https://orcid.org/0000-0003-0667-3137) · [website](https://patueconomics.com/)), School of Economics, Can Tho University.
 
 Built to support the P6 (meta-analysis) component of the first author's doctoral
 dissertation on the internationalization-performance relationship.
