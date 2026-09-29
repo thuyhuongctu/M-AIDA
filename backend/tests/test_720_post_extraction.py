@@ -22,13 +22,12 @@ import json
 import os
 import sys
 
-import fitz
 import pytest
 from fastapi.testclient import TestClient
 
 import main as app_module
 from extractor import StatisticalExtractor
-from conftest import ADMIN_HEADERS
+from conftest import ADMIN_HEADERS, make_minimal_pdf
 
 EV = {
     "evidence_page": 7,
@@ -49,11 +48,7 @@ class FakeEngine:
 
 
 def _pdf_b64(text: str = "dummy") -> str:
-    doc = fitz.open()
-    doc.new_page().insert_text((72, 72), text)
-    pdf = doc.tobytes()
-    doc.close()
-    return base64.b64encode(pdf).decode()
+    return base64.b64encode(make_minimal_pdf(text)).decode()
 
 
 @pytest.fixture()

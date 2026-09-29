@@ -31,7 +31,7 @@ import secrets
 from datetime import datetime, timezone
 from typing import Any
 
-import fitz  # PyMuPDF
+import pypdfium2 as pdfium
 from fastapi import FastAPI, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -227,7 +227,7 @@ def _machine_proposal_snapshot(effect) -> dict:
 def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
     """Accept a Base64-encoded PDF and return an extracted effect-size record.
 
-    The PDF is decoded, text is extracted via PyMuPDF, and the
+    The PDF is decoded, text is extracted via pypdfium2, and the
     StatisticalExtractor LLM pipeline produces an ExtractedEffect.  The result
     is persisted in the study store and returned to the caller.
 
@@ -245,12 +245,17 @@ def extract_pdf(request: ExtractionRequest) -> StudyDatabaseEntry:
             status_code=400, detail=f"Invalid Base64 PDF content: {exc}"
         ) from exc
 
-    # Extract plain text with PyMuPDF
+    # Extract plain text with pypdfium2 (PDFium bindings, BSD-3-Clause/Apache-2.0)
     try:
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-        pages_text: list[str] = [page.get_text() for page in doc]  # type: ignore[union-attr]
+        pdf_doc = pdfium.PdfDocument(pdf_bytes)
+        pages_text: list[str] = []
+        for page in pdf_doc:
+            textpage = page.get_textpage()
+            pages_text.append(textpage.get_text_range())
+            textpage.close()
+            page.close()
         full_text = "\n".join(pages_text)
-        doc.close()
+        pdf_doc.close()
     except Exception as exc:
         raise HTTPException(
             status_code=422, detail=f"PDF text extraction failed: {exc}"

@@ -25,20 +25,14 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from conftest import ADMIN_HEADERS
+from conftest import ADMIN_HEADERS, make_minimal_pdf
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def _make_pdf(marker: str = "t = 2.40, df = 248") -> str:
     """Return a Base64 one-page PDF so the route reaches the extractor stage."""
-    import fitz
-
-    doc = fitz.open()
-    page = doc.new_page()
-    page.insert_text((72, 72), f"Rehearsal paper. {marker}.")
-    data = doc.tobytes()
-    doc.close()
+    data = make_minimal_pdf(f"Rehearsal paper. {marker}.")
     return base64.b64encode(data).decode()
 
 
