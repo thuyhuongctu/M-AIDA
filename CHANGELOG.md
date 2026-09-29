@@ -20,6 +20,32 @@ internal release line used during the doctoral meta-analysis (P6).
   nộp cho hồ sơ đăng ký quyền tác giả 7.1.1 giữ nguyên, vẫn dùng PyMuPDF như đã
   khai; thay đổi này chỉ áp dụng cho mã nguồn từ 7.1.2 trở đi.
 
+## [7.2.2] - 2026-09-23: khóa quản trị cho mọi yêu cầu ghi qua API
+
+Bản vá bảo mật sau 7.2.1, không đổi công thức, không đổi lược đồ dữ liệu, không
+đụng bản ghi đã khóa. Mã đã vào `main` qua PR #103; bản này chỉ gắn số hiệu để
+dựng lại ảnh container có kèm bản vá.
+
+- Bảo mật: nginx của bản triển khai chính chuyển mọi yêu cầu `/api/` sang
+  backend, nên trước bản này khách ghé bất kỳ có thể gọi thẳng
+  `PATCH /verify`, `POST /lock`, `POST /extract` (tốn ngân sách LLM) và
+  `POST /notion/sync`. Nay middleware `admin_key_guard` chặn mọi yêu cầu
+  POST/PATCH/PUT/DELETE thiếu header `X-MAIDA-Admin-Key` khớp
+  `MAIDA_ADMIN_KEY` (so sánh hằng thời gian); các tuyến chỉ đọc vẫn công
+  khai. Không đặt khóa thì backend tự sinh một khóa và in ra lúc khởi động,
+  không bao giờ mặc định mở. Defense App (`MAIDA_DEMO_MODE`) giữ PIN riêng.
+- Giao diện: ô "Admin key" ở đầu trang, khóa chỉ lưu trong `localStorage`,
+  không nhúng vào gói JS lúc build.
+- Ảnh `latest` trên GHCR trước bản này dựng từ 7.2.1, chưa có khóa quản trị;
+  máy chủ đang chạy ảnh cũ cần kéo lại ảnh và đặt `MAIDA_ADMIN_KEY`.
+- DOI: **DOI phiên bản của 7.2.2 là `10.5281/zenodo.22920619`** (tag `v7.2.2`
+  = `8af4881`), ghi bổ sung sau khi phát hành. Bản phát hành GitHub lúc đầu
+  mang nhầm tag viết hoa `V7.2.2`, nên Zenodo lưu thêm một bản ghi trùng,
+  `10.5281/zenodo.22920581`, cùng commit `8af4881`: nội dung đúng nhưng KHÔNG
+  trích dẫn, để mọi trích dẫn trỏ về một bản ghi. Tag viết hoa cũng không kích
+  hoạt `deploy-ghcr.yml` (bộ lọc `v*` phân biệt hoa thường); ảnh GHCR 7.2.2 chỉ
+  được dựng sau khi gắn lại tag `v7.2.2`.
+
 ## [7.2.1] - 2026-09-03: một số hiệu phiên bản duy nhất; giao diện hiển thị trường dẫn xuất
 
 Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đồ dữ liệu, không

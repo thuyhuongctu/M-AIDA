@@ -24,7 +24,7 @@ const http: AxiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// 7.2.1: the backend rejects every mutating request (extract/verify/lock/
+// 7.2.2: the backend rejects every mutating request (extract/verify/lock/
 // Notion-sync) without X-MAIDA-Admin-Key (main.py:admin_key_guard), since
 // nginx proxies /api/ publicly in the production deployment. The key is
 // entered once by the PI (see the header input in App.tsx), kept only in

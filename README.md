@@ -1,7 +1,7 @@
 # M-AIDA: Meta-Analysis Intelligent Data Assistant
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21850575.svg)](https://doi.org/10.5281/zenodo.21850575)
-![version](https://img.shields.io/badge/version-7.2.1-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+![version](https://img.shields.io/badge/version-7.2.2-blue) ![python](https://img.shields.io/badge/python-FastAPI-green) ![frontend](https://img.shields.io/badge/frontend-React%2019%20%2B%20TS-61dafb) ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
 Research software for meta-analysis: semi-automated effect-size extraction from
 academic PDFs with a vendor-neutral large-language-model adapter, human-in-the-loop
@@ -11,7 +11,7 @@ exports a reproducible effect-size dataset for three-level meta-analytic regress
 **Authors**
 
 - Do Thuy Huong ([ORCID 0000-0002-7711-2487](https://orcid.org/0000-0002-7711-2487)), PhD Candidate, School of Economics, Can Tho University.
-- Phan Anh Tu ([ORCID 0000-0003-0667-3137](https://orcid.org/0000-0003-0667-3137)), School of Economics, Can Tho University.
+- Phan Anh Tu ([ORCID 0000-0003-0667-3137](https://orcid.org/0000-0003-0667-3137) · [website](https://patueconomics.com/)), School of Economics, Can Tho University.
 
 Built to support the P6 (meta-analysis) component of the first author's doctoral
 dissertation on the internationalization-performance relationship.
@@ -155,6 +155,8 @@ down in favour of that app's own presenter-PIN middleware.
 
 ## Extraction Workflow
 
+Interactive diagram of the extract → verify → lock path: [`assets/diagrams/maida-workflow.html`](https://thuyhuongctu.github.io/M-AIDA/assets/diagrams/maida-workflow.html) (source: `assets/diagrams/maida-workflow.workflow.json`, rendered with [Archify](https://github.com/tt-a1i/archify), MIT).
+
 1. **Parse**: PDF text is extracted with MuPDF and segmented into statistical regions.
    At most 40,000 characters of text are sent to the model (`PDF_TEXT_LIMIT`); when a
    paper is longer the record carries `text_truncated = true`, so an empty proposal
@@ -284,14 +286,15 @@ go stale when the dataset moves to a new lock generation.
 If you use M-AIDA, please cite it (GitHub renders a "Cite this repository" button
 from `CITATION.cff`):
 
-> Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.2.1)
+> Do, T. H., and Phan, A. T. (2026). *M-AIDA: Meta-Analysis Intelligent Data Assistant* (Version 7.2.2)
 > [Computer software]. Can Tho University. https://doi.org/10.5281/zenodo.21850575
 
 Zenodo mints two kinds of identifier. The **concept DOI**
 `10.5281/zenodo.21850575` always resolves to the latest release; cite it for the
 software in general. A **version DOI** pins one release, for an exact
-reproducible build: `10.5281/zenodo.22260059` for v7.2.1 (tag `v7.2.1`, commit
-`d2ea8e3`, the current release), `10.5281/zenodo.22259090` for v7.2.0 (tag
+reproducible build: `10.5281/zenodo.22920619` for v7.2.2 (tag `v7.2.2`, commit
+`8af4881`, the current release), `10.5281/zenodo.22260059` for v7.2.1 (tag
+`v7.2.1`, commit `d2ea8e3`), `10.5281/zenodo.22259090` for v7.2.0 (tag
 `v7.2.0`, commit `3ff42c4`, the first release after the 31 August 2026 code
 review), `10.5281/zenodo.21926336` for v7.1.1 and `10.5281/zenodo.21850576` for
 v7.1.2.
@@ -311,6 +314,12 @@ earlier commits than the release title claimed: `10.5281/zenodo.22258783` and
 unpatched commit `3c8de32`, and carrying the metadata version 7.1.1) and
 `10.5281/zenodo.22259684` (from a release titled `v7.2.1`, archiving the 7.2.0
 commit `3ff42c4`). The authors have asked Zenodo to withdraw them.
+
+A fourth record, `10.5281/zenodo.22920581` (23 September 2026), is a
+**duplicate of v7.2.2**: the GitHub release was first published under the
+mistyped tag `V7.2.2` and then re-tagged `v7.2.2`, and Zenodo archived both.
+It holds the same commit `8af4881`, so its content is correct, but cite
+`10.5281/zenodo.22920619` so that every reference points at one record.
 
 ## Authorship, license, and research-integrity note
 
@@ -333,7 +342,7 @@ never commit a real `.env` (it is git-ignored). In the recommended deployment
 (DEPLOY.md), nginx is the only published service and proxies every `/api/`
 request straight to the backend; without a check there, any site visitor
 could call the same mutating routes the UI uses. Every extract/verify/lock/
-Notion-sync request (7.2.1) is therefore gated on the `X-MAIDA-Admin-Key`
+Notion-sync request (7.2.2) is therefore gated on the `X-MAIDA-Admin-Key`
 header, checked against `MAIDA_ADMIN_KEY` (`backend/main.py:admin_key_guard`).
 Read-only routes (list/get studies, CSV export, health) stay public, since
 they serve the published, locked dataset this project exists to make

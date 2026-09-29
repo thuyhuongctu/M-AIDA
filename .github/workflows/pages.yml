@@ -40,7 +40,10 @@ jobs:
           mkdir -p _site
           cp ./*.html _site/ 2>/dev/null || true
           cp manifest.webmanifest sw.js _site/ 2>/dev/null || true
-          for d in assets icons voice; do
+          # css/ phải có trong danh sách: các trang nạp css/fonts.css (phông tự lưu
+          # trữ có bộ ký tự tiếng Việt). Thiếu nó thì trang thật trả 404 cho
+          # fonts.css và nhãn mono rơi về phông hệ thống, dù chạy tại chỗ vẫn đúng.
+          for d in assets css icons voice; do
             [ -d "$d" ] && cp -r "$d" _site/
           done
           touch _site/.nojekyll

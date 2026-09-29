@@ -75,6 +75,9 @@
   .album{display:flex;flex-direction:column;align-items:center;gap:1.4rem;animation:floaty 6s ease-in-out infinite}
   .discwrap{position:relative;width:min(78vw,360px);aspect-ratio:1;display:grid;place-items:center}
   .discwrap .ring{position:absolute;border-radius:50%}
+/* Vòng trang trí quanh đĩa lòi ra 3px ở bề ngang 390, đủ để cả trang cuộn ngang;
+   clip cắt phần ấy mà không tạo khung cuộn. */
+section.stage{overflow-x:clip}
   .discwrap .r1{inset:-6%;border:1px dashed rgba(125,165,195,.28)}
   .discwrap .r2{inset:-15%;border:1px solid rgba(138,74,88,.32)}
   .discwrap.spin .r1{animation:spin 22s linear infinite}
@@ -222,6 +225,13 @@
 <meta property="og:image" content="https://thuyhuongctu.github.io/M-AIDA/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<!-- Thẻ chia sẻ: thiếu chúng thì dán link lên Facebook/Zalo chỉ ra khung trống hoặc lấy nhầm chữ trong trang. -->
+<link rel="canonical" href="https://thuyhuongctu.github.io/M-AIDA/songs.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thuyhuongctu.github.io/M-AIDA/songs.html">
+<meta property="og:title" content="M-AIDA Audio, Je m'appelle Hương">
+<meta property="og:description" content="The M-AIDA main work «The Heartbeat of M-AIDA (Que les preuves décident)» on an immersive 3D lyric console, with synchronized lyrics and the full recording archive. Lyrics by Do Thuy Huong.">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
 <div class="field"><span class="orb a"></span><span class="orb b"></span></div>
@@ -248,7 +258,7 @@
         <span class="ring r1" aria-hidden="true"></span>
         <span class="ring r2" aria-hidden="true"></span>
         <div class="disc" id="disc">
-          <img id="cover" src="assets/img/huong/song_cover.jpg" alt="Album cover, Do Thuy Huong in ao dai">
+          <img width="1024" height="1024" id="cover" src="assets/img/huong/song_cover.jpg" alt="Album cover, Do Thuy Huong in ao dai">
           <span class="halo" aria-hidden="true"></span>
           <span class="badge" id="heroPlay" role="button" tabindex="0" aria-label="Play"><span>
             <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -404,10 +414,10 @@
         </div>
       </div>
       <div class="abgallery">
-        <figure class="abcard"><img src="assets/img/huong/song_stride.png" alt="Hương áo dài, sải bước" loading="lazy"><figcaption class="cap"><small><span class="vi">Khởi hành</span><span class="en">Departure</span></small>Que les preuves décident</figcaption></figure>
-        <figure class="abcard"><img src="assets/img/huong/song_present.png" alt="Hương áo dài, giới thiệu" loading="lazy"><figcaption class="cap"><small>Intro · 76 BPM</small>Je m'appelle Hương</figcaption></figure>
-        <figure class="abcard"><img src="assets/img/huong/song_thumbs.png" alt="Hương áo dài, ngón cái" loading="lazy"><figcaption class="cap"><small>Chorus</small>Extract · verify · lock</figcaption></figure>
-        <figure class="abcard"><img src="assets/img/huong/song_cheer.png" alt="Hương áo dài, ăn mừng" loading="lazy"><figcaption class="cap"><small><span class="vi">Kết</span><span class="en">Finale</span></small><span class="vi">Từ Việt Nam ra thế giới</span><span class="en">From Vietnam to the world</span></figcaption></figure>
+        <figure class="abcard"><img width="614" height="1200" src="assets/img/huong/song_stride.png" alt="Hương áo dài, sải bước" loading="lazy"><figcaption class="cap"><small><span class="vi">Khởi hành</span><span class="en">Departure</span></small>Que les preuves décident</figcaption></figure>
+        <figure class="abcard"><img width="468" height="1056" src="assets/img/huong/song_present.png" alt="Hương áo dài, giới thiệu" loading="lazy"><figcaption class="cap"><small>Intro · 76 BPM</small>Je m'appelle Hương</figcaption></figure>
+        <figure class="abcard"><img width="352" height="1200" src="assets/img/huong/song_thumbs.png" alt="Hương áo dài, ngón cái" loading="lazy"><figcaption class="cap"><small>Chorus</small>Extract · verify · lock</figcaption></figure>
+        <figure class="abcard"><img width="426" height="1026" src="assets/img/huong/song_cheer.png" alt="Hương áo dài, ăn mừng" loading="lazy"><figcaption class="cap"><small><span class="vi">Kết</span><span class="en">Finale</span></small><span class="vi">Từ Việt Nam ra thế giới</span><span class="en">From Vietnam to the world</span></figcaption></figure>
       </div>
     </div>
   </section>
@@ -440,7 +450,7 @@
   <div class="prog" id="prog"><div class="bar" id="bar"></div></div>
   <div class="prow">
     <div class="now">
-      <img id="npCover" src="assets/img/huong/song_cover.jpg" alt="">
+      <img width="1024" height="1024" id="npCover" src="assets/img/huong/song_cover.jpg" alt="">
       <div class="txt"><b id="npTitle">Je m'appelle Hương</b><small id="npSub">mon histoire</small></div>
     </div>
     <div class="ctr">

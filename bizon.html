@@ -4,9 +4,9 @@
 BizOn: Mô phỏng tình huống trong kinh doanh
 Business Situation Simulation (EC1314)
 Phiên bản / Version: 2.5, 07/2026 (giao diện Gamified Arena + trợ lý AI Ms. Hương)
-Tác giả / Author: PhD Candidate Do Thuy Huong
-Bản quyền / Copyright © 2026 Do Thuy Huong. All rights reserved.
-Tác phẩm do tác giả tự sáng tạo, không sử dụng kinh phí tổ chức.
+Tác giả / Authors: PhD Candidate Do Thuy Huong & Assoc. Prof. Dr. Phan Anh Tu (patueconomics.com)
+Bản quyền / Copyright © 2026 Do Thuy Huong & Phan Anh Tu. All rights reserved.
+Tác phẩm do các đồng tác giả tự sáng tạo, không sử dụng kinh phí tổ chức.
 Chương trình máy tính đăng ký quyền tác giả.
 ============================================================
 -->
@@ -19,8 +19,8 @@ Chương trình máy tính đăng ký quyền tác giả.
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="application-name" content="BizOn">
 <meta name="version" content="2.4">
-<meta name="author" content="PhD Candidate Do Thuy Huong">
-<meta name="copyright" content="© 2026 Do Thuy Huong. All rights reserved.">
+<meta name="author" content="PhD Candidate Do Thuy Huong & Assoc. Prof. Dr. Phan Anh Tu">
+<meta name="copyright" content="© 2026 Do Thuy Huong & Phan Anh Tu. All rights reserved.">
 <meta name="theme-color" content="#2554F4">
 <meta name="description" content="BizOn · Hệ thống mô phỏng tình huống trong kinh doanh (EC1314): trò chơi mô phỏng 6 vòng cho 5 nhóm sinh viên với hàm cầu, biến cố ngẫu nhiên, bảng xếp hạng và lưu trữ cục bộ. Business situation simulation game for classroom use.">
 <title>BizOn · Mô phỏng tình huống trong kinh doanh | M-AIDA</title>
@@ -559,7 +559,11 @@ Chương trình máy tính đăng ký quyền tác giả.
     z-index: 1;
   }
 
-  .brand-text h1 {
+  /* Chữ «BizOn» ở thanh trên là nhãn thương hiệu, không phải tiêu đề trang: để
+     h1 thì nó luôn hiện cùng h1 của bảng đang mở, thành hai h1 một lúc. Tiêu
+     đề thật của từng bảng là .hero-title. */
+  .brand-text .brand-name {
+    margin: 0;
     font-family: var(--font-display);
     font-size: 20px;
     font-weight: 800;
@@ -1718,6 +1722,13 @@ Chương trình máy tính đăng ký quyền tác giả.
 <meta property="og:image" content="https://thuyhuongctu.github.io/M-AIDA/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<!-- Thẻ chia sẻ: thiếu chúng thì dán link lên Facebook/Zalo chỉ ra khung trống hoặc lấy nhầm chữ trong trang. -->
+<link rel="canonical" href="https://thuyhuongctu.github.io/M-AIDA/bizon.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://thuyhuongctu.github.io/M-AIDA/bizon.html">
+<meta property="og:title" content="BizOn · Mô phỏng tình huống trong kinh doanh | M-AIDA">
+<meta property="og:description" content="BizOn · Hệ thống mô phỏng tình huống trong kinh doanh (EC1314): trò chơi mô phỏng 6 vòng cho 5 nhóm sinh viên với hàm cầu, biến cố ngẫu nhiên, bảng xếp hạng và lưu trữ cục bộ. Business situation simulation game for classroom use.">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body data-theme="dark">
 <a href="library.html" style="position:fixed;top:10px;left:10px;z-index:9999;display:inline-flex;align-items:center;gap:.4rem;font:600 12px/1 system-ui,sans-serif;color:#fff;background:rgba(20,10,13,.72);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);padding:7px 11px;border-radius:999px;text-decoration:none">← Thư viện Sáng tạo · M-AIDA</a>
@@ -1750,7 +1761,7 @@ Chương trình máy tính đăng ký quyền tác giả.
         </svg>
       </div>
       <div class="brand-text">
-        <h1>BizOn</h1>
+        <p class="brand-name">BizOn</p>
         <div class="tagline" data-i18n="tagline">Mô phỏng tình huống trong kinh doanh · 6 vòng · EC1314</div>
       </div>
     </div>
@@ -2147,7 +2158,8 @@ Chương trình máy tính đăng ký quyền tác giả.
     <div class="footer-text">
       <span>BizOn v2.5 · © 2026</span>
       <span class="divider">|</span>
-      <span class="accent-name">PhD Candidate Do Thuy Huong</span>
+      <span class="accent-name">PhD Candidate Do Thuy Huong</span> &amp;
+      <a class="accent-name" href="https://patueconomics.com/" target="_blank" rel="noopener noreferrer">Assoc. Prof. Dr. Phan Anh Tu</a>
       <span class="divider">|</span>
       <span>HK 2B · 2025–2026</span>
       <span class="divider">|</span>
@@ -3798,7 +3810,7 @@ function printReport() {
     <table><thead><tr><th>#</th><th>${t('th_team')}</th><th>${t('th_company')}</th><th>${t('th_revenue')}</th><th>${t('th_cost')}</th><th>${t('th_profit')}</th><th>${t('th_cash')}</th></tr></thead><tbody>${rows}</tbody></table>
     <h2>${t('chart_per_round')}</h2>
     <table><thead><tr><th>${t('th_round')}</th>${state.groups.map(g => `<th>${g.name}</th>`).join('')}</tr></thead><tbody>${roundRows || ''}</tbody></table>
-    <p style="margin-top:24px;">BizOn v2.5 · © 2026 Do Thuy Huong</p>`;
+    <p style="margin-top:24px;">BizOn v2.5 · © 2026 Do Thuy Huong &amp; Phan Anh Tu</p>`;
   window.print();
 }
 

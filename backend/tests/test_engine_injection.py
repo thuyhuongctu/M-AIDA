@@ -69,3 +69,16 @@ class TestEngineInjection:
     def test_make_engine_rejects_unknown_provider(self):
         with pytest.raises(EngineError):
             make_engine("unknown-vendor", api_key="x")
+
+
+class TestDefaultModel:
+    def test_blank_model_falls_back_to_a_real_model_id(self):
+        # Trước đây mặc định là "provider-default-model" — API từ chối, nên
+        # để trống LLM_MODEL là trích xuất hỏng hẳn. Không gọi mạng ở đây.
+        engine = make_engine("anthropic", api_key="sk-test", model="")
+        assert engine.model.startswith("claude-")
+        assert engine.model != "provider-default-model"
+
+    def test_explicit_model_wins(self):
+        engine = make_engine("anthropic", api_key="sk-test", model="claude-opus-5-5")
+        assert engine.model == "claude-opus-5-5"
