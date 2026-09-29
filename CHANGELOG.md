@@ -3,6 +3,23 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## Chưa phát hành: gỡ PyMuPDF (AGPL-3.0) khỏi phụ thuộc runtime (29/09/2026)
+
+- Thay PyMuPDF bằng **pypdfium2** (BSD-3-Clause / Apache-2.0) tại đúng một
+  điểm dùng: `backend/main.py`, hàm `extract_pdf` (tuyến `POST /api/extract`).
+  Xem `THIRD_PARTY_LICENSES.md` mục 2 để biết lý do và phạm vi.
+- Kiểm thử (`backend/tests/test_persistence_and_demo_mode.py`,
+  `backend/tests/test_720_post_extraction.py`) và script lịch sử
+  `verify_findings.py` trước đây dùng PyMuPDF để tạo tệp PDF mẫu; nay dựng PDF
+  tối giản trực tiếp bằng tay (không phụ thuộc thư viện tạo PDF nào), tránh
+  đưa PyMuPDF trở lại qua đường kiểm thử.
+- Đồng bộ `license` trong `backend/pyproject.toml` (trước đó ghi
+  `LicenseRef-MAIDA-Academic`, không khớp `LICENSE`) thành `AGPL-3.0-only` —
+  bản chuẩn `LICENSE` gốc không đổi, chỉ sửa siêu dữ liệu gói.
+- Không hồi tố: gói lưu chiểu `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.zip` đã
+  nộp cho hồ sơ đăng ký quyền tác giả 7.1.1 giữ nguyên, vẫn dùng PyMuPDF như đã
+  khai; thay đổi này chỉ áp dụng cho mã nguồn từ 7.1.2 trở đi.
+
 ## [7.2.1] - 2026-09-03: một số hiệu phiên bản duy nhất; giao diện hiển thị trường dẫn xuất
 
 Bản vá nhỏ sau 7.2.0, không đổi công thức, không đổi lược đồ dữ liệu, không

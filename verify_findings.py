@@ -20,6 +20,35 @@ from fastapi.testclient import TestClient  # noqa: E402
 import main as app_module  # noqa: E402
 from extractor import StatisticalExtractor  # noqa: E402
 
+
+def _make_pdf(text: str = "dummy") -> bytes:
+    """Minimal single-page PDF, no third-party PDF library dependency (main.py
+    reads PDFs with pypdfium2, which has no write/generation API)."""
+    escaped = text.replace("\\", r"\\").replace("(", r"\(").replace(")", r"\)")
+    content = f"BT /F1 12 Tf 72 720 Td ({escaped}) Tj ET".encode("latin-1")
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        b"<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> "
+        b"/MediaBox [0 0 612 792] /Contents 5 0 R >>",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        b"<< /Length " + str(len(content)).encode() + b" >>\nstream\n" + content + b"\nendstream",
+    ]
+    out = bytearray(b"%PDF-1.4\n")
+    offsets = [0]
+    for i, obj in enumerate(objects, start=1):
+        offsets.append(len(out))
+        out += f"{i} 0 obj\n".encode() + obj + b"\nendobj\n"
+    xref_offset = len(out)
+    n = len(objects) + 1
+    out += f"xref\n0 {n}\n".encode()
+    out += b"0000000000 65535 f \n"
+    for off in offsets[1:]:
+        out += f"{off:010d} 00000 n \n".encode()
+    out += f"trailer\n<< /Size {n} /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF".encode()
+    return bytes(out)
+
+
 EV = {
     "evidence_page": 7,
     "evidence_quote": "Table 3 reports the focal coefficient for DOI.",
@@ -43,12 +72,8 @@ def make_study(client, payload):
         engine=FakeEngine({**EV, **payload})
     )
     import base64
-    import fitz
 
-    doc = fitz.open()
-    doc.new_page().insert_text((72, 72), "dummy")
-    pdf = doc.tobytes()
-    doc.close()
+    pdf = _make_pdf("dummy")
     r = client.post(
         "/api/extract",
         json={
@@ -201,11 +226,7 @@ def main():
         engine=FakeEngine({**EV, "effect_r": "0.35", "sample_n": 200})
     )
     import base64
-    import fitz
-    doc = fitz.open()
-    doc.new_page().insert_text((72, 72), "dummy")
-    pdf = doc.tobytes()
-    doc.close()
+    pdf = _make_pdf("dummy")
     r = client.post("/api/extract", json={
         "pdf_content": base64.b64encode(pdf).decode(),
         "paper_metadata": {"title": "T", "authors": "A", "year": 2020,
