@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./film/support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>M-AIDA · Defense opener</title>
+<style>
+@font-face{font-family:'Inter';font-weight:400;src:url(assets/fonts/inter-400-latin.woff2) format('woff2');}
+@font-face{font-family:'Inter';font-weight:600;src:url(assets/fonts/inter-600-latin.woff2) format('woff2');}
+@font-face{font-family:'Inter';font-weight:700;src:url(assets/fonts/inter-700-latin.woff2) format('woff2');}
+@font-face{font-family:'JetBrains Mono';font-weight:400;src:url(assets/fonts/jetbrains-mono-400-latin.woff2) format('woff2');}
+@font-face{font-family:'Source Serif 4';font-weight:400;src:url(assets/fonts/source-serif-4-400-latin.woff2) format('woff2');}
+@font-face{font-family:'Source Serif 4';font-weight:600;src:url(assets/fonts/source-serif-4-600-latin.woff2) format('woff2');}
+html,body{margin:0;height:100%;background:#171a19;overflow:hidden;}
+a{color:#c0862a;} a:hover{color:#a97321;}
+</style>
+<script>window.OM_SCENES = '[{"name":"Mark","dur":6,"desc":"The split diamond mark assembles and the M-AIDA wordmark settles"},{"name":"Question","dur":9,"desc":"Many studies, one question: unverified rows build a forest plot"},{"name":"Extract","dur":13,"desc":"Live console: upload a PDF, run extraction, new record appears for review"},{"name":"Gate","dur":8,"desc":"Console view: page-and-quote evidence for statistic and N, or no record"},{"name":"Verify","dur":14,"desc":"Filter needs review, open the new record, note, approve, lock"},{"name":"Close","dur":14.4,"desc":"Locked rows pool into the amber diamond; lockup, authors and DOI"}]';</script>
+<script>window.OM_PLAYBACK = '{"mode":"loop"}';</script>
+<script>window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"motionEditor":true,"showHuong":true,"captions":true,"sound":true}/*EDITMODE-END*/;</script>
+</helmet>
+<div style="position:fixed;inset:0;background:#171a19;">
+<x-import component-from-global-scope="MaidaFilm" from="./film/animations-v3.jsx ./film/tweaks-panel.jsx ./film/maida-film.jsx" style="position:absolute;inset:0;" hint-size="100%,100%"></x-import>
+</div>
+</x-dc>
+</body>
+</html>
