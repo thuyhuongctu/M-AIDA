@@ -48,6 +48,13 @@ set "KEY="
 echo Da luu ma khoa vao backend\.env tren may nay.
 
 :have_key
+rem Kiem tra ma khoa + ma mo hinh bang mot yeu cau 5 token truoc khi mo app.
+".venv\Scripts\python.exe" backend\check_llm.py
+if errorlevel 1 (
+  echo.
+  echo Sua backend\.env theo huong dan o tren roi nhap dup lai tep nay.
+  goto :error
+)
 rem Chi nghe tren chinh may nay: backend\.env giu ma khoa that, khong de may
 rem khac cung mang Wi-Fi goi vao tieu tien API.
 set "MAIDA_HOST=127.0.0.1"

@@ -22,6 +22,9 @@ Nhấp đúp **`CHAY_MAIDA_WINDOWS.bat`** ở thư mục gốc của kho.
   khoá. Dán mã vào và nhấn Enter. Chữ **không hiện ra** trên màn hình khi dán,
   đó là cố ý. Mã được lưu vào `backend\.env` **trên máy cô**. Git bỏ qua tệp
   này, nên mã không bao giờ lên GitHub.
+- Trước khi mở app, tệp `.bat` chạy `backend\check_llm.py`: gửi một yêu cầu 5 token
+  để xác nhận mã khoá và mã mô hình (`LLM_MODEL`) dùng được. Nếu báo THẤT BẠI, sửa
+  `backend\.env` theo gợi ý in ra rồi chạy lại; app chỉ mở khi kiểm tra THÀNH CÔNG.
 - **Các lần sau** chỉ cần nhấp đúp; trình duyệt tự mở `http://127.0.0.1:8765/`.
 - Cửa sổ đen phải để mở trong lúc làm việc; đóng nó là tắt M-AIDA.
 - Dòng **Presenter PIN** trong cửa sổ đen là mã cần nhập trước khi tải PDF
