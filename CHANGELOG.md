@@ -3,6 +3,20 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## Chưa phát hành: dọn kho và viết lại lịch sử (01/10/2026)
+
+- Kho chỉ còn phần chương trình máy tính và tài liệu kỹ thuật: gỡ các trang web
+  giới thiệu/sáng tạo (`*.html` ở gốc kho), `assets/` đa phương tiện (ảnh, bài hát,
+  phông chữ), `voice/`, `film/`, `icons/`, `css/`, workflow GitHub Pages và các tài
+  liệu làm việc cũ (`CODE_REVIEW_2026-08-31.md`, `TRUOC-CONG-BO.md`,
+  `PUBLISHING.md`, `docs/BRANCH-POLICY.md`, `HUONG_DAN_TIENG_VIET.docx`). Giữ
+  `assets/brand/` và `assets/diagrams/`.
+- Lịch sử Git được viết lại: mọi commit đứng tên `Do Thuy Huong
+  <thuyhuongctu@gmail.com>`, bỏ trailer công cụ trong thông điệp commit; mọi mã
+  commit thay đổi. Tag `v7.1.1` trỏ lại đúng commit tham chiếu của hồ sơ đăng ký
+  quyền tác giả (xem `IP_REGISTER.md`). Chỉ giữ nhánh `main`.
+- Không thay đổi mã nguồn backend/frontend/analysis/validation/demo.
+
 ## Chưa phát hành: gỡ PyMuPDF (AGPL-3.0) khỏi phụ thuộc runtime (29/09/2026)
 
 - Thay PyMuPDF bằng **pypdfium2** (BSD-3-Clause / Apache-2.0) tại đúng một

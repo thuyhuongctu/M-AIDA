@@ -25,8 +25,6 @@ jobs:
         run: python demo/smoke_test.py
       - name: Independent-validation analysis tests
         run: python -m pytest validation/tests -q
-      - name: Public-site research metrics guard
-        run: python scripts/check_site_metrics.py
 
   frontend:
     runs-on: ubuntu-latest

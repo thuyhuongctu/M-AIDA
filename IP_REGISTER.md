@@ -49,6 +49,16 @@ Phân công vai trò chi tiết: xem `AUTHORS_AND_OWNERSHIP.md`.
 | Nội dung | 41 tệp, trong đó 17 tệp mã nguồn; đã loại bỏ mọi khóa bí mật (sanitized) |
 | Tệp mã băm | `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.sha256.txt` (cùng thư mục hồ sơ) |
 
+Gói dựng lại ngày 01/10/2026 (nộp kèm đợt hoàn thiện hồ sơ đồng sở hữu với Đại học Cần Thơ;
+gói cũ không còn trên máy tác giả):
+
+| Khóa (Key) | Giá trị |
+|---|---|
+| Tên gói | `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED_2026-10-01.zip` |
+| SHA-256 | `ca10589b6c68b4b976a35cc2dfe0bedd99a5230e57610aa1f9bd92fd91c15738` |
+| Nội dung | 36 tệp: 30 tệp mã nguồn và cấu hình (đúng danh sách in tại Chương 9 Thuyết minh, 3.714 dòng, khớp từng byte với tag `v7.1.1`) + LICENSE, README, AUTHORS, CITATION.cff, CHANGELOG, DEPOSIT_MANIFEST.json |
+| Tệp mã băm | `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED_2026-10-01.zip.sha256.txt` |
+
 ## 5. Ghi chú đối chiếu phiên bản (Version reconciliation note)
 
 Ghi chú này lập ra để hội đồng và cơ quan đăng ký không hiểu nhầm là hồ sơ
@@ -138,6 +148,7 @@ sai sót đã tồn tại:
 | 13/08/2026 | Gỡ câu dẫn cổng `MAIDA_RIGHTS_STATUS` khỏi mục 5bis điểm 6: rà kho xác nhận biến và tệp `frontend/.env.store.example` không tồn tại. Việc chặn thương mại hóa được ghi lại đúng bản chất là quyết định quản trị, không phải cổng kỹ thuật |
 | 13/08/2026 | Đợt 2: đính chính chính điểm 6 của mục 5bis. Bản đợt 1 khẳng định biến `MAIDA_RIGHTS_STATUS` và tệp `frontend/.env.store.example` "không tồn tại" và "chưa có cổng kỹ thuật nào cưỡng chế". Khẳng định đó sai: cả hai đều tồn tại trên nhánh `feat/app-store-readiness-v1`, và cổng có cưỡng chế thật, fail-closed. Nguyên nhân: đợt rà chỉ quét `main`, không quét nhánh, nên kết luận "không tồn tại" được rút ra từ một phạm vi hẹp hơn phạm vi mà câu văn tuyên bố. Đã thay bằng mô tả theo từng nhánh. |
 | 13/08/2026 | Bổ sung khi kiểm chứng đợt 2 bằng `git for-each-ref` trên mọi ref: cổng còn tồn tại trên nhánh thứ hai `feat/ui-integration-v1`, hai tệp cổng trùng khớp từng byte với `feat/app-store-readiness-v1`. Bảng theo nhánh đã ghi cả hai; cả hai đều chưa gộp vào `main`. |
+| 01/10/2026 | Viết lại lịch sử kho (gộp danh tính tác giả, gỡ trailer công cụ, gỡ trang web/đa phương tiện khỏi lịch sử); dời tag `v7.1.1` về commit tham chiếu `26dc90f24b7e`; bổ sung gói lưu chiểu dựng lại 01/10/2026 (mục 4); xóa nhánh cũ, chỉ giữ `main` |
 | 13/08/2026 | Sửa `commercial.html`: gỡ ba lời mời liên hệ mua gói (Pro, Team/Lab, Enterprise), đổi gói "Free" thành "Open source / tự triển khai AGPL-3.0" (bản cũ mô tả hạn mức theo tháng và tài khoản, dịch vụ chưa tồn tại), bổ sung khối cảnh báo trạng thái quyền ở đầu mục bảng giá, viết lại ghi chú minh bạch cho khớp `COMMERCIAL-LICENSE.md`. Lý do: trang đang chào bán dịch vụ trong khi văn bản cấp phép khai chưa thể cấp phép thương mại. |
 
 ## Định danh commit của bản chuẩn tham chiếu (bổ sung 13/07/2026)
@@ -157,3 +168,21 @@ sai sót đã tồn tại:
   thái: sau khi thay tag, Release chuyển về bản nháp theo cơ chế của GitHub; bước còn
   lại là chủ sở hữu bấm Publish (Edit, chọn tag `v7.1.1`, Publish release) và đính kèm
   gói `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.zip` vào mục Assets.
+
+### Cập nhật 01/10/2026: viết lại lịch sử kho và dời tag lần hai
+
+- Ngày 01/10/2026, lịch sử Git của kho được viết lại (git filter-repo) để gộp mọi danh
+  tính tác giả về `Do Thuy Huong <thuyhuongctu@gmail.com>`, loại bỏ các trailer công cụ
+  khỏi thông điệp commit, và gỡ khỏi lịch sử các trang web giới thiệu/sáng tạo cùng tệp
+  đa phương tiện không thuộc chương trình máy tính. Vì vậy **mọi mã commit đổi**.
+- Commit tương ứng với `24dac0219b8020bd8f0b1c7d048f7a9ee9340dfe` sau khi viết lại là
+  **`26dc90f24b7ec0a5748748d6d37af0a061290c8f`**; 30 tệp mã nguồn và cấu hình của bản 7.1.1 đã được
+  đối chiếu SHA-256 từng tệp: **trùng khớp 100%** với bản trước khi viết lại.
+- Phát hiện khi rà soát: tag `v7.1.1` đã bị dời nhầm (13/08/2026) sang một commit chứa mã
+  7.1.2 trở lên (`store.py`, `StatusBanner.tsx`, bộ kiểm thử 7.1.2). Tag **đã được trỏ lại**
+  về commit tham chiếu `26dc90f24b7e` cùng ngày 01/10/2026.
+- Các tag khác (`v7.1.2`, `v7.2.0`, `v7.2.1`, `v7.2.2`) giữ nguyên nội dung cây, chỉ đổi mã
+  commit theo lịch sử mới. Bản ghi Zenodo không bị ảnh hưởng (Zenodo lưu bản chụp tại
+  thời điểm phát hành).
+- Nhánh: chỉ còn `main`; toàn bộ nhánh cũ và lịch sử gốc được lưu trong gói sao lưu
+  `BACKUP_M-AIDA_goc_truoc_khi_sua_2026-10-01.bundle` do chủ sở hữu giữ ngoài kho.
