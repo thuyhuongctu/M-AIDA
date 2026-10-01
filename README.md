@@ -155,7 +155,7 @@ down in favour of that app's own presenter-PIN middleware.
 
 ## Extraction Workflow
 
-Interactive diagram of the extract → verify → lock path: [`assets/diagrams/maida-workflow.html`](https://thuyhuongctu.github.io/M-AIDA/assets/diagrams/maida-workflow.html) (source: `assets/diagrams/maida-workflow.workflow.json`, rendered with [Archify](https://github.com/tt-a1i/archify), MIT).
+Interactive diagram of the extract → verify → lock path: [`assets/diagrams/maida-workflow.html`](assets/diagrams/maida-workflow.html) (open locally in a browser) (source: `assets/diagrams/maida-workflow.workflow.json`, rendered with [Archify](https://github.com/tt-a1i/archify), MIT).
 
 1. **Parse**: PDF text is extracted with MuPDF and segmented into statistical regions.
    At most 40,000 characters of text are sent to the model (`PDF_TEXT_LIMIT`); when a
@@ -199,87 +199,6 @@ pointer, and excluded records keep a written reason (PRISMA-ready). Each run
 emits `figures.json`: the single source every display surface reads its
 headline numbers from. Policy details are in
 [`analysis/README.md`](analysis/README.md).
-
-## Live web pages (GitHub Pages)
-
-The repository is also served as a static site (GitHub Pages):
-
-- **Main page** ([index.html](https://thuyhuongctu.github.io/M-AIDA/)): overview,
-  positioning, the interactive atlas of the locked study corpus, the in-browser
-  extraction console (three sample papers: r, t, standardized beta, walked
-  through the same convert/verify/lock/export gates; it refuses PDFs, which need
-  the backend), and the Huong AI tour guide. Bilingual EN/VI.
-- **Defense App** ([defense.html](https://thuyhuongctu.github.io/M-AIDA/defense.html)):
-  public explanation of the presenter-controlled local application, its
-  Academic Demo / Defense App / Cloud boundaries, rehearsal flow, and launch
-  instructions. Verify, Lock, and Reset remain local rather than public.
-- **Commercial page** ([commercial.html](https://thuyhuongctu.github.io/M-AIDA/commercial.html)):
-  productization and licensing overview.
-- **Data & Melody** ([data_melody.html](https://thuyhuongctu.github.io/M-AIDA/data_melody.html)):
-  the story of the software told as a guided walk with Huong AI (Vietnamese,
-  English, French), with a live World Bank indicators widget.
-- **Creative Library** ([library.html](https://thuyhuongctu.github.io/M-AIDA/library.html)):
-  a hub that links the project's components (the meta-analysis platform, the
-  Data & Melody walk, the songs, the BizOn simulation game, and the academic
-  page), with a Huong AI image gallery. Bilingual EN/VI with light/dark themes.
-- **Songs** ([songs.html](https://thuyhuongctu.github.io/M-AIDA/songs.html)):
-  the main work *"The Heartbeat of M-AIDA (Que les preuves decident)"* on an
-  immersive 3D lyric console with synchronized lyrics, an artist gallery, and a
-  curated pair of non-duplicate recordings (the extended main work plus
-  *"Je m'appelle Hương – mon histoire"*).
-- **BizOn AI** ([bizon.html](https://thuyhuongctu.github.io/M-AIDA/bizon.html)):
-  a playable, multi-agent "living market" business-simulation game used in the
-  author's Business Simulation course.
-- **Author's academic homepage** ([huong.html](https://thuyhuongctu.github.io/M-AIDA/huong.html)):
-  Do Thuy Huong's personal page, bio, publications (ORCID), teaching linked to
-  research, journal peer-review / academic service, an interactive 3D globe of the
-  studied economies, a World Bank data widget, and a blog. Bilingual VI/EN with
-  light/dark themes.
-- **Privacy policy** ([privacy.html](https://thuyhuongctu.github.io/M-AIDA/privacy.html)):
-  cookieless-analytics disclosure (VI/EN).
-
-**Theme song.** The project's main work is *"The Heartbeat of M-AIDA (Que les
-preuves decident)"* (`assets/maida_song_official.mp3`, an extended cut of about
-4.5 minutes). It is featured on the Songs page and is available site-wide
-through a shared floating player that loops the curated pair (the main work plus
-*"Je m'appelle Hương – mon histoire"*). The mood menu on the main and commercial
-pages plays the *heartbeat* recording (`assets/maida_song_heartbeat.mp3`), with an
-instrumental option. All lyrics were written by Do Thuy Huong (17 July 2026). The
-Data & Melody page carries the full song cover: the author's ao dai portrait on a
-floral backdrop with animated falling music notes and a Vietnam map watermark.
-
-**Design.** The main and commercial pages ship a premium editorial design in the
-*"Je m'appelle Hương"* brand palette: a warm ivory default theme with a
-dusty-mauve primary and a warm-gold accent, a rosewood dark theme behind the
-toggle, glass cards, scroll-reveal animations, and a scroll progress bar. The
-academic `asia-*` atlas pages keep their own terracotta/ochre/green data theme. All character artwork
-uses the realistic 3D Huong character in high resolution; cross-page links
-carry the selected language (`?lang=`), and Data & Melody opens in French by
-default with VI / EN / FR toggles.
-
-**Brand and design system.** The official brand kit lives in
-[`assets/brand/`](assets/brand/) (diamond mark, lockups, favicon, og-image, and
-usage rules including the two-design-system boundary with the institutional
-identity); the page headers render the official mark bound to theme tokens.
-Design tokens and components are canonical in [`css/tokens.css`](css/tokens.css)
-and [`css/components.css`](css/components.css), documented in
-[`styleguide.html`](styleguide.html) (plus a fully offline
-`styleguide-standalone.html`). Fonts are self-hosted woff2 subsets
-([`assets/fonts/`](assets/fonts/), SIL OFL: see `THIRD_PARTY_LICENSES.md`);
-no external font CDN is called.
-
-**Data consistency.** Every headline research number on the site (studies,
-effect sizes, economies, pooled and bias-adjusted *r*, I²) has a single source
-of truth in [`assets/data/site-metrics.json`](assets/data/site-metrics.json),
-mirrored from the locked P6 corpus (`p6/results/table1_baseline.csv` in the
-dissertation repo). A guard, [`scripts/check_site_metrics.py`](scripts/check_site_metrics.py),
-runs in the GitHub Pages workflow and **fails the deploy** if any page drifts
-from those numbers, so the published pages cannot show stale statistics.
-
-The narration layer follows the same discipline from the other side: the Huong
-AI voice guide never speaks a research number. She explains the process; the
-numbers stay on screen, read from the single source. Recordings therefore never
-go stale when the dataset moves to a new lock generation.
 
 ## Citation
 
