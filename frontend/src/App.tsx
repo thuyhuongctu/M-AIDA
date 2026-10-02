@@ -18,6 +18,7 @@ import DatasetPanel from "./components/DatasetPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
 import LoginScreen from "./components/LoginScreen";
 import { Logo } from "./components/Logo";
+import VnMark from "./components/VnMark";
 import ReviewScreen from "./components/ReviewScreen";
 import StatusPill from "./components/StatusPill";
 import Tour, { tourDone, type TourTab } from "./components/Tour";
@@ -271,6 +272,7 @@ export default function App() {
   return (
     <I18nContext.Provider value={i18n}>
       <div className="shell">
+        <VnMark />
         {header}
         {body}
         {footer}
