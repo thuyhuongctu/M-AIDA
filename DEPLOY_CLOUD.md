@@ -49,9 +49,20 @@ nano /opt/m-aida/deploy/.env.cloud   # điền MAIDA_DOMAIN, SUPABASE_URL, SUPAB
 bash install.sh                 # lần 2: dựng và chạy
 ```
 
-Kiểm tra: `https://<tên miền>/api/health` trả về `"auth_mode": "supabase"`,
-`"storage": "postgres"`, `"llm_ready": true`. Bảng được tạo tự động khi backend
-khởi động (Alembic `upgrade head`).
+Lần chạy thứ hai, trước khi khởi động, bộ cài chạy `backend/check_cloud.py`
+bên trong image backend: đọc `.env.cloud`, thử kết nối Postgres, tải JWKS của
+dự án Supabase (hoặc kiểm tra `SUPABASE_JWT_SECRET`), gọi thử mô hình 5 token,
+và in từng mục ĐẠT/HỎNG kèm cách sửa. Có mục HỎNG thì không khởi động. Chạy
+lại riêng lúc nào cũng được:
+
+```bash
+cd /opt/m-aida
+docker compose -f docker-compose.cloud.yml --env-file deploy/.env.cloud run --rm --no-deps backend python check_cloud.py
+```
+
+Kiểm tra sau khi chạy: `https://<tên miền>/api/health` trả về
+`"auth_mode": "supabase"`, `"storage": "postgres"`, `"llm_ready": true`. Bảng
+được tạo tự động khi backend khởi động (Alembic `upgrade head`).
 
 Tài khoản trong `MAIDA_ADMIN_EMAILS` đăng nhập lần đầu sẽ có vai trò
 `admin`: thẻ **Account** có công cụ cấp tín dụng và tổng chi phí mô hình.

@@ -49,9 +49,20 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 0
 fi
 
-echo "== Starting the stack"
 cd "$DIR"
-docker compose -f docker-compose.cloud.yml --env-file deploy/.env.cloud up -d --build
-docker compose -f docker-compose.cloud.yml --env-file deploy/.env.cloud ps
+COMPOSE="docker compose -f docker-compose.cloud.yml --env-file deploy/.env.cloud"
+
+echo "== Building the backend image and checking the configuration"
+$COMPOSE build backend
+if ! $COMPOSE run --rm --no-deps backend python check_cloud.py; then
+  echo
+  echo "!! The configuration check failed (see the lines marked HONG above)."
+  echo "   Fix $ENV_FILE and run this script again. Nothing was started."
+  exit 1
+fi
+
+echo "== Starting the stack"
+$COMPOSE up -d --build
+$COMPOSE ps
 echo
 echo "== Done. Health: https://$(grep -E '^MAIDA_DOMAIN=' deploy/.env.cloud | cut -d= -f2)/api/health"
