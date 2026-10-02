@@ -245,10 +245,12 @@ def analyze(gold_rows: list[dict[str, str]], pred_rows: list[dict[str, str]], to
         errors.append(error)
 
         gold_n = as_int(g["gold_n"], "gold_n", case_id)
-        pred_n = as_int(p["predicted_n"], "predicted_n", case_id)
-        if gold_n <= 0 or pred_n <= 0:
+        # A proposal may carry r without N (the evidence gate only requires a
+        # quote for an N it reports); a missing N counts as not exact.
+        pred_n = as_int(p["predicted_n"], "predicted_n", case_id, optional=True)
+        if gold_n <= 0 or (pred_n is not None and pred_n <= 0):
             raise ValueError(f"{case_id}: sample sizes must be positive")
-        exact_n += gold_n == pred_n
+        exact_n += pred_n is not None and gold_n == pred_n
 
         gold_route = g["gold_route"].strip()
         exact_route += gold_route == p["predicted_route"].strip()

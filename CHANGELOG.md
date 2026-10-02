@@ -122,8 +122,29 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   Anthropic/VPS, quyền xuất và xóa, luật Việt Nam, tòa Cần Thơ); sinh trang tĩnh
   `/legal/terms.html`, `/legal/privacy.html` bằng `legal/build_pages.py`; liên
   kết từ màn hình đăng nhập và chân trang ở chế độ nhiều người dùng.
+- **Gói chạy kiểm định độ chính xác** (`validation/`), chưa có kết quả nào:
+  `run_benchmark.py` chạy đúng đường trích xuất của ứng dụng một lần trên mẫu
+  đã khóa (từ chối khung `PROVISIONAL`, temperature chưa đóng băng, `LLM_MODEL`
+  trống, cây git có thay đổi chưa commit; không ghi đè thư mục chạy; chạy tiếp
+  sau gián đoạn chỉ khi cấu hình trùng `run_config.json`; thử lại chỉ khi lỗi
+  nhà cung cấp) và ghi `run_manifest.json`, `proposals.csv` (đề xuất máy nguyên
+  vẹn), câu trả lời thô, CSDL để PI kiểm chứng trong ứng dụng, cùng hai mẫu
+  `proposal_matches.csv` và `verification_log.csv`. `coding_workbooks.py` tạo
+  sổ liệt kê candidate effect và hai sổ Excel cho hai người mã hóa (cột định
+  danh khóa, danh sách chọn, kiểm tra r trong [-1, 1], N nguyên dương), rồi
+  gộp thành `gold_standard_draft.csv` (chỉ điền sẵn khi hai người đồng ý) và
+  `disagreements.csv`. `build_predictions.py` ghép một đợt chạy với chuẩn vàng
+  đã phân xử thành `predictions.csv` theo quy tắc ghi sẵn (một đề xuất mỗi bài;
+  mọi đề xuất phải được ghép; từ chối đợt diễn tập và đợt còn lỗi).
+  `analyze_validation.py`: đề xuất có r nhưng thiếu N tính là N sai thay vì
+  làm hỏng phân tích. Bản nháp sửa §6 protocol: `validation/PROTOCOL_S6_DRAFT_VI.md`.
+- **Đóng băng cấu hình mô hình**: `LLM_TEMPERATURE` (tùy chọn; để trống thì
+  không gửi tham số, đúng hành vi cũ); `extractor.prompt_fingerprint()` băm
+  system prompt, mẫu tin nhắn, giới hạn 40.000 ký tự và 1.024 token đầu ra
+  (hiện `sha256:fb368e1cb9123eef`; prompt của 8.0 trùng 7.2.x, khác 7.1.1).
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
-  (backend); `@supabase/supabase-js` (frontend, chỉ tải khi chạy chế độ
+  (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
+  `@supabase/supabase-js` (frontend, chỉ tải khi chạy chế độ
   `supabase`). Chưa có trong 8.0: thanh toán, trang giá, xóa tài khoản tự phục
   vụ, Sentry/uptime (xem `DEPLOY_CLOUD.md` §8).
 

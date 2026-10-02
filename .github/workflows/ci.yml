@@ -15,7 +15,7 @@ jobs:
           python-version: '3.11'
           cache: pip
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt pytest ruff
+        run: pip install -r backend/requirements.txt -r validation/requirements.txt pytest ruff
       - name: Lint (syntax errors and undefined names)
         run: ruff check backend demo validation --select E9,F
       - name: Unit tests

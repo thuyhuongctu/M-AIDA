@@ -39,6 +39,11 @@ class Settings(BaseSettings):
         default="", validation_alias=AliasChoices("ANTHROPIC_MODEL", "LLM_MODEL")
     )
 
+    # Sampling temperature sent to the model. Unset = provider default (the
+    # behaviour of every release up to 8.0). Set it (e.g. 0) to freeze a
+    # validation configuration; validation/run_benchmark.py records it.
+    llm_temperature: float | None = None
+
     notion_token: str = ""
     notion_database_id: str = ""
     maida_port: int = 8765
