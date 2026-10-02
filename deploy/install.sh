@@ -64,5 +64,17 @@ fi
 echo "== Starting the stack"
 $COMPOSE up -d --build
 $COMPOSE ps
+
+# The first start creates the tables and closes them to the Supabase REST API
+# (migration 0002). Verify that on the live database before inviting anyone.
+echo "== Waiting for the backend, then re-checking the database"
+for i in $(seq 1 30); do
+  if $COMPOSE exec -T backend python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8765/api/health').status==200 else 1)" 2>/dev/null; then break; fi
+  sleep 2
+done
+if ! $COMPOSE exec -T backend python check_cloud.py --no-llm; then
+  echo "!! The live database check failed. Stop the stack (docker compose ... down) and fix it before opening the service."
+  exit 1
+fi
 echo
 echo "== Done. Health: https://$(grep -E '^MAIDA_DOMAIN=' deploy/.env.cloud | cut -d= -f2)/api/health"

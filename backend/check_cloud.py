@@ -80,7 +80,53 @@ def check_db(url: str) -> bool:
         say(OK, f"Lược đồ: Alembic ở bản {head}")
     else:
         say(WARN, "Lược đồ: chưa có bảng; backend sẽ chạy `alembic upgrade head` khi khởi động lần đầu.")
+    if head and url.startswith("postgres"):
+        return check_data_api_closed(url)
     return True
+
+
+def check_data_api_closed(url: str) -> bool:
+    """On Supabase, the REST API serves the anon/authenticated roles to anyone
+    holding the public anon key: no M-AIDA table may be granted to them, and
+    every table must have row level security on (migration 0002)."""
+    from sqlalchemy import text
+
+    from db import Base, make_engine
+
+    ours = set(Base.metadata.tables) | {"alembic_version"}
+    engine = make_engine(url)
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text(
+                "SELECT c.relname, c.relrowsecurity, pg_get_userbyid(c.relowner) FROM pg_class c "
+                "JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'r'"
+            )).all()
+            grants = conn.execute(text(
+                "SELECT DISTINCT grantee, table_name FROM information_schema.role_table_grants "
+                "WHERE table_schema = 'public' AND grantee IN ('anon', 'authenticated')"
+            )).all()
+            me = conn.execute(text("SELECT current_user")).scalar()
+    finally:
+        engine.dispose()
+    present = {r[0]: (r[1], r[2]) for r in rows if r[0] in ours}
+    ok = True
+    no_rls = sorted(t for t, (rls, _) in present.items() if not rls)
+    exposed = sorted({t for _, t in grants if t in ours})
+    foreign_owner = sorted(t for t, (_, owner) in present.items() if owner != me)
+    if no_rls:
+        say(BAD, "Row level security đang TẮT trên: " + ", ".join(no_rls) + ". Chạy lại backend để áp migration 0002.")
+        ok = False
+    if exposed:
+        say(BAD, "REST API của Supabase (vai trò anon/authenticated) còn quyền trên: " + ", ".join(exposed)
+            + ". Bất kỳ ai có khóa anon đều đọc/sửa được. Áp migration 0002 trước khi mở dịch vụ.")
+        ok = False
+    if foreign_owner:
+        say(WARN, f"Bảng không thuộc vai trò kết nối ({me}): " + ", ".join(foreign_owner)
+            + ". Row level security sẽ chặn cả backend; tạo lại bảng bằng chính backend.")
+        ok = False
+    if ok:
+        say(OK, f"REST API của Supabase đóng với {len(present)} bảng M-AIDA (RLS bật, anon/authenticated không có quyền).")
+    return ok
 
 
 def check_auth(settings) -> bool:

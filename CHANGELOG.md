@@ -60,13 +60,29 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   `backend/check_cloud.py` kiểm tra cấu hình trước khi mở dịch vụ (Postgres,
   JWKS/secret Supabase, khóa mô hình, chế độ mock/demo); bộ cài chạy nó trước
   `docker compose up` và dừng khi có mục hỏng.
-- **Kiểm thử**: 22 test mới (`backend/tests/test_800_cloud_multiuser.py`): xác
+- **Kiểm thử**: 25 test mới (`backend/tests/test_800_cloud_multiuser.py`): xác
   minh JWT (hợp lệ, hết hạn, sai aud, chữ ký giả, HS256), tách dữ liệu, quy tắc
   tín dụng, job bất đồng bộ, giới hạn tốc độ, khôi phục job dở dang, di trú tệp
   7.x; 79 test cũ và smoke test Defense App giữ nguyên và vẫn đạt. Kiểm thử
   đầu cuối bằng trình duyệt (`backend/tests/e2e/run_e2e.py`, Playwright): đăng
   nhập → tải PDF → job xong → bị từ chối giữ phí → duyệt → khóa → xuất CSV →
   tài khoản → người thứ hai không thấy gì → admin cấp tín dụng → tiếng Việt.
+- **Bảo mật: đóng REST API của Supabase với các bảng M-AIDA** (migration
+  `0002_lock_down_data_api`). Trên Supabase, bảng tạo trong `public` mặc định
+  được cấp toàn quyền cho `anon` và `authenticated`, và khóa anon là công khai;
+  không có migration này, bất kỳ ai cũng đọc được e-mail người dùng và sửa số
+  dư tín dụng qua `https://<ref>.supabase.co/rest/v1/...` (đã tái hiện trên
+  Postgres 16 với quyền mặc định giống Supabase). Migration thu hồi mọi quyền
+  của hai vai trò đó trên mọi bảng và sequence, bật row level security không
+  policy; backend là chủ bảng nên không bị ảnh hưởng; trên Postgres không có
+  các vai trò này (tự cài) chỉ bật RLS. `check_cloud.py` xác minh trên cơ sở
+  dữ liệu thật (RLS, quyền, chủ bảng); `deploy/install.sh` chạy lại kiểm tra
+  sau lần khởi động đầu. Sửa đặc tả v8, vốn ghi "chưa cần RLS".
+- **Kiểm thử trên Postgres thật**: `MAIDA_TEST_PG_URL` cho mỗi test một cơ sở
+  dữ liệu mới nhân từ mẫu có vai trò và quyền mặc định như Supabase; 16 test
+  nhiều người dùng và 3 test riêng (`test_803_postgres.py`: danh sách bảng của
+  0002 phủ toàn bộ lược đồ, quyền và RLS sau migration, JSONB/tiếng Việt/múi
+  giờ/khóa sổ tín dụng) đạt trên Postgres 16.
 - **Phê duyệt là của con người** (`pi_approved_at`, mới trong `ExtractedEffect`):
   `requires_verification` chỉ là cờ của máy (tin cậy dưới ngưỡng). PATCH
   `/verify` với `pi_approved=true` nay ghi thời điểm phê duyệt; `POST /lock`
