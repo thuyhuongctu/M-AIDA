@@ -87,7 +87,14 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   hai cột với bốn bước quy trình (đọc văn bản, nhận diện, quy đổi, cổng bằng
   chứng) ánh xạ từ trạng thái job; thẻ Bộ dữ liệu riêng (đếm, thanh tiến độ
   khóa, CSV, Notion); màn hình đăng nhập hai cột. Không có nhân vật minh họa.
-  Bỏ `StatusBanner` và `VerificationDashboard` cũ.
+  Bỏ `StatusBanner` và `VerificationDashboard` cũ. Giai đoạn 2: **forest plot
+  xem trước** trong Bộ dữ liệu (`ForestPlot`): mỗi bản ghi đã khóa một dòng,
+  khoảng tin cậy 95% tính trên Fisher z từ `variance_z` của máy chủ (hoặc
+  1/(n−3) khi thiếu) rồi đổi về r, ô vuông theo trọng số nghịch phương sai,
+  hình thoi gộp theo hiệu ứng cố định ghi rõ "xem trước" vì mô hình ba cấp
+  chạy ở metafor; **tour hướng dẫn** 11 bước dạng hộp chữ song ngữ (tự mở lần
+  đăng nhập đầu, nút "Guide/Hướng dẫn" mở lại), đánh dấu vùng liên quan trên
+  từng màn hình.
 - **Pháp lý**: `legal/TERMS.md` và `legal/PRIVACY.md` (Điều khoản dịch vụ và
   Chính sách riêng tư cho beta kín, song ngữ Anh/Việt, viết đối chiếu được với
   lược đồ `backend/db.py`: không lưu PDF, các bảng lưu gì, bên xử lý Supabase/

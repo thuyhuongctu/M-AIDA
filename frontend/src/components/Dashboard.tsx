@@ -71,7 +71,7 @@ export default function Dashboard({ refreshKey, onNewExtraction, onOpenStudy }: 
       {error && <p className="error-message">{error}</p>}
 
       <div className="summary-grid">
-        <div className="summary-card summary-card-credits">
+        <div className="summary-card summary-card-credits" data-tour="credits">
           <span className="summary-number">
             <span className="glyph glyph-locked" aria-hidden="true">◆</span>
             <span data-testid="credits-balance">{me ? (me.credits === null ? "∞" : me.credits) : "…"}</span>

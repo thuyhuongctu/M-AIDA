@@ -81,6 +81,16 @@ def main() -> int:
             expect(page.get_by_test_id("dashboard")).to_be_visible()
             expect(page.get_by_test_id("credits-balance")).to_have_text("3")
             expect(page.get_by_test_id("header-user")).to_contain_text("alice@example.org")
+            # First sign-in: the guided tour opens; two steps switch tabs, then skip.
+            expect(page.get_by_test_id("tour")).to_be_visible()
+            shot("02a-tour")
+            page.get_by_test_id("tour-next").click()
+            expect(page.get_by_test_id("tour")).to_contain_text("credits")
+            page.get_by_test_id("tour-next").click()
+            expect(page.get_by_test_id("tab-extract")).to_have_attribute("aria-selected", "true")
+            page.get_by_test_id("tour-skip").click()
+            expect(page.get_by_test_id("tour")).to_have_count(0)
+            page.get_by_test_id("tab-dashboard").click()
             shot("02-dashboard-empty")
 
             # 2. Upload and extract
@@ -140,6 +150,10 @@ def main() -> int:
             # CSV export from the Dataset tab: intercept the download
             page.get_by_test_id("tab-dataset").click()
             expect(page.get_by_test_id("dataset-panel")).to_contain_text("1")
+            # forest plot: one locked row (r = 0.31, n = 240 -> Fisher-z CI) and the pooled preview
+            forest = page.get_by_test_id("forest-plot")
+            expect(forest).to_contain_text("0.310 [0.191, 0.420]")
+            expect(forest).to_contain_text("Pooled (preview)")
             with page.expect_download(timeout=10_000) as dl:
                 page.get_by_test_id("export-csv").click()
             csv_path = dl.value.path()

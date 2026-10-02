@@ -20,6 +20,7 @@ import LoginScreen from "./components/LoginScreen";
 import { Logo } from "./components/Logo";
 import ReviewScreen from "./components/ReviewScreen";
 import StatusPill from "./components/StatusPill";
+import Tour, { tourDone, type TourTab } from "./components/Tour";
 import { I18nContext, Lang, readLang, storeLang, translate } from "./i18n";
 import { ClientConfig, MeResponse, StudyDatabaseEntry } from "./types";
 import "@fontsource/source-serif-4/400.css";
@@ -123,6 +124,13 @@ export default function App() {
     setActiveTab("verify");
   }, []);
 
+  // Guided tour (8.0): once per browser after the first sign-in, and on demand.
+  const [tourOpen, setTourOpen] = useState(false);
+  useEffect(() => {
+    if (cloud && auth.user && !tourDone()) setTourOpen(true);
+  }, [cloud, auth.user]);
+  const tourTab = useCallback((tab: TourTab) => setActiveTab(tab), []);
+
   const t = i18n.t;
 
   const tabs: { id: Tab; label: string; badge?: number; cloudOnly?: boolean }[] = [
@@ -190,6 +198,11 @@ export default function App() {
               onChange={handleAdminKeyChange}
             />
           </div>
+        )}
+        {signedIn && config && (
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setTourOpen(true)} data-testid="tour-open">
+            {t("tour_btn")}
+          </button>
         )}
         <div className="seg-group" role="group" aria-label="Language">
           <button type="button" className={`seg ${lang === "en" ? "seg-on" : ""}`} onClick={() => i18n.setLang("en")}>EN</button>
@@ -261,6 +274,7 @@ export default function App() {
         {header}
         {body}
         {footer}
+        <Tour open={tourOpen} onClose={() => setTourOpen(false)} onTab={tourTab} />
       </div>
     </I18nContext.Provider>
   );

@@ -239,6 +239,7 @@ export default function ExtractionPanel({ onExtracted, cloud = false, credits = 
       {/* Drop zone */}
       <div
         className={`drop-zone ${dragOver ? "drag-over" : ""} ${file ? "has-file" : ""}`}
+        data-tour="drop"
         onDragOver={(e) => {
           e.preventDefault();
           setDragOver(true);
@@ -354,7 +355,7 @@ export default function ExtractionPanel({ onExtracted, cloud = false, credits = 
       </form>
     </div>
 
-    <aside className="extract-pipeline">
+    <aside className="extract-pipeline" data-tour="pipeline">
       <span className="eyebrow">{t("ex_pipeline")}</span>
       <ol className="pipeline">
         {([["ex_s1", "ex_s1d"], ["ex_s2", "ex_s2d"], ["ex_s3", "ex_s3d"], ["ex_s4", "ex_s4d"]] as const).map(([k, d], i) => (
