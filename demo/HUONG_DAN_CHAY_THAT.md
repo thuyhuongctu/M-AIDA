@@ -6,7 +6,10 @@ vệ chạy không cần mạng và không gọi AI.
 
 ## Cần có
 
-1. **Python 3.12** (hoặc 3.11). Tải ở <https://www.python.org/downloads/windows/>.
+1. **Python 3.12 bản 64-bit** (hoặc 3.11 64-bit). Tải ở
+   <https://www.python.org/downloads/windows/>, chọn *Windows installer (64-bit)*.
+   Bản 32-bit không dùng được: numpy/pandas/scipy không có gói dựng sẵn, pip sẽ
+   cố biên dịch rồi hỏng; tệp `.bat` sẽ dừng và báo nếu máy chỉ có bản 32-bit.
    Khi cài, nhớ đánh dấu ô **"Add python.exe to PATH"**. Đừng dùng 3.13: một
    vài thư viện số của M-AIDA chưa có bản cài sẵn cho 3.13.
 2. **Mã khoá Claude (API key)**, bắt đầu bằng `sk-ant-`. Lấy ở
@@ -27,7 +30,11 @@ Nhấp đúp **`CHAY_MAIDA_WINDOWS.bat`** ở thư mục gốc của kho.
   `backend\.env` theo gợi ý in ra rồi chạy lại; app chỉ mở khi kiểm tra THÀNH CÔNG.
 - **Các lần sau** chỉ cần nhấp đúp; trình duyệt tự mở `http://127.0.0.1:8765/`.
 - Cửa sổ đen phải để mở trong lúc làm việc; đóng nó là tắt M-AIDA.
-- Dòng **Presenter PIN** trong cửa sổ đen là mã cần nhập trước khi tải PDF
+- Khung **MA PIN (Presenter PIN)** trong cửa sổ đen là mã 4 chữ số bảo vệ các
+  thao tác ghi. Trình duyệt do tệp `.bat` mở sẽ nhận mã này sẵn (nút góc trên
+  hiện "Presenter unlocked"); chỉ khi mở trang bằng tay mới cần bấm *Presenter
+  PIN* và nhập. Trước đây (7.2.0 đến 7.2.2) nút này bị lỗi và mọi thao tác ghi
+  trả về 401; đã sửa ở 7.2.3. Mã này cần trước khi tải PDF
   lên, sửa hay khoá bản ghi. Mỗi lần chạy một mã mới.
 
 ## Quy trình với một bài báo

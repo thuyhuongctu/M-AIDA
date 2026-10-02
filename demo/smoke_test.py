@@ -21,7 +21,12 @@ from demo import run_defense  # noqa: E402
 run_defense.restore_or_seed()
 client = TestClient(run_defense.main.app)
 
-assert client.get("/").status_code == 200
+ui = client.get("/")
+assert ui.status_code == 200
+# 7.2.3: the UI must define the PIN helper and send the header, otherwise every
+# mutating action (extract/verify/lock/reset) answers 401 (bug since 7.2.0).
+assert "async function presenterPin" in ui.text
+assert "X-MAIDA-Demo-PIN" in ui.text
 assert client.get("/manifest.webmanifest").status_code == 200
 assert client.get("/sw.js").status_code == 200
 health = client.get("/api/health")

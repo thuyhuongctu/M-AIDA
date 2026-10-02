@@ -11,14 +11,17 @@ if exist ".venv\Scripts\python.exe" goto :have_venv
 echo [M-AIDA] Lan dau chay: dang cai moi truong Python, mat vai phut...
 rem Uu tien 3.12 roi 3.11: numpy/scipy ghim trong requirements.txt chua co
 rem ban dung san cho Python 3.13, cai se hong giua chung.
+rem Chi nhan Python 64-bit: ban 32-bit khong co goi numpy/pandas/scipy dung san,
+rem pip se co bien dich tu ma nguon va hong (02/10/2026).
 set "PYV="
-py -3.12 -c "1" >nul 2>&1 && set "PYV=-3.12"
-if not defined PYV py -3.11 -c "1" >nul 2>&1 && set "PYV=-3.11"
+py -3.12-64 -c "1" >nul 2>&1 && set "PYV=-3.12-64"
+if not defined PYV py -3.11-64 -c "1" >nul 2>&1 && set "PYV=-3.11-64"
 if not defined PYV (
   echo.
-  echo Khong tim thay Python 3.12 hoac 3.11.
-  echo Tai Python 3.12 tai https://www.python.org/downloads/windows/
-  echo va nho tick "Add python.exe to PATH" khi cai, roi nhap dup lai tep nay.
+  echo Khong tim thay Python 3.12 hoac 3.11 ban 64-bit.
+  echo Ban 32-bit dang co tren may KHONG dung duoc.
+  echo Tai ban 64-bit: https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe
+  echo Khi cai nho tick "Add python.exe to PATH", bam Install Now, roi nhap dup lai tep nay.
   goto :error
 )
 py %PYV% -m venv .venv || goto :error
@@ -58,11 +61,22 @@ if errorlevel 1 (
 rem Chi nghe tren chinh may nay: backend\.env giu ma khoa that, khong de may
 rem khac cung mang Wi-Fi goi vao tieu tien API.
 set "MAIDA_HOST=127.0.0.1"
+rem Ma PIN 4 chu so, moi lan chay mot ma moi; chi may nay goi duoc nen du an toan.
+rem (Ma mac dinh cua demo/run_defense.py la chuoi ngau nhien 6 ky tu, de go nham.)
+set /a MAIDA_DEMO_PIN=%random% %% 9000 + 1000
+rem O che do demo, khoa quan tri khong duoc dung; dat san de backend khong in
+rem "Generated MAIDA admin key" ra man hinh, tranh nham voi ma PIN.
+set "MAIDA_ADMIN_KEY=demo-%random%%random%%random%"
 echo.
 echo [M-AIDA] Dang khoi dong. Trinh duyet se tu mo http://127.0.0.1:8765/
-echo Ma PIN (Presenter PIN) in ben duoi: dung de xac nhan, khoa va xuat du lieu.
 echo Dong cua so nay la tat M-AIDA.
-start "" cmd /c "timeout /t 5 >nul & start http://127.0.0.1:8765/"
+echo.
+echo   ==========================================
+echo     MA PIN (Presenter PIN):  %MAIDA_DEMO_PIN%
+echo   ==========================================
+echo   Trinh duyet mo tu dong se nhan ma nay san; chi can nhap lai neu trang hoi.
+echo.
+start "" cmd /c "timeout /t 5 >nul & start http://127.0.0.1:8765/?pin=%MAIDA_DEMO_PIN%"
 ".venv\Scripts\python.exe" demo\run_defense.py
 goto :eof
 
