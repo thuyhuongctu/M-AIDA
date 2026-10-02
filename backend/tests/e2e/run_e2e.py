@@ -159,6 +159,15 @@ def main() -> int:
             expect(page.get_by_test_id("tab-dashboard")).to_have_text("Bảng điều khiển")
             shot("10-vietnamese")
 
+            # 10. Legal pages are served next to the app (static, bilingual)
+            page.goto(f"{BASE}/legal/terms.html")
+            expect(page.locator("h1#en")).to_contain_text("Terms of Service")
+            expect(page.locator("h1#vi")).to_contain_text("Điều khoản dịch vụ")
+            shot("11-terms")
+            page.goto(f"{BASE}/legal/privacy.html")
+            expect(page.locator("h1#en")).to_contain_text("Privacy Policy")
+            shot("12-privacy")
+
             browser.close()
         print("E2E passed.")
         return 0

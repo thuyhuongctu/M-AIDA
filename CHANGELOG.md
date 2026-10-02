@@ -67,10 +67,16 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   đầu cuối bằng trình duyệt (`backend/tests/e2e/run_e2e.py`, Playwright): đăng
   nhập → tải PDF → job xong → bị từ chối giữ phí → duyệt → khóa → xuất CSV →
   tài khoản → người thứ hai không thấy gì → admin cấp tín dụng → tiếng Việt.
+- **Pháp lý**: `legal/TERMS.md` và `legal/PRIVACY.md` (Điều khoản dịch vụ và
+  Chính sách riêng tư cho beta kín, song ngữ Anh/Việt, viết đối chiếu được với
+  lược đồ `backend/db.py`: không lưu PDF, các bảng lưu gì, bên xử lý Supabase/
+  Anthropic/VPS, quyền xuất và xóa, luật Việt Nam, tòa Cần Thơ); sinh trang tĩnh
+  `/legal/terms.html`, `/legal/privacy.html` bằng `legal/build_pages.py`; liên
+  kết từ màn hình đăng nhập và chân trang ở chế độ nhiều người dùng.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `@supabase/supabase-js` (frontend, chỉ tải khi chạy chế độ
-  `supabase`). Chưa có trong 8.0: thanh toán, trang giá, Điều khoản/Chính sách
-  riêng tư, Sentry/uptime (xem `DEPLOY_CLOUD.md` §7).
+  `supabase`). Chưa có trong 8.0: thanh toán, trang giá, xóa tài khoản tự phục
+  vụ, Sentry/uptime (xem `DEPLOY_CLOUD.md` §8).
 
 ## 7.2.3 (02/10/2026): sửa lỗi mã PIN của Defense App; chạy thật trên Windows
 

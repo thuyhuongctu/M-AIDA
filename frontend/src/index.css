@@ -500,3 +500,7 @@ body {
   .grant-form { grid-template-columns: 1fr; }
   .app-header { flex-direction: column; align-items: flex-start; }
 }
+
+.login-legal { margin: 1rem 0 0; font-size: 0.78rem; color: #718096; line-height: 1.45; }
+.login-legal a, .footer-legal a { color: #2563eb; }
+.footer-legal { font-size: 0.78rem; }
