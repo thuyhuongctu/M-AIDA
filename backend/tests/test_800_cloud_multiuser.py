@@ -17,7 +17,7 @@ import jwt
 import pytest
 from fastapi.testclient import TestClient
 
-from conftest import make_minimal_pdf
+from conftest import fresh_database_url, make_minimal_pdf
 
 # ----------------------------------------------------------------------------- fixtures
 
@@ -58,6 +58,9 @@ def cloud(tmp_path, monkeypatch):
     """A mock-mode app on its own database; restores the default app after."""
     monkeypatch.setenv("MAIDA_AUTH_MODE", "mock")
     monkeypatch.setenv("MAIDA_DB_PATH", str(tmp_path / "cloud.db"))
+    url = fresh_database_url(tmp_path, "cloud")
+    if not url.startswith("sqlite"):
+        monkeypatch.setenv("DATABASE_URL", url)
     monkeypatch.setenv("MAIDA_ADMIN_EMAILS", "operator@example.org")
     monkeypatch.setenv("MAIDA_BETA_CREDITS", "3")
     monkeypatch.setenv("MAIDA_JOBS_PER_HOUR", "4")

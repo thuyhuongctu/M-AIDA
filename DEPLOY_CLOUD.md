@@ -96,12 +96,25 @@ MAIDA_AUTH_MODE=mock MAIDA_FRONTEND_DIR=../frontend/build MAIDA_ADMIN_EMAILS=you
 ```
 
 Chế độ `mock` dùng token ký cục bộ, chỉ để kiểm thử; đừng mở ra Internet.
+Chạy bộ test nhiều người dùng trên Postgres thật (cần một cơ sở dữ liệu mẫu
+`template_supabase` có các vai trò `anon`, `authenticated`, `service_role` và
+quyền mặc định như Supabase): `MAIDA_TEST_PG_URL="postgresql+psycopg://postgres@/postgres?host=/tmp/pgtest&port=55432" pytest backend/tests/test_800_cloud_multiuser.py backend/tests/test_803_postgres.py`.
 Kiểm thử đầu cuối tự động bằng trình duyệt: `python backend/tests/e2e/run_e2e.py`
 (chạy backend giả lập mô hình, đăng nhập, tải PDF, duyệt, khóa, xuất CSV,
 kiểm tra tách dữ liệu và công cụ vận hành).
 
 ## 6. Bảo mật
 
+- **REST API của Supabase phải đóng với các bảng M-AIDA.** Trên Supabase, mọi
+  bảng tạo trong schema `public` mặc định được cấp toàn quyền cho vai trò
+  `anon` và `authenticated`, và REST API của dự án phục vụ hai vai trò đó cho
+  bất kỳ ai có khóa anon, mà khóa này công khai vì trình duyệt cần nó để đăng
+  nhập. Migration `0002_lock_down_data_api` (chạy cùng giao dịch với lần tạo
+  bảng đầu tiên) thu hồi mọi quyền của hai vai trò đó và bật row level
+  security trên tất cả bảng; backend là chủ bảng nên không bị ảnh hưởng.
+  `check_cloud.py` kiểm tra lại điều này trên cơ sở dữ liệu thật và bộ cài
+  chạy nó ngay sau lần khởi động đầu. Không tạo bảng M-AIDA bằng tay trong
+  bảng điều khiển Supabase (bảng sẽ thuộc vai trò khác và thiếu khóa này).
 - Bí mật chỉ nằm trong `deploy/.env.cloud` (quyền 600, đã có trong .gitignore).
 - Backend xác minh JWT bằng JWKS của dự án (ES256/RS256) hoặc secret HS256;
   kiểm tra `aud`, `exp`; mọi tuyến `/api/*` trừ `/api/health` và `/api/config`

@@ -15,6 +15,31 @@ os.environ.setdefault("MAIDA_ADMIN_KEY", TEST_ADMIN_KEY)
 
 ADMIN_HEADERS = {"X-MAIDA-Admin-Key": TEST_ADMIN_KEY}
 
+#: Set MAIDA_TEST_PG_URL (a maintenance URL such as
+#: postgresql+psycopg://postgres@/postgres?host=/tmp/pgtest&port=55432) to run
+#: the multi-user suite against a real Postgres: every test then gets a fresh
+#: database cloned from MAIDA_TEST_PG_TEMPLATE (default template_supabase, a
+#: database carrying the Supabase roles and default privileges).
+PG_URL = os.environ.get("MAIDA_TEST_PG_URL", "")
+PG_TEMPLATE = os.environ.get("MAIDA_TEST_PG_TEMPLATE", "template_supabase")
+
+
+def fresh_database_url(tmp_path, name: str) -> str:
+    """SQLite file under tmp_path, or a brand-new Postgres database."""
+    if not PG_URL:
+        return f"sqlite:///{tmp_path / (name + '.db')}"
+    import uuid
+
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.engine import make_url
+
+    db = f"maida_test_{name}_{uuid.uuid4().hex[:8]}"
+    admin = create_engine(PG_URL, isolation_level="AUTOCOMMIT")
+    with admin.connect() as conn:
+        conn.execute(text(f'CREATE DATABASE "{db}" TEMPLATE "{PG_TEMPLATE}"'))
+    admin.dispose()
+    return make_url(PG_URL).set(database=db).render_as_string(hide_password=False)
+
 
 def make_minimal_pdf(text: str) -> bytes:
     """Build a minimal single-page PDF containing ``text``, with no third-party
