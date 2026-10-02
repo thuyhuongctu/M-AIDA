@@ -3,6 +3,26 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## 7.2.3 (02/10/2026): sửa lỗi mã PIN của Defense App; chạy thật trên Windows
+
+- **Sửa lỗi** `demo/ui.html`: từ 7.2.0 (Defense App v1, 01/08/2026) nút *Presenter
+  PIN* gọi hàm `presenterPin()` chưa được định nghĩa và giao diện không gửi tiêu đề
+  `X-MAIDA-Demo-PIN`, nên mọi thao tác ghi qua giao diện (trích xuất, duyệt, khóa,
+  reset) đều bị `demo/run_defense.py` trả về 401. Nay có hộp nhập PIN trong trang,
+  PIN giữ trong `sessionStorage` của phiên và được gửi kèm mọi yêu cầu
+  POST/PATCH/PUT/DELETE; sai PIN thì xóa và hỏi lại. Trang nhận `?pin=` trên URL
+  (chỉ dành cho bộ khởi chạy cục bộ) rồi xóa khỏi thanh địa chỉ.
+- `demo/smoke_test.py` thêm kiểm tra tĩnh: giao diện phải định nghĩa `presenterPin`
+  và gửi `X-MAIDA-Demo-PIN`, để lỗi này không lặp lại.
+- `CHAY_MAIDA_WINDOWS.bat`: chỉ nhận Python 3.12/3.11 **64-bit** (`py -3.12-64`),
+  báo rõ khi máy chỉ có bản 32-bit thay vì để pip biên dịch pandas rồi hỏng; tự
+  tạo mã PIN 4 chữ số (`MAIDA_DEMO_PIN`) in to ở cuối cửa sổ, mở trình duyệt với
+  `?pin=` để không phải gõ lại; đặt sẵn `MAIDA_ADMIN_KEY` để backend không in khóa
+  quản trị ra màn hình (dễ nhầm với PIN; ở chế độ demo khóa này không dùng).
+- `demo/HUONG_DAN_CHAY_THAT.md` cập nhật theo hai điểm trên. Số hiệu 7.2.3 ở
+  `backend/main.py`, `backend/pyproject.toml`, `CITATION.cff`, `.zenodo.json`.
+- Không đổi công thức, lược đồ dữ liệu hay bản ghi đã khóa.
+
 ## Chưa phát hành: dọn kho và viết lại lịch sử (01/10/2026)
 
 - Kho chỉ còn phần chương trình máy tính và tài liệu kỹ thuật: gỡ các trang web

@@ -74,6 +74,14 @@
   .msg{margin-top:12px;padding:9px 12px;border-radius:9px;font-size:13.5px;display:none}
   .msg.ok{display:block;background:#e8f1ea;color:var(--ok)}
   .msg.err{display:block;background:#f8e6e6;color:var(--err)}
+  dialog#pinDlg{border:1px solid var(--line);border-radius:12px;padding:20px 22px;max-width:360px;
+    background:var(--card);color:var(--ink);font-family:inherit}
+  dialog#pinDlg::backdrop{background:rgba(43,38,32,.45)}
+  dialog#pinDlg h3{margin:0 0 6px;font-size:16px}
+  dialog#pinDlg p{margin:0 0 10px;font-size:13px;color:var(--muted)}
+  dialog#pinDlg input{width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid var(--line);
+    border-radius:8px;font-size:16px;letter-spacing:.08em}
+  dialog#pinDlg .btns{margin-top:12px;display:flex;gap:8px}
   .upload input[type=file]{padding:6px}
   .note{font-size:12.5px;color:var(--muted);margin-top:8px}
   footer{max-width:1280px;margin:0 auto;padding:8px 22px 26px;color:var(--muted);font-size:12.5px}
@@ -170,6 +178,14 @@
     </div>
   </section>
 </main>
+<dialog id="pinDlg">
+  <form method="dialog">
+    <h3>Presenter PIN</h3>
+    <p>Enter the PIN printed in the M-AIDA terminal window at startup. It is required once per session to extract, verify, lock or reset.</p>
+    <input id="pinInput" autocomplete="off" spellcheck="false" aria-label="Presenter PIN">
+    <div class="btns"><button class="act approve" value="ok">Unlock</button><button class="act ghost" value="cancel">Cancel</button></div>
+  </form>
+</dialog>
 <footer>
   M-AIDA · Meta-Analysis Intelligent Data Assistant · Do Thuy Huong and Phan Anh Tu ·
   live FastAPI backend, no simulated responses. Values shown come from the seeded
@@ -193,11 +209,43 @@ function statusBadge(s){
   return '<span class="b verified">approved</span>';
 }
 
+const PIN_KEY = 'maida-demo-pin';
+const MUTATING = new Set(['POST', 'PATCH', 'PUT', 'DELETE']);
+
+function askPin(){
+  return new Promise(resolve => {
+    const dlg = $('pinDlg'), inp = $('pinInput');
+    inp.value = '';
+    dlg.onclose = () => resolve(dlg.returnValue === 'ok' ? inp.value.trim() : '');
+    dlg.showModal(); inp.focus();
+  });
+}
+
+// Presenter PIN: kept for the session only; demo/run_defense.py rejects every
+// mutating request that does not carry it in X-MAIDA-Demo-PIN.
+async function presenterPin(force){
+  let pin = force ? '' : (sessionStorage.getItem(PIN_KEY) || '');
+  if (!pin) pin = await askPin();
+  if (pin){ sessionStorage.setItem(PIN_KEY, pin); $('presenterBtn').textContent = 'Presenter unlocked'; }
+  else { sessionStorage.removeItem(PIN_KEY); $('presenterBtn').textContent = 'Presenter PIN'; }
+  return pin;
+}
+
 async function api(path, opts){
+  opts = Object.assign({}, opts || {});
+  const method = (opts.method || 'GET').toUpperCase();
+  if (MUTATING.has(method)){
+    const pin = await presenterPin(false);
+    if (!pin){ const err = new Error('Presenter PIN required.'); err.status = 401; throw err; }
+    opts.headers = Object.assign({}, opts.headers || {}, { 'X-MAIDA-Demo-PIN': pin });
+  }
   const res = await fetch(path, opts);
   const text = await res.text();
   let body = null; try { body = JSON.parse(text); } catch(e){ body = text; }
   if (!res.ok){
+    if (res.status === 401 && MUTATING.has(method)){
+      sessionStorage.removeItem(PIN_KEY); $('presenterBtn').textContent = 'Presenter PIN';
+    }
     const detail = body && body.detail ? body.detail : (res.status + ' ' + res.statusText);
     const err = new Error(detail); err.status = res.status; throw err;
   }
@@ -343,11 +391,14 @@ $('extractBtn').onclick = async () => {
 };
 
 $('exportBtn').onclick = () => { location.href = '/api/studies/export/csv'; };
-$('presenterBtn').onclick = () => {
-  sessionStorage.removeItem('maida-demo-pin');
-  const pin = presenterPin();
-  if (pin) $('presenterBtn').textContent = 'Presenter unlocked';
-};
+$('presenterBtn').onclick = () => { presenterPin(true); };
+// CHAY_MAIDA_WINDOWS.bat opens http://127.0.0.1:8765/?pin=NNNN so the local
+// operator never has to retype the PIN; the query string is dropped at once.
+(function(){
+  const qp = new URLSearchParams(location.search).get('pin');
+  if (qp){ sessionStorage.setItem(PIN_KEY, qp.trim()); history.replaceState(null, '', location.pathname + location.hash); }
+})();
+if (sessionStorage.getItem(PIN_KEY)) $('presenterBtn').textContent = 'Presenter unlocked';
 $('fullBtn').onclick = async () => {
   document.body.classList.toggle('presentation');
   if (!document.fullscreenElement) await document.documentElement.requestFullscreen().catch(()=>{});
