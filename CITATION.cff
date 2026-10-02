@@ -8,7 +8,7 @@ abstract: >-
   dashboard for the principal investigator and an immutable data-lock workflow
   that exports a reproducible effect-size dataset for three-level meta-analysis.
 type: software
-version: "7.2.3"
+version: "8.0.0"
 date-released: "2026-10-02"
 license: AGPL-3.0-only
 repository-code: "https://github.com/thuyhuongctu/M-AIDA"

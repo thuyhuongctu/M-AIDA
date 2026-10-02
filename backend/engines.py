@@ -51,8 +51,17 @@ class AnthropicEngine:
         self._anthropic = anthropic
         self._client = anthropic.Anthropic(api_key=api_key)
         self.model = model or self.DEFAULT_MODEL
+        # 8.0: token counts and latency of the last call, read by the job
+        # pipeline to write llm_calls (cost accounting per user). Engines
+        # that do not report usage simply leave these at None/0.
+        self.last_usage: dict[str, int] | None = None
+        self.last_latency_ms: int = 0
 
     def complete(self, system: str, user: str, max_tokens: int = 1024) -> str:
+        import time
+
+        started = time.perf_counter()
+        self.last_usage = None
         try:
             message = self._client.messages.create(
                 model=self.model,
@@ -61,8 +70,16 @@ class AnthropicEngine:
                 messages=[{"role": "user", "content": user}],
             )
         except self._anthropic.APIError as exc:  # pragma: no cover - network
+            self.last_latency_ms = int((time.perf_counter() - started) * 1000)
             logger.error("Provider API call failed: %s", exc)
             raise EngineError(str(exc)) from exc
+        self.last_latency_ms = int((time.perf_counter() - started) * 1000)
+        usage = getattr(message, "usage", None)
+        if usage is not None:
+            self.last_usage = {
+                "input_tokens": int(getattr(usage, "input_tokens", 0) or 0),
+                "output_tokens": int(getattr(usage, "output_tokens", 0) or 0),
+            }
         return next(
             (block.text for block in message.content if block.type == "text"), ""
         ).strip()

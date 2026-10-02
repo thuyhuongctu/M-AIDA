@@ -1,0 +1,38 @@
+# Caddy front door for M-AIDA 8.x. MAIDA_DOMAIN and MAIDA_ACME_EMAIL come from
+# deploy/.env.cloud through docker-compose.cloud.yml.
+{
+    email {$MAIDA_ACME_EMAIL}
+}
+
+{$MAIDA_DOMAIN} {
+    encode zstd gzip
+
+    # Uploads are capped by the backend (MAIDA_MAX_PDF_MB); Caddy's own limit
+    # sits a little above it so the backend's clearer error is what the user sees.
+    request_body {
+        max_size 32MB
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Supabase Auth (the project URL) is the only remote origin the bundle talks to.
+        Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'none'"
+        -Server
+    }
+
+    handle /api/* {
+        reverse_proxy backend:8765
+    }
+
+    handle {
+        reverse_proxy frontend:3000
+    }
+
+    log {
+        output stdout
+        format json
+    }
+}
