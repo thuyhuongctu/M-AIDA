@@ -6,15 +6,21 @@
  */
 
 import React, { useCallback, useEffect, useState } from "react";
-import { fetchJobs, fetchMe } from "../api";
+import { fetchJobs, fetchMe, fetchStudies } from "../api";
 import { useI18n } from "../i18n";
-import type { ExtractionJob, MeResponse } from "../types";
+import type { ExtractionJob, MeResponse, StudyDatabaseEntry } from "../types";
 import { JobStatusPill } from "./JobStatusPill";
 
 interface DashboardProps {
   refreshKey: number;
   onNewExtraction: () => void;
   onOpenStudy: (studyId: string) => void;
+}
+
+/** Records still waiting for the PI, lowest confidence first. */
+function nextUp(pending: StudyDatabaseEntry[]): StudyDatabaseEntry | null {
+  if (pending.length === 0) return null;
+  return [...pending].sort((a, b) => a.extraction_confidence - b.extraction_confidence)[0];
 }
 
 function fmtWhen(iso: string | null): string {
@@ -27,13 +33,15 @@ export default function Dashboard({ refreshKey, onNewExtraction, onOpenStudy }: 
   const { t } = useI18n();
   const [me, setMe] = useState<MeResponse | null>(null);
   const [jobs, setJobs] = useState<ExtractionJob[]>([]);
+  const [pending, setPending] = useState<StudyDatabaseEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const [m, j] = await Promise.all([fetchMe(), fetchJobs(20)]);
+      const [m, j, unlocked] = await Promise.all([fetchMe(), fetchJobs(20), fetchStudies({ locked: false })]);
       setMe(m);
       setJobs(j);
+      setPending(unlocked.filter((s) => !s.pi_approved_at));
       setError(null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t("error_generic"));
@@ -64,22 +72,58 @@ export default function Dashboard({ refreshKey, onNewExtraction, onOpenStudy }: 
 
       <div className="summary-grid">
         <div className="summary-card summary-card-credits">
-          <span className="summary-number" data-testid="credits-balance">
-            {me ? (me.credits === null ? "∞" : me.credits) : "…"}
+          <span className="summary-number">
+            <span className="glyph glyph-locked" aria-hidden="true">◆</span>
+            <span data-testid="credits-balance">{me ? (me.credits === null ? "∞" : me.credits) : "…"}</span>
           </span>
           <span className="summary-label">{t("dash_credits")}</span>
         </div>
         <div className="summary-card">
-          <span className="summary-number">{me ? me.studies : "…"}</span>
+          <span className="summary-number">
+            <span className="glyph glyph-pending" aria-hidden="true">◇</span>
+            {me ? me.studies : "…"}
+          </span>
           <span className="summary-label">{t("dash_studies")}</span>
         </div>
         <div className="summary-card summary-card-locked">
-          <span className="summary-number">{me ? me.locked : "…"}</span>
+          <span className="summary-number">
+            <span className="glyph glyph-locked" aria-hidden="true">◆</span>
+            {me ? me.locked : "…"}
+          </span>
           <span className="summary-label">{t("dash_locked")}</span>
         </div>
       </div>
 
-      <h3 className="panel-subtitle">{t("dash_recent_jobs")}</h3>
+      {(() => {
+        const next = nextUp(pending);
+        return (
+          <div className={`next-up ${next ? "" : "next-up-empty"}`} data-testid="next-up">
+            <span className="glyph glyph-pending" aria-hidden="true">◇</span>
+            <div className="next-up-text">
+              <strong>
+                {pending.length === 0
+                  ? t("next_up_none")
+                  : pending.length === 1
+                    ? t("next_up_one")
+                    : `${pending.length} ${t("next_up_many")}`}
+              </strong>
+              {next && (
+                <span className="hint-inline">
+                  {t("next_up_next")}: {next.authors || next.paper_title} ({next.year}) · {t("next_up_conf")}{" "}
+                  {next.extraction_confidence.toFixed(2)}
+                </span>
+              )}
+            </div>
+            {next && (
+              <button className="btn btn-primary btn-sm" onClick={() => onOpenStudy(next.study_id)} data-testid="continue-review">
+                {t("continue_review")} →
+              </button>
+            )}
+          </div>
+        );
+      })()}
+
+      <h3 className="eyebrow">{t("dash_recent_jobs")}</h3>
       {jobs.length === 0 ? (
         <p className="empty-text">{t("dash_no_jobs")}</p>
       ) : (
@@ -106,7 +150,7 @@ export default function Dashboard({ refreshKey, onNewExtraction, onOpenStudy }: 
                   <td className="job-result-cell">
                     {job.status === "succeeded" && job.study_id ? (
                       <button className="btn btn-link btn-sm" onClick={() => onOpenStudy(job.study_id as string)}>
-                        {t("job_open_study")}
+                        {t("job_open_study")} · <span className="mono">{job.study_id.slice(0, 8)}</span>
                       </button>
                     ) : job.status === "rejected" || job.status === "failed" ? (
                       <span className="job-error" title={job.error_message ?? ""}>

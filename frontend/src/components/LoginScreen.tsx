@@ -3,11 +3,13 @@
  *
  * Supabase mode: magic link by e-mail or Google. Mock mode (tests): any
  * e-mail signs in at once. The screen is never shown in admin_key mode.
+ * Two columns: the brand block with the one-sentence promise, and the form.
  */
 
 import React, { useState } from "react";
 import { signInWithEmail, signInWithGoogle } from "../auth";
 import { useI18n } from "../i18n";
+import { Logo } from "./Logo";
 
 interface LoginScreenProps {
   mode: "supabase" | "mock";
@@ -15,7 +17,7 @@ interface LoginScreenProps {
 }
 
 export default function LoginScreen({ mode, version }: LoginScreenProps) {
-  const { t } = useI18n();
+  const { t, lang, setLang } = useI18n();
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -49,57 +51,77 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
   };
 
   return (
-    <div className="login-wrap">
-      <div className="login-card" data-testid="login-card">
-        <h2 className="login-title">{t("login_title")}</h2>
-        <p className="login-intro">{t("login_intro")}</p>
+    <div className="login" data-testid="login-card">
+      <aside className="login-brand">
+        <div className="login-brand-top">
+          <Logo />
+        </div>
+        <div className="login-brand-mid">
+          <p className="login-claim">
+            {lang === "vi"
+              ? "Máy đề xuất kèm câu trích nguyên văn. Người kiểm chứng và khóa."
+              : "The machine proposes, with the sentence it read. A person verifies and locks."}
+          </p>
+        </div>
+        <p className="login-brand-foot">Do Thuy Huong &amp; Phan Anh Tu · School of Economics, Can Tho University</p>
+      </aside>
 
-        {sent ? (
-          <div className="alert alert-success">
-            <p>{t("login_link_sent")}</p>
-          </div>
-        ) : (
-          <form onSubmit={submit} className="login-form">
-            <label className="form-label" htmlFor="login-email">
-              {t("login_email")}
-            </label>
-            <input
-              id="login-email"
-              className="form-input"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@university.edu"
-            />
-            {mode === "mock" && <p className="hint-text">{t("login_mock_hint")}</p>}
-            <button type="submit" className="btn btn-primary login-btn" disabled={busy}>
-              {busy ? t("loading") : mode === "mock" ? t("login_mock_button") : t("login_send_link")}
-            </button>
-          </form>
-        )}
+      <section className="login-side">
+        <div className="login-topbar">
+          <button type="button" className={`seg ${lang === "en" ? "seg-on" : ""}`} onClick={() => setLang("en")}>EN</button>
+          <button type="button" className={`seg ${lang === "vi" ? "seg-on" : ""}`} onClick={() => setLang("vi")}>VI</button>
+        </div>
+        <div className="login-form-wrap">
+          <span className="eyebrow mono">M-AIDA {version} · closed beta</span>
+          <h2 className="login-title">{t("login_title")}</h2>
+          <p className="login-intro">{t("login_intro")}</p>
 
-        {mode === "supabase" && !sent && (
-          <>
-            <div className="login-divider">
-              <span>{t("login_or")}</span>
+          {sent ? (
+            <div className="note note-ok">
+              <p>{t("login_link_sent")}</p>
             </div>
-            <button type="button" className="btn btn-ghost login-btn" onClick={google} disabled={busy}>
-              {t("login_google")}
-            </button>
-          </>
-        )}
+          ) : (
+            <form onSubmit={submit} className="login-form">
+              <label className="form-label" htmlFor="login-email">{t("login_email")}</label>
+              <input
+                id="login-email"
+                className="form-input"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@university.edu"
+              />
+              {mode === "mock" && <p className="hint-text">{t("login_mock_hint")}</p>}
+              <button type="submit" className="btn btn-primary login-btn" disabled={busy}>
+                {busy ? t("loading") : mode === "mock" ? t("login_mock_button") : t("login_send_link")}
+              </button>
+            </form>
+          )}
 
-        {error && <p className="error-message">{error}</p>}
-        <p className="login-legal">
-          {t("login_legal_prefix")}{" "}
-          <a href="/legal/terms.html" target="_blank" rel="noopener noreferrer">{t("legal_terms")}</a>
-          {" "}{t("login_legal_and")}{" "}
-          <a href="/legal/privacy.html" target="_blank" rel="noopener noreferrer">{t("legal_privacy")}</a>.
-        </p>
-        <p className="login-foot">M-AIDA v{version} · Do Thuy Huong &amp; Phan Anh Tu · Can Tho University</p>
-      </div>
+          {mode === "supabase" && !sent && (
+            <>
+              <div className="login-divider"><span>{t("login_or")}</span></div>
+              <button type="button" className="btn btn-ghost login-btn" onClick={google} disabled={busy}>
+                <span className="g-mark" aria-hidden="true">G</span> {t("login_google")}
+              </button>
+            </>
+          )}
+
+          {error && <p className="error-message">{error}</p>}
+          <p className="login-legal">
+            {t("login_legal_prefix")}{" "}
+            <a href="/legal/terms.html" target="_blank" rel="noopener noreferrer">{t("legal_terms")}</a>
+            {" "}{t("login_legal_and")}{" "}
+            <a href="/legal/privacy.html" target="_blank" rel="noopener noreferrer">{t("legal_privacy")}</a>.
+            {" "}
+            {lang === "vi"
+              ? "Không cần mật khẩu; lần đăng nhập đầu tạo tài khoản với 10 tín dụng beta."
+              : "No password. The first sign-in creates your account with 10 beta credits."}
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
