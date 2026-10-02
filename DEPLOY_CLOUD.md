@@ -112,8 +112,19 @@ kiểm tra tách dữ liệu và công cụ vận hành).
 - Nhật ký không ghi nội dung PDF; `audit_log` ghi ai làm gì (extract, verify,
   lock, export, delete, grant) trên bản ghi nào.
 
-## 7. Chưa có trong 8.0 (dự kiến)
+## 7. Điều khoản dịch vụ và Chính sách riêng tư
 
-Thanh toán (Lemon Squeezy/Paddle), trang giá, Điều khoản dịch vụ và Chính sách
-riêng tư, xóa tài khoản tự phục vụ, hàng đợi ngoài tiến trình (arq + Redis)
-khi tải tăng, Sentry/uptime.
+Nguồn là `legal/TERMS.md` và `legal/PRIVACY.md` (song ngữ, bản beta 1.0).
+Sửa ở đó rồi chạy `python legal/build_pages.py` để sinh
+`frontend/public/legal/terms.html` và `privacy.html`; bản build phục vụ chúng
+tại `/legal/terms.html` và `/legal/privacy.html`, được liên kết từ màn hình
+đăng nhập ("Khi đăng nhập, bạn chấp nhận…") và chân trang. Trước khi mở beta
+cô điền ngày hiệu lực, tên nhà cung cấp VPS (mục 4 của Chính sách) và nên nhờ
+người có chuyên môn pháp lý đọc một lượt; thay đổi quan trọng sau đó phải
+báo người dùng trước 15 ngày như hai văn bản đã cam kết.
+
+## 8. Chưa có trong 8.0 (dự kiến)
+
+Thanh toán (Lemon Squeezy/Paddle), trang giá, xóa tài khoản tự phục vụ (hiện
+xử lý qua e-mail trong 30 ngày như Chính sách ghi), hàng đợi ngoài tiến trình
+(arq + Redis) khi tải tăng, Sentry/uptime.

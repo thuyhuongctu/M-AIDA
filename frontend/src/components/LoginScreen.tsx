@@ -92,6 +92,12 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
         )}
 
         {error && <p className="error-message">{error}</p>}
+        <p className="login-legal">
+          {t("login_legal_prefix")}{" "}
+          <a href="/legal/terms.html" target="_blank" rel="noopener noreferrer">{t("legal_terms")}</a>
+          {" "}{t("login_legal_and")}{" "}
+          <a href="/legal/privacy.html" target="_blank" rel="noopener noreferrer">{t("legal_privacy")}</a>.
+        </p>
         <p className="login-foot">M-AIDA v{version} · Do Thuy Huong &amp; Phan Anh Tu · Can Tho University</p>
       </div>
     </div>

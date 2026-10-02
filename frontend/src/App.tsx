@@ -159,6 +159,15 @@ export default function App() {
         </a>{" "}
         · School of Economics, Can Tho University
       </p>
+      {cloud && (
+        <p className="footer-legal">
+          <a href="/legal/terms.html" target="_blank" rel="noopener noreferrer">{t("legal_terms")}</a>
+          {" · "}
+          <a href="/legal/privacy.html" target="_blank" rel="noopener noreferrer">{t("legal_privacy")}</a>
+          {" · "}
+          <a href="https://github.com/thuyhuongctu/M-AIDA" target="_blank" rel="noopener noreferrer">AGPL-3.0</a>
+        </p>
+      )}
     </footer>
   );
 

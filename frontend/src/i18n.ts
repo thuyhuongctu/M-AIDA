@@ -82,6 +82,11 @@ const en = {
   admin_calls: "calls",
   admin_cost: "estimated cost",
   admin_users: "Accounts",
+  // legal
+  legal_terms: "Terms of Service",
+  legal_privacy: "Privacy Policy",
+  login_legal_prefix: "By signing in you accept the",
+  login_legal_and: "and the",
   // misc
   loading: "Loading…",
   error_generic: "Something went wrong.",
@@ -152,6 +157,10 @@ const vi: typeof en = {
   admin_calls: "lượt gọi",
   admin_cost: "chi phí ước tính",
   admin_users: "Tài khoản",
+  legal_terms: "Điều khoản dịch vụ",
+  legal_privacy: "Chính sách riêng tư",
+  login_legal_prefix: "Khi đăng nhập, bạn chấp nhận",
+  login_legal_and: "và",
   loading: "Đang tải…",
   error_generic: "Có lỗi xảy ra.",
   lang_switch: "English",
