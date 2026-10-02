@@ -1,121 +1,164 @@
 """
-SQLite-backed study store for M-AIDA.
+Study store for M-AIDA (8.0: SQLAlchemy, SQLite or Postgres, per-owner).
 
-Why this exists
----------------
-Studies used to live in a module-level ``dict``, so every backend restart threw
-away the researcher's verified and locked records. That is acceptable for a
-throwaway prototype and unacceptable for a live defence demo, where a crashed
-or reloaded process in front of the committee would silently erase the work
-just demonstrated.
+History
+-------
+7.1.2 replaced the module-level dict with a SQLite file so verified and locked
+records survive a restart. 8.0 keeps that guarantee and adds two things the
+cloud deployment needs: a second backend (Postgres on Supabase) and an owner
+on every record, so one database can hold many researchers' studies without
+any of them seeing another's.
 
 Design choices
 --------------
-* **Standard-library ``sqlite3`` only.** The API routes are synchronous ``def``
-  functions, so an async driver would buy nothing and would add a dependency.
-* **One JSON payload column** rather than a column per field. ``StudyDatabaseEntry``
-  is a Pydantic model that still evolves; storing the serialised model keeps the
-  schema stable across model changes and keeps filtering logic in Python, exactly
-  where it already lived. Effect sizes are never queried by SQL predicates here.
-* **Dict-like surface** (``get``/``put``/``values``/``__len__``/``__contains__``)
-  so call sites read the same as the old dict and the diff stays reviewable.
-
-The store is safe to use from FastAPI's threadpool: the connection is opened with
-``check_same_thread=False`` and every operation is serialised through a lock.
+* **Same surface as before** (``get``/``put``/``values``/``clear``/``__len__``/
+  ``__contains__``) plus an ``owner_id`` argument. main.py, demo/run_defense.py
+  and the 7.x tests keep working: with ``owner_id=None`` the store behaves as
+  the single-operator store of 7.2 (owner "local").
+* **One JSON payload column** remains the record of truth; a few columns are
+  copied out of it for filtering and ordering (owner, lock state, year ...).
+* **No schema code here**: tables come from the Alembic migration run by
+  ``db.init_schema``.
 """
 
 from __future__ import annotations
 
 import json
-import sqlite3
-import threading
 from pathlib import Path
 
+from sqlalchemy import delete, func, select
+from sqlalchemy.engine import Engine
+
+from db import LOCAL_OWNER_ID, StudyRow, User, init_schema, make_engine, make_session_factory, utcnow
 from models import StudyDatabaseEntry
 
-_SCHEMA = """
-CREATE TABLE IF NOT EXISTS studies (
-    study_id   TEXT PRIMARY KEY,
-    payload    TEXT NOT NULL,
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-"""
+
+def _as_url(target: str | Path) -> str:
+    text = str(target)
+    if "://" in text:
+        return text
+    return f"sqlite:///{text}"
 
 
 class StudyStore:
-    """Persistent, dict-like collection of :class:`StudyDatabaseEntry` records."""
+    """Persistent collection of :class:`StudyDatabaseEntry`, isolated by owner."""
 
-    def __init__(self, db_path: str | Path) -> None:
-        self._path = Path(db_path)
-        self._lock = threading.Lock()
-        if self._path.parent and str(self._path.parent) not in ("", "."):
-            self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(str(self._path), check_same_thread=False)
-        self._conn.row_factory = sqlite3.Row
-        with self._lock:
-            # WAL keeps readers from blocking on the writer, which matters when
-            # the demo UI polls /api/health while an extraction is being saved.
-            self._conn.execute("PRAGMA journal_mode=WAL")
-            self._conn.executescript(_SCHEMA)
-            self._conn.commit()
+    def __init__(self, target: str | Path, *, engine: Engine | None = None) -> None:
+        self.url = _as_url(target)
+        self.engine = engine or make_engine(self.url)
+        init_schema(self.engine)
+        self.session_factory = make_session_factory(self.engine)
+        self._ensure_local_owner()
 
-    # -- read -------------------------------------------------------------
+    # -- helpers ------------------------------------------------------------
 
-    def get(self, study_id: str) -> StudyDatabaseEntry | None:
-        """Return one entry, or ``None`` when the id is unknown."""
-        with self._lock:
-            row = self._conn.execute(
-                "SELECT payload FROM studies WHERE study_id = ?", (study_id,)
-            ).fetchone()
+    def _ensure_local_owner(self) -> None:
+        """The single-operator deployment writes every record under "local"."""
+        with self.session_factory() as s:
+            if s.get(User, LOCAL_OWNER_ID) is None:
+                s.add(User(id=LOCAL_OWNER_ID, email="", name="Local operator", role="admin",
+                           beta=False, credits_balance=0, created_at=utcnow()))
+                s.commit()
+
+    @staticmethod
+    def _entry(row: StudyRow) -> StudyDatabaseEntry:
+        payload = row.payload
+        if isinstance(payload, str):  # defensive: legacy TEXT column
+            payload = json.loads(payload)
+        return StudyDatabaseEntry(**payload)
+
+    # -- read ---------------------------------------------------------------
+
+    def get(self, study_id: str, owner_id: str | None = None) -> StudyDatabaseEntry | None:
+        """Return one entry, or ``None`` when unknown *or owned by someone else*."""
+        with self.session_factory() as s:
+            row = s.get(StudyRow, study_id)
         if row is None:
             return None
-        return StudyDatabaseEntry(**json.loads(row["payload"]))
+        if owner_id is not None and row.owner_id != owner_id:
+            return None
+        return self._entry(row)
 
-    def values(self) -> list[StudyDatabaseEntry]:
-        """Return every entry, oldest first, so listings are stable across calls."""
-        with self._lock:
-            rows = self._conn.execute(
-                "SELECT payload FROM studies ORDER BY updated_at, study_id"
-            ).fetchall()
-        return [StudyDatabaseEntry(**json.loads(r["payload"])) for r in rows]
+    def owner_of(self, study_id: str) -> str | None:
+        with self.session_factory() as s:
+            row = s.get(StudyRow, study_id)
+        return None if row is None else row.owner_id
+
+    def values(self, owner_id: str | None = None) -> list[StudyDatabaseEntry]:
+        """Every entry (of one owner when given), oldest first, so listings are stable."""
+        stmt = select(StudyRow).order_by(StudyRow.updated_at, StudyRow.study_id)
+        if owner_id is not None:
+            stmt = stmt.where(StudyRow.owner_id == owner_id)
+        with self.session_factory() as s:
+            rows = s.scalars(stmt).all()
+        return [self._entry(r) for r in rows]
+
+    def count(self, owner_id: str | None = None, *, locked: bool | None = None) -> int:
+        stmt = select(func.count()).select_from(StudyRow)
+        if owner_id is not None:
+            stmt = stmt.where(StudyRow.owner_id == owner_id)
+        if locked is not None:
+            stmt = stmt.where(StudyRow.pi_locked.is_(locked))
+        with self.session_factory() as s:
+            return int(s.scalar(stmt) or 0)
 
     def __contains__(self, study_id: object) -> bool:
         return isinstance(study_id, str) and self.get(study_id) is not None
 
     def __len__(self) -> int:
-        with self._lock:
-            row = self._conn.execute("SELECT COUNT(*) AS n FROM studies").fetchone()
-        return int(row["n"])
+        return self.count()
 
-    # -- write ------------------------------------------------------------
+    # -- write --------------------------------------------------------------
 
-    def put(self, entry: StudyDatabaseEntry) -> StudyDatabaseEntry:
-        """Insert or replace one entry and return it unchanged."""
-        payload = entry.model_dump_json()
-        with self._lock:
-            self._conn.execute(
-                "INSERT INTO studies (study_id, payload, updated_at) "
-                "VALUES (?, ?, datetime('now')) "
-                "ON CONFLICT(study_id) DO UPDATE SET "
-                "payload = excluded.payload, updated_at = excluded.updated_at",
-                (entry.study_id, payload),
-            )
-            self._conn.commit()
+    def put(self, entry: StudyDatabaseEntry, owner_id: str | None = None) -> StudyDatabaseEntry:
+        """Insert or replace one entry and return it unchanged.
+
+        On update the owner is never changed: a record stays with the account
+        that extracted it even if a caller passes another owner by mistake.
+        """
+        payload = json.loads(entry.model_dump_json())
+        with self.session_factory() as s:
+            row = s.get(StudyRow, entry.study_id)
+            if row is None:
+                owner = owner_id or LOCAL_OWNER_ID
+                row = StudyRow(study_id=entry.study_id, owner_id=owner, workspace_id=owner)
+                s.add(row)
+            row.year = entry.year
+            row.country = entry.country or ""
+            row.pi_locked = bool(entry.pi_locked)
+            row.requires_verification = bool(entry.requires_verification)
+            row.extracted_at = entry.extracted_at
+            row.locked_at = entry.locked_at
+            row.updated_at = utcnow()
+            row.payload = payload
+            s.commit()
         return entry
 
-    def clear(self) -> int:
-        """Delete every entry and return how many were removed.
+    def delete(self, study_id: str, owner_id: str | None = None) -> bool:
+        """Delete one entry; ``False`` when unknown or not owned by ``owner_id``."""
+        with self.session_factory() as s:
+            row = s.get(StudyRow, study_id)
+            if row is None or (owner_id is not None and row.owner_id != owner_id):
+                return False
+            s.delete(row)
+            s.commit()
+            return True
 
-        Used only by the demo-reset route so a rehearsal can be replayed from a
-        clean state; it is never reachable when demo mode is off.
+    def clear(self, owner_id: str | None = None) -> int:
+        """Delete every entry (of one owner when given); returns the count removed.
+
+        Without an owner this is the demo-reset behaviour of 7.2 and is only
+        reachable from demo/run_defense.py.
         """
-        with self._lock:
-            cur = self._conn.execute("DELETE FROM studies")
-            self._conn.commit()
-            return int(cur.rowcount)
+        stmt = delete(StudyRow)
+        if owner_id is not None:
+            stmt = stmt.where(StudyRow.owner_id == owner_id)
+        with self.session_factory() as s:
+            result = s.execute(stmt)
+            s.commit()
+            return int(result.rowcount or 0)
 
-    # -- lifecycle --------------------------------------------------------
+    # -- lifecycle ----------------------------------------------------------
 
     def close(self) -> None:
-        with self._lock:
-            self._conn.close()
+        self.engine.dispose()

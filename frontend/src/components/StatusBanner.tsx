@@ -75,7 +75,7 @@ export default function StatusBanner() {
       ? { tone: "bad", value: "unavailable" }
       : { tone: "warn", value: "checking…" };
 
-  const persistent = health?.storage === "sqlite";
+  const persistent = health?.storage === "sqlite" || health?.storage === "postgres";
 
   return (
     <div className="status-banner" role="status" aria-live="polite">
@@ -89,7 +89,9 @@ export default function StatusBanner() {
         label="Data"
         value={
           health
-            ? `${persistent ? "persistent" : health.storage ?? "unknown"} · ${health.study_count} record(s)`
+            ? health.study_count === null || health.study_count === undefined
+              ? `${persistent ? "persistent" : health.storage ?? "unknown"} · ${health.storage ?? ""}`.trim()
+              : `${persistent ? "persistent" : health.storage ?? "unknown"} · ${health.study_count} record(s)`
             : "checking…"
         }
       />

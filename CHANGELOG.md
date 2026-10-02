@@ -3,6 +3,72 @@
 All notable changes to this project are documented here. Versions follow the
 internal release line used during the doctoral meta-analysis (P6).
 
+## 8.0.0 (chưa phát hành, 02/10/2026): dịch vụ web nhiều người dùng (beta kín)
+
+Lõi khoa học (trích xuất có cổng bằng chứng, dẫn xuất phương sai, duyệt và khóa,
+xuất CSV đủ trường) giữ nguyên 7.2.3; không đổi công thức hay bản ghi đã khóa.
+Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một máy chủ.
+
+- **Danh tính** (`backend/auth.py`): `MAIDA_AUTH_MODE` = `admin_key` (mặc định,
+  đúng hành vi 7.2: một người vận hành, khóa dùng chung trên yêu cầu ghi),
+  `supabase` (JWT của Supabase Auth xác minh cục bộ bằng JWKS ES256/RS256 hoặc
+  secret HS256; kiểm tra `aud`, `exp`) hoặc `mock` (token ký cục bộ, chỉ để kiểm
+  thử). Ở hai chế độ sau mọi tuyến `/api/*` trừ `/api/health`, `/api/config`
+  đều cần `Authorization: Bearer`. Tài khoản mới tự tạo khi đăng nhập lần đầu,
+  được cấp `MAIDA_BETA_CREDITS` (10) tín dụng; e-mail trong `MAIDA_ADMIN_EMAILS`
+  có vai trò admin.
+- **Dữ liệu** (`backend/db.py`, `backend/store.py`, Alembic `backend/alembic/`):
+  SQLAlchemy 2 thay `sqlite3` thuần; cùng lược đồ chạy trên SQLite (cục bộ,
+  demo, test) và Postgres (`DATABASE_URL`, Supabase). Bảng mới `users`,
+  `extraction_jobs`, `llm_calls`, `credit_ledger`, `orders` (để sẵn), `audit_log`;
+  bảng `studies` thêm `owner_id`, `workspace_id` và các cột lọc; tệp SQLite của
+  7.x được di trú tại chỗ (mọi bản ghi cũ thuộc chủ `local`). `StudyStore` giữ
+  nguyên giao diện `get/put/values/clear` nên `demo/run_defense.py` và test cũ
+  không đổi; thêm tham số `owner_id`: người này không đọc, sửa, khóa, xóa hay
+  xuất bản ghi của người kia (trả 404, không phải 403, để không dò được id).
+- **Job trích xuất** (`backend/jobs.py`): `POST /api/jobs` (multipart) → kiểm tra
+  magic bytes, 25 MB, 80 trang, đọc chữ bằng pypdfium2, giới hạn 1 job đang
+  chạy mỗi người, 4 toàn hệ thống, 10 job/giờ/người → giữ 1 tín dụng → chạy nền →
+  `GET /api/jobs/{id}` để thăm dò. Hai tuyến đồng bộ 7.x `POST /api/extract` và
+  `POST /api/extract/upload` đi cùng đường ống này nên cùng quy tắc. Job mô hình
+  đã trả lời nhưng bị từ chối (thiếu câu trích, sai định dạng) ghi `rejected`
+  và **giữ phí**; lỗi phía hệ thống ghi `failed` và **hoàn tự động**; job dở
+  dang khi máy chủ khởi động lại cũng hoàn. PDF không ghi xuống đĩa.
+- **Tín dụng và chi phí** (`backend/credits.py`): sổ `credit_ledger` chỉ ghi
+  thêm là nguồn sự thật, `users.credits_balance` là cache; số dư không âm; khóa
+  hàng người dùng khi ghi (`FOR UPDATE` trên Postgres). `llm_calls` ghi token
+  vào/ra từ `response.usage` của SDK (adapter `AnthropicEngine` nay có
+  `last_usage`, `last_latency_ms`), chi phí ước tính theo bảng giá cấu hình, và
+  kết quả (`ok`, `evidence_missing`, `malformed_output`, `provider_error`).
+- **Tuyến mới**: `GET /api/config`, `POST /api/auth/mock-login` (chỉ `mock`),
+  `GET /api/me`, `GET /api/me/ledger`, `GET /api/me/export`, `GET/POST /api/jobs`,
+  `GET /api/jobs/{id}`, `DELETE /api/studies/{id}` (chỉ bản chưa khóa),
+  `GET /api/admin/users`, `POST /api/admin/credits`, `GET /api/admin/usage`.
+  `/api/health` thêm `auth_mode`; ở chế độ nhiều người dùng `study_count` là
+  `null` (không lộ tổng số bản ghi của mọi tài khoản). `MAIDA_FRONTEND_DIR` cho
+  phép backend tự phục vụ bản build giao diện (một tiến trình, dùng cho e2e).
+- **Giao diện** (`frontend/`): màn hình đăng nhập (liên kết e-mail hoặc Google
+  qua Supabase; chế độ thử nhập e-mail là vào), bảng điều khiển (tín dụng, số
+  bản ghi, job gần đây tự làm mới), trích xuất qua job có thăm dò và thông báo
+  từ chối/hoàn phí, thẻ Tài khoản (số dư, lịch sử tín dụng, tải toàn bộ dữ liệu
+  JSON, đăng xuất; với admin: cấp tín dụng, tổng chi phí mô hình, danh sách tài
+  khoản), chuyển Anh/Việt cho phần điều hướng và các màn hình mới. Ô khóa quản
+  trị chỉ còn ở chế độ `admin_key`. Bản build mặc định gọi API cùng gốc.
+- **Triển khai**: `docker-compose.cloud.yml` (Caddy TLS tự động + backend +
+  frontend), `deploy/Caddyfile` (HSTS, CSP), `deploy/.env.cloud.example`,
+  `deploy/install.sh` (Ubuntu, một lệnh), `DEPLOY_CLOUD.md` (tiếng Việt).
+- **Kiểm thử**: 16 test mới (`backend/tests/test_800_cloud_multiuser.py`): xác
+  minh JWT (hợp lệ, hết hạn, sai aud, chữ ký giả, HS256), tách dữ liệu, quy tắc
+  tín dụng, job bất đồng bộ, giới hạn tốc độ, khôi phục job dở dang, di trú tệp
+  7.x; 79 test cũ và smoke test Defense App giữ nguyên và vẫn đạt. Kiểm thử
+  đầu cuối bằng trình duyệt (`backend/tests/e2e/run_e2e.py`, Playwright): đăng
+  nhập → tải PDF → job xong → bị từ chối giữ phí → duyệt → khóa → xuất CSV →
+  tài khoản → người thứ hai không thấy gì → admin cấp tín dụng → tiếng Việt.
+- Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
+  (backend); `@supabase/supabase-js` (frontend, chỉ tải khi chạy chế độ
+  `supabase`). Chưa có trong 8.0: thanh toán, trang giá, Điều khoản/Chính sách
+  riêng tư, Sentry/uptime (xem `DEPLOY_CLOUD.md` §7).
+
 ## 7.2.3 (02/10/2026): sửa lỗi mã PIN của Defense App; chạy thật trên Windows
 
 - **Sửa lỗi** `demo/ui.html`: từ 7.2.0 (Defense App v1, 01/08/2026) nút *Presenter

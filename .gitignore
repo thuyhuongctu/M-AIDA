@@ -28,3 +28,6 @@ frontend/build/
 
 # editor / script backups are never part of the registered work
 *.bak
+
+# 8.x cloud configuration (secrets)
+deploy/.env.cloud

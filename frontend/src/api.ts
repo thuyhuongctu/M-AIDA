@@ -8,16 +8,27 @@
 
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import type {
+  AccountExport,
+  AdminUsage,
+  AdminUser,
+  ClientConfig,
+  ExtractionJob,
   ExtractionRequest,
   HealthResponse,
+  LedgerEntry,
+  MeResponse,
+  MockLoginResponse,
   NotionSyncResponse,
   StudyDatabaseEntry,
   StudyFilters,
   VerificationDecision,
 } from "./types";
 
+// Production builds are same-origin by default (nginx or the backend itself
+// serves the bundle and /api/*); the Vite dev server talks to the local
+// backend. VITE_API_URL overrides both.
 const BASE_URL =
-  import.meta.env.VITE_API_URL ?? "http://localhost:8765";
+  import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "http://localhost:8765" : "");
 
 const http: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -52,6 +63,26 @@ export function setAdminKey(key: string): void {
 
 setAdminKey(getAdminKey());
 
+// 8.0: in the cloud modes (supabase / mock) every request carries the user's
+// own bearer token instead. auth.ts registers the provider at start-up so
+// this module does not import auth.ts (which imports this one).
+let tokenProvider: () => string | null = () => null;
+let unauthorizedHandler: () => void = () => undefined;
+
+export function registerAuth(provider: () => string | null, onUnauthorized: () => void): void {
+  tokenProvider = provider;
+  unauthorizedHandler = onUnauthorized;
+}
+
+http.interceptors.request.use((cfg) => {
+  const token = tokenProvider();
+  if (token) {
+    cfg.headers = cfg.headers ?? {};
+    cfg.headers.Authorization = `Bearer ${token}`;
+  }
+  return cfg;
+});
+
 // 7.2.1: FastAPI puts the human-readable reason in `detail` (e.g. the 422 from
 // the PI-editable whitelist, or the lock gate refusing a record without an
 // effect size). Surface it as the Error message instead of axios's generic
@@ -60,6 +91,7 @@ http.interceptors.response.use(
   (res) => res,
   (err: unknown) => {
     if (axios.isAxiosError(err) && err.response) {
+      if (err.response.status === 401 && tokenProvider()) unauthorizedHandler();
       const data = err.response.data as { detail?: unknown } | undefined;
       const detail = data?.detail;
       const text =
@@ -80,6 +112,108 @@ http.interceptors.response.use(
 
 export async function fetchHealth(): Promise<HealthResponse> {
   const res: AxiosResponse<HealthResponse> = await http.get("/api/health");
+  return res.data;
+}
+
+export async function fetchConfig(): Promise<ClientConfig> {
+  const res: AxiosResponse<ClientConfig> = await http.get("/api/config");
+  return res.data;
+}
+
+export async function mockLogin(email: string, name = ""): Promise<MockLoginResponse> {
+  const res: AxiosResponse<MockLoginResponse> = await http.post("/api/auth/mock-login", { email, name });
+  return res.data;
+}
+
+// ---------------------------------------------------------------------------
+// Account (8.0)
+// ---------------------------------------------------------------------------
+
+export async function fetchMe(): Promise<MeResponse> {
+  const res: AxiosResponse<MeResponse> = await http.get("/api/me");
+  return res.data;
+}
+
+export async function fetchLedger(limit = 100): Promise<LedgerEntry[]> {
+  const res: AxiosResponse<LedgerEntry[]> = await http.get("/api/me/ledger", { params: { limit } });
+  return res.data;
+}
+
+export async function downloadAccountExport(): Promise<void> {
+  const res: AxiosResponse<AccountExport> = await http.get("/api/me/export");
+  const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "maida_account_export.json";
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---------------------------------------------------------------------------
+// Extraction jobs (8.0)
+// ---------------------------------------------------------------------------
+
+export async function createJob(
+  file: File,
+  metadata: { title?: string; authors?: string; year?: number; country?: string } = {}
+): Promise<ExtractionJob> {
+  const form = new FormData();
+  form.append("file", file);
+  if (metadata.title) form.append("title", metadata.title);
+  if (metadata.authors) form.append("authors", metadata.authors);
+  if (metadata.year) form.append("year", String(metadata.year));
+  if (metadata.country) form.append("country", metadata.country);
+  const res: AxiosResponse<ExtractionJob> = await http.post("/api/jobs", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+}
+
+export async function fetchJob(jobId: string): Promise<ExtractionJob> {
+  const res: AxiosResponse<ExtractionJob> = await http.get(`/api/jobs/${jobId}`);
+  return res.data;
+}
+
+export async function fetchJobs(limit = 20): Promise<ExtractionJob[]> {
+  const res: AxiosResponse<ExtractionJob[]> = await http.get("/api/jobs", { params: { limit } });
+  return res.data;
+}
+
+/** Poll a job until it leaves queued/running. */
+export async function waitForJob(
+  jobId: string,
+  onUpdate?: (job: ExtractionJob) => void,
+  intervalMs = 2000
+): Promise<ExtractionJob> {
+  for (;;) {
+    const job = await fetchJob(jobId);
+    onUpdate?.(job);
+    if (job.status !== "queued" && job.status !== "running") return job;
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+}
+
+export async function deleteStudy(studyId: string): Promise<void> {
+  await http.delete(`/api/studies/${studyId}`);
+}
+
+// ---------------------------------------------------------------------------
+// Operator (admin) routes (8.0)
+// ---------------------------------------------------------------------------
+
+export async function adminUsers(): Promise<AdminUser[]> {
+  const res: AxiosResponse<AdminUser[]> = await http.get("/api/admin/users");
+  return res.data;
+}
+
+export async function adminGrantCredits(email: string, credits: number, note = ""): Promise<{ credits: number }> {
+  const res: AxiosResponse<{ credits: number }> = await http.post("/api/admin/credits", { email, credits, note });
+  return res.data;
+}
+
+export async function adminUsage(days = 30): Promise<AdminUsage> {
+  const res: AxiosResponse<AdminUsage> = await http.get("/api/admin/usage", { params: { days } });
   return res.data;
 }
 

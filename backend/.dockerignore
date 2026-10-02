@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.*
+!.env.example
+!.env.production.example
+tests/

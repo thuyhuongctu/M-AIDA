@@ -88,6 +88,14 @@ extraction additionally requires `LLM_API_KEY` in `backend/.env`; without it the
 extraction endpoint returns an explicit 503 and verification, locking, filtering,
 reset, and CSV export continue to work offline.
 
+## Multi-user cloud service (8.x)
+
+Version 8 adds per-user sign-in (Supabase Auth), owner-isolated data on
+Postgres, background extraction jobs and a credit ledger, so one server can
+serve many researchers. The single-operator mode of 7.x stays the default.
+Runbook: **[DEPLOY_CLOUD.md](DEPLOY_CLOUD.md)** (`docker-compose.cloud.yml`,
+`deploy/install.sh`).
+
 ## Production deployment
 
 To run the app for real (single host / VPS, prebuilt GHCR images, or a managed
@@ -147,6 +155,17 @@ confirmed for every PRIMARY study; the freeze command enforces both gates.
 | GET | `/api/studies/export/csv` | Export locked studies as CSV | - |
 | POST | `/api/notion/sync` | Push locked studies to Notion | required |
 | GET | `/api/health` | Health check and service configuration flags | - |
+| GET | `/api/config` | Public client configuration (auth mode, Supabase URL/anon key) (8.x) | - |
+| POST | `/api/jobs` | Multipart PDF upload to a background extraction job (8.x) | required |
+| GET | `/api/jobs`, `/api/jobs/{id}` | Caller's extraction jobs; poll one until it settles (8.x) | - |
+| GET | `/api/me`, `/api/me/ledger`, `/api/me/export` | Caller's account, credit ledger, full data export (8.x) | - |
+| DELETE | `/api/studies/{id}` | Delete an unlocked study of the caller (8.x) | required |
+| GET/POST | `/api/admin/users`, `/api/admin/credits`, `/api/admin/usage` | Operator tools: accounts, credit grants, model cost (8.x, admin role) | - |
+
+In the multi-user modes (`MAIDA_AUTH_MODE=supabase|mock`, 8.x) the admin key is
+not used: every route except `/api/health` and `/api/config` requires the
+user's own `Authorization: Bearer <token>`, and every study, job and ledger
+entry is filtered by its owner.
 
 "Admin key" means the request must carry `X-MAIDA-Admin-Key: <MAIDA_ADMIN_KEY>`
 or the backend refuses it with 401, whatever the caller's origin - see

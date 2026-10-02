@@ -6,8 +6,9 @@
  */
 
 import React, { useCallback, useRef, useState } from "react";
-import { uploadPdf } from "../api";
-import { getConfidenceTier, StudyDatabaseEntry } from "../types";
+import { createJob, fetchStudy, waitForJob } from "../api";
+import { useI18n } from "../i18n";
+import { getConfidenceTier, JobStatus, StudyDatabaseEntry } from "../types";
 
 // ---------------------------------------------------------------------------
 // Confidence badge
@@ -42,7 +43,7 @@ interface ResultCardProps {
 
 function ResultCard({ entry }: ResultCardProps) {
   return (
-    <div className="result-card">
+    <div className="result-card" data-testid="result-card">
       <h3 className="result-title">{entry.paper_title || "(untitled)"}</h3>
       <p className="result-meta">
         {entry.authors} · {entry.year} · {entry.country}
@@ -111,12 +112,16 @@ function ResultCard({ entry }: ResultCardProps) {
 
 interface ExtractionPanelProps {
   onExtracted?: (entry: StudyDatabaseEntry) => void;
+  /** True in the multi-user modes: show the credit note and job phases. */
+  cloud?: boolean;
 }
 
-export default function ExtractionPanel({ onExtracted }: ExtractionPanelProps) {
+export default function ExtractionPanel({ onExtracted, cloud = false }: ExtractionPanelProps) {
+  const { t } = useI18n();
   const [dragOver, setDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<JobStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<StudyDatabaseEntry | null>(null);
 
@@ -167,19 +172,32 @@ export default function ExtractionPanel({ onExtracted }: ExtractionPanelProps) {
       }
       setLoading(true);
       setError(null);
+      setResult(null);
+      setPhase("queued");
       try {
-        const entry = await uploadPdf(file, { title, authors, year, country });
-        setResult(entry);
-        onExtracted?.(entry);
+        // 8.0: one job per upload. The server reserves a credit, runs the
+        // model in the background and the browser polls until it settles.
+        const job = await createJob(file, { title, authors, year, country });
+        const done = await waitForJob(job.id, (j) => setPhase(j.status));
+        if (done.status === "succeeded" && done.study_id) {
+          const entry = await fetchStudy(done.study_id);
+          setResult(entry);
+          onExtracted?.(entry);
+        } else if (done.status === "rejected") {
+          setError(`${t("ex_rejected")} ${done.error_message ?? ""}`.trim());
+        } else {
+          setError(`${t("ex_failed")} ${done.error_message ?? ""}`.trim());
+        }
       } catch (err: unknown) {
         const msg =
           err instanceof Error ? err.message : "Extraction failed. Check backend.";
-        setError(msg);
+        setError(msg.startsWith("402") ? t("ex_no_credits") : msg);
       } finally {
         setLoading(false);
+        setPhase(null);
       }
     },
-    [file, title, authors, year, country, onExtracted]
+    [file, title, authors, year, country, onExtracted, t]
   );
 
   return (
@@ -277,15 +295,22 @@ export default function ExtractionPanel({ onExtracted }: ExtractionPanelProps) {
           </div>
         </div>
 
-        {error && <p className="error-message">{error}</p>}
+        {error && <p className="error-message" data-testid="extract-error">{error}</p>}
 
         <button
           type="submit"
           className="btn btn-primary"
           disabled={loading || !file}
+          data-testid="extract-submit"
         >
           {loading ? "Extracting…" : "Extract Effect Size"}
         </button>
+        {loading && phase && (
+          <p className="hint-text job-phase" data-testid="job-phase">
+            {phase === "queued" ? t("ex_queued") : t("ex_running")}
+          </p>
+        )}
+        {cloud && <p className="hint-text">{t("ex_cost_note")}</p>}
       </form>
 
       {/* Result */}

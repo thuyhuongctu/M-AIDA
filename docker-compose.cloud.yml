@@ -1,0 +1,60 @@
+# M-AIDA 8.x: multi-user cloud deployment on one VPS.
+# See DEPLOY_CLOUD.md (Vietnamese runbook).
+#
+#   cp deploy/.env.cloud.example deploy/.env.cloud     # fill in the secrets
+#   docker compose -f docker-compose.cloud.yml --env-file deploy/.env.cloud up -d --build
+#
+# Caddy terminates TLS for $MAIDA_DOMAIN (automatic Let's Encrypt certificate),
+# serves the React bundle from the frontend container and proxies /api/* to
+# the FastAPI backend. Postgres and Auth live in Supabase; nothing here holds
+# user data except the uploaded PDF in memory while it is being read.
+
+services:
+  backend:
+    build: ./backend
+    env_file: deploy/.env.cloud
+    restart: unless-stopped
+    expose:
+      - "8765"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://localhost:8765/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""            # same-origin: Caddy routes /api/* to the backend
+    restart: unless-stopped
+    expose:
+      - "3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      MAIDA_DOMAIN: ${MAIDA_DOMAIN:?set MAIDA_DOMAIN in deploy/.env.cloud}
+      MAIDA_ACME_EMAIL: ${MAIDA_ACME_EMAIL:-}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -143,10 +143,101 @@ export interface StudyFilters {
 /** What the next upload will actually do, as reported by the backend. */
 export type ExtractionMode = "live" | "rehearsed_fallback" | "unavailable";
 
+export interface ClientConfig {
+  version: string;
+  auth_mode: "admin_key" | "supabase" | "mock";
+  supabase_url: string;
+  supabase_anon_key: string;
+  beta_credits: number;
+  max_pdf_mb: number;
+  max_pages: number;
+}
+
+export interface MockLoginResponse {
+  access_token: string;
+  token_type: string;
+  user: { id: string; email: string; role: string; name: string };
+}
+
+export interface MeResponse {
+  id: string;
+  email: string;
+  name: string;
+  role: "user" | "admin";
+  beta: boolean;
+  /** null in admin_key mode (credits are not counted for the single operator). */
+  credits: number | null;
+  studies: number;
+  locked: number;
+  auth_mode: ClientConfig["auth_mode"];
+}
+
+export type JobStatus = "queued" | "running" | "succeeded" | "rejected" | "failed";
+
+export interface ExtractionJob {
+  id: string;
+  status: JobStatus;
+  filename: string;
+  size_bytes: number;
+  pages: number | null;
+  metadata: PaperMetadata;
+  study_id: string | null;
+  error_code: string | null;
+  error_message: string | null;
+  model: string | null;
+  credits_charged: number;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
+export interface LedgerEntry {
+  id: number;
+  delta: number;
+  reason: "purchase" | "extraction" | "refund" | "grant_beta" | "adjust_admin";
+  balance_after: number;
+  job_id: string | null;
+  note: string;
+  created_at: string;
+}
+
+export interface AccountExport {
+  exported_at: string;
+  version: string;
+  user: { id: string; email: string; name: string };
+  studies: StudyDatabaseEntry[];
+  jobs: ExtractionJob[];
+  ledger: LedgerEntry[];
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  beta: boolean;
+  credits: number;
+  created_at: string;
+  last_seen_at: string | null;
+  studies: number;
+}
+
+export interface AdminUsage {
+  days: number;
+  calls: number;
+  input_tokens: number;
+  output_tokens: number;
+  estimated_cost_usd: number;
+  per_user: { user_id: string; calls: number; estimated_cost_usd: number }[];
+  outcomes: Record<string, number>;
+  price_table: { input_per_mtok: number; output_per_mtok: number };
+}
+
 export interface HealthResponse {
   status: string;
   version: string;
-  study_count: number;
+  /** null in the multi-user modes (per-user counts come from /api/me). */
+  study_count: number | null;
   llm_configured?: boolean;
   anthropic_configured?: boolean;
   notion_configured: boolean;
@@ -155,6 +246,7 @@ export interface HealthResponse {
   storage_path?: string;
   llm_ready?: boolean;
   demo_mode?: boolean;
+  auth_mode?: ClientConfig["auth_mode"];
   extraction_mode?: ExtractionMode;
 }
 

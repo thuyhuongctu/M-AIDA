@@ -68,10 +68,91 @@ class Settings(BaseSettings):
     # Allowed CORS origins (comma-separated in env; pydantic-settings handles list)
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
+    # ------------------------------------------------------------------
+    # 8.0 (cloud): identity, data isolation, credits
+    # ------------------------------------------------------------------
+    # How callers are identified:
+    #   admin_key - single operator, shared X-MAIDA-Admin-Key on mutations
+    #               (the 7.2.x behaviour; default so every existing deployment,
+    #               the Windows runner and the Defense App keep working).
+    #   supabase  - multi-user SaaS: every /api route (except /api/health and
+    #               /api/config) needs "Authorization: Bearer <Supabase JWT>".
+    #   mock      - like supabase but tokens are minted locally by
+    #               POST /api/auth/mock-login; for tests and e2e only.
+    maida_auth_mode: str = "admin_key"
+
+    # SQLAlchemy URL. Empty = SQLite file at MAIDA_DB_PATH (local/demo). Cloud:
+    # postgresql+psycopg://postgres.<ref>:<password>@<pooler-host>:6543/postgres
+    database_url: str = ""
+
+    # Supabase project settings (auth mode "supabase"). The JWKS URL is derived
+    # from SUPABASE_URL; SUPABASE_JWT_SECRET is only needed for projects that
+    # still sign access tokens with the legacy HS256 shared secret.
+    supabase_url: str = ""
+    supabase_anon_key: str = ""
+    supabase_jwt_secret: str = ""
+    supabase_jwt_audience: str = "authenticated"
+
+    # Secret used to sign mock tokens (auth mode "mock"); never for production.
+    maida_mock_jwt_secret: str = "maida-mock-secret-not-for-production"
+
+    # Emails that get the admin role on first sign-in (comma-separated string;
+    # see admin_emails below).
+    maida_admin_emails: str = ""
+
+    # Credits granted to every new account (closed beta: 10; after launch: 3).
+    maida_beta_credits: int = 10
+
+    # Upload limits and concurrency for the job pipeline.
+    maida_max_pdf_mb: int = 25
+    maida_max_pages: int = 80
+    maida_max_running_jobs: int = 4          # whole process
+    maida_max_running_jobs_per_user: int = 1
+    maida_jobs_per_hour: int = 10            # per user
+
+    # Price table used for the *estimated* cost column of llm_calls (USD per
+    # million tokens). Real spend is what the provider console bills.
+    llm_price_input_per_mtok: float = 3.0
+    llm_price_output_per_mtok: float = 15.0
+
+    # Serve a built frontend (frontend/build) from "/" when set: single-process
+    # deployments, the Windows runner and the e2e suite use it; the compose
+    # stack keeps nginx in front instead.
+    maida_frontend_dir: str = ""
+
     @property
     def resolved_model(self) -> str:
         """Return the configured model id, if one was supplied by the researcher."""
         return self.anthropic_model
+
+    @property
+    def resolved_database_url(self) -> str:
+        """SQLAlchemy URL for the study store: explicit DATABASE_URL or SQLite."""
+        url = self.database_url.strip()
+        if not url:
+            return f"sqlite:///{self.maida_db_path}"
+        # Supabase hands out "postgresql://" (or "postgres://") strings; the
+        # installed driver is psycopg 3, so name it explicitly.
+        for prefix in ("postgresql://", "postgres://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg://" + url[len(prefix):]
+        return url
+
+    @property
+    def admin_emails(self) -> frozenset[str]:
+        return frozenset(
+            e.strip().lower() for e in self.maida_admin_emails.split(",") if e.strip()
+        )
+
+    @property
+    def cloud_mode(self) -> bool:
+        """True when callers are individual authenticated users (not one operator)."""
+        return self.maida_auth_mode in ("supabase", "mock")
+
+    @property
+    def supabase_jwks_url(self) -> str:
+        base = self.supabase_url.rstrip("/")
+        return f"{base}/auth/v1/.well-known/jwks.json" if base else ""
 
 
 _settings: Settings | None = None
