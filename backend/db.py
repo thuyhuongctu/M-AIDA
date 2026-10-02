@@ -225,7 +225,7 @@ def make_engine(url: str) -> Engine:
     # noticed before a request uses a dead connection. prepare_threshold=None
     # disables psycopg's server-side prepared statements, which Supabase's
     # transaction-mode pooler (port 6543) does not support.
-    connect_args = {"prepare_threshold": None} if "psycopg" in url else {}
+    connect_args = {"prepare_threshold": None, "connect_timeout": 10} if "psycopg" in url else {}
     return create_engine(
         url, pool_size=5, max_overflow=5, pool_pre_ping=True, future=True,
         connect_args=connect_args,

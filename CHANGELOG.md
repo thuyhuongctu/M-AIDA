@@ -57,7 +57,10 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
 - **Triển khai**: `docker-compose.cloud.yml` (Caddy TLS tự động + backend +
   frontend), `deploy/Caddyfile` (HSTS, CSP), `deploy/.env.cloud.example`,
   `deploy/install.sh` (Ubuntu, một lệnh), `DEPLOY_CLOUD.md` (tiếng Việt).
-- **Kiểm thử**: 16 test mới (`backend/tests/test_800_cloud_multiuser.py`): xác
+  `backend/check_cloud.py` kiểm tra cấu hình trước khi mở dịch vụ (Postgres,
+  JWKS/secret Supabase, khóa mô hình, chế độ mock/demo); bộ cài chạy nó trước
+  `docker compose up` và dừng khi có mục hỏng.
+- **Kiểm thử**: 20 test mới (`backend/tests/test_800_cloud_multiuser.py`): xác
   minh JWT (hợp lệ, hết hạn, sai aud, chữ ký giả, HS256), tách dữ liệu, quy tắc
   tín dụng, job bất đồng bộ, giới hạn tốc độ, khôi phục job dở dang, di trú tệp
   7.x; 79 test cũ và smoke test Defense App giữ nguyên và vẫn đạt. Kiểm thử
