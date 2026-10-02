@@ -224,7 +224,7 @@ const VerificationPanel = forwardRef<VerificationPanelHandle, VerificationPanelP
       {noR && <div className="note note-warn">{t("rv_needs_r")}</div>}
 
       <h3 className="eyebrow">{t("rv_statistics")}</h3>
-      <table className="vp-table">
+      <table className="vp-table" data-tour="stats">
         <thead>
           <tr>
             <th>{t("rv_field")}</th>
@@ -259,7 +259,7 @@ const VerificationPanel = forwardRef<VerificationPanelHandle, VerificationPanelP
       </table>
 
       <h3 className="eyebrow">{t("rv_moderators")}</h3>
-      <div className="vp-mods">
+      <div className="vp-mods" data-tour="mods">
         {MOD_GROUPS.map(({ key, label, options }) => {
           const value = current(key);
           return (
@@ -340,7 +340,7 @@ const VerificationPanel = forwardRef<VerificationPanelHandle, VerificationPanelP
       {notice && <p className="success-message">{notice}</p>}
 
       {!locked && (
-        <div className="vp-actions">
+        <div className="vp-actions" data-tour="actions">
           <span className="vp-actions-right">
             <button type="button" className="btn btn-primary" onClick={() => void approve()} disabled={busy} data-testid="vp-approve">
               {busy ? t("rv_saving") : approved ? `${t("rv_approved_msg")} ✓` : t("rv_approve")}

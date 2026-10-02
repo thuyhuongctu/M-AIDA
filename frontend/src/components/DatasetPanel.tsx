@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { downloadCsv, fetchStudies, syncToNotion } from "../api";
 import { useI18n } from "../i18n";
 import type { NotionSyncResponse, StudyDatabaseEntry } from "../types";
+import ForestPlot from "./ForestPlot";
 import { Glyph, stateOf } from "./ReviewScreen";
 
 export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
@@ -91,7 +92,9 @@ export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
 
       {error && <p className="error-message">{error}</p>}
 
-      <div className="export-actions">
+      <ForestPlot studies={studies} />
+
+      <div className="export-actions" data-tour="export">
         <div className="export-card">
           <h3 className="export-card-title">{t("ds_csv_title")}</h3>
           <p className="export-card-desc">{t("ds_csv_desc")}</p>

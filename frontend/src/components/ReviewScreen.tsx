@@ -151,7 +151,7 @@ export default function ReviewScreen({ initialStudyId, refreshKey, onChanged }: 
 
   return (
     <div className="review" data-testid="review-screen">
-      <aside className="rv-queue">
+      <aside className="rv-queue" data-tour="queue">
         <div className="rv-queue-head">
           <span className="eyebrow">{t("rv_queue")}</span>
           <div className="chips">
@@ -223,7 +223,7 @@ export default function ReviewScreen({ initialStudyId, refreshKey, onChanged }: 
         </div>
       </aside>
 
-      <section className="rv-evidence">
+      <section className="rv-evidence" data-tour="evidence">
         {!selected ? (
           <p className="empty-text">{t("rv_pick")}</p>
         ) : (
