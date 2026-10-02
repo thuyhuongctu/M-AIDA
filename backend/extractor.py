@@ -38,6 +38,14 @@ CONFIDENCE_FROM_T: float = 0.8     # Derived from t-statistic + df
 CONFIDENCE_FROM_BETA: float = 0.6  # Derived from standardised β coefficient
 CONFIDENCE_REVIEW_THRESHOLD: float = 0.7  # Flag for PI review if below this
 PDF_TEXT_LIMIT: int = 40_000  # characters of PDF text sent to the model (documented, 7.2.0)
+MAX_OUTPUT_TOKENS: int = 1024  # completion budget per extraction call
+
+#: User message sent with every extraction (metadata JSON, then the PDF text).
+_USER_TEMPLATE = (
+    "Paper metadata provided by the researcher:\n{metadata}\n\n"
+    "---BEGIN PDF TEXT---\n{text}\n---END PDF TEXT---\n\n"
+    "Extract the statistical parameters as described and return valid JSON."
+)
 
 # ---------------------------------------------------------------------------
 # Extraction system prompt
@@ -447,15 +455,13 @@ class StatisticalExtractor:
 
     def _call_llm(self, text: str, metadata: dict[str, Any]) -> dict[str, Any]:
         """Send the extraction prompt to the engine and parse the JSON response."""
-        user_content = (
-            f"Paper metadata provided by the researcher:\n{json.dumps(metadata)}\n\n"
-            f"---BEGIN PDF TEXT---\n{text[:PDF_TEXT_LIMIT]}\n---END PDF TEXT---\n\n"
-            "Extract the statistical parameters as described and return valid JSON."
+        user_content = _USER_TEMPLATE.format(
+            metadata=json.dumps(metadata), text=text[:PDF_TEXT_LIMIT]
         )
 
         try:
             raw_text = self._engine.complete(
-                system=_SYSTEM_PROMPT, user=user_content, max_tokens=1024
+                system=_SYSTEM_PROMPT, user=user_content, max_tokens=MAX_OUTPUT_TOKENS
             )
         except EngineError as exc:
             logger.error("Extraction engine call failed: %s", exc)
@@ -628,3 +634,17 @@ def _safe_literal(value: Any, allowed: tuple[str, ...]) -> Any | None:
     if value in allowed:
         return value
     return None
+
+
+def prompt_fingerprint() -> str:
+    """Identifier of the frozen extraction prompt (validation manifests).
+
+    Hashes everything that shapes what the model is asked: the system prompt,
+    the user-message template, the text limit and the output budget. Any edit
+    to these changes the fingerprint, so a validation result can be tied to
+    exactly one prompt version.
+    """
+    import hashlib
+
+    payload = "\n".join([_SYSTEM_PROMPT, _USER_TEMPLATE, str(PDF_TEXT_LIMIT), str(MAX_OUTPUT_TOKENS)])
+    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]

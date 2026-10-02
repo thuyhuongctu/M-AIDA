@@ -45,12 +45,16 @@ class AnthropicEngine:
     # và rẻ hơn Opus; muốn đổi thì đặt LLM_MODEL trong backend/.env.
     DEFAULT_MODEL = "claude-sonnet-5"
 
-    def __init__(self, api_key: str, model: str | None = None) -> None:
+    def __init__(self, api_key: str, model: str | None = None, temperature: float | None = None) -> None:
         import anthropic  # lazy: only this adapter needs the SDK
 
         self._anthropic = anthropic
         self._client = anthropic.Anthropic(api_key=api_key)
         self.model = model or self.DEFAULT_MODEL
+        # None = do not send the parameter (the provider's default applies,
+        # which is the behaviour of every release up to 8.0). A validation
+        # run freezes an explicit value (LLM_TEMPERATURE) and records it.
+        self.temperature = temperature
         # 8.0: token counts and latency of the last call, read by the job
         # pipeline to write llm_calls (cost accounting per user). Engines
         # that do not report usage simply leave these at None/0.
@@ -63,11 +67,13 @@ class AnthropicEngine:
         started = time.perf_counter()
         self.last_usage = None
         try:
+            extra = {} if self.temperature is None else {"temperature": self.temperature}
             message = self._client.messages.create(
                 model=self.model,
                 max_tokens=max_tokens,
                 system=system,
                 messages=[{"role": "user", "content": user}],
+                **extra,
             )
         except self._anthropic.APIError as exc:  # pragma: no cover - network
             self.last_latency_ms = int((time.perf_counter() - started) * 1000)
@@ -86,7 +92,7 @@ class AnthropicEngine:
 
 
 def make_engine(
-    provider: str, api_key: str, model: str | None = None
+    provider: str, api_key: str, model: str | None = None, temperature: float | None = None
 ) -> ExtractionEngine:
     """Factory: build the configured engine.
 
@@ -97,5 +103,5 @@ def make_engine(
     """
     provider = (provider or "anthropic").lower()
     if provider == "anthropic":
-        return AnthropicEngine(api_key=api_key, model=model)
+        return AnthropicEngine(api_key=api_key, model=model, temperature=temperature)
     raise EngineError(f"Unknown llm_provider: {provider!r}")

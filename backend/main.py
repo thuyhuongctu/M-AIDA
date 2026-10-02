@@ -183,6 +183,7 @@ def _get_extractor() -> StatisticalExtractor:
         settings.llm_provider,
         api_key=settings.anthropic_api_key,
         model=settings.resolved_model,
+        temperature=settings.llm_temperature,
     )
     return StatisticalExtractor(engine=engine)
 
