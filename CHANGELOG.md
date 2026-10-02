@@ -60,13 +60,34 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   `backend/check_cloud.py` kiểm tra cấu hình trước khi mở dịch vụ (Postgres,
   JWKS/secret Supabase, khóa mô hình, chế độ mock/demo); bộ cài chạy nó trước
   `docker compose up` và dừng khi có mục hỏng.
-- **Kiểm thử**: 20 test mới (`backend/tests/test_800_cloud_multiuser.py`): xác
+- **Kiểm thử**: 22 test mới (`backend/tests/test_800_cloud_multiuser.py`): xác
   minh JWT (hợp lệ, hết hạn, sai aud, chữ ký giả, HS256), tách dữ liệu, quy tắc
   tín dụng, job bất đồng bộ, giới hạn tốc độ, khôi phục job dở dang, di trú tệp
   7.x; 79 test cũ và smoke test Defense App giữ nguyên và vẫn đạt. Kiểm thử
   đầu cuối bằng trình duyệt (`backend/tests/e2e/run_e2e.py`, Playwright): đăng
   nhập → tải PDF → job xong → bị từ chối giữ phí → duyệt → khóa → xuất CSV →
   tài khoản → người thứ hai không thấy gì → admin cấp tín dụng → tiếng Việt.
+- **Phê duyệt là của con người** (`pi_approved_at`, mới trong `ExtractedEffect`):
+  `requires_verification` chỉ là cờ của máy (tin cậy dưới ngưỡng). PATCH
+  `/verify` với `pi_approved=true` nay ghi thời điểm phê duyệt; `POST /lock`
+  từ chối (422) bản ghi chưa có phê duyệt của người dù máy tin cậy 1,0; đánh
+  dấu trích xuất lại (`pi_approved=false`) xóa phê duyệt. Bản ghi 7.x chưa
+  khóa cần được duyệt lại một lần. CSV có thêm cột `pi_approved_at`.
+- **Giao diện theo bản thiết kế 02/10** (giai đoạn 1): hệ màu kem/hổ phách,
+  chữ Source Serif 4 và JetBrains Mono tự lưu trong gói (fontsource, không
+  CDN); thanh đầu với biểu tượng khóa, thẻ điều hướng, một viên trạng thái
+  thay dải bốn ô, viên tín dụng, chữ cái đầu tài khoản, chuyển EN/VI; màn
+  hình **Kiểm chứng ba cột** (`ReviewScreen`): hàng chờ lọc Tất cả/Cần kiểm
+  chứng/Đã duyệt/Đã khóa với ký hiệu ◇/◆, cột bằng chứng hiện câu trích
+  nguyên văn và số trang cho thống kê và cỡ mẫu kèm phép quy đổi (không hiện
+  trang PDF vì không giữ PDF), bảng Field/Machine/Current trong đó cột máy
+  không bao giờ đổi, biến điều tiết dạng nút chọn, ghi chú bắt buộc trước khi
+  duyệt, khóa phải gõ lại mã nghiên cứu, phím tắt J/K/A/L; bảng điều khiển có
+  thẻ "N bản ghi đang chờ, tiếp theo là…" mở thẳng bản ghi; trang Trích xuất
+  hai cột với bốn bước quy trình (đọc văn bản, nhận diện, quy đổi, cổng bằng
+  chứng) ánh xạ từ trạng thái job; thẻ Bộ dữ liệu riêng (đếm, thanh tiến độ
+  khóa, CSV, Notion); màn hình đăng nhập hai cột. Không có nhân vật minh họa.
+  Bỏ `StatusBanner` và `VerificationDashboard` cũ.
 - **Pháp lý**: `legal/TERMS.md` và `legal/PRIVACY.md` (Điều khoản dịch vụ và
   Chính sách riêng tư cho beta kín, song ngữ Anh/Việt, viết đối chiếu được với
   lược đồ `backend/db.py`: không lưu PDF, các bảng lưu gì, bên xử lý Supabase/

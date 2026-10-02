@@ -99,29 +99,53 @@ def main() -> int:
             expect(page.get_by_test_id("extract-error")).to_contain_text("Rejected", timeout=20_000)
             shot("04-rejected")
 
-            # 4. Dashboard: 1 credit left, two jobs
+            # 4. Dashboard: 1 credit left, two jobs, one record waiting for review
             page.get_by_test_id("tab-dashboard").click()
             expect(page.get_by_test_id("credits-balance")).to_have_text("1")
             rows = page.get_by_test_id("job-row")
             expect(rows).to_have_count(2)
             expect(rows.first).to_have_attribute("data-status", "rejected")
             expect(rows.nth(1)).to_have_attribute("data-status", "succeeded")
+            expect(page.get_by_test_id("next-up")).to_contain_text("1 record waiting")
             shot("05-dashboard-jobs")
 
-            # 5. Verify & lock through the existing panels
-            page.get_by_test_id("tab-verify").click()
-            page.locator(".study-row").first.click()
-            page.get_by_role("button", name="Approve & Lock").click()
-            expect(page.locator(".studies-table .badge", has_text="Locked").first).to_be_visible(timeout=10_000)
+            # 5. "Continue reviewing" opens the record in the three-pane review screen
+            page.get_by_test_id("continue-review").click()
+            expect(page.get_by_test_id("review-screen")).to_be_visible()
+            expect(page.get_by_test_id("verification-panel")).to_be_visible()
+            expect(page.get_by_test_id("evidence-card")).to_contain_text("r = 0.31")
+            # approval needs a note
+            page.get_by_test_id("vp-approve").click()
+            expect(page.get_by_test_id("vp-error")).to_contain_text("Required")
+            page.get_by_test_id("vp-notes").fill("Checked r and n against table 3 of the paper.")
+            page.get_by_test_id("vp-approve").click()
+            expect(page.get_by_test_id("vp-approve")).to_contain_text("Approved", timeout=10_000)
+            expect(page.get_by_test_id("rv-item").first).to_have_attribute("data-state", "approved")
+            shot("06-approved")
+            # lock: the dialog demands the study id
+            page.get_by_test_id("vp-lock").click()
+            dialog = page.get_by_test_id("lock-dialog")
+            expect(dialog).to_be_visible()
+            study_id = dialog.locator("code").inner_text().strip()
+            expect(page.get_by_test_id("lock-confirm")).to_be_disabled()
+            page.get_by_test_id("lock-id-input").fill(study_id)
+            page.get_by_test_id("lock-confirm").click()
+            expect(page.get_by_test_id("locked-banner")).to_be_visible(timeout=10_000)
+            expect(page.get_by_test_id("rv-item").first).to_have_attribute("data-state", "locked")
             shot("06-locked")
+            # keyboard navigation does not crash with a single record
+            page.keyboard.press("j")
+            page.keyboard.press("k")
 
-            # CSV export: intercept the download
-            page.get_by_role("button", name="Refresh counts").click()
+            # CSV export from the Dataset tab: intercept the download
+            page.get_by_test_id("tab-dataset").click()
+            expect(page.get_by_test_id("dataset-panel")).to_contain_text("1")
             with page.expect_download(timeout=10_000) as dl:
-                page.get_by_role("button", name="Export to CSV").click()
+                page.get_by_test_id("export-csv").click()
             csv_path = dl.value.path()
             text = Path(csv_path).read_text(encoding="utf-8")
             assert "paper-240" in text or "0.31" in text, text[:200]
+            shot("06b-dataset")
 
             # 6. Account tab: ledger shows grant / extraction x2
             page.get_by_test_id("tab-account").click()
@@ -137,7 +161,7 @@ def main() -> int:
             expect(page.get_by_test_id("credits-balance")).to_have_text("3")
             expect(page.get_by_test_id("job-row")).to_have_count(0)
             page.get_by_test_id("tab-verify").click()
-            expect(page.locator(".study-row")).to_have_count(0)
+            expect(page.get_by_test_id("rv-item")).to_have_count(0)
             shot("08-bob-empty")
 
             # 8. Operator: grant credits, see usage

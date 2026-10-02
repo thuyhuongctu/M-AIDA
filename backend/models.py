@@ -309,6 +309,13 @@ class ExtractedEffect(BaseModel):
     pi_locked: bool = Field(
         False, description="True after Principal Investigator permanently locks entry"
     )
+    # 8.0: the PI's approval is recorded explicitly. ``requires_verification``
+    # is the MACHINE's flag (confidence below threshold); a record can only
+    # be locked once a person has approved it through PATCH /verify, whatever
+    # the machine's confidence - "the machine proposes, a person verifies".
+    pi_approved_at: datetime | None = Field(
+        None, description="When the PI approved the record via PATCH /verify (pi_approved=true); required before locking"
+    )
     derived_from: str | None = Field(
         None,
         description=(

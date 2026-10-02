@@ -4,26 +4,33 @@
  *
  * 8.0 layout:
  *   - admin_key mode (single operator, 7.x behaviour): Extract | Verify & Lock
- *     tabs plus the admin-key field in the header.
+ *     | Dataset, plus the admin-key field in the header.
  *   - supabase / mock modes (many users): sign-in screen, then
- *     Dashboard | Extract | Verify & Lock | Account.
+ *     Dashboard | Extract | Verify & Lock | Dataset | Account.
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchHealth, getAdminKey, setAdminKey } from "./api";
+import { fetchHealth, fetchMe, getAdminKey, setAdminKey } from "./api";
 import { AuthState, getAuthState, initAuth, subscribe } from "./auth";
 import AccountPanel from "./components/AccountPanel";
 import Dashboard from "./components/Dashboard";
-import ExportPanel from "./components/ExportPanel";
+import DatasetPanel from "./components/DatasetPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
 import LoginScreen from "./components/LoginScreen";
-import StatusBanner from "./components/StatusBanner";
-import VerificationDashboard from "./components/VerificationDashboard";
+import { Logo } from "./components/Logo";
+import ReviewScreen from "./components/ReviewScreen";
+import StatusPill from "./components/StatusPill";
 import { I18nContext, Lang, readLang, storeLang, translate } from "./i18n";
-import { ClientConfig, StudyDatabaseEntry } from "./types";
+import { ClientConfig, MeResponse, StudyDatabaseEntry } from "./types";
+import "@fontsource/source-serif-4/400.css";
+import "@fontsource/source-serif-4/400-italic.css";
+import "@fontsource/source-serif-4/600.css";
+import "@fontsource/source-serif-4/700.css";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
 import "./index.css";
 
-type Tab = "dashboard" | "extract" | "verify" | "account";
+type Tab = "dashboard" | "extract" | "verify" | "dataset" | "account";
 
 export default function App() {
   // Language (8.0): English by default, Vietnamese on request; remembered per browser.
@@ -56,12 +63,16 @@ export default function App() {
   }, []);
 
   const cloud = config?.auth_mode === "supabase" || config?.auth_mode === "mock";
+  const signedIn = !cloud || !!auth.user;
 
   // Count new extractions so the Verify tab can show an attention badge, and
   // bump a key so the dashboard/account panels reload after a change.
   const [extractionCount, setExtractionCount] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const bump = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   const [activeTab, setActiveTab] = useState<Tab>("extract");
+  const [focusStudyId, setFocusStudyId] = useState<string | null>(null);
   // Every (re-)sign-in lands on the dashboard; the per-session counters reset too.
   const userId = auth.user?.id ?? null;
   useEffect(() => {
@@ -71,7 +82,16 @@ export default function App() {
     }
   }, [cloud, userId]);
 
-  const [refreshKey, setRefreshKey] = useState(0);
+  // Account summary for the header pills (credits) - cloud modes only.
+  const [me, setMe] = useState<MeResponse | null>(null);
+  useEffect(() => {
+    if (!cloud || !auth.user) {
+      setMe(null);
+      return;
+    }
+    fetchMe().then(setMe).catch(() => setMe(null));
+  }, [cloud, auth.user, refreshKey]);
+
   // Version label: read once from /api/health so the UI can never disagree
   // with the backend (7.2.1). Falls back to "?" while unreachable.
   const [version, setVersion] = useState<string>("?");
@@ -81,41 +101,83 @@ export default function App() {
       .catch(() => setVersion("?"));
   }, []);
 
-  // 7.2.2: the PI's admin key, kept only in this browser (see api.ts). Every
-  // extract/verify/lock/Notion-sync call fails with 401 until this is set to
-  // the value printed in the backend's startup log / MAIDA_ADMIN_KEY. Only
+  // 7.2.2: the PI's admin key, kept only in this browser (see api.ts). Only
   // shown in admin_key mode.
   const [adminKey, setAdminKeyField] = useState<string>(getAdminKey);
-  const handleAdminKeyChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setAdminKeyField(value);
-      setAdminKey(value);
-    },
-    []
-  );
-
-  const handleExtracted = useCallback((_entry: StudyDatabaseEntry) => {
-    setExtractionCount((c) => c + 1);
-    setRefreshKey((k) => k + 1);
+  const handleAdminKeyChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAdminKeyField(value);
+    setAdminKey(value);
   }, []);
 
-  const switchToVerify = useCallback(() => {
+  const handleExtracted = useCallback(
+    (_entry: StudyDatabaseEntry) => {
+      setExtractionCount((c) => c + 1);
+      bump();
+    },
+    [bump]
+  );
+
+  const openStudy = useCallback((studyId: string) => {
+    setFocusStudyId(studyId);
     setActiveTab("verify");
   }, []);
 
   const t = i18n.t;
 
+  const tabs: { id: Tab; label: string; badge?: number; cloudOnly?: boolean }[] = [
+    { id: "dashboard", label: t("nav_dashboard"), cloudOnly: true },
+    { id: "extract", label: t("nav_extract") },
+    { id: "verify", label: t("nav_verify"), badge: extractionCount },
+    { id: "dataset", label: t("nav_dataset") },
+    { id: "account", label: t("nav_account"), cloudOnly: true },
+  ];
+
+  const initials = (auth.user?.name || auth.user?.email || "?")
+    .split(/[\s@.]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+
   const header = (
-    <header className="app-header">
-      <div className="header-brand">
-        <h1 className="app-title">M-AIDA</h1>
-        <span className="app-version">v{version}</span>
+    <header className="shell-head">
+      <div className="shell-head-left">
+        <Logo />
+        {signedIn && config && (
+          <nav className="shell-nav" role="tablist">
+            {tabs
+              .filter((tab) => !tab.cloudOnly || cloud)
+              .map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  className={`nav-pill ${activeTab === tab.id ? "nav-pill-on" : ""}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  data-testid={`tab-${tab.id}`}
+                >
+                  {tab.label}
+                  {tab.badge ? <span className="nav-badge mono">{tab.badge}</span> : null}
+                </button>
+              ))}
+          </nav>
+        )}
       </div>
-      <p className="app-subtitle">
-        Meta-Analysis Intelligent Data Assistant - Internationalization &amp; Performance
-      </p>
-      <div className="header-right">
+      <div className="shell-head-right">
+        {signedIn && config && <StatusPill />}
+        {cloud && me && me.credits !== null && (
+          <span className="pill pill-credits mono" data-testid="credits-pill">
+            <span className="glyph glyph-locked" aria-hidden="true">◆</span> {me.credits} {t("credits")}
+          </span>
+        )}
+        {cloud && auth.user && (
+          <span className="avatar" title={auth.user.email} data-testid="header-user">
+            <span className="sr-only">{t("signed_in_as")} </span>
+            <strong className="sr-only">{auth.user.email}</strong>
+            <span aria-hidden="true">{initials}</span>
+          </span>
+        )}
         {config?.auth_mode === "admin_key" && (
           <div className="admin-key-field">
             <label htmlFor="admin-key-input">Admin key</label>
@@ -129,34 +191,19 @@ export default function App() {
             />
           </div>
         )}
-        {cloud && auth.user && (
-          <span className="header-user" data-testid="header-user">
-            {t("signed_in_as")} <strong>{auth.user.email}</strong>
-          </span>
-        )}
-        <button
-          type="button"
-          className="lang-toggle"
-          onClick={() => i18n.setLang(lang === "en" ? "vi" : "en")}
-          aria-label="Switch language"
-        >
-          {t("lang_switch")}
-        </button>
+        <div className="seg-group" role="group" aria-label="Language">
+          <button type="button" className={`seg ${lang === "en" ? "seg-on" : ""}`} onClick={() => i18n.setLang("en")}>EN</button>
+          <button type="button" className={`seg lang-toggle ${lang === "vi" ? "seg-on" : ""}`} onClick={() => i18n.setLang(lang === "vi" ? "en" : "vi")}>VI</button>
+        </div>
       </div>
     </header>
   );
 
   const footer = (
-    <footer className="app-footer">
+    <footer className="shell-foot">
       <p>
-        M-AIDA v{version} · PhD Dissertation Research Tool · Asia-Pacific I&rarr;P
-        Meta-Analysis
-      </p>
-      <p>
-        Do Thuy Huong &amp;{" "}
-        <a href="https://patueconomics.com/" target="_blank" rel="noopener noreferrer">
-          Phan Anh Tu
-        </a>{" "}
+        M-AIDA v{version} · Do Thuy Huong &amp;{" "}
+        <a href="https://patueconomics.com/" target="_blank" rel="noopener noreferrer">Phan Anh Tu</a>{" "}
         · School of Economics, Can Tho University
       </p>
       {cloud && (
@@ -174,104 +221,43 @@ export default function App() {
   let body: React.ReactNode;
   if (bootError) {
     body = (
-      <main className="app-main">
-        <div className="alert alert-warn">
-          <p>Cannot reach the M-AIDA backend: {bootError}</p>
-        </div>
+      <main className="shell-main">
+        <div className="note note-warn"><p>Cannot reach the M-AIDA backend: {bootError}</p></div>
       </main>
     );
   } else if (!config) {
     body = (
-      <main className="app-main">
+      <main className="shell-main">
         <p className="loading-text">{t("loading")}</p>
       </main>
     );
   } else if (cloud && !auth.user) {
-    body = (
-      <main className="app-main">
+    return (
+      <I18nContext.Provider value={i18n}>
         <LoginScreen mode={config.auth_mode as "supabase" | "mock"} version={version} />
-      </main>
+      </I18nContext.Provider>
     );
   } else {
     body = (
-      <>
-        <StatusBanner />
-        <nav className="tab-nav" role="tablist">
-          {cloud && (
-            <button role="tab" aria-selected={activeTab === "dashboard"}
-                    className={`tab-btn ${activeTab === "dashboard" ? "active" : ""}`}
-                    onClick={() => setActiveTab("dashboard")} data-testid="tab-dashboard">
-              {t("nav_dashboard")}
-            </button>
-          )}
-          <button role="tab" aria-selected={activeTab === "extract"}
-                  className={`tab-btn ${activeTab === "extract" ? "active" : ""}`}
-                  onClick={() => setActiveTab("extract")} data-testid="tab-extract">
-            {t("nav_extract")}
-          </button>
-          <button role="tab" aria-selected={activeTab === "verify"}
-                  className={`tab-btn ${activeTab === "verify" ? "active" : ""}`}
-                  onClick={() => setActiveTab("verify")} data-testid="tab-verify">
-            {t("nav_verify")}
-            {extractionCount > 0 && <span className="tab-badge">{extractionCount}</span>}
-          </button>
-          {cloud && (
-            <button role="tab" aria-selected={activeTab === "account"}
-                    className={`tab-btn ${activeTab === "account" ? "active" : ""}`}
-                    onClick={() => setActiveTab("account")} data-testid="tab-account">
-              {t("nav_account")}
-            </button>
-          )}
-        </nav>
-
-        <main className="app-main">
-          {activeTab === "dashboard" && cloud && (
-            <div className="tab-content">
-              <Dashboard
-                refreshKey={refreshKey}
-                onNewExtraction={() => setActiveTab("extract")}
-                onOpenStudy={() => setActiveTab("verify")}
-              />
-            </div>
-          )}
-
-          {activeTab === "extract" && (
-            <div className="tab-content">
-              <ExtractionPanel onExtracted={handleExtracted} cloud={cloud} />
-              {extractionCount > 0 && (
-                <div className="extraction-prompt">
-                  <p>
-                    {extractionCount} paper{extractionCount !== 1 ? "s" : ""} extracted
-                    this session.
-                  </p>
-                  <button className="btn btn-link" onClick={switchToVerify}>
-                    Go to Verify &amp; Lock
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "verify" && (
-            <div className="tab-content verify-tab">
-              <VerificationDashboard />
-              <ExportPanel />
-            </div>
-          )}
-
-          {activeTab === "account" && cloud && (
-            <div className="tab-content">
-              <AccountPanel refreshKey={refreshKey} />
-            </div>
-          )}
-        </main>
-      </>
+      <main className={`shell-main ${activeTab === "verify" ? "shell-main-wide" : ""}`}>
+        {activeTab === "dashboard" && cloud && (
+          <Dashboard refreshKey={refreshKey} onNewExtraction={() => setActiveTab("extract")} onOpenStudy={openStudy} />
+        )}
+        {activeTab === "extract" && (
+          <ExtractionPanel onExtracted={handleExtracted} cloud={cloud} credits={me?.credits ?? null} onOpenReview={openStudy} onSettled={bump} />
+        )}
+        {activeTab === "verify" && (
+          <ReviewScreen initialStudyId={focusStudyId} refreshKey={refreshKey} onChanged={bump} />
+        )}
+        {activeTab === "dataset" && <DatasetPanel refreshKey={refreshKey} />}
+        {activeTab === "account" && cloud && <AccountPanel refreshKey={refreshKey} />}
+      </main>
     );
   }
 
   return (
     <I18nContext.Provider value={i18n}>
-      <div className="app">
+      <div className="shell">
         {header}
         {body}
         {footer}

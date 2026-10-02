@@ -114,14 +114,31 @@ interface ExtractionPanelProps {
   onExtracted?: (entry: StudyDatabaseEntry) => void;
   /** True in the multi-user modes: show the credit note and job phases. */
   cloud?: boolean;
+  credits?: number | null;
+  onOpenReview?: (studyId: string) => void;
+  /** Called when a job settles with any outcome (credits may have moved). */
+  onSettled?: () => void;
 }
 
-export default function ExtractionPanel({ onExtracted, cloud = false }: ExtractionPanelProps) {
+type StepState = "waiting" | "running" | "passed" | "failed" | "rejected";
+
+/** Map the job's coarse status onto the four pipeline steps shown to the user. */
+function pipelineSteps(phase: JobStatus | null, outcome: JobStatus | null): StepState[] {
+  if (outcome === "succeeded") return ["passed", "passed", "passed", "passed"];
+  if (outcome === "rejected") return ["passed", "passed", "passed", "rejected"];
+  if (outcome === "failed") return ["passed", "failed", "waiting", "waiting"];
+  if (phase === "queued") return ["passed", "waiting", "waiting", "waiting"];
+  if (phase === "running") return ["passed", "running", "running", "waiting"];
+  return ["waiting", "waiting", "waiting", "waiting"];
+}
+
+export default function ExtractionPanel({ onExtracted, cloud = false, credits = null, onOpenReview, onSettled }: ExtractionPanelProps) {
   const { t } = useI18n();
   const [dragOver, setDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [phase, setPhase] = useState<JobStatus | null>(null);
+  const [outcome, setOutcome] = useState<JobStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<StudyDatabaseEntry | null>(null);
 
@@ -173,12 +190,14 @@ export default function ExtractionPanel({ onExtracted, cloud = false }: Extracti
       setLoading(true);
       setError(null);
       setResult(null);
+      setOutcome(null);
       setPhase("queued");
       try {
         // 8.0: one job per upload. The server reserves a credit, runs the
         // model in the background and the browser polls until it settles.
         const job = await createJob(file, { title, authors, year, country });
         const done = await waitForJob(job.id, (j) => setPhase(j.status));
+        setOutcome(done.status);
         if (done.status === "succeeded" && done.study_id) {
           const entry = await fetchStudy(done.study_id);
           setResult(entry);
@@ -192,17 +211,30 @@ export default function ExtractionPanel({ onExtracted, cloud = false }: Extracti
         const msg =
           err instanceof Error ? err.message : "Extraction failed. Check backend.";
         setError(msg.startsWith("402") ? t("ex_no_credits") : msg);
+        setOutcome("failed");
       } finally {
         setLoading(false);
         setPhase(null);
+        onSettled?.();
       }
     },
-    [file, title, authors, year, country, onExtracted, t]
+    [file, title, authors, year, country, onExtracted, onSettled, t]
   );
 
+  const steps = pipelineSteps(phase, outcome);
+  const stepLabel: Record<StepState, string> = {
+    waiting: t("ex_waiting"),
+    running: t("ex_running_s"),
+    passed: t("ex_passed"),
+    failed: t("ex_failed_s"),
+    rejected: t("ex_rejected_s"),
+  };
+
   return (
-    <div className="panel extraction-panel">
-      <h2 className="panel-title">Extract Effect Size from PDF</h2>
+    <div className="extract">
+    <div className="extract-form">
+      <h2 className="page-title">Extract an effect size</h2>
+      <p className="lede">The model proposes; nothing enters the dataset until you verify and lock it.</p>
 
       {/* Drop zone */}
       <div
@@ -297,24 +329,58 @@ export default function ExtractionPanel({ onExtracted, cloud = false }: Extracti
 
         {error && <p className="error-message" data-testid="extract-error">{error}</p>}
 
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading || !file}
-          data-testid="extract-submit"
-        >
-          {loading ? "Extracting…" : "Extract Effect Size"}
-        </button>
+        <div className="extract-run">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={loading || !file || (cloud && credits !== null && credits < 1)}
+            data-testid="extract-submit"
+          >
+            {loading ? "Extracting…" : "Run extraction"}
+          </button>
+          {cloud && credits !== null && (
+            <span className="hint-inline">
+              <span className="glyph glyph-locked" aria-hidden="true">◆</span> uses 1 {t("credit_one")} · {credits} left
+            </span>
+          )}
+        </div>
         {loading && phase && (
           <p className="hint-text job-phase" data-testid="job-phase">
             {phase === "queued" ? t("ex_queued") : t("ex_running")}
           </p>
         )}
         {cloud && <p className="hint-text">{t("ex_cost_note")}</p>}
+        <p className="hint-text mono">{t("ex_limits")}: 25 MB · 80 pages · 1 running job · 10 jobs per hour</p>
       </form>
+    </div>
 
-      {/* Result */}
-      {result && <ResultCard entry={result} />}
+    <aside className="extract-pipeline">
+      <span className="eyebrow">{t("ex_pipeline")}</span>
+      <ol className="pipeline">
+        {([["ex_s1", "ex_s1d"], ["ex_s2", "ex_s2d"], ["ex_s3", "ex_s3d"], ["ex_s4", "ex_s4d"]] as const).map(([k, d], i) => (
+          <li key={k} className={`step step-${steps[i]}`} data-testid={`step-${i + 1}`} data-state={steps[i]}>
+            <span className="step-n mono">0{i + 1}</span>
+            <span className="step-body">
+              <span className="step-title">{t(k)}</span>
+              <span className="step-detail">{t(d)}</span>
+            </span>
+            <span className="step-state mono">{stepLabel[steps[i]]}</span>
+          </li>
+        ))}
+      </ol>
+
+      {result && (
+        <div className="extract-result" data-testid="result-wrap">
+          <ResultCard entry={result} />
+          <p className="hint-text">{t("ex_mods_blank")}</p>
+          {onOpenReview && (
+            <button type="button" className="btn btn-link" onClick={() => onOpenReview(result.study_id)}>
+              {t("ex_open_review")} →
+            </button>
+          )}
+        </div>
+      )}
+    </aside>
     </div>
   );
 }

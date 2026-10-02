@@ -78,6 +78,8 @@ export interface ExtractedEffect {
   extraction_confidence: number;
   requires_verification: boolean;
   pi_locked: boolean;
+  /** 8.0: set by PATCH /verify with pi_approved=true; required before locking. */
+  pi_approved_at: string | null;
   pi_edited_fields: string[];
   pi_override_at: string | null; // ISO 8601 or null
   derived_from: string | null;

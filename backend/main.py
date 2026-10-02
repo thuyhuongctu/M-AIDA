@@ -622,8 +622,13 @@ def verify_study(study_id: str, decision: VerificationDecision, user: CurrentUse
     # flagged whatever the PI ticked (finding A3).
     if data.get("effect_r") is None:
         data["requires_verification"] = True
+        data["pi_approved_at"] = None
     elif decision.pi_approved:
         data["requires_verification"] = False
+        # 8.0: the approval itself is recorded; the lock gate requires it.
+        data["pi_approved_at"] = datetime.now(timezone.utc)
+    else:
+        data["pi_approved_at"] = None
 
     updated = StudyDatabaseEntry(**data)
     _studies.put(updated, owner_id=user.id)
@@ -659,6 +664,13 @@ def lock_study(study_id: str, user: CurrentUser) -> StudyDatabaseEntry:
                 "Study still requires verification; "
                 "approve via PATCH /verify before locking."
             ),
+        )
+    if entry.pi_approved_at is None:
+        # 8.0: a high machine confidence is not an approval. Nothing is locked
+        # until a person has approved it through PATCH /verify.
+        raise HTTPException(
+            status_code=422,
+            detail="Study has not been approved by the PI; approve via PATCH /verify before locking.",
         )
     if entry.effect_r is None or entry.variance_r is None:
         # 7.2.0 (finding A3): final data must carry an effect size AND its
