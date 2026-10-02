@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { signInWithEmail, signInWithGoogle } from "../auth";
 import { useI18n } from "../i18n";
 import { Logo } from "./Logo";
+import VnMark from "./VnMark";
 
 interface LoginScreenProps {
   mode: "supabase" | "mock";
@@ -53,6 +54,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
   return (
     <div className="login" data-testid="login-card">
       <aside className="login-brand">
+        <VnMark variant="hero" />
         <div className="login-brand-top">
           <Logo />
         </div>

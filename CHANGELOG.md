@@ -94,7 +94,12 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   hình thoi gộp theo hiệu ứng cố định ghi rõ "xem trước" vì mô hình ba cấp
   chạy ở metafor; **tour hướng dẫn** 11 bước dạng hộp chữ song ngữ (tự mở lần
   đăng nhập đầu, nút "Guide/Hướng dẫn" mở lại), đánh dấu vùng liên quan trên
-  từng màn hình.
+  từng màn hình. **Bản đồ Việt Nam chìm dưới nền** như trang 7.x
+  (`frontend/src/assets/vnmark.svg`, 5,6 KB): đường bờ đất liền, quần đảo
+  Hoàng Sa và Trường Sa, lá cờ ở cực Bắc, ngôi sao ở Cần Thơ, bốn ngọn hải
+  đăng nhấp nháy (dừng khi người dùng chọn giảm chuyển động); rõ ở cột trái
+  màn hình đăng nhập, mờ dưới nội dung ở mọi trang khác, không in ra. Hai ảnh
+  chân dung trong bản đồ cũ được bỏ theo quyết định không dùng nhân vật.
 - **Pháp lý**: `legal/TERMS.md` và `legal/PRIVACY.md` (Điều khoản dịch vụ và
   Chính sách riêng tư cho beta kín, song ngữ Anh/Việt, viết đối chiếu được với
   lược đồ `backend/db.py`: không lưu PDF, các bảng lưu gì, bên xử lý Supabase/

@@ -440,3 +440,25 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 .tour-btns { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
 .tour-btns-right { display: flex; gap: 0.4rem; }
 .tour-target { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: var(--radius); }
+
+/* --- Vietnam map watermark (as on the 7.x site) ------------------------------------ */
+.shell { position: relative; isolation: isolate; }
+.vnmark { pointer-events: none; user-select: none; }
+.vnmark img { display: block; width: 100%; height: auto; }
+.vnmark-page {
+  position: fixed; z-index: -1; top: 54%; right: 1.5%; transform: translateY(-50%);
+  width: min(32vw, 440px); opacity: 0.55;
+}
+.login-brand { position: relative; overflow: hidden; isolation: isolate; }
+.vnmark-hero {
+  position: absolute; z-index: -1; top: 50%; right: -6%; transform: translateY(-50%);
+  width: min(32vw, 420px); opacity: 0.75;
+}
+.login-brand-mid { max-width: 300px; }
+/* let the map show through the review panes that sit on the page colour */
+.rv-queue, .rv-evidence { background: transparent; }
+@media (max-width: 760px) {
+  .vnmark-page { right: 50%; top: 60%; transform: translate(50%, -50%); width: min(88vw, 380px); opacity: 0.4; }
+  .vnmark-hero { right: 50%; transform: translate(50%, -50%); width: min(70vw, 300px); opacity: 0.45; }
+}
+@media print { .vnmark { display: none; } }
