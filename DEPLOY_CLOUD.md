@@ -24,8 +24,19 @@ của Supabase (sao lưu hằng ngày theo gói); PDF tải lên chỉ ở bộ 
 
 ## 2. Chuẩn bị (làm một lần)
 
-1. **Tên miền** trỏ bản ghi A về IP của VPS.
-2. **Dự án Supabase riêng** cho M-AIDA (không dùng chung với BizOn):
+1. **VPS** Ubuntu 22.04/24.04 đặt ở **Singapore** (cùng vùng với cơ sở dữ liệu
+   Supabase `ap-southeast-1`, để mỗi yêu cầu không phải đi xa). Tối thiểu
+   2 vCPU / 2 GB; nên 2 vCPU / 4 GB vì bước dựng giao diện (npm) chạy ngay trên
+   máy chủ.
+2. **Tên miền** (hoặc tên miền con) trỏ bản ghi A về IP của VPS.
+3. **Máy chủ gửi thư (SMTP) cho thư đăng nhập: bắt buộc.** Dịch vụ thư có sẵn
+   của Supabase chỉ gửi tới địa chỉ của thành viên dự án và chỉ 2 thư mỗi giờ,
+   nên người dùng beta sẽ nhận lỗi "Email address not authorized". Tạo tài khoản
+   ở một nhà cung cấp SMTP (ví dụ Resend: gói miễn phí 100 thư/ngày; Brevo: 300
+   thư/ngày), xác minh tên miền gửi (bản ghi SPF, DKIM do nhà cung cấp đưa), rồi
+   điền máy chủ, cổng, tài khoản, mật khẩu ở Supabase → Authentication → Emails →
+   SMTP Settings. Địa chỉ gửi nên là `no-reply@<tên miền>`.
+4. **Dự án Supabase riêng** cho M-AIDA (không dùng chung với BizOn):
    - Authentication → Providers: bật Email (magic link) và Google (cần OAuth
      client trên Google Cloud; có thể để sau, magic link là đủ cho beta).
    - Authentication → URL Configuration: Site URL = `https://<tên miền>`,
@@ -36,18 +47,24 @@ của Supabase (sao lưu hằng ngày theo gói); PDF tải lên chỉ ở bộ 
      `postgresql+psycopg://`.
    - Nếu dự án còn ký JWT bằng *JWT secret* (HS256) thay vì khóa bất đối xứng:
      lấy secret ở Project Settings → JWT Keys và điền `SUPABASE_JWT_SECRET`.
-3. **Khóa Anthropic** riêng cho dịch vụ, đặt hạn mức chi tiêu tháng trên
+5. **Khóa Anthropic** riêng cho dịch vụ, đặt hạn mức chi tiêu tháng trên
    console (gợi ý: bằng khoảng 2 lần doanh thu tín dụng kỳ vọng).
 
 ## 3. Cài đặt trên VPS (Ubuntu 22.04/24.04)
 
+Bản 8.0 nằm ở nhánh `v8-cloud` (nhánh `main` vẫn là 7.2.3, bản chạy trên
+Windows), nên bộ cài lấy từ nhánh đó và đặt `MAIDA_BRANCH=v8-cloud`:
+
 ```bash
 ssh root@<ip>
-curl -fsSL https://raw.githubusercontent.com/thuyhuongctu/M-AIDA/main/deploy/install.sh -o install.sh
-bash install.sh                 # lần 1: cài Docker, clone kho, tạo deploy/.env.cloud rồi dừng
-nano /opt/m-aida/deploy/.env.cloud   # điền MAIDA_DOMAIN, SUPABASE_URL, SUPABASE_ANON_KEY, DATABASE_URL, LLM_API_KEY, MAIDA_ADMIN_EMAILS
-bash install.sh                 # lần 2: dựng và chạy
+curl -fsSL https://raw.githubusercontent.com/thuyhuongctu/M-AIDA/v8-cloud/deploy/install.sh -o install.sh
+MAIDA_BRANCH=v8-cloud bash install.sh   # lần 1: cài Docker, clone kho, tạo deploy/.env.cloud rồi dừng
+nano /opt/m-aida/deploy/.env.cloud      # điền MAIDA_DOMAIN, SUPABASE_URL, SUPABASE_ANON_KEY, DATABASE_URL, LLM_API_KEY, MAIDA_ADMIN_EMAILS
+MAIDA_BRANCH=v8-cloud bash install.sh   # lần 2: dựng và chạy
 ```
+
+Khi 8.0 được gộp vào `main`, bỏ `MAIDA_BRANCH` và đổi `v8-cloud` trong đường
+dẫn thành `main`.
 
 Lần chạy thứ hai, trước khi khởi động, bộ cài chạy `backend/check_cloud.py`
 bên trong image backend: đọc `.env.cloud`, thử kết nối Postgres, tải JWKS của

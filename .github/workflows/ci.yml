@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, 'dev/**', 'fix/**', 'feat/**', 'chore/**']
+    branches: [main, v8-cloud, 'dev/**', 'fix/**', 'feat/**', 'chore/**']
   pull_request:
 
 jobs:
@@ -44,3 +44,31 @@ jobs:
       - name: Production build
         working-directory: frontend
         run: npm run build
+
+  images:
+    # The VPS builds these images itself (docker-compose.cloud.yml); building
+    # them here first means a broken Dockerfile shows up in CI, not on the server.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.service }} image (not pushed)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.service }}
+          push: false
+          tags: maida-${{ matrix.service }}:ci
+          load: true
+      - name: Backend image starts and answers /api/health
+        if: matrix.service == 'backend'
+        run: |
+          docker run -d --name maida -p 8765:8765 maida-backend:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8765/api/health; then echo; exit 0; fi
+            sleep 2
+          done
+          docker logs maida
+          exit 1
