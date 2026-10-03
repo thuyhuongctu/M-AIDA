@@ -126,9 +126,19 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   án nghiên cứu luận án, không ghi địa chỉ Trường, không ghi chức vụ hành chính.
   Chân trang bỏ dòng "School of Economics, Can Tho University". Nguồn và quyền
   dùng hình ghi ở `frontend/src/assets/people/README.md`. Không đưa vào: nhân vật
-  trong tour, thẻ mẹo, hộp khóa và công cụ quản trị; logo 3D (tải three.js từ
-  CDN); trang Tạo tài khoản có thêm trường và trang Bảng giá (để sau beta).
-  Kiểm thử đầu cuối mở hộp Liên hệ và kiểm tra không có địa chỉ, chức vụ.
+  trong tour, thẻ mẹo, hộp khóa và công cụ quản trị; trang Tạo tài khoản có thêm
+  trường và trang Bảng giá (để sau beta). Kiểm thử đầu cuối mở hộp Liên hệ và
+  kiểm tra không có địa chỉ, chức vụ.
+- **Logo 3D** (`Logo3D`, `src/three/maidaLogo3d.ts`, dựng lại từ bản thiết kế
+  03/10): chữ ba lớp mực/cát/hổ phách như mô hình ba cấp, gạch nối là một dòng
+  forest plot, bản đồ Việt Nam với Hoàng Sa, Trường Sa và Cần Thơ là hình thoi
+  gộp, hai tác giả đứng hai đầu. Ở cột trái màn hình đăng nhập (kéo để xoay, bánh
+  xe vẫn cuộn trang) và trong hộp "M-AIDA 3D" mở khi bấm logo ở đầu trang (có
+  phóng to). three.js 0.184.0 cài trong gói, tách thành chunk riêng (~145 KB
+  gzip) chỉ tải ở hai chỗ đó; không gọi CDN nên không phải nới CSP. Không có
+  WebGL thì hiện logo phẳng; khi người dùng chọn giảm chuyển động thì mô hình
+  đứng yên. Khung hình tính theo bán kính ngang của mô hình để không bị cắt ở
+  mọi góc xoay. Kiểm thử đầu cuối kiểm tra cả hai chỗ.
 - **Pháp lý**: `legal/TERMS.md` và `legal/PRIVACY.md` (Điều khoản dịch vụ và
   Chính sách riêng tư cho beta kín, song ngữ Anh/Việt, viết đối chiếu được với
   lược đồ `backend/db.py`: không lưu PDF, các bảng lưu gì, bên xử lý Supabase/
@@ -157,6 +167,7 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   (hiện `sha256:fb368e1cb9123eef`; prompt của 8.0 trùng 7.2.x, khác 7.1.1).
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
+  `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);
   `@supabase/supabase-js` (frontend, chỉ tải khi chạy chế độ
   `supabase`). Chưa có trong 8.0: thanh toán, trang giá, xóa tài khoản tự phục
   vụ, Sentry/uptime (xem `DEPLOY_CLOUD.md` §8).

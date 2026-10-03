@@ -14,6 +14,7 @@ import { signInWithEmail, signInWithGoogle } from "../auth";
 import { useI18n } from "../i18n";
 import ContactDialog from "./ContactDialog";
 import { Logo } from "./Logo";
+import Logo3D from "./Logo3D";
 import VnMark from "./VnMark";
 import sceneLogin from "../assets/people/scene-login.webp";
 
@@ -64,6 +65,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
           <Logo />
         </div>
         <div className="login-brand-mid">
+          <Logo3D framing={1.12} className="logo3d-login" />
           <p className="login-claim">
             {lang === "vi"
               ? "Máy đề xuất kèm câu trích nguyên văn. Người kiểm chứng và khóa."

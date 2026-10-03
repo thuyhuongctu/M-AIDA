@@ -14,6 +14,7 @@ import { fetchHealth, fetchMe, getAdminKey, setAdminKey } from "./api";
 import { AuthState, getAuthState, initAuth, subscribe } from "./auth";
 import AccountPanel from "./components/AccountPanel";
 import ContactDialog from "./components/ContactDialog";
+import Logo3DDialog from "./components/Logo3DDialog";
 import Dashboard from "./components/Dashboard";
 import DatasetPanel from "./components/DatasetPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
@@ -77,6 +78,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("extract");
   const [focusStudyId, setFocusStudyId] = useState<string | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
+  const [logo3dOpen, setLogo3dOpen] = useState(false);
   // Every (re-)sign-in lands on the dashboard; the per-session counters reset too.
   const userId = auth.user?.id ?? null;
   useEffect(() => {
@@ -154,7 +156,17 @@ export default function App() {
   const header = (
     <header className="shell-head">
       <div className="shell-head-left">
-        <Logo />
+        <button
+          type="button"
+          className="logo-btn"
+          onClick={() => setLogo3dOpen(true)}
+          title={t("logo3d_open")}
+          aria-label={t("logo3d_open")}
+          data-testid="logo-3d-open"
+        >
+          <Logo />
+        </button>
+        <Logo3DDialog open={logo3dOpen} onClose={() => setLogo3dOpen(false)} />
         {signedIn && config && (
           <nav className="shell-nav" role="tablist">
             {tabs
