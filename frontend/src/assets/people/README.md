@@ -5,8 +5,8 @@
 | `scene-login.webp` | `assets/scene-login.jpg` của gói thiết kế 03/10/2026, đổi sang WebP, giữ nguyên tỉ lệ 688 × 384 | Màn hình đăng nhập, luân phiên |
 | `scene-magnifier.webp` | Ảnh cô gửi 03/10/2026 (hai tác giả cầm kính lúp), 688 × 384 | Màn hình đăng nhập, luân phiên |
 | `scene-huong-maida.webp` | Ảnh cô gửi 03/10/2026 (Hương cầm kính lúp, biểu tượng M-AIDA), 688 × 384 | Màn hình đăng nhập, luân phiên |
-| `avatar-huong.webp` | Cắt phần mặt từ ảnh cận mặt Hương cô gửi 03/10/2026 (bỏ hết bảng số), 192 × 192 | Hộp Liên hệ |
-| `avatar-tu.webp` | Cắt phần mặt từ ảnh cận mặt Thầy Tú cô gửi 03/10/2026 (bỏ hết bảng số), 192 × 192 | Hộp Liên hệ |
+| `avatar-huong.webp` | Cắt phần đầu và vai, nhìn thẳng, từ `assets/huong.png` của gói thiết kế, 192 × 192 | Hộp Liên hệ |
+| `avatar-tu.webp` | Cắt phần đầu và vai, nhìn thẳng, từ `assets/tu/aodai.png` của gói thiết kế, đặt trên nền trắng, 192 × 192 | Hộp Liên hệ |
 | `figure-huong.webp` | `assets/huong/present.png` của gói thiết kế, đổi sang WebP giữ nền trong suốt, 231 × 499 | Logo 3D (đăng nhập, hộp M-AIDA 3D) |
 | `figure-tu.webp` | `assets/tu/aodai.png` của gói thiết kế, đổi sang WebP giữ nền trong suốt, 439 × 1046 | Logo 3D (đăng nhập, hộp M-AIDA 3D) |
 
