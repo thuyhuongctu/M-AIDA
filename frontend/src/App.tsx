@@ -13,6 +13,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchHealth, fetchMe, getAdminKey, setAdminKey } from "./api";
 import { AuthState, getAuthState, initAuth, subscribe } from "./auth";
 import AccountPanel from "./components/AccountPanel";
+import ContactDialog from "./components/ContactDialog";
 import Dashboard from "./components/Dashboard";
 import DatasetPanel from "./components/DatasetPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
@@ -75,6 +76,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<Tab>("extract");
   const [focusStudyId, setFocusStudyId] = useState<string | null>(null);
+  const [contactOpen, setContactOpen] = useState(false);
   // Every (re-)sign-in lands on the dashboard; the per-session counters reset too.
   const userId = auth.user?.id ?? null;
   useEffect(() => {
@@ -216,10 +218,12 @@ export default function App() {
   const footer = (
     <footer className="shell-foot">
       <p>
-        M-AIDA v{version} · Do Thuy Huong &amp;{" "}
-        <a href="https://patueconomics.com/" target="_blank" rel="noopener noreferrer">Phan Anh Tu</a>{" "}
-        · School of Economics, Can Tho University
+        M-AIDA v{version} · {t("project_line")} ·{" "}
+        <button type="button" className="link-btn" onClick={() => setContactOpen(true)} data-testid="contact-open">
+          {t("contact_open")}
+        </button>
       </p>
+      <ContactDialog open={contactOpen} onClose={() => setContactOpen(false)} />
       {cloud && (
         <p className="footer-legal">
           <a href="/legal/terms.html" target="_blank" rel="noopener noreferrer">{t("legal_terms")}</a>

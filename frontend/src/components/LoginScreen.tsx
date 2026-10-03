@@ -3,14 +3,19 @@
  *
  * Supabase mode: magic link by e-mail or Google. Mock mode (tests): any
  * e-mail signs in at once. The screen is never shown in admin_key mode.
- * Two columns: the brand block with the one-sentence promise, and the form.
+ * Two columns: the brand block (promise, illustration of the two authors,
+ * contact) and the form. The illustration is the only character artwork on a
+ * working route besides the contact avatars (decision 03/10/2026: characters
+ * on the front, not at the workbench).
  */
 
 import React, { useState } from "react";
 import { signInWithEmail, signInWithGoogle } from "../auth";
 import { useI18n } from "../i18n";
+import ContactDialog from "./ContactDialog";
 import { Logo } from "./Logo";
 import VnMark from "./VnMark";
+import sceneLogin from "../assets/people/scene-login.webp";
 
 interface LoginScreenProps {
   mode: "supabase" | "mock";
@@ -23,6 +28,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [contactOpen, setContactOpen] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +60,6 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
   return (
     <div className="login" data-testid="login-card">
       <aside className="login-brand">
-        <VnMark variant="hero" />
         <div className="login-brand-top">
           <Logo />
         </div>
@@ -64,11 +69,22 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
               ? "Máy đề xuất kèm câu trích nguyên văn. Người kiểm chứng và khóa."
               : "The machine proposes, with the sentence it read. A person verifies and locks."}
           </p>
+          <figure className="login-scene">
+            <img src={sceneLogin} alt={t("login_scene_alt")} width={688} height={384} />
+          </figure>
         </div>
-        <p className="login-brand-foot">Do Thuy Huong &amp; Phan Anh Tu · School of Economics, Can Tho University</p>
+        <p className="login-brand-foot">
+          {t("project_line")} ·{" "}
+          <button type="button" className="link-btn" onClick={() => setContactOpen(true)} data-testid="contact-open">
+            {t("contact_open")}
+          </button>
+        </p>
+        <ContactDialog open={contactOpen} onClose={() => setContactOpen(false)} />
       </aside>
 
       <section className="login-side">
+        {/* the map moved behind the form when the illustration took the brand column */}
+        <VnMark variant="hero" />
         <div className="login-topbar">
           <button type="button" className={`seg ${lang === "en" ? "seg-on" : ""}`} onClick={() => setLang("en")}>EN</button>
           <button type="button" className={`seg ${lang === "vi" ? "seg-on" : ""}`} onClick={() => setLang("vi")}>VI</button>

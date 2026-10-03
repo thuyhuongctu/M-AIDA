@@ -116,6 +116,19 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   đăng nhấp nháy (dừng khi người dùng chọn giảm chuyển động); rõ ở cột trái
   màn hình đăng nhập, mờ dưới nội dung ở mọi trang khác, không in ra. Hai ảnh
   chân dung trong bản đồ cũ được bỏ theo quyết định không dùng nhân vật.
+- **Mặt tiền theo gói thiết kế 03/10** (quyết định cùng ngày: nhân vật ở mặt
+  tiền, không ở bàn làm việc). Cột trái màn hình đăng nhập có tranh minh họa
+  hai tác giả (`frontend/src/assets/people/scene-login.webp`, 37 KB, giữ tỉ lệ
+  gốc, không cắt); bản đồ Việt Nam chìm chuyển sang sau cột biểu mẫu. Hộp
+  **Liên hệ** (`ContactDialog`), mở từ chân trang đăng nhập và chân trang ứng
+  dụng: Đỗ Thùy Hương và PGS.TS. Phan Anh Tú (ảnh đại diện, vai trò đồng sáng
+  lập, e-mail, GitHub, trang cá nhân; Thầy đã đồng ý), M-AIDA trình bày là dự
+  án nghiên cứu luận án, không ghi địa chỉ Trường, không ghi chức vụ hành chính.
+  Chân trang bỏ dòng "School of Economics, Can Tho University". Nguồn và quyền
+  dùng hình ghi ở `frontend/src/assets/people/README.md`. Không đưa vào: nhân vật
+  trong tour, thẻ mẹo, hộp khóa và công cụ quản trị; logo 3D (tải three.js từ
+  CDN); trang Tạo tài khoản có thêm trường và trang Bảng giá (để sau beta).
+  Kiểm thử đầu cuối mở hộp Liên hệ và kiểm tra không có địa chỉ, chức vụ.
 - **Pháp lý**: `legal/TERMS.md` và `legal/PRIVACY.md` (Điều khoản dịch vụ và
   Chính sách riêng tư cho beta kín, song ngữ Anh/Việt, viết đối chiếu được với
   lược đồ `backend/db.py`: không lưu PDF, các bảng lưu gì, bên xử lý Supabase/
