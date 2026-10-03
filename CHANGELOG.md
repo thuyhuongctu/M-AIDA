@@ -129,6 +129,11 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   trong tour, thẻ mẹo, hộp khóa và công cụ quản trị; trang Tạo tài khoản có thêm
   trường và trang Bảng giá (để sau beta). Kiểm thử đầu cuối mở hộp Liên hệ và
   kiểm tra không có địa chỉ, chức vụ.
+- **Tranh đăng nhập luân phiên** (ảnh cô gửi 03/10): mỗi lần mở trang hiện một
+  trong ba tranh cùng cỡ 688 × 384 (hai tác giả trước màn hình phân tích; hai tác
+  giả cầm kính lúp; Hương với biểu tượng M-AIDA), mỗi tranh có mô tả thay thế
+  riêng. Ảnh đại diện trong hộp Liên hệ thay bằng ảnh cận mặt, cắt bỏ hết bảng số
+  (số trong tranh do công cụ tạo ảnh vẽ, vô nghĩa).
 - **Logo 3D** (`Logo3D`, `src/three/maidaLogo3d.ts`, dựng lại từ bản thiết kế
   03/10): chữ ba lớp mực/cát/hổ phách như mô hình ba cấp, gạch nối là một dòng
   forest plot, bản đồ Việt Nam với Hoàng Sa, Trường Sa và Cần Thơ là hình thoi

@@ -79,6 +79,7 @@ def main() -> int:
             # 3D logo: WebGL scene when the browser has WebGL, flat wordmark otherwise
             expect(page.get_by_test_id("logo3d")).to_have_attribute("data-state", re.compile("ready|fallback"), timeout=20000)
             print("[e2e] login 3D logo:", page.get_by_test_id("logo3d").get_attribute("data-state"))
+            expect(page.get_by_test_id("login-scene")).to_have_attribute("alt", re.compile("^Illustration: "))
             page.wait_for_timeout(800)
             shot("01-login")
             # Contact: both authors, presented as a research project, no institutional address

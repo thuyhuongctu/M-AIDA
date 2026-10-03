@@ -17,6 +17,16 @@ import { Logo } from "./Logo";
 import Logo3D from "./Logo3D";
 import VnMark from "./VnMark";
 import sceneLogin from "../assets/people/scene-login.webp";
+import sceneMagnifier from "../assets/people/scene-magnifier.webp";
+import sceneHuongMaida from "../assets/people/scene-huong-maida.webp";
+import type { StringKey } from "../i18n";
+
+/** Illustrations that take turns on the sign-in page (one per visit). */
+const SCENES: { src: string; alt: StringKey }[] = [
+  { src: sceneLogin, alt: "login_scene_alt" },
+  { src: sceneMagnifier, alt: "login_scene_alt_magnifier" },
+  { src: sceneHuongMaida, alt: "login_scene_alt_maida" },
+];
 
 interface LoginScreenProps {
   mode: "supabase" | "mock";
@@ -30,6 +40,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
+  const [scene] = useState(() => SCENES[Math.floor(Math.random() * SCENES.length)]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +83,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
               : "The machine proposes, with the sentence it read. A person verifies and locks."}
           </p>
           <figure className="login-scene">
-            <img src={sceneLogin} alt={t("login_scene_alt")} width={688} height={384} />
+            <img src={scene.src} alt={t(scene.alt)} width={688} height={384} data-testid="login-scene" />
           </figure>
         </div>
         <p className="login-brand-foot">
