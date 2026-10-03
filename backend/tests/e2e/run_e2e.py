@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import subprocess
 import sys
 import time
@@ -75,6 +76,10 @@ def main() -> int:
             # 1. Sign in
             page.goto(BASE)
             expect(page.get_by_test_id("login-card")).to_be_visible()
+            # 3D logo: WebGL scene when the browser has WebGL, flat wordmark otherwise
+            expect(page.get_by_test_id("logo3d")).to_have_attribute("data-state", re.compile("ready|fallback"), timeout=20000)
+            print("[e2e] login 3D logo:", page.get_by_test_id("logo3d").get_attribute("data-state"))
+            page.wait_for_timeout(800)
             shot("01-login")
             # Contact: both authors, presented as a research project, no institutional address
             page.get_by_test_id("contact-open").click()
@@ -104,6 +109,15 @@ def main() -> int:
             expect(page.get_by_test_id("tour")).to_have_count(0)
             page.get_by_test_id("tab-dashboard").click()
             shot("02-dashboard-empty")
+            # header logo opens the 3D dialog; three.js is loaded only now
+            page.get_by_test_id("logo-3d-open").click()
+            dlg = page.get_by_test_id("logo3d-dialog")
+            expect(dlg).to_be_visible()
+            expect(dlg.get_by_test_id("logo3d")).to_have_attribute("data-state", re.compile("ready|fallback"), timeout=20000)
+            page.wait_for_timeout(800)
+            shot("02b-logo3d-dialog")
+            page.keyboard.press("Escape")
+            expect(dlg).to_be_hidden()
 
             # 2. Upload and extract
             page.get_by_test_id("tab-extract").click()
