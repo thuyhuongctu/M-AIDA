@@ -538,3 +538,8 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 .logo3d-large { height: min(70vh, 560px); border-radius: 0; }
 .logo3d-note { margin: 0; padding: 0.6rem 1.1rem 0.8rem; font-size: 0.82rem; color: var(--ink-2); }
 @media (max-width: 760px) { .logo3d-login { height: 200px; } }
+/* phones: the sign-in form comes first; the brand column (3D logo, illustration) follows */
+@media (max-width: 760px) {
+  .login-side { order: -1; border-bottom: 1px solid var(--line); }
+  .login-form-wrap { padding: 1.25rem 1rem 1.75rem; }
+}
