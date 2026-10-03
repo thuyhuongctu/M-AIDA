@@ -168,6 +168,8 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);
+  `axios` nâng lên 1.20 (vá lỗ hổng mức cao của 1.0 đến 1.19 do `npm audit` báo:
+  prototype pollution trong fetch adapter, ReDoS khi phân tích URL `data:`);
   `@supabase/supabase-js` (frontend, chỉ tải khi chạy chế độ
   `supabase`). Chưa có trong 8.0: thanh toán, trang giá, xóa tài khoản tự phục
   vụ, Sentry/uptime (xem `DEPLOY_CLOUD.md` §8).
