@@ -62,6 +62,7 @@ def cloud(tmp_path, monkeypatch):
     if not url.startswith("sqlite"):
         monkeypatch.setenv("DATABASE_URL", url)
     monkeypatch.setenv("MAIDA_ADMIN_EMAILS", "operator@example.org")
+    monkeypatch.setenv("MAIDA_INVITED_EMAILS", "@example.org")
     monkeypatch.setenv("MAIDA_BETA_CREDITS", "3")
     monkeypatch.setenv("MAIDA_JOBS_PER_HOUR", "4")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-not-real")
@@ -394,3 +395,43 @@ def test_database_url_is_normalised_for_psycopg():
     assert s.resolved_database_url == "postgresql+psycopg://u:p@h:6543/db"
     assert Settings(database_url="postgres://u:p@h/db").resolved_database_url.startswith("postgresql+psycopg://")
     assert Settings(database_url="", maida_db_path="x.db").resolved_database_url == "sqlite:///x.db"
+
+
+# ----------------------------------------------------------------------------- closed beta: invitations
+
+
+def test_invitation_rules():
+    from settings import Settings
+
+    closed = Settings(maida_admin_emails="Boss@Lab.org", maida_invited_emails="")
+    assert closed.is_invited("boss@lab.org") and not closed.is_invited("someone@lab.org")
+    listed = Settings(maida_admin_emails="", maida_invited_emails=" A@x.org , @CTU.edu.vn ")
+    assert listed.is_invited("a@X.org") and listed.is_invited("ncs@ctu.edu.vn")
+    assert not listed.is_invited("b@x.org") and not listed.is_invited("ncs@student.ctu.edu.vn.evil.com")
+    assert not listed.is_invited("") and not listed.is_invited("no-at-sign")
+    assert Settings(maida_invited_emails="*").is_invited("anyone@anywhere.net")
+
+
+def test_uninvited_sign_in_creates_nothing(cloud):
+    main, client, _, login = cloud
+    r = client.post("/api/auth/mock-login", json={"email": "mallory@evil.test"})
+    assert r.status_code == 403 and r.json()["detail"].startswith("not_invited")
+    # a token minted elsewhere (as Supabase would) is refused on every route too
+    token = main._verifier.mint_mock_token("mallory-sub", "mallory@evil.test")
+    for path in ("/api/me", "/api/studies", "/api/jobs"):
+        assert client.get(path, headers={"Authorization": f"Bearer {token}"}).status_code == 403
+    admin = login("operator@example.org")
+    emails = [u["email"] for u in client.get("/api/admin/users", headers=admin).json()]
+    assert "mallory@evil.test" not in emails  # no account row, so no free credits either
+
+
+def test_removing_an_invitation_locks_out_an_existing_account(cloud):
+    main, client, _, login = cloud
+    alice, bob, admin = login("alice@example.org"), login("bob@example.org"), login("operator@example.org")
+    assert client.get("/api/me", headers=alice).status_code == 200
+    import settings as settings_module
+
+    settings_module.get_settings().maida_invited_emails = "bob@example.org"
+    assert client.get("/api/me", headers=alice).status_code == 403  # her still-valid token no longer works
+    assert client.get("/api/me", headers=bob).status_code == 200
+    assert client.get("/api/me", headers=admin).status_code == 200  # admins are always allowed

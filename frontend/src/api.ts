@@ -106,6 +106,11 @@ http.interceptors.response.use(
   }
 );
 
+/** True when the backend refused the caller as not invited to the closed beta (403 not_invited). */
+export function isNotInvited(err: unknown): boolean {
+  return err instanceof Error && err.message.includes("not_invited");
+}
+
 // ---------------------------------------------------------------------------
 // Health
 // ---------------------------------------------------------------------------

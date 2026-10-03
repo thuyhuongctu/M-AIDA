@@ -105,6 +105,15 @@ class Settings(BaseSettings):
     # see admin_emails below).
     maida_admin_emails: str = ""
 
+    # Closed beta: who may sign in at all (auth modes "supabase" and "mock").
+    # Comma-separated e-mail addresses and/or whole domains written with a
+    # leading "@" (e.g. "a@x.org, @ctu.edu.vn"). "*" lets anyone with the link
+    # in. Admin e-mails are always allowed. Empty = only the admins: a closed
+    # beta stays closed until someone is invited, and nobody can create
+    # accounts (each with free credits paid by the operator's API key) just by
+    # finding the URL.
+    maida_invited_emails: str = ""
+
     # Credits granted to every new account (closed beta: 10; after launch: 3).
     maida_beta_credits: int = 10
 
@@ -148,6 +157,23 @@ class Settings(BaseSettings):
         return frozenset(
             e.strip().lower() for e in self.maida_admin_emails.split(",") if e.strip()
         )
+
+    @property
+    def invitations(self) -> tuple[bool, frozenset[str], frozenset[str]]:
+        """(open to anyone, invited addresses, invited domains)."""
+        items = [i.strip().lower() for i in self.maida_invited_emails.split(",") if i.strip()]
+        domains = frozenset(i[1:] for i in items if i.startswith("@") and len(i) > 1)
+        addresses = frozenset(i for i in items if "@" in i and not i.startswith("@"))
+        return ("*" in items, addresses, domains)
+
+    def is_invited(self, email: str) -> bool:
+        email = (email or "").strip().lower()
+        if not email or "@" not in email:
+            return False
+        open_to_all, addresses, domains = self.invitations
+        if open_to_all or email in self.admin_emails or email in addresses:
+            return True
+        return email.rsplit("@", 1)[1] in domains
 
     @property
     def cloud_mode(self) -> bool:

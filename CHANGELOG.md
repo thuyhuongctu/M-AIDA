@@ -134,6 +134,21 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   giả cầm kính lúp; Hương với biểu tượng M-AIDA), mỗi tranh có mô tả thay thế
   riêng. Ảnh đại diện trong hộp Liên hệ là ảnh nhìn thẳng, cùng cỡ đầu, cùng áo
   dài trắng như hai nhân vật trong logo 3D.
+- **Danh sách mời cho beta kín** (`MAIDA_INVITED_EMAILS`): trước đây ai có
+  đường dẫn cũng đăng nhập được (bằng Google, hoặc thư đăng nhập khi đã có SMTP)
+  và mỗi tài khoản mới nhận tín dụng miễn phí trả bằng khóa API của người vận
+  hành. Nay chỉ địa chỉ hoặc tên miền (`@ctu.edu.vn`) trong danh sách, cùng các
+  admin, mới đăng nhập được; để trống là chỉ admin; `*` là mở cho mọi người.
+  Kiểm tra ở mọi yêu cầu, trước khi ghi gì vào cơ sở dữ liệu, nên người ngoài
+  danh sách không tạo được tài khoản và bỏ một địa chỉ khỏi danh sách là khóa
+  ngay tài khoản đó. Giao diện hiện một màn hình "chưa có trong danh sách beta"
+  kèm địa chỉ liên hệ thay vì không gian làm việc toàn lỗi. `check_cloud.py`
+  báo số địa chỉ, tên miền được mời và cảnh báo khi để `*`. Chế độ "Testing"
+  của Google OAuth không thay được việc này: với quyền đăng nhập cơ bản, người
+  ngoài danh sách thử nghiệm vẫn đăng nhập được.
+- **Chạy thử một mình trên Windows** (`CHAY_MAIDA_V8_THU.bat`): bản 8.0 ở chế độ
+  thử trên `127.0.0.1:8766`, môi trường Python và cơ sở dữ liệu riêng, mã khóa
+  lấy từ bản 7.2.3 bên cạnh; không cần Supabase, VPS, tên miền hay SMTP.
 - **Logo 3D** (`Logo3D`, `src/three/maidaLogo3d.ts`, dựng lại từ bản thiết kế
   03/10): chữ ba lớp mực/cát/hổ phách như mô hình ba cấp, gạch nối là một dòng
   forest plot, bản đồ Việt Nam với Hoàng Sa, Trường Sa và Cần Thơ là hình thoi

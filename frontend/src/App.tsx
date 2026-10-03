@@ -10,8 +10,8 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchHealth, fetchMe, getAdminKey, setAdminKey } from "./api";
-import { AuthState, getAuthState, initAuth, subscribe } from "./auth";
+import { fetchHealth, fetchMe, getAdminKey, isNotInvited, setAdminKey } from "./api";
+import { AuthState, getAuthState, initAuth, signOut, subscribe } from "./auth";
 import AccountPanel from "./components/AccountPanel";
 import ContactDialog from "./components/ContactDialog";
 import Logo3DDialog from "./components/Logo3DDialog";
@@ -90,12 +90,22 @@ export default function App() {
 
   // Account summary for the header pills (credits) - cloud modes only.
   const [me, setMe] = useState<MeResponse | null>(null);
+  // Closed beta: a signed-in address that is not on MAIDA_INVITED_EMAILS gets
+  // 403 not_invited from every route; show one clear screen instead of a
+  // workspace full of errors.
+  const [notInvited, setNotInvited] = useState(false);
   useEffect(() => {
+    setNotInvited(false);
     if (!cloud || !auth.user) {
       setMe(null);
       return;
     }
-    fetchMe().then(setMe).catch(() => setMe(null));
+    fetchMe()
+      .then(setMe)
+      .catch((err: unknown) => {
+        setMe(null);
+        if (isNotInvited(err)) setNotInvited(true);
+      });
   }, [cloud, auth.user, refreshKey]);
 
   // Version label: read once from /api/health so the UI can never disagree
@@ -259,6 +269,21 @@ export default function App() {
     body = (
       <main className="shell-main">
         <p className="loading-text">{t("loading")}</p>
+      </main>
+    );
+  } else if (cloud && auth.user && notInvited) {
+    body = (
+      <main className="shell-main">
+        <section className="not-invited" data-testid="not-invited">
+          <h1 className="page-title">{t("not_invited_title")}</h1>
+          <p className="mono">{auth.user.email}</p>
+          <p>
+            {t("not_invited_body")} <a href="mailto:thuyhuongctu@gmail.com">thuyhuongctu@gmail.com</a>.
+          </p>
+          <button type="button" className="btn btn-primary" onClick={() => void signOut()}>
+            {t("not_invited_switch")}
+          </button>
+        </section>
       </main>
     );
   } else if (cloud && !auth.user) {

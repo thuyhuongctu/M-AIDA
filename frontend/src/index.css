@@ -543,3 +543,8 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
   .login-side { order: -1; border-bottom: 1px solid var(--line); }
   .login-form-wrap { padding: 1.25rem 1rem 1.75rem; }
 }
+
+/* --- closed beta: address not invited --------------------------------------------- */
+.not-invited { max-width: 560px; margin: 3rem auto; padding: 1.6rem 1.8rem; display: flex; flex-direction: column; gap: 0.7rem; align-items: flex-start; border: 1px solid var(--line-2); border-radius: var(--radius-lg); background: var(--card); }
+.not-invited .page-title { margin: 0; font-size: 1.5rem; text-wrap: balance; }
+.not-invited p { margin: 0; color: var(--ink-2); line-height: 1.5; }

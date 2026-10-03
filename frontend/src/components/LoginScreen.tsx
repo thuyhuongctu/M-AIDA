@@ -10,6 +10,7 @@
  */
 
 import React, { useState } from "react";
+import { isNotInvited } from "../api";
 import { signInWithEmail, signInWithGoogle } from "../auth";
 import { useI18n } from "../i18n";
 import ContactDialog from "./ContactDialog";
@@ -52,7 +53,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
       await signInWithEmail(value);
       if (mode === "supabase") setSent(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("error_generic"));
+      setError(isNotInvited(err) ? t("not_invited_login") : err instanceof Error ? err.message : t("error_generic"));
     } finally {
       setBusy(false);
     }

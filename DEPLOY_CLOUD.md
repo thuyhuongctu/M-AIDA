@@ -84,6 +84,16 @@ Kiểm tra sau khi chạy: `https://<tên miền>/api/health` trả về
 Tài khoản trong `MAIDA_ADMIN_EMAILS` đăng nhập lần đầu sẽ có vai trò
 `admin`: thẻ **Account** có công cụ cấp tín dụng và tổng chi phí mô hình.
 
+**Danh sách mời (beta kín).** `MAIDA_INVITED_EMAILS` liệt kê ai được đăng nhập:
+từng địa chỉ, hoặc cả tên miền viết với `@` đứng đầu, cách nhau bằng dấu phẩy
+(ví dụ `ncs01@gmail.com, @ctu.edu.vn`). Để trống thì chỉ các admin vào được;
+`*` thì ai có đường dẫn cũng vào được (chỉ dùng khi đã mở bán, vì mỗi tài khoản
+mới nhận tín dụng miễn phí trả bằng khóa API của cô). Người ngoài danh sách bị
+từ chối trước khi tài khoản được tạo, và bỏ một địa chỉ khỏi danh sách thì tài
+khoản đó bị khóa ngay ở yêu cầu kế tiếp (bản ghi vẫn còn trong cơ sở dữ liệu).
+Sửa danh sách xong thì khởi động lại backend:
+`docker compose -f docker-compose.cloud.yml --env-file deploy/.env.cloud up -d backend`.
+
 ## 4. Vận hành hằng ngày
 
 | Việc | Lệnh / nơi làm |
@@ -113,6 +123,12 @@ MAIDA_AUTH_MODE=mock MAIDA_FRONTEND_DIR=../frontend/build MAIDA_ADMIN_EMAILS=you
 ```
 
 Chế độ `mock` dùng token ký cục bộ, chỉ để kiểm thử; đừng mở ra Internet.
+
+Trên Windows có sẵn `CHAY_MAIDA_V8_THU.bat` cho việc này: đặt bản 8.0 (kèm
+`frontend\build` đã dựng) trong một thư mục cạnh thư mục `M-AIDA` của bản 7.2.3,
+nhấp đúp tệp; nó dựng môi trường Python riêng, lấy mã khóa từ
+`..\M-AIDA\backend\.env`, chỉ nghe ở `127.0.0.1:8766` (bản 7.2.3 vẫn ở cổng
+8765) và lưu dữ liệu thử ở `backend\maida_v8_thu.db`.
 Chạy bộ test nhiều người dùng trên Postgres thật (cần một cơ sở dữ liệu mẫu
 `template_supabase` có các vai trò `anon`, `authenticated`, `service_role` và
 quyền mặc định như Supabase): `MAIDA_TEST_PG_URL="postgresql+psycopg://postgres@/postgres?host=/tmp/pgtest&port=55432" pytest backend/tests/test_800_cloud_multiuser.py backend/tests/test_803_postgres.py`.

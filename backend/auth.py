@@ -149,6 +149,16 @@ class UserDirectory:
 
         sub = str(claims["sub"])
         email = str(claims.get("email") or "").lower()
+        # Closed beta: refuse before anything is written, so an uninvited
+        # sign-in creates no account and no free credits. Checked on every
+        # request, so removing an address from the list also locks out an
+        # account that already exists (its records stay in the database).
+        if not self.settings.is_invited(email):
+            logger.info("Refused sign-in for %s: not on MAIDA_INVITED_EMAILS", email or "(no e-mail)")
+            raise HTTPException(
+                status_code=403,
+                detail="not_invited: this e-mail address is not on the M-AIDA closed-beta list.",
+            )
         meta = claims.get("user_metadata") or {}
         name = str(meta.get("full_name") or meta.get("name") or "")
         wants_admin = bool(email) and email in self.settings.admin_emails

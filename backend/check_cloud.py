@@ -168,6 +168,17 @@ def check_auth(settings) -> bool:
                 ok = False
     if not settings.admin_emails:
         say(WARN, "MAIDA_ADMIN_EMAILS trống: sẽ không có tài khoản admin để cấp tín dụng.")
+    open_to_all, addresses, domains = settings.invitations
+    if open_to_all:
+        say(WARN, "MAIDA_INVITED_EMAILS=*: ai có đường dẫn cũng tạo được tài khoản và nhận "
+                  f"{settings.maida_beta_credits} tín dụng (trả bằng khóa API của người vận hành). Chỉ dùng khi đã mở bán.")
+    elif addresses or domains:
+        say(OK, f"Danh sách mời: {len(addresses)} địa chỉ, {len(domains)} tên miền"
+                + (f" ({', '.join('@' + d for d in sorted(domains))})" if domains else "")
+                + "; người ngoài danh sách bị từ chối trước khi tạo tài khoản.")
+    else:
+        say(WARN, "MAIDA_INVITED_EMAILS trống: chỉ các e-mail trong MAIDA_ADMIN_EMAILS đăng nhập được. "
+                  "Thêm e-mail hoặc tên miền (vd. @ctu.edu.vn) để mời người dùng beta.")
     return ok
 
 

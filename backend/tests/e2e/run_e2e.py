@@ -94,6 +94,10 @@ def main() -> int:
             shot("01b-contact")
             page.keyboard.press("Escape")
             expect(contact).to_be_hidden()
+            # closed beta: an address outside MAIDA_INVITED_EMAILS is refused, no account made
+            page.fill("#login-email", "mallory@evil.test")
+            page.click("text=Sign in (test mode)")
+            expect(page.locator(".error-message")).to_contain_text("not on the closed-beta list")
             page.fill("#login-email", "alice@example.org")
             page.click("text=Sign in (test mode)")
             expect(page.get_by_test_id("dashboard")).to_be_visible()
@@ -232,6 +236,29 @@ def main() -> int:
             page.goto(f"{BASE}/legal/privacy.html")
             expect(page.locator("h1#en")).to_contain_text("Privacy Policy")
             shot("12-privacy")
+
+            # 11. A session for an address that is no longer (or never was) invited,
+            #     as after a Supabase sign-in: one clear screen, not a broken workspace.
+            import time as _time
+
+            import jwt as _jwt
+
+            now = int(_time.time())
+            token = _jwt.encode({"sub": "mock-uninvited", "email": "mallory@evil.test", "aud": "authenticated",
+                                 "role": "authenticated", "iat": now, "exp": now + 600},
+                                os.environ.get("MAIDA_MOCK_JWT_SECRET", "maida-mock-secret-not-for-production"),
+                                algorithm="HS256")
+            page.goto(BASE)
+            page.evaluate("""([t]) => {
+                sessionStorage.setItem('maida_mock_token', t);
+                sessionStorage.setItem('maida_mock_user', JSON.stringify({id: 'mock-uninvited', email: 'mallory@evil.test', name: ''}));
+            }""", [token])
+            page.reload()
+            expect(page.get_by_test_id("not-invited")).to_be_visible()
+            expect(page.get_by_test_id("not-invited")).to_contain_text("mallory@evil.test")
+            shot("13-not-invited")
+            page.get_by_test_id("not-invited").get_by_role("button").click()
+            expect(page.get_by_test_id("login-card")).to_be_visible()
 
             browser.close()
         print("E2E passed.")
