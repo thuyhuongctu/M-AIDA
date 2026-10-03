@@ -146,6 +146,11 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   báo số địa chỉ, tên miền được mời và cảnh báo khi để `*`. Chế độ "Testing"
   của Google OAuth không thay được việc này: với quyền đăng nhập cơ bản, người
   ngoài danh sách thử nghiệm vẫn đăng nhập được.
+- **Bảng giá ước tính chi phí mô hình** đổi mặc định từ 3/15 sang 2/10 USD mỗi
+  triệu token đầu vào/đầu ra (giá Claude Sonnet 5 và 5.5 tra ngày 03/10/2026);
+  số cũ làm chi phí ước tính cao hơn thực tế khoảng một nửa. `claude-sonnet-5`
+  là bí danh của một mô hình nay đã thuộc loại cũ (legacy, không ngừng trước
+  30/06/2027); nghiên cứu đánh giá cần ghim một mã cố định.
 - **Chạy thử một mình trên Windows** (`CHAY_MAIDA_V8_THU.bat`): bản 8.0 ở chế độ
   thử trên `127.0.0.1:8766`, môi trường Python và cơ sở dữ liệu riêng, mã khóa
   lấy từ bản 7.2.3 bên cạnh; không cần Supabase, VPS, tên miền hay SMTP.

@@ -214,8 +214,8 @@ def test_admin_can_grant_credits_and_see_usage(cloud):
     assert client.post("/api/admin/credits", headers=alice, json={"email": "alice@example.org", "credits": 5}).status_code == 403
     usage = client.get("/api/admin/usage", headers=admin).json()
     assert usage["calls"] == 1 and usage["input_tokens"] == 1200 and usage["output_tokens"] == 150
-    # 1200 * 3 / 1e6 + 150 * 15 / 1e6 = 0.0036 + 0.00225
-    assert usage["estimated_cost_usd"] == pytest.approx(0.00585, abs=1e-6)
+    # 1200 * 2 / 1e6 + 150 * 10 / 1e6 = 0.0024 + 0.0015
+    assert usage["estimated_cost_usd"] == pytest.approx(0.0039, abs=1e-6)
     assert usage["outcomes"] == {"ok": 1}
 
 

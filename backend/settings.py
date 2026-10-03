@@ -126,8 +126,11 @@ class Settings(BaseSettings):
 
     # Price table used for the *estimated* cost column of llm_calls (USD per
     # million tokens). Real spend is what the provider console bills.
-    llm_price_input_per_mtok: float = 3.0
-    llm_price_output_per_mtok: float = 15.0
+    # Defaults = Claude Sonnet 5 / Sonnet 5.5 list price checked 03/10/2026
+    # (2 USD input, 10 USD output per million tokens); earlier releases used
+    # 3/15, which overstated the estimate by about half.
+    llm_price_input_per_mtok: float = 2.0
+    llm_price_output_per_mtok: float = 10.0
 
     # Serve a built frontend (frontend/build) from "/" when set: single-process
     # deployments, the Windows runner and the e2e suite use it; the compose
