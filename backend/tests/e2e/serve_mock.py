@@ -27,6 +27,7 @@ os.environ.setdefault("MAIDA_DB_PATH", str(Path(tempfile.mkdtemp(prefix="maida-e
 os.environ.setdefault("MAIDA_ADMIN_EMAILS", "operator@example.org")
 os.environ.setdefault("MAIDA_INVITED_EMAILS", "@example.org")
 os.environ.setdefault("MAIDA_BETA_CREDITS", "3")
+os.environ.setdefault("MAIDA_PAYMENTS", "mock")  # fake checkout, no money moves
 os.environ.setdefault("MAIDA_FRONTEND_DIR", str(ROOT / "frontend" / "build"))
 os.environ.setdefault("ANTHROPIC_API_KEY", "sk-e2e-not-real")
 os.environ.setdefault("LLM_MODEL", "fake-e2e-model")

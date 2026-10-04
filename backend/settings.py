@@ -132,6 +132,32 @@ class Settings(BaseSettings):
     llm_price_input_per_mtok: float = 2.0
     llm_price_output_per_mtok: float = 10.0
 
+    # ------------------------------------------------------------------
+    # Payments (credit packs). Off unless MAIDA_PAYMENTS is set.
+    # ------------------------------------------------------------------
+    #   ""     - no shop: credits come only from beta grants and the operator.
+    #   payos  - payOS (VietQR) payment links; needs the three PAYOS_* keys of
+    #            a payment channel and MAIDA_PUBLIC_URL for the return pages.
+    #   mock   - a local fake checkout for tests and the e2e run. Refused in
+    #            auth mode "supabase": anyone could pay themselves credits.
+    maida_payments: str = ""
+    payos_client_id: str = ""
+    payos_api_key: str = ""
+    payos_checksum_key: str = ""
+    payos_api_base: str = "https://api-merchant.payos.vn"
+
+    # Public address of the site (no trailing slash), used to build the
+    # return and cancel URLs that the payment page sends the buyer back to.
+    maida_public_url: str = ""
+
+    # Credit packs on sale: "id:credits:price_vnd" entries separated by commas.
+    # The defaults are the DRAFT prices of the 03/10/2026 commercial plan
+    # (still to be approved by the co-owners); set the variable to change them.
+    maida_credit_packs: str = "thu:30:149000,tongquan:100:399000,nhom:300:990000"
+
+    # Minutes before an unpaid payment link expires.
+    maida_order_ttl_minutes: int = 30
+
     # Serve a built frontend (frontend/build) from "/" when set: single-process
     # deployments, the Windows runner and the e2e suite use it; the compose
     # stack keeps nginx in front instead.
@@ -177,6 +203,30 @@ class Settings(BaseSettings):
         if open_to_all or email in self.admin_emails or email in addresses:
             return True
         return email.rsplit("@", 1)[1] in domains
+
+    @property
+    def credit_packs(self) -> tuple[tuple[str, int, int], ...]:
+        """(pack id, credits, price in VND) parsed from MAIDA_CREDIT_PACKS."""
+        packs: list[tuple[str, int, int]] = []
+        for item in self.maida_credit_packs.split(","):
+            item = item.strip()
+            if not item:
+                continue
+            parts = [p.strip() for p in item.split(":")]
+            if len(parts) != 3 or not parts[0]:
+                raise ValueError(f"MAIDA_CREDIT_PACKS entry {item!r} is not id:credits:price_vnd")
+            pack_id, credits, price = parts[0], int(parts[1]), int(parts[2])
+            if credits <= 0 or price <= 0:
+                raise ValueError(f"MAIDA_CREDIT_PACKS entry {item!r} needs positive numbers")
+            if any(p[0] == pack_id for p in packs):
+                raise ValueError(f"MAIDA_CREDIT_PACKS has pack id {pack_id!r} twice")
+            packs.append((pack_id, credits, price))
+        return tuple(packs)
+
+    @property
+    def payments_provider(self) -> str:
+        """"" (no shop), "payos" or "mock"."""
+        return self.maida_payments.strip().lower()
 
     @property
     def cloud_mode(self) -> bool:

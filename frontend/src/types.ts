@@ -153,6 +153,8 @@ export interface ClientConfig {
   beta_credits: number;
   max_pdf_mb: number;
   max_pages: number;
+  /** Payment provider for credit packs; "" (or absent on older servers) = no shop. */
+  payments?: PaymentProvider;
 }
 
 export interface MockLoginResponse {
@@ -257,4 +259,53 @@ export interface NotionSyncResponse {
   failed: number;
   errors: string[];
   message: string;
+}
+
+// ---------------------------------------------------------------------------
+// Payments: credit packs (8.0, backend/payments.py)
+// ---------------------------------------------------------------------------
+
+export type PaymentProvider = "" | "payos" | "mock";
+
+export interface CreditPack {
+  id: string;
+  credits: number;
+  price_vnd: number;
+}
+
+export interface PacksResponse {
+  enabled: boolean;
+  provider: PaymentProvider;
+  currency: "VND";
+  packs: CreditPack[];
+}
+
+export type OrderStatus = "pending" | "paid" | "cancelled" | "expired" | "failed";
+
+export interface PaymentOrder {
+  id: string;
+  /** Numeric code the payment provider knows the order by (shown to the buyer). */
+  order_code: number;
+  pack_id: string;
+  credits: number;
+  amount: number;
+  currency: string;
+  status: OrderStatus;
+  provider: string;
+  /** Payment page; empty unless the order is still pending. */
+  checkout_url: string;
+  /** Bank reference once paid; "UNDERPAID <amount> <ref>" when too little arrived. */
+  payment_reference: string;
+  created_at: string;
+  paid_at: string | null;
+  expires_at: string | null;
+  /** Only in the operator's list. */
+  email?: string;
+}
+
+export interface AdminOrders {
+  orders: PaymentOrder[];
+  paid_orders: number;
+  paid_amount_vnd: number;
+  paid_credits: number;
 }

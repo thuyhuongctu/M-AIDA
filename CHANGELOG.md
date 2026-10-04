@@ -190,14 +190,33 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   không gửi tham số, đúng hành vi cũ); `extractor.prompt_fingerprint()` băm
   system prompt, mẫu tin nhắn, giới hạn 40.000 ký tự và 1.024 token đầu ra
   (hiện `sha256:fb368e1cb9123eef`; prompt của 8.0 trùng 7.2.x, khác 7.1.1).
+- **Mua gói tín dụng qua payOS** (`backend/payments.py`, migration
+  `0003_payments`, tắt mặc định): `MAIDA_PAYMENTS=payos` cùng `PAYOS_CLIENT_ID`,
+  `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, `MAIDA_PUBLIC_URL` (https) mở phần
+  *Buy credits* ở thẻ Account. Tuyến mới: `GET /api/payments/packs`,
+  `POST/GET /api/payments/orders`, `POST /api/payments/orders/{ref}/sync|cancel`,
+  `POST /api/payments/payos/webhook` (công khai, xác thực bằng chữ ký
+  HMAC-SHA256 trên `data`), `GET /api/admin/orders` (đơn và tổng đã thu). Chữ ký
+  yêu cầu và chữ ký webhook đối chiếu với SDK Python chính thức của payOS
+  (1.1.0) trên cùng dữ liệu. Mỗi đơn cộng tín dụng đúng một lần (khóa dòng trên
+  Postgres, chỉ mục duy nhất một phần `ux_ledger_purchase_order`); chuyển thiếu
+  không cộng; tiền đến cho đơn đã hủy hoặc hết hạn vẫn cộng; 6 liên kết mỗi giờ
+  mỗi người. Khi quay về từ trang thanh toán (`/?payment=return&order=...`),
+  thẻ Account hỏi lại trạng thái đơn nên tín dụng vẫn vào khi webhook đến muộn.
+  Giá gói đặt bằng `MAIDA_CREDIT_PACKS`; mặc định là giá **nháp** của kế hoạch
+  03/10/2026, chưa được duyệt. `MAIDA_PAYMENTS=mock` (trang thanh toán giả) chỉ
+  chạy với `MAIDA_AUTH_MODE=mock` và được bộ kiểm thử trình duyệt dùng.
+  `check_cloud.py` kiểm cấu hình thanh toán và in URL webhook cần đăng ký.
+  15 test mới (`test_804_payments.py`), 2 test cho `check_cloud.py`. Chưa có:
+  hạn dùng tín dụng 12 tháng, điều khoản mua gói trong `TERMS.md`, hóa đơn.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);
   `axios` nâng lên 1.20 (vá lỗ hổng mức cao của 1.0 đến 1.19 do `npm audit` báo:
   prototype pollution trong fetch adapter, ReDoS khi phân tích URL `data:`);
   `@supabase/supabase-js` (frontend, chỉ tải khi chạy chế độ
-  `supabase`). Chưa có trong 8.0: thanh toán, trang giá, xóa tài khoản tự phục
-  vụ, Sentry/uptime (xem `DEPLOY_CLOUD.md` §8).
+  `supabase`). Chưa có trong 8.0: thanh toán bằng thẻ quốc tế, trang giá công
+  khai, xóa tài khoản tự phục vụ, Sentry/uptime (xem `DEPLOY_CLOUD.md` §8).
 
 ## 7.2.3 (02/10/2026): sửa lỗi mã PIN của Defense App; chạy thật trên Windows
 

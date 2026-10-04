@@ -363,7 +363,25 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 .grant-form { display: grid; grid-template-columns: 2fr 1fr auto; gap: 0.75rem; align-items: end; max-width: 640px; }
 .grant-form .form-row { margin-bottom: 0; }
 .grant-form .hint-text { grid-column: 1 / -1; }
-.usage-line { font-size: 0.88rem; color: var(--ink-2); margin: 1rem 0 0.75rem; }
+.usage-line, .paid-line { font-size: 0.88rem; color: var(--ink-2); margin: 1rem 0 0.75rem; }
+.badge-plain { color: var(--muted); border-color: var(--line-2); background: var(--card-2); }
+
+/* credit packs and payments */
+.pay-notice { margin: 0 0 1rem; padding: 0.6rem 0.85rem; border: 1px solid var(--line-2); border-radius: var(--radius); font-size: 0.9rem; color: var(--ink-2); background: var(--card-2); }
+.pay-notice-ok { color: var(--ok-dark); border-color: var(--ok); background: var(--ok-bg); }
+.pay-notice-warn { color: var(--danger-dark); border-color: var(--danger); background: var(--danger-bg); }
+.pay-shop { margin: 0 0 1.25rem; }
+.pay-intro { max-width: 70ch; margin: 0 0 0.75rem; }
+.pack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.75rem; max-width: 760px; }
+.pack-card { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--card); }
+.pack-name { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.pack-credits { font-family: var(--serif); font-size: 1.6rem; line-height: 1.15; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pack-credits small { font-family: inherit; font-size: 0.85rem; color: var(--muted); }
+.pack-price { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pack-unit { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; font-variant-numeric: tabular-nums; }
+.pack-card .btn { align-self: flex-start; margin-top: auto; }
+.orders-table .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.order-actions { display: flex; gap: 0.6rem; align-items: center; justify-content: flex-end; white-space: nowrap; }
 
 /* --- login ---------------------------------------------------------------------- */
 .login { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 100vh; }

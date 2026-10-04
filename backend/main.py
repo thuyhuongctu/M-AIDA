@@ -24,6 +24,13 @@ POST   /api/notion/sync           Push caller's locked studies to Notion
 GET    /api/admin/users           (admin) accounts and balances
 POST   /api/admin/credits         (admin) grant credits
 GET    /api/admin/usage           (admin) model calls and estimated cost
+GET    /api/payments/packs        Credit packs on sale (empty when payments are off)
+POST   /api/payments/orders       Create a payment link for a pack → checkout URL
+GET    /api/payments/orders       Caller's orders, newest first
+POST   /api/payments/orders/{ref}/sync    Ask the provider about one order (id or order code)
+POST   /api/payments/orders/{ref}/cancel  Mark a pending order cancelled
+POST   /api/payments/payos/webhook        payOS payment notification (public, signed)
+GET    /api/admin/orders          (admin) all orders and paid totals
 
 Identity and data isolation (8.0)
 ---------------------------------
@@ -66,6 +73,7 @@ from extractor import PRIMARY_STAT_FIELDS, StatisticalExtractor
 from jobs import JobService, machine_proposal_snapshot
 from models import ExtractionRequest, StudyDatabaseEntry, VerificationDecision
 from notion_sync import NotionSync
+from payments import PaymentError, WebhookInvalid, build_payment_service
 from settings import get_settings
 from store import StudyStore
 
@@ -167,6 +175,10 @@ async def admin_key_guard(request: Request, call_next):
 _studies = StudyStore(settings.resolved_database_url)
 _sessions = _studies.session_factory
 _credits = CreditService(_sessions)
+_payments = build_payment_service(settings, _sessions)
+if settings.payments_provider and _payments.problem:
+    logger.error("MAIDA_PAYMENTS=%s but payments are disabled: %s",
+                 settings.payments_provider, _payments.problem)
 _verifier = TokenVerifier(settings) if settings.cloud_mode else None
 _directory = UserDirectory(_sessions, settings)
 current_user = build_current_user_dependency(settings, _verifier, _directory)
@@ -270,6 +282,7 @@ def client_config() -> dict[str, Any]:
         "beta_credits": settings.maida_beta_credits,
         "max_pdf_mb": settings.maida_max_pdf_mb,
         "max_pages": settings.maida_max_pages,
+        "payments": _payments.provider.name if _payments.enabled else "",
     }
 
 
@@ -334,6 +347,141 @@ def my_export(user: CurrentUser) -> dict[str, Any]:
         "jobs": [JobService.to_dict(j) for j in _jobs.list(user.id, limit=1000)],
         "ledger": [e.__dict__ for e in _credits.history(user.id, limit=1000)],
     }
+
+
+# ---------------------------------------------------------------------------
+# Payments: credit packs (payments.py)
+# ---------------------------------------------------------------------------
+
+
+def _payment_error(exc: PaymentError) -> HTTPException:
+    return HTTPException(status_code=exc.status_code, detail=exc.detail)
+
+
+class OrderCreate(BaseModel):
+    pack_id: str = Field(..., min_length=1, max_length=32)
+
+
+@app.get("/api/payments/packs", tags=["payments"])
+def payment_packs(user: CurrentUser) -> dict[str, Any]:
+    enabled = _payments.enabled and settings.cloud_mode
+    return {
+        "enabled": enabled,
+        "provider": _payments.provider.name if enabled else "",
+        "currency": "VND",
+        "packs": [{"id": p.id, "credits": p.credits, "price_vnd": p.price_vnd} for p in _payments.packs]
+        if enabled else [],
+    }
+
+
+@app.post("/api/payments/orders", status_code=201, tags=["payments"])
+def payment_create_order(body: OrderCreate, user: CurrentUser) -> dict[str, Any]:
+    try:
+        order = _payments.create_order(user.id, body.pack_id.strip())
+    except PaymentError as exc:
+        raise _payment_error(exc) from exc
+    _audit(user.id, "order", order_code=order["order_code"], pack=order["pack_id"], amount=order["amount"])
+    return order
+
+
+@app.get("/api/payments/orders", tags=["payments"])
+def payment_list_orders(user: CurrentUser, limit: int = Query(50, ge=1, le=200)) -> list[dict[str, Any]]:
+    return _payments.list_orders(user.id, limit)
+
+
+@app.post("/api/payments/orders/{ref}/sync", tags=["payments"])
+def payment_sync_order(ref: str, user: CurrentUser) -> dict[str, Any]:
+    try:
+        return _payments.sync_order(user.id, ref)
+    except PaymentError as exc:
+        raise _payment_error(exc) from exc
+
+
+@app.post("/api/payments/orders/{ref}/cancel", tags=["payments"])
+def payment_cancel_order(ref: str, user: CurrentUser) -> dict[str, Any]:
+    """Mark a pending order cancelled (the buyer came back via the cancel page).
+
+    Only local bookkeeping: if money for it arrives anyway, the webhook or a
+    status check still credits it.
+    """
+    try:
+        order = _payments.get_order(user.id, ref)
+        if order["status"] != "pending":
+            return order
+        return _payments.mark_cancelled(user.id, ref)
+    except PaymentError as exc:
+        raise _payment_error(exc) from exc
+
+
+@app.post("/api/payments/payos/webhook", tags=["payments"], include_in_schema=False)
+async def payos_webhook(request: Request) -> dict[str, Any]:
+    """payOS payment notification. Public: authenticity comes from the
+    HMAC-SHA256 signature over ``data`` with the channel's checksum key.
+
+    Answers 200 for every correctly signed notification, including payOS's
+    test call when the webhook URL is registered and notifications about
+    orders this server does not know, so payOS does not retry them forever.
+    """
+    if not (_payments.enabled and _payments.provider and _payments.provider.name == "payos"):
+        raise HTTPException(status_code=404, detail="Not found.")
+    try:
+        payload = await request.json()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Invalid JSON.") from exc
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="Invalid payload.")
+    try:
+        result = _payments.handle_webhook(payload)
+    except WebhookInvalid as exc:
+        logger.warning("payOS webhook rejected: %s", exc)
+        raise HTTPException(status_code=400, detail="Invalid signature.") from exc
+    return {"success": True, "result": result}
+
+
+# Mock checkout: tests and the e2e run only (auth mode "mock", MAIDA_PAYMENTS=mock).
+
+
+def _mock_order(order_code: int):
+    if not (_payments.enabled and _payments.provider and _payments.provider.name == "mock"):
+        raise HTTPException(status_code=404, detail="Not found.")
+    from db import Order
+
+    with _sessions() as s:
+        order = s.scalars(select(Order).where(Order.order_code == order_code)).first()
+    if order is None:
+        raise HTTPException(status_code=404, detail="Order not found.")
+    return order
+
+
+@app.get("/api/payments/mock/checkout/{order_code}", include_in_schema=False)
+def mock_checkout(order_code: int):
+    from fastapi.responses import HTMLResponse
+
+    order = _mock_order(order_code)
+    amount = f"{int(order.amount):,}".replace(",", ".")
+    return HTMLResponse(f"""<!doctype html><html lang="vi"><meta charset="utf-8">
+<title>Mock checkout {order_code}</title>
+<body style="font-family:sans-serif;max-width:420px;margin:40px auto">
+<h1>Mock checkout</h1><p>Test payment page (MAIDA_PAYMENTS=mock). No money moves.</p>
+<p>Order <b>{order_code}</b>: {order.credits} credits, {amount} {order.currency}</p>
+<form method="post" action="/api/payments/mock/checkout/{order_code}/pay">
+<button data-testid="mock-pay" type="submit">Pay (simulate)</button></form>
+<form method="post" action="/api/payments/mock/checkout/{order_code}/cancel">
+<button data-testid="mock-cancel" type="submit">Cancel</button></form></body></html>""")
+
+
+@app.post("/api/payments/mock/checkout/{order_code}/{action}", include_in_schema=False)
+def mock_checkout_action(order_code: int, action: str):
+    from fastapi.responses import RedirectResponse
+
+    order = _mock_order(order_code)
+    if action == "pay":
+        _payments.confirm_paid(order_code, amount_paid=int(order.amount),
+                               reference=f"MOCK{order_code}", source="mock")
+        return RedirectResponse(f"/?payment=return&order={order_code}", status_code=303)
+    if action == "cancel":
+        return RedirectResponse(f"/?payment=cancel&order={order_code}", status_code=303)
+    raise HTTPException(status_code=404, detail="Not found.")
 
 
 # ---------------------------------------------------------------------------
@@ -801,6 +949,12 @@ def admin_usage(user: CurrentUser, days: int = Query(30, ge=1, le=365)) -> dict[
         "price_table": {"input_per_mtok": settings.llm_price_input_per_mtok,
                         "output_per_mtok": settings.llm_price_output_per_mtok},
     }
+
+
+@app.get("/api/admin/orders", tags=["admin"])
+def admin_orders(user: CurrentUser, limit: int = Query(200, ge=1, le=1000)) -> dict[str, Any]:
+    require_admin(user)
+    return _payments.admin_orders(limit)
 
 
 # ---------------------------------------------------------------------------

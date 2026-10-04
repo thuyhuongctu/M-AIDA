@@ -26,6 +26,7 @@ from pathlib import Path
 
 from sqlalchemy import (
     JSON,
+    BigInteger,
     Boolean,
     DateTime,
     Float,
@@ -36,6 +37,7 @@ from sqlalchemy import (
     Text,
     create_engine,
     event,
+    text,
 )
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.engine import Engine
@@ -155,24 +157,52 @@ class CreditLedger(Base):
     note: Mapped[str] = mapped_column(String(300), nullable=False, default="")
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
 
-    __table_args__ = (Index("ix_ledger_owner_created", "owner_id", "created_at"),)
+    __table_args__ = (
+        Index("ix_ledger_owner_created", "owner_id", "created_at"),
+        # One purchase credit per order, whatever races (migration 0003).
+        Index("ux_ledger_purchase_order", "ref_order_id", unique=True,
+              postgresql_where=text("reason = 'purchase'"),
+              sqlite_where=text("reason = 'purchase'")),
+    )
 
 
 class Order(Base):
-    """Payment orders (filled by the payment webhook, phase S6; table exists now
-    so the ledger can reference it without a later migration)."""
+    """Credit-pack purchases (payments.py). One row per payment link.
+
+    ``status``: pending -> paid (credits added, exactly once) | cancelled |
+    expired. The ledger entry of a paid order carries ``ref_order_id`` and a
+    unique index (migration 0003) makes a second credit for the same order
+    impossible even if two notifications race.
+    """
 
     __tablename__ = "orders"
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     owner_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), nullable=False)
     provider: Mapped[str] = mapped_column(String(40), nullable=False, default="")
+    #: Provider-side id (payOS paymentLinkId).
     provider_order_id: Mapped[str] = mapped_column(String(120), nullable=False, default="")
+    #: Price actually charged, in ``currency`` units (VND for payOS).
     amount: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     currency: Mapped[str] = mapped_column(String(8), nullable=False, default="USD")
     credits: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    # -- 0003 --
+    #: Numeric order code sent to payOS (unique; payOS identifies orders by it).
+    order_code: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    pack_id: Mapped[str] = mapped_column(String(32), nullable=False, default="")
+    checkout_url: Mapped[str] = mapped_column(String(500), nullable=False, default="")
+    #: Bank transfer reference reported by the provider when paid.
+    payment_reference: Mapped[str] = mapped_column(String(120), nullable=False, default="")
+    paid_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+
+    __table_args__ = (
+        Index("ux_orders_order_code", "order_code", unique=True),
+        Index("ix_orders_owner_created", "owner_id", "created_at"),
+    )
 
 
 class AuditLog(Base):

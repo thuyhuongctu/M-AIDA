@@ -112,6 +112,73 @@ dạng từ chối (422) **không hoàn**; job lỗi phía hệ thống (nhà cu
 timeout, lỗi nội bộ, máy chủ khởi động lại) **hoàn tự động**. Số dư không bao
 giờ âm.
 
+### Bán gói tín dụng qua payOS (tắt mặc định)
+
+Backend có sẵn luồng mua gói tín dụng trả trước qua payOS (chuyển khoản
+VietQR). Mặc định tắt: khi `MAIDA_PAYMENTS` trống, thẻ Account không hiện phần
+mua gói và các tuyến `/api/payments/*` trả 503 hoặc 404.
+
+Trước khi bật:
+
+1. Các đồng sở hữu duyệt giá gói, rồi đặt `MAIDA_CREDIT_PACKS`
+   (`mã:số tín dụng:giá VND`, cách nhau bởi dấu phẩy). Nếu để trống, backend
+   dùng giá **nháp** của kế hoạch 03/10/2026:
+   `thu:30:149000,tongquan:100:399000,nhom:300:990000`.
+2. Bổ sung điều khoản mua gói vào `legal/TERMS.md` (giá, không hoàn tiền,
+   thời hạn dùng tín dụng) rồi sinh lại trang. Thời hạn 12 tháng trong kế
+   hoạch **chưa** được backend thực thi: hiện tín dụng không hết hạn.
+3. Tạo kênh thanh toán trên payOS gắn với tài khoản ngân hàng nhận tiền, lấy
+   Client ID, API Key và Checksum Key.
+
+Cấu hình trong `deploy/.env.cloud`:
+
+```
+MAIDA_PAYMENTS=payos
+PAYOS_CLIENT_ID=...
+PAYOS_API_KEY=...
+PAYOS_CHECKSUM_KEY=...
+MAIDA_PUBLIC_URL=https://maida.example.org
+```
+
+Chạy `check_cloud.py`: nó báo khóa còn thiếu và in URL webhook. Đăng ký URL
+`https://<tên miền>/api/payments/payos/webhook` cho kênh thanh toán trên
+trang quản lý payOS, hoặc gọi API (payOS gửi một lượt thử, backend trả 200):
+
+```bash
+curl -X POST https://api-merchant.payos.vn/confirm-webhook \
+  -H "x-client-id: $PAYOS_CLIENT_ID" -H "x-api-key: $PAYOS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"webhookUrl":"https://maida.example.org/api/payments/payos/webhook"}'
+```
+
+Luồng mua:
+
+1. Người dùng chọn gói; backend ghi đơn `pending` rồi xin payOS một liên kết
+   thanh toán (mã đơn 12 chữ số; nội dung chuyển khoản `MA` + 7 số cuối của mã
+   đơn; liên kết hết hạn sau `MAIDA_ORDER_TTL_MINUTES`, mặc định 30 phút).
+2. Người dùng chuyển khoản trên trang của payOS.
+3. payOS gọi webhook kèm chữ ký HMAC-SHA256; backend kiểm chữ ký bằng
+   Checksum Key rồi cộng tín dụng.
+4. payOS đưa trình duyệt về `/?payment=return&order=...`; thẻ Account hỏi lại
+   payOS trạng thái đơn, nên tín dụng vẫn vào khi webhook đến muộn hoặc chưa
+   được đăng ký. Người dùng cũng có nút *Check* ở từng đơn.
+
+Bảo đảm của backend:
+
+- mỗi đơn chỉ cộng tín dụng một lần (khóa dòng trên Postgres và chỉ mục duy
+  nhất `ux_ledger_purchase_order` của migration `0003_payments`), kể cả khi
+  payOS gửi lại webhook;
+- chuyển thiếu tiền thì không cộng: đơn giữ trạng thái chờ, ghi
+  `UNDERPAID ...` và hiện ở danh sách của người vận hành để xử lý tay;
+- tiền đến cho đơn đã hủy hoặc đã hết hạn vẫn được cộng, vì người dùng đã trả;
+- tối đa 6 liên kết thanh toán mỗi giờ cho mỗi người;
+- hệ thống không tự hoàn tiền.
+
+Người vận hành xem mọi đơn và tổng đã thu ở Account → Operator tools, hoặc
+`GET /api/admin/orders`. Giá trị `MAIDA_PAYMENTS=mock` chỉ để kiểm thử (trang
+thanh toán giả, không có tiền thật); backend từ chối nó khi đăng nhập thật
+(`MAIDA_AUTH_MODE=supabase`).
+
 ## 5. Chạy thử không cần Supabase (máy cá nhân hoặc CI)
 
 ```bash
@@ -134,7 +201,7 @@ Chạy bộ test nhiều người dùng trên Postgres thật (cần một cơ s
 quyền mặc định như Supabase): `MAIDA_TEST_PG_URL="postgresql+psycopg://postgres@/postgres?host=/tmp/pgtest&port=55432" pytest backend/tests/test_800_cloud_multiuser.py backend/tests/test_803_postgres.py`.
 Kiểm thử đầu cuối tự động bằng trình duyệt: `python backend/tests/e2e/run_e2e.py`
 (chạy backend giả lập mô hình, đăng nhập, tải PDF, duyệt, khóa, xuất CSV,
-kiểm tra tách dữ liệu và công cụ vận hành).
+kiểm tra tách dữ liệu, mua một gói qua trang thanh toán giả và công cụ vận hành).
 
 ## 6. Bảo mật
 
@@ -150,8 +217,9 @@ kiểm tra tách dữ liệu và công cụ vận hành).
   bảng điều khiển Supabase (bảng sẽ thuộc vai trò khác và thiếu khóa này).
 - Bí mật chỉ nằm trong `deploy/.env.cloud` (quyền 600, đã có trong .gitignore).
 - Backend xác minh JWT bằng JWKS của dự án (ES256/RS256) hoặc secret HS256;
-  kiểm tra `aud`, `exp`; mọi tuyến `/api/*` trừ `/api/health` và `/api/config`
-  đều cần token; dữ liệu lọc theo `owner_id` ở tầng backend.
+  kiểm tra `aud`, `exp`; mọi tuyến `/api/*` trừ `/api/health`, `/api/config`
+  và webhook payOS đều cần token (webhook được xác thực bằng chữ ký HMAC thay
+  cho token); dữ liệu lọc theo `owner_id` ở tầng backend.
 - Caddy thêm HSTS, CSP (chỉ cho phép kết nối tới `*.supabase.co`), chặn nhúng iframe.
 - Giới hạn: 25 MB và 80 trang mỗi PDF, 1 job đang chạy mỗi người, 4 job toàn
   hệ thống, 10 job mỗi giờ mỗi người (đổi trong `.env.cloud`).
@@ -171,6 +239,7 @@ báo người dùng trước 15 ngày như hai văn bản đã cam kết.
 
 ## 8. Chưa có trong 8.0 (dự kiến)
 
-Thanh toán (Lemon Squeezy/Paddle), trang giá, xóa tài khoản tự phục vụ (hiện
+Thanh toán bằng thẻ quốc tế, trang giá công khai, hạn dùng tín dụng 12 tháng,
+xóa tài khoản tự phục vụ (hiện
 xử lý qua e-mail trong 30 ngày như Chính sách ghi), hàng đợi ngoài tiến trình
 (arq + Redis) khi tải tăng, Sentry/uptime.

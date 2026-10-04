@@ -9,6 +9,7 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import type {
   AccountExport,
+  AdminOrders,
   AdminUsage,
   AdminUser,
   ClientConfig,
@@ -19,6 +20,8 @@ import type {
   MeResponse,
   MockLoginResponse,
   NotionSyncResponse,
+  PacksResponse,
+  PaymentOrder,
   StudyDatabaseEntry,
   StudyFilters,
   VerificationDecision,
@@ -204,6 +207,46 @@ export async function deleteStudy(studyId: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Payments: credit packs (8.0)
+// ---------------------------------------------------------------------------
+
+/** Absolute URL for a path the backend returns (the mock checkout page is relative). */
+export function apiUrl(pathOrUrl: string): string {
+  return pathOrUrl.startsWith("/") ? `${BASE_URL}${pathOrUrl}` : pathOrUrl;
+}
+
+export async function fetchPacks(): Promise<PacksResponse> {
+  const res: AxiosResponse<PacksResponse> = await http.get("/api/payments/packs");
+  return res.data;
+}
+
+/** Create a payment link for a pack; the caller then sends the browser to `checkout_url`. */
+export async function createOrder(packId: string): Promise<PaymentOrder> {
+  const res: AxiosResponse<PaymentOrder> = await http.post("/api/payments/orders", { pack_id: packId });
+  return res.data;
+}
+
+export async function fetchOrders(limit = 20): Promise<PaymentOrder[]> {
+  const res: AxiosResponse<PaymentOrder[]> = await http.get("/api/payments/orders", { params: { limit } });
+  return res.data;
+}
+
+/** Ask the server to check one order with the payment provider (id or order code). */
+export async function syncOrder(ref: string | number): Promise<PaymentOrder> {
+  const res: AxiosResponse<PaymentOrder> = await http.post(
+    `/api/payments/orders/${encodeURIComponent(String(ref))}/sync`
+  );
+  return res.data;
+}
+
+export async function cancelOrder(ref: string | number): Promise<PaymentOrder> {
+  const res: AxiosResponse<PaymentOrder> = await http.post(
+    `/api/payments/orders/${encodeURIComponent(String(ref))}/cancel`
+  );
+  return res.data;
+}
+
+// ---------------------------------------------------------------------------
 // Operator (admin) routes (8.0)
 // ---------------------------------------------------------------------------
 
@@ -219,6 +262,11 @@ export async function adminGrantCredits(email: string, credits: number, note = "
 
 export async function adminUsage(days = 30): Promise<AdminUsage> {
   const res: AxiosResponse<AdminUsage> = await http.get("/api/admin/usage", { params: { days } });
+  return res.data;
+}
+
+export async function adminOrders(limit = 200): Promise<AdminOrders> {
+  const res: AxiosResponse<AdminOrders> = await http.get("/api/admin/orders", { params: { limit } });
   return res.data;
 }
 

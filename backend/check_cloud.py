@@ -19,7 +19,9 @@ Các mục:
      được nâng khi backend khởi động).
   3. Supabase Auth: JWKS tải được (khóa bất đối xứng) hoặc có SUPABASE_JWT_SECRET.
   4. Mô hình: một yêu cầu 5 token tới LLM_MODEL (bỏ qua với --no-llm).
-  5. Cảnh báo: chế độ mock, demo bật, thiếu MAIDA_ADMIN_EMAILS, CORS.
+  5. Thanh toán (MAIDA_PAYMENTS): đủ khóa payOS, MAIDA_PUBLIC_URL là https,
+     bảng gói đọc được; in URL webhook cần đăng ký với payOS.
+  6. Cảnh báo: chế độ mock, demo bật, thiếu MAIDA_ADMIN_EMAILS, CORS.
 """
 
 from __future__ import annotations
@@ -205,6 +207,39 @@ def check_llm(settings) -> bool:
     return True
 
 
+def check_payments(settings) -> bool:
+    """MAIDA_PAYMENTS: refuse a half-configured shop; show what payOS needs."""
+    from payments import build_payment_service
+
+    provider = settings.payments_provider
+    service = build_payment_service(settings, None)
+    if not provider:
+        if service.problem:  # MAIDA_CREDIT_PACKS unreadable although the shop is off
+            say(WARN, f"MAIDA_CREDIT_PACKS: {service.problem}")
+        say(OK, "MAIDA_PAYMENTS trống: chưa bán gói tín dụng; tín dụng chỉ do người vận hành cấp.")
+        return True
+    if service.problem:
+        say(BAD, f"MAIDA_PAYMENTS={provider}: {service.problem}")
+        return False
+    packs = ", ".join(f"{p.id} {p.credits} tín dụng {p.price_vnd:,} đ".replace(",", ".") for p in service.packs)
+    say(OK, f"Thanh toán {provider}: {len(service.packs)} gói ({packs}); liên kết hết hạn sau "
+            f"{settings.maida_order_ttl_minutes} phút.")
+    from settings import Settings
+
+    if settings.maida_credit_packs.strip() == Settings.model_fields["maida_credit_packs"].default:
+        say(WARN, "MAIDA_CREDIT_PACKS chưa đặt: đang dùng giá NHÁP của kế hoạch 03/10/2026; "
+                  "đặt giá đã được các đồng sở hữu duyệt trước khi bán.")
+    if provider == "payos":
+        webhook = f"{settings.maida_public_url.rstrip('/')}/api/payments/payos/webhook"
+        say(OK, f"payOS: client id ...{settings.payos_client_id[-4:]}; trang quay về {settings.maida_public_url.rstrip('/')}/")
+        say(WARN, f"Đăng ký URL webhook cho kênh thanh toán payOS: {webhook} "
+                  "(payOS gửi một lượt thử; backend trả 200). Thiếu webhook thì tín dụng chỉ vào khi người mua "
+                  "quay lại trang hoặc bấm Kiểm tra.")
+    say(WARN, "Trước khi bán: Điều khoản dịch vụ phải có điều khoản mua gói (giá, không hoàn tiền, "
+              "thời hạn dùng tín dụng) và cách xử lý hóa đơn.")
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--env", default="", help="đường dẫn tệp .env (mặc định: biến môi trường hiện có / backend/.env)")
@@ -229,6 +264,7 @@ def main(argv: list[str] | None = None) -> int:
         results.append(check_db(url))
     else:
         results.append(check_db(url))
+    results.append(check_payments(settings))
     if settings.maida_demo_mode:
         say(BAD, "MAIDA_DEMO_MODE=true: chế độ demo tắt khóa quản trị; phải là false khi mở dịch vụ.")
         results.append(False)

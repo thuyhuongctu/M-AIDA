@@ -9,10 +9,10 @@
  *     Dashboard | Extract | Verify & Lock | Dataset | Account.
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchHealth, fetchMe, getAdminKey, isNotInvited, setAdminKey } from "./api";
 import { AuthState, getAuthState, initAuth, signOut, subscribe } from "./auth";
-import AccountPanel from "./components/AccountPanel";
+import AccountPanel, { readPaymentReturn, type PaymentReturn } from "./components/AccountPanel";
 import ContactDialog from "./components/ContactDialog";
 import Logo3DDialog from "./components/Logo3DDialog";
 import Dashboard from "./components/Dashboard";
@@ -79,11 +79,23 @@ export default function App() {
   const [focusStudyId, setFocusStudyId] = useState<string | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
   const [logo3dOpen, setLogo3dOpen] = useState(false);
-  // Every (re-)sign-in lands on the dashboard; the per-session counters reset too.
+  // Back from a payment page (/?payment=return|cancel&order=…): open the
+  // Account tab once, where the order is settled and the address cleaned.
+  const [paymentReturn, setPaymentReturn] = useState<PaymentReturn | null>(readPaymentReturn);
+  const paymentTabPending = useRef(paymentReturn !== null);
+  const paymentHandled = useCallback(() => {
+    setPaymentReturn(null);
+    setRefreshKey((k) => k + 1);
+  }, []);
+
+  // Every (re-)sign-in lands on the dashboard (or on Account after a payment);
+  // the per-session counters reset too.
   const userId = auth.user?.id ?? null;
   useEffect(() => {
     if (cloud) {
-      setActiveTab("dashboard");
+      const toAccount = paymentTabPending.current && userId !== null;
+      if (toAccount) paymentTabPending.current = false;
+      setActiveTab(toAccount ? "account" : "dashboard");
       setExtractionCount(0);
     }
   }, [cloud, userId]);
@@ -305,7 +317,9 @@ export default function App() {
           <ReviewScreen initialStudyId={focusStudyId} refreshKey={refreshKey} onChanged={bump} />
         )}
         {activeTab === "dataset" && <DatasetPanel refreshKey={refreshKey} />}
-        {activeTab === "account" && cloud && <AccountPanel refreshKey={refreshKey} />}
+        {activeTab === "account" && cloud && (
+          <AccountPanel refreshKey={refreshKey} paymentReturn={paymentReturn} onPaymentReturnHandled={paymentHandled} />
+        )}
       </main>
     );
   }

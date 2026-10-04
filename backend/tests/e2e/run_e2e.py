@@ -2,7 +2,8 @@
 
 Flow: sign in (mock) -> dashboard shows 3 credits -> upload a PDF -> job
 settles -> record shown -> credits 2 -> second user cannot see it ->
-verify -> lock -> CSV export -> account ledger -> sign out.
+verify -> lock -> CSV export -> account ledger -> credit pack bought through
+the mock checkout -> operator tools -> sign out.
 
 Prerequisites: `npm run build` in frontend/, `pip install playwright` in the
 backend venv and a Chromium Playwright can find. Starts serve_mock.py itself.
@@ -209,6 +210,21 @@ def main() -> int:
             expect(page.get_by_test_id("rv-item")).to_have_count(0)
             shot("08-bob-empty")
 
+            # 7b. Credit pack through the mock checkout: pay, come back to
+            #     /?payment=return&order=..., credits added once, address cleaned.
+            page.get_by_test_id("tab-account").click()
+            expect(page.get_by_test_id("pay-shop")).to_be_visible()
+            page.get_by_test_id("buy-thu").click()
+            page.wait_for_url(re.compile(r"/api/payments/mock/checkout/\d+$"))
+            shot("08b-mock-checkout")
+            page.get_by_test_id("mock-pay").click()
+            expect(page.get_by_test_id("pay-notice")).to_contain_text("30 credits added", timeout=15_000)
+            expect(page.get_by_test_id("account-credits")).to_have_text("33")
+            expect(page.get_by_test_id("orders-table")).to_contain_text("paid")
+            expect(page.locator(".ledger-table")).to_contain_text("Purchase")
+            assert "payment=" not in page.url, page.url
+            shot("08c-paid")
+
             # 8. Operator: grant credits, see usage
             page.get_by_test_id("tab-account").click()
             page.get_by_test_id("sign-out").click()
@@ -221,6 +237,7 @@ def main() -> int:
             page.get_by_role("button", name="Grant").click()
             expect(page.locator(".grant-form .hint-text")).to_contain_text("6 credits", timeout=10_000)
             expect(page.locator(".usage-line")).to_contain_text("2 calls")
+            expect(page.get_by_test_id("admin-paid-total")).to_contain_text("149,000")
             shot("09-operator")
 
             # 9. Vietnamese toggle renders
