@@ -276,7 +276,7 @@ const en = {
   not_invited_login: "This e-mail address is not on the closed-beta list. To ask for an invitation, write to thuyhuongctu@gmail.com.",
   logo3d_title: "M-AIDA in 3D",
   logo3d_note: "Each letter has three stacked levels, like the three-level meta-analysis model. Drag to turn, scroll to zoom.",
-  logo3d_alt: "M-AIDA logo in 3D: three-level letters, a forest-plot hyphen and the map of Vietnam, with the two authors on either side",
+  logo3d_alt: "M-AIDA logo in 3D: three-level letters, a forest-plot hyphen and the map of Vietnam, with Đỗ Thùy Hương on the left",
   logo3d_open: "Show the logo in 3D",
   // misc
   loading: "Loading…",
@@ -590,7 +590,7 @@ const vi: typeof en = {
   not_invited_login: "Địa chỉ e-mail này chưa có trong danh sách beta kín. Để xin lời mời, hãy viết tới thuyhuongctu@gmail.com.",
   logo3d_title: "M-AIDA 3D",
   logo3d_note: "Mỗi chữ gồm ba lớp xếp chồng, như mô hình phân tích gộp ba cấp. Kéo để xoay, cuộn để phóng to.",
-  logo3d_alt: "Logo M-AIDA dạng 3D: chữ ba lớp, gạch nối là một dòng forest plot, bản đồ Việt Nam, hai tác giả hai bên",
+  logo3d_alt: "Logo M-AIDA dạng 3D: chữ ba lớp, gạch nối là một dòng forest plot, bản đồ Việt Nam, Đỗ Thùy Hương đứng bên trái",
   logo3d_open: "Xem logo 3D",
   loading: "Đang tải…",
   error_generic: "Có lỗi xảy ra.",

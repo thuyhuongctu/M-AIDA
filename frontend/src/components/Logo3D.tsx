@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../i18n";
 import { Logo } from "./Logo";
 import figureHuong from "../assets/people/figure-huong.webp";
-import figureTu from "../assets/people/figure-tu.webp";
 
 interface Logo3DProps {
   /** Wheel zoom (dialog) or not (sign-in page, where the wheel scrolls the page). */
@@ -45,7 +44,6 @@ export default function Logo3D({ zoom = false, framing, className = "" }: Logo3D
         const handle = await mod.mountLogo3D(el, {
           background: bg,
           huongUrl: figureHuong,
-          advisorUrl: figureTu,
           animate: !reduce,
           zoom,
           framing,

@@ -8,7 +8,7 @@
 | `avatar-huong.webp` | Cắt phần đầu và vai, nhìn thẳng, từ `assets/huong.png` của gói thiết kế, 192 × 192 | Hộp Liên hệ |
 | `avatar-tu.webp` | Cắt phần đầu và vai, nhìn thẳng, từ `assets/tu/aodai.png` của gói thiết kế, đặt trên nền trắng, 192 × 192 | Hộp Liên hệ |
 | `figure-huong.webp` | `assets/huong/present.png` của gói thiết kế, đổi sang WebP giữ nền trong suốt, 231 × 499 | Logo 3D (đăng nhập, hộp M-AIDA 3D) |
-| `figure-tu.webp` | `assets/tu/aodai.png` của gói thiết kế, đổi sang WebP giữ nền trong suốt, 439 × 1046 | Logo 3D (đăng nhập, hộp M-AIDA 3D) |
+| `figure-tu.webp` | `assets/tu/aodai.png` của gói thiết kế, đổi sang WebP giữ nền trong suốt, 439 × 1046 | Không dùng từ 05/10/2026 (bỏ khỏi logo 3D theo ý cô Hương); giữ tệp, chưa xóa |
 
 - Các hình do Đỗ Thùy Hương tạo bằng công cụ AI, được phép dùng thương mại (theo xác nhận của tác giả ngày 03/10/2026).
 - PGS.TS. Phan Anh Tú đồng ý cho dùng hình, e-mail và trang cá nhân trên trang công khai của M-AIDA (theo xác nhận của Đỗ Thùy Hương ngày 03/10/2026).

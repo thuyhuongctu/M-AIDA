@@ -6,8 +6,9 @@
  * Every letter has three stacked levels (ink, sand, amber) like the
  * three-level meta-analysis model; the hyphen is a forest-plot row; the map of
  * Vietnam stands between the A and the D with Hoang Sa and Truong Sa floating
- * as data points and Can Tho as the pooled diamond; the two authors stand on
- * pedestals at either end, always turned to the camera.
+ * as data points and Can Tho as the pooled diamond; Hương stands on a
+ * pedestal at the left end, always turned to the camera. (The advisor's figure
+ * at the right end was removed on 05/10/2026 at her request.)
  *
  * This module is loaded with a dynamic import() from Logo3D.tsx, so three.js
  * is a separate chunk that only the sign-in page and the logo dialog fetch.
@@ -19,9 +20,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 export interface Logo3DOptions {
   /** CSS colour painted behind the scene. */
   background: string;
-  /** Hương's and the advisor's cut-out figures (same-origin URLs). */
+  /** Hương's cut-out figure (same-origin URL). */
   huongUrl: string;
-  advisorUrl: string;
   /** Turntable and floating islands; off under prefers-reduced-motion. */
   animate: boolean;
   /** Wheel zoom; off on the sign-in page so the wheel still scrolls the page. */
@@ -212,9 +212,9 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
   letter(A, "letter_A2", x);
   x += 0.92 + 2 * L1;
 
-  // the two authors on pedestals, cut-out figures that always face the camera
+  // Hương on a pedestal, a cut-out figure that always faces the camera
   const loader = new THREE.TextureLoader();
-  const [texH, texT] = await Promise.all([loader.loadAsync(opts.huongUrl), loader.loadAsync(opts.advisorUrl)]);
+  const texH = await loader.loadAsync(opts.huongUrl);
   const figure = (tex: THREE.Texture, height: number, name: string, px: number) => {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 8;
@@ -232,19 +232,21 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
     return { grp, mesh };
   };
   const huong = figure(texH, 1.0, "huong", -0.5);
-  const advisor = figure(texT, 1.08, "advisor", x + 0.42);
-  x += 0.84;
 
-  // ground: forest-plot baseline, the pooled diamond lying flat, a pearl plinth
-  const cx = (x - 0.84) / 2 - 0.05;
+  // ground: forest-plot baseline, the pooled diamond lying flat, a pearl plinth.
+  // The model runs from the left edge of Hương's pedestal to the last letter;
+  // the plinth keeps the same 0.26 margin on each side as before.
+  const left = -0.5 - 0.25;
+  const plinthW = x - left + 0.52;
+  const cx = (left + x) / 2;
   g.children.forEach((o) => {
     o.position.x -= cx;
   });
-  add(new THREE.BoxGeometry(x + 1.1, 0.02, 0.02), ink, "axis_line", 0, 0.01, 0.62);
+  add(new THREE.BoxGeometry(plinthW, 0.02, 0.02), ink, "axis_line", 0, 0.01, 0.62);
   const diamond = ext(poly([[0, 0.34], [0.62, 0], [0, -0.34], [-0.62, 0]]), 0.05, 0.012);
   diamond.rotateX(-Math.PI / 2);
   add(diamond, amber, "pooled_diamond", mapX - cx + mx(140), 0.0, 0.32);
-  add(new THREE.BoxGeometry(x + 1.1, 0.06, 0.9), pearl, "plinth", 0, -0.03, 0.22);
+  add(new THREE.BoxGeometry(plinthW, 0.06, 0.9), pearl, "plinth", 0, -0.03, 0.22);
   g.children.forEach((o) => {
     o.position.y += 0.06;
   });
@@ -317,7 +319,6 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
     }
     controls.update();
     face(huong);
-    face(advisor);
     renderer.render(scene, camera);
   });
 
@@ -333,7 +334,6 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
         mats.forEach((m) => m.dispose());
       });
       texH.dispose();
-      texT.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     },
