@@ -28,7 +28,20 @@ export interface Logo3DOptions {
   zoom: boolean;
   /** Margin around the model when framing (1 = touching the edges). */
   framing?: number;
+  /** "paper" (ink letters on cream) or "cosmos" (light letters on the night sky). */
+  palette?: "paper" | "cosmos";
 }
+
+/**
+ * Colours of the model per look. Paper is the design handoff of 03/10; cosmos
+ * (05/10/2026) turns the front level of the letters, the forest-plot row and
+ * the island dots star-white and the plinth night-blue, so the logo reads on
+ * the dark background. The three levels keep their order: front, middle, back.
+ */
+const PALETTES = {
+  paper: { front: 0x1a1714, middle: 0xc4b8a1, back: 0xd39a3a, base: 0xfbf6ec, baseRough: 0.25, pearl: 0xfbf6ec, hemiGround: 0xd8d2c4, shadow: 0.18 },
+  cosmos: { front: 0xe8edf3, middle: 0x6f86a3, back: 0xf0b968, base: 0x141d2e, baseRough: 0.65, pearl: 0xffffff, hemiGround: 0x27324a, shadow: 0.35 },
+} as const;
 
 export interface Logo3DHandle {
   dispose(): void;
@@ -80,7 +93,8 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
 
   // Studio light, as in the design's <three-d-stage>: sky/ground wash, a
   // shadow-casting key light and a dim fill so silhouettes never go black.
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+  const pal = PALETTES[opts.palette ?? "paper"];
+  scene.add(new THREE.HemisphereLight(0xffffff, pal.hemiGround, 1.0));
   const key = new THREE.DirectionalLight(0xffffff, 2.2);
   key.position.set(4, 7, 5);
   key.castShadow = true;
@@ -90,7 +104,7 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
   const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
   fill.position.set(-5, 3, -4);
   scene.add(fill);
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: 0.18 }));
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: pal.shadow }));
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
   scene.add(ground);
@@ -98,10 +112,12 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
   // -- the model --------------------------------------------------------------
   const mat = (name: string, color: number, roughness: number, metalness = 0) =>
     new THREE.MeshStandardMaterial({ name, color, roughness, metalness });
-  const ink = mat("ink", 0x1a1714, 0.38, 0.1);
-  const sand = mat("sand", 0xc4b8a1, 0.7);
-  const amber = mat("amber", 0xd39a3a, 0.28, 0.38);
-  const pearl = mat("pearl", 0xfbf6ec, 0.25, 0.05);
+  // "ink" is the front level whatever its colour (star-white in the cosmos palette)
+  const ink = mat("ink", pal.front, 0.38, 0.1);
+  const sand = mat("sand", pal.middle, 0.7);
+  const amber = mat("amber", pal.back, 0.28, 0.38);
+  const pearl = mat("pearl", pal.pearl, 0.25, 0.05);
+  const plinthMat = mat("plinth", pal.base, pal.baseRough, 0.05);
   const red = mat("flag_red", 0xda251d, 0.5);
   const gold = mat("flag_star", 0xffce00, 0.4);
 
@@ -228,7 +244,7 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
     plane.translate(0, height / 2 + 0.06, 0);
     const mesh = add(plane, material, `${name}_figure`, 0, 0, 0, grp);
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: 0.5 });
-    add(new THREE.CylinderGeometry(0.22, 0.25, 0.04, 48), pearl, `${name}_pedestal`, 0, 0.03, 0, grp);
+    add(new THREE.CylinderGeometry(0.22, 0.25, 0.04, 48), plinthMat, `${name}_pedestal`, 0, 0.03, 0, grp);
     return { grp, mesh };
   };
   const huong = figure(texH, 1.0, "huong", -0.5);
@@ -246,7 +262,7 @@ export async function mountLogo3D(container: HTMLElement, opts: Logo3DOptions): 
   const diamond = ext(poly([[0, 0.34], [0.62, 0], [0, -0.34], [-0.62, 0]]), 0.05, 0.012);
   diamond.rotateX(-Math.PI / 2);
   add(diamond, amber, "pooled_diamond", mapX - cx + mx(140), 0.0, 0.32);
-  add(new THREE.BoxGeometry(plinthW, 0.06, 0.9), pearl, "plinth", 0, -0.03, 0.22);
+  add(new THREE.BoxGeometry(plinthW, 0.06, 0.9), plinthMat, "plinth", 0, -0.03, 0.22);
   g.children.forEach((o) => {
     o.position.y += 0.06;
   });

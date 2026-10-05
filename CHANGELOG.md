@@ -279,6 +279,10 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   `assets/brand/maida-orbit-cosmos.svg`, màu đặc, không dùng để đăng ký nhãn hiệu.
 - **Logo 3D chỉ còn hình Đỗ Thùy Hương** (05/10); hình PGS.TS. Phan Anh Tú vẫn ở
   hộp Liên hệ và tranh đăng nhập.
+- **Logo 3D chữ sáng cho giao diện Vũ trụ** (05/10): lớp trước của chữ, dòng
+  forest plot và các chấm đảo màu trắng sao, lớp giữa xanh xám, lớp sau hổ
+  phách, bệ xanh đêm. Giao diện giấy giữ bảng màu cũ (chữ mực trên nền kem). Mô
+  hình tự dựng lại khi đổi giao diện.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);

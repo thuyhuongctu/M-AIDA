@@ -21,11 +21,26 @@ interface Logo3DProps {
 }
 
 type State = "loading" | "ready" | "fallback";
+type Palette = "paper" | "cosmos";
+
+const currentPalette = (): Palette => (document.documentElement.dataset.look === "cosmos" ? "cosmos" : "paper");
+
+/** The look on <html data-look>, followed live so the model is rebuilt when it changes. */
+function usePalette(): Palette {
+  const [palette, setPalette] = useState<Palette>(currentPalette);
+  useEffect(() => {
+    const mo = new MutationObserver(() => setPalette(currentPalette()));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-look"] });
+    return () => mo.disconnect();
+  }, []);
+  return palette;
+}
 
 export default function Logo3D({ zoom = false, framing, className = "" }: Logo3DProps) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<State>("loading");
+  const palette = usePalette();
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +62,7 @@ export default function Logo3D({ zoom = false, framing, className = "" }: Logo3D
           animate: !reduce,
           zoom,
           framing,
+          palette,
         });
         if (cancelled) handle.dispose();
         else {
@@ -62,7 +78,7 @@ export default function Logo3D({ zoom = false, framing, className = "" }: Logo3D
       cancelled = true;
       dispose?.();
     };
-  }, [zoom, framing]);
+  }, [zoom, framing, palette]);
 
   return (
     <div
