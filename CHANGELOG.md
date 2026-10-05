@@ -224,6 +224,14 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   `GET /api/me/report`, `PUT /api/me/report/prisma`. 3 test mới
   (`test_805_reports.py`); kiểm thử trình duyệt thêm bước PRISMA, tệp metafor,
   hiệu ứng ngẫu nhiên và thẻ Thanh toán.
+- **Giao diện Vũ trụ (Cosmos)** (theo gói thiết kế 04/10): nút "✦ Vũ trụ" ở đầu
+  trang chuyển giữa giao diện giấy (mặc định) và bầu trời đêm; trình duyệt nhớ
+  lựa chọn. Chỉ đổi token màu trên `<html data-look="cosmos">` (thêm token
+  `--on-ink` cho chữ trên nền mực), nền là một canvas 2D (`CosmosBackdrop`: sao,
+  hai vầng sáng, một quỹ đạo) không dùng thư viện hay tải gì từ ngoài, vẽ một
+  khung tĩnh khi người xem chọn giảm chuyển động và dừng khi thẻ trình duyệt bị
+  ẩn. Không đưa three.js/d3 từ unpkg và phông Google của bản thiết kế vào, vì CSP
+  của Caddy chặn các nguồn đó.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);

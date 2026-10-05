@@ -119,6 +119,8 @@ const en = {
   // shell
   nav_dataset: "Reports",
   nav_billing: "Billing",
+  look_cosmos: "Cosmos",
+  look_cosmos_hint: "Switch between the paper look and the night-sky look (remembered in this browser)",
   status_ok: "all systems ok",
   status_backend_down: "backend unreachable",
   status_llm_off: "extraction unavailable",
@@ -381,6 +383,8 @@ const vi: typeof en = {
   admin_paid_credits: "tín dụng đã bán",
   nav_dataset: "Báo cáo",
   nav_billing: "Thanh toán",
+  look_cosmos: "Vũ trụ",
+  look_cosmos_hint: "Chuyển giữa giao diện giấy và giao diện bầu trời đêm (trình duyệt này sẽ nhớ lựa chọn)",
   status_ok: "hệ thống bình thường",
   status_backend_down: "không tới được máy chủ",
   status_llm_off: "trích xuất không sẵn sàng",

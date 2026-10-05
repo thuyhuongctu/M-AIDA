@@ -266,6 +266,18 @@ def main() -> int:
             expect(page.get_by_test_id("tab-dashboard")).to_have_text("Bảng điều khiển")
             shot("10-vietnamese")
 
+            # 9b. Cosmos look: night-sky tokens + canvas backdrop, remembered after reload
+            page.get_by_test_id("look-toggle").click()
+            expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
+            expect(page.get_by_test_id("cosmos-backdrop")).to_be_attached()
+            page.get_by_test_id("tab-dataset").click()
+            shot("10b-cosmos-reports")
+            page.reload()
+            expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
+            page.get_by_test_id("look-toggle").click()
+            expect(page.locator("html")).to_have_attribute("data-look", "paper")
+            expect(page.get_by_test_id("cosmos-backdrop")).to_have_count(0)
+
             # 10. Legal pages are served next to the app (static, bilingual)
             page.goto(f"{BASE}/legal/terms.html")
             expect(page.locator("h1#en")).to_contain_text("Terms of Service")

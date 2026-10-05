@@ -23,11 +23,50 @@
   --ok: #4f7a59;
   --ok-dark: #2f5a3a;
   --ok-bg: #edf3ee;
+  /* Text and icons on an ink-filled surface (active pills, primary buttons). */
+  --on-ink: #fff;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --mono: "JetBrains Mono", Menlo, Consolas, monospace;
   --radius: 4px;
   --radius-lg: 8px;
 }
+
+/* "Cosmos" look (design package 04/10/2026): night sky, star-white ink, amber
+   accent, cyan for "ok". Switched on <html data-look="cosmos"> from the header;
+   only tokens change here, so every component follows. */
+:root[data-look="cosmos"] {
+  --bg: #04060b;
+  --bg-2: #0b1220;
+  --card: rgba(11, 17, 29, 0.84);
+  --card-2: rgba(20, 29, 46, 0.88);
+  --line: rgba(232, 237, 243, 0.12);
+  --line-2: rgba(232, 237, 243, 0.26);
+  --ink: #e8edf3;
+  --ink-2: #c7d1dd;
+  --muted: #95a3b5;
+  --muted-2: #66748a;
+  --accent: #f0b968;
+  --accent-dark: #ffd27a;
+  --accent-bg: rgba(240, 185, 104, 0.12);
+  --danger: #ff917f;
+  --danger-dark: #ffb4a8;
+  --danger-bg: rgba(255, 145, 127, 0.12);
+  --ok: #7cc9d6;
+  --ok-dark: #a9e3ec;
+  --ok-bg: rgba(124, 201, 214, 0.12);
+  --on-ink: #04060b;
+  color-scheme: dark;
+}
+:root[data-look="cosmos"] .shell { position: relative; z-index: 1; }
+:root[data-look="cosmos"] .vnmark img { filter: invert(1) hue-rotate(180deg); opacity: 0.5; }
+:root[data-look="cosmos"] .logo3d { --logo3d-bg: #0b1220; }
+:root[data-look="cosmos"] .panel,
+:root[data-look="cosmos"] .export-card,
+:root[data-look="cosmos"] .prisma,
+:root[data-look="cosmos"] .pack-card { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.cosmos-backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; display: block; }
+.look-toggle { white-space: nowrap; }
+.look-toggle-on { border-color: var(--accent); color: var(--accent-dark); }
 
 * { box-sizing: border-box; }
 html, body, #root { margin: 0; min-height: 100%; }
@@ -83,17 +122,17 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
   border-radius: var(--radius); cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
 }
 .nav-pill:hover { background: var(--bg-2); }
-.nav-pill-on, .nav-pill-on:hover { background: var(--ink); color: #fff; }
+.nav-pill-on, .nav-pill-on:hover { background: var(--ink); color: var(--on-ink); }
 .nav-pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .nav-badge { font-size: 0.72rem; color: var(--muted-2); }
-.nav-pill-on .nav-badge { color: rgba(255,255,255,0.75); }
+.nav-pill-on .nav-badge { color: var(--on-ink); opacity: 0.75; }
 .pill {
   display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.75rem; border-radius: 999px;
   border: 1px solid var(--line); background: var(--card); font-size: 0.8rem; color: var(--ink-2);
 }
 .pill-credits { border-color: var(--line-2); }
 .avatar {
-  width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: #fff; display: inline-flex;
+  width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: var(--on-ink); display: inline-flex;
   align-items: center; justify-content: center; font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
 }
 .seg-group { display: inline-flex; border: 1px solid var(--line-2); border-radius: var(--radius); overflow: hidden; }
@@ -101,7 +140,7 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
   border: 0; background: var(--card); color: var(--ink-2); font-family: var(--mono); font-size: 0.72rem;
   padding: 0.3rem 0.55rem; cursor: pointer;
 }
-.seg-on { background: var(--ink); color: #fff; }
+.seg-on { background: var(--ink); color: var(--on-ink); }
 .seg:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .admin-key-field { display: flex; align-items: center; gap: 0.5rem; }
 .admin-key-field label { font-size: 0.75rem; color: var(--muted); }
@@ -143,9 +182,9 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn-primary { background: var(--ink); color: #fff; }
+.btn-primary { background: var(--ink); color: var(--on-ink); }
 .btn-primary:hover:not(:disabled) { background: var(--ink-2); }
-.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent { background: var(--accent); color: var(--on-ink); }
 .btn-accent:hover:not(:disabled) { background: var(--accent-dark); }
 .btn-secondary { background: var(--bg-2); color: var(--ink); border-color: var(--line-2); }
 .btn-ghost { background: var(--card); color: var(--ink); border-color: var(--line-2); }
@@ -163,7 +202,7 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 .chip.mono { font-size: 0.72rem; border-radius: var(--radius); }
 .chip:hover:not(:disabled) { background: var(--bg-2); }
 .chip:disabled { cursor: default; opacity: 0.7; }
-.chip-on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.chip-on { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
 .chip-count { font-family: var(--mono); font-size: 0.7rem; opacity: 0.75; }
 .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
@@ -443,6 +482,7 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 
 /* --- forest plot ------------------------------------------------------------------ */
 .forest { margin: 0.5rem 0 1.75rem; }
+.forest-empty { margin: 0.4rem 0 1.5rem; }
 .forest-head { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.4rem; }
 .forest-head .eyebrow { margin: 0; }
 .forest-head .hint-inline { max-width: 60ch; text-align: right; }

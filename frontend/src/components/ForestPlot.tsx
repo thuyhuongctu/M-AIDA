@@ -145,7 +145,7 @@ export default function ForestPlot({
   const pooledLabel = `${t("ds_pooled")} · ${estimator === "random" ? t("rp_est_random_short") : t("rp_est_fixed_short")}`;
 
   if (rows.length === 0) {
-    return <p className="hint-text">{t("ds_forest_empty")}</p>;
+    return <p className="hint-text forest-empty">{t("ds_forest_empty")}</p>;
   }
 
   // Scale: symmetric-ish range covering every interval, snapped to 0.1 and clamped to [-1, 1].

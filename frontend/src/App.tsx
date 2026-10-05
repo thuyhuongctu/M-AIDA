@@ -14,6 +14,7 @@ import { fetchHealth, fetchMe, getAdminKey, isNotInvited, setAdminKey } from "./
 import { AuthState, getAuthState, initAuth, signOut, subscribe } from "./auth";
 import AccountPanel from "./components/AccountPanel";
 import BillingPanel, { readPaymentReturn, type PaymentReturn } from "./components/BillingPanel";
+import CosmosBackdrop from "./components/CosmosBackdrop";
 import ContactDialog from "./components/ContactDialog";
 import Logo3DDialog from "./components/Logo3DDialog";
 import Dashboard from "./components/Dashboard";
@@ -37,6 +38,16 @@ import "./index.css";
 
 type Tab = "dashboard" | "extract" | "verify" | "dataset" | "billing" | "account";
 
+type Look = "paper" | "cosmos";
+const LOOK_KEY = "maida_look";
+function readLook(): Look {
+  try {
+    return localStorage.getItem(LOOK_KEY) === "cosmos" ? "cosmos" : "paper";
+  } catch {
+    return "paper";
+  }
+}
+
 export default function App() {
   // Language (8.0): English by default, Vietnamese on request; remembered per browser.
   const [lang, setLangState] = useState<Lang>(readLang);
@@ -51,6 +62,19 @@ export default function App() {
     }),
     [lang]
   );
+
+  // Look (8.0, design package 04/10): "paper" (default) or "cosmos" (night sky).
+  // Remembered per browser; applied on <html data-look> so every token follows.
+  const [look, setLook] = useState<Look>(readLook);
+  useEffect(() => {
+    document.documentElement.dataset.look = look;
+    try {
+      localStorage.setItem(LOOK_KEY, look);
+    } catch {
+      /* storage unavailable: the choice lasts for this page only */
+    }
+  }, [look]);
+  const toggleLook = useCallback(() => setLook((l) => (l === "cosmos" ? "paper" : "cosmos")), []);
 
   // Identity (8.0): resolved once from /api/config, then kept in sync with auth.ts.
   const [config, setConfig] = useState<ClientConfig | null>(null);
@@ -244,6 +268,16 @@ export default function App() {
             {t("tour_btn")}
           </button>
         )}
+        <button
+          type="button"
+          className={`btn btn-ghost btn-sm look-toggle ${look === "cosmos" ? "look-toggle-on" : ""}`}
+          aria-pressed={look === "cosmos"}
+          title={t("look_cosmos_hint")}
+          onClick={toggleLook}
+          data-testid="look-toggle"
+        >
+          ✦ {t("look_cosmos")}
+        </button>
         <div className="seg-group" role="group" aria-label="Language">
           <button type="button" className={`seg ${lang === "en" ? "seg-on" : ""}`} onClick={() => i18n.setLang("en")}>EN</button>
           <button type="button" className={`seg lang-toggle ${lang === "vi" ? "seg-on" : ""}`} onClick={() => i18n.setLang(lang === "vi" ? "en" : "vi")}>VI</button>
@@ -304,6 +338,7 @@ export default function App() {
   } else if (cloud && !auth.user) {
     return (
       <I18nContext.Provider value={i18n}>
+        {look === "cosmos" && <CosmosBackdrop />}
         <LoginScreen mode={config.auth_mode as "supabase" | "mock"} version={version} />
       </I18nContext.Provider>
     );
@@ -330,6 +365,7 @@ export default function App() {
 
   return (
     <I18nContext.Provider value={i18n}>
+      {look === "cosmos" && <CosmosBackdrop />}
       <div className="shell">
         <VnMark />
         {header}
