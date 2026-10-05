@@ -98,6 +98,16 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str = ""
     supabase_jwt_audience: str = "authenticated"
 
+    # How people sign in when MAIDA_AUTH_MODE=supabase:
+    #   magic    - e-mailed sign-in link (or Google); needs working SMTP on the
+    #              Supabase project (the built-in mailer only reaches project
+    #              members). Default: the public beta.
+    #   password - e-mail + password of an account the operator created by hand
+    #              in Supabase (Authentication -> Users -> Add user, "Auto
+    #              Confirm"). No mail is sent, so no SMTP is needed: meant for
+    #              a small internal trial with sign-ups switched off.
+    maida_login_method: str = "magic"
+
     # Secret used to sign mock tokens (auth mode "mock"); never for production.
     maida_mock_jwt_secret: str = "maida-mock-secret-not-for-production"
 

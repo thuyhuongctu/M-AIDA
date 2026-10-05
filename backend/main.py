@@ -308,6 +308,12 @@ def health_check() -> dict[str, Any]:
     }
 
 
+def _login_method() -> str:
+    """Normalised MAIDA_LOGIN_METHOD; anything unknown falls back to "magic"."""
+    method = (settings.maida_login_method or "").strip().lower()
+    return method if method in ("magic", "password") else "magic"
+
+
 @app.get("/api/config", tags=["system"])
 def client_config() -> dict[str, Any]:
     """Settings the browser needs before anyone is signed in.
@@ -320,6 +326,9 @@ def client_config() -> dict[str, Any]:
         "auth_mode": settings.maida_auth_mode,
         "supabase_url": settings.supabase_url if settings.maida_auth_mode == "supabase" else "",
         "supabase_anon_key": settings.supabase_anon_key if settings.maida_auth_mode == "supabase" else "",
+        # Supabase mode only: "magic" (e-mailed link / Google) or "password"
+        # (accounts created by the operator; no mail needed).
+        "login_method": _login_method() if settings.maida_auth_mode == "supabase" else "",
         "beta_credits": settings.maida_beta_credits,
         "max_pdf_mb": settings.maida_max_pdf_mb,
         "max_pages": settings.maida_max_pages,

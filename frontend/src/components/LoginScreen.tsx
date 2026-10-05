@@ -1,7 +1,8 @@
 /**
  * LoginScreen - sign-in for the multi-user (cloud) modes.
  *
- * Supabase mode: magic link by e-mail or Google. Mock mode (tests): any
+ * Supabase mode: magic link by e-mail or Google, or e-mail + password when the
+ * operator issues the accounts (internal trial). Mock mode (tests): any
  * e-mail signs in at once. The screen is never shown in admin_key mode.
  * Two columns: the brand block (promise, illustration of the two authors,
  * contact) and the form. The illustration is the only character artwork on a
@@ -11,7 +12,7 @@
 
 import React, { useState } from "react";
 import { isNotInvited } from "../api";
-import { signInWithEmail, signInWithGoogle } from "../auth";
+import { getLoginMethod, signInWithEmail, signInWithGoogle, signInWithPassword } from "../auth";
 import { startDemo } from "../demo";
 import { useI18n } from "../i18n";
 import ContactDialog from "./ContactDialog";
@@ -40,6 +41,9 @@ interface LoginScreenProps {
 export default function LoginScreen({ mode, version }: LoginScreenProps) {
   const { t, lang, setLang } = useI18n();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // Internal trial (login_method = "password"): accounts are made by the operator, no e-mail is sent.
+  const usePassword = mode === "supabase" && getLoginMethod() === "password";
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,10 +57,19 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
     setBusy(true);
     setError(null);
     try {
-      await signInWithEmail(value);
-      if (mode === "supabase") setSent(true);
+      if (usePassword) {
+        await signInWithPassword(value, password);
+      } else {
+        await signInWithEmail(value);
+        if (mode === "supabase") setSent(true);
+      }
     } catch (err: unknown) {
-      setError(isNotInvited(err) ? t("not_invited_login") : err instanceof Error ? err.message : t("error_generic"));
+      const bad = (err as { code?: string } | null)?.code === "bad_password";
+      setError(
+        bad ? t("login_bad_password")
+          : isNotInvited(err) ? t("not_invited_login")
+          : err instanceof Error ? err.message : t("error_generic"),
+      );
     } finally {
       setBusy(false);
     }
@@ -129,14 +142,33 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@university.edu"
               />
+              {usePassword && (
+                <>
+                  <label className="form-label" htmlFor="login-password">{t("login_password")}</label>
+                  <input
+                    id="login-password"
+                    className="form-input"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    data-testid="login-password"
+                  />
+                  <p className="hint-text">{t("login_password_hint")}</p>
+                </>
+              )}
               {mode === "mock" && <p className="hint-text">{t("login_mock_hint")}</p>}
               <button type="submit" className="btn btn-primary login-btn" disabled={busy}>
-                {busy ? t("loading") : mode === "mock" ? t("login_mock_button") : t("login_send_link")}
+                {busy ? t("loading")
+                  : mode === "mock" ? t("login_mock_button")
+                  : usePassword ? t("login_password_button")
+                  : t("login_send_link")}
               </button>
             </form>
           )}
 
-          {mode === "supabase" && !sent && (
+          {mode === "supabase" && !sent && !usePassword && (
             <>
               <div className="login-divider"><span>{t("login_or")}</span></div>
               <button type="button" className="btn btn-ghost login-btn" onClick={google} disabled={busy}>
@@ -160,9 +192,13 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
             {" "}{t("login_legal_and")}{" "}
             <a href="/legal/privacy.html" target="_blank" rel="noopener noreferrer">{t("legal_privacy")}</a>.
             {" "}
-            {lang === "vi"
-              ? "Không cần mật khẩu; lần đăng nhập đầu tạo tài khoản với 10 tín dụng beta."
-              : "No password. The first sign-in creates your account with 10 beta credits."}
+            {usePassword
+              ? lang === "vi"
+                ? "Tài khoản do quản trị viên cấp cho đợt chạy thử nội bộ."
+                : "Accounts are issued by the administrator for the internal trial."
+              : lang === "vi"
+                ? "Không cần mật khẩu; lần đăng nhập đầu tạo tài khoản với 10 tín dụng beta."
+                : "No password. The first sign-in creates your account with 10 beta credits."}
           </p>
         </div>
         <WorldClocks variant="strip" />

@@ -36,6 +36,7 @@ from dataclasses import dataclass
 
 import jwt
 from fastapi import Depends, HTTPException, Request
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
 from db import LOCAL_OWNER_ID, User, utcnow
@@ -172,15 +173,28 @@ class UserDirectory:
                     beta=True, credits_balance=0, created_at=utcnow(),
                 )
                 s.add(user)
-            else:
+                user.last_seen_at = utcnow()
+                try:
+                    s.commit()
+                except IntegrityError:
+                    # Right after a first sign-in the browser fires several
+                    # requests at once; another one created this row a moment
+                    # ago. Use that row: exactly one request (the one whose
+                    # insert succeeded) grants the beta credits.
+                    s.rollback()
+                    created = False
+                    user = s.get(User, sub)
+                    if user is None:  # not a duplicate after all
+                        raise
+            if not created:
                 if email and user.email != email:
                     user.email = email
                 if name and user.name != name:
                     user.name = name
                 if wants_admin and user.role != "admin":
                     user.role = "admin"
-            user.last_seen_at = utcnow()
-            s.commit()
+                user.last_seen_at = utcnow()
+                s.commit()
             principal = Principal(id=user.id, email=user.email, role=user.role, name=user.name)
         if created and self.settings.maida_beta_credits > 0:
             CreditService(self.session_factory).grant(

@@ -9,6 +9,17 @@ Lõi khoa học (trích xuất có cổng bằng chứng, dẫn xuất phương 
 xuất CSV đủ trường) giữ nguyên 7.2.3; không đổi công thức hay bản ghi đã khóa.
 Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một máy chủ.
 
+- **Chạy thử nội bộ** (05/10/2026): `MAIDA_LOGIN_METHOD=password` cho chế độ
+  `supabase` (đăng nhập e-mail + mật khẩu của tài khoản người vận hành tạo tay,
+  không gửi thư nên không cần SMTP; `/api/config` báo `login_method`, trang
+  đăng nhập ẩn liên kết qua thư và Google). `CHAY_MAIDA_NOI_BO.bat` (cổng 8767,
+  SQLite riêng, khóa Claude đọc từ bản 7.2.3), `MO_LINK_NOI_BO.bat` (đường hầm
+  Cloudflare Quick Tunnel), `noi_bo.env.mau`, `backend/check_noi_bo.py` (từ chối
+  khóa bí mật Supabase, danh sách mời `*`, thanh toán bật) và
+  `HUONG_DAN_CHAY_NOI_BO.md`. Sửa lỗi: nhiều yêu cầu đồng thời ngay sau lần đăng
+  nhập đầu từng làm một yêu cầu lỗi 500 (trùng khóa `users.id`); nay yêu cầu
+  thua dùng lại bản ghi vừa tạo và tín dụng beta chỉ cấp một lần. Kiểm thử:
+  `tests/test_807_login_method.py`, e2e `tests/e2e/run_e2e_password.py`.
 - **Danh tính** (`backend/auth.py`): `MAIDA_AUTH_MODE` = `admin_key` (mặc định,
   đúng hành vi 7.2: một người vận hành, khóa dùng chung trên yêu cầu ghi),
   `supabase` (JWT của Supabase Auth xác minh cục bộ bằng JWKS ES256/RS256 hoặc

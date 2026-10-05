@@ -31,3 +31,7 @@ frontend/build/
 
 # 8.x cloud configuration (secrets)
 deploy/.env.cloud
+
+# 8.0 chay thu noi bo (cau hinh rieng tren may, cong cu duong ham)
+noi_bo.env
+cloudflared.exe

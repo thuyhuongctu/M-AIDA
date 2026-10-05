@@ -6,8 +6,10 @@
  *
  *   admin_key - 7.x single operator: no sign-in screen, the admin key typed in
  *               the header is sent as X-MAIDA-Admin-Key (see api.ts).
- *   supabase  - Supabase Auth in the browser (magic link or Google); the
- *               session's access token goes out as a bearer token.
+ *   supabase  - Supabase Auth in the browser (magic link or Google, or
+ *               e-mail + password for operator-made accounts when
+ *               /api/config says login_method = "password"); the session's
+ *               access token goes out as a bearer token.
  *   mock      - tests / e2e: POST /api/auth/mock-login mints a token.
  *
  * Nothing secret is stored here: the Supabase anon key is public by design
@@ -147,6 +149,23 @@ export async function signInWithEmail(email: string): Promise<void> {
     return;
   }
   throw new Error("Sign-in is not used in this deployment mode.");
+}
+
+/** Supabase mode: "password" when the operator creates accounts by hand (no e-mail sent), else "magic". */
+export function getLoginMethod(): "magic" | "password" {
+  return config?.auth_mode === "supabase" && config.login_method === "password" ? "password" : "magic";
+}
+
+/** E-mail + password of an account the operator created in Supabase (internal trial; no SMTP needed). */
+export async function signInWithPassword(email: string, password: string): Promise<void> {
+  if (state.mode !== "supabase" || !supabase) throw new Error("Password sign-in needs Supabase mode.");
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    const err = new Error(error.message) as Error & { code?: string };
+    if (/invalid login credentials/i.test(error.message)) err.code = "bad_password";
+    throw err;
+  }
+  // onAuthStateChange delivers the session; the backend then checks the invitation list.
 }
 
 export async function signInWithGoogle(): Promise<void> {

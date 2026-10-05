@@ -150,6 +150,8 @@ export interface ClientConfig {
   auth_mode: "admin_key" | "supabase" | "mock";
   supabase_url: string;
   supabase_anon_key: string;
+  /** Supabase mode: "magic" (e-mailed link / Google) or "password" (accounts made by the operator). */
+  login_method?: "magic" | "password" | "";
   beta_credits: number;
   max_pdf_mb: number;
   max_pages: number;

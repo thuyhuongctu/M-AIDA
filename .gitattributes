@@ -8,6 +8,8 @@
 # Batch của Windows giữ CRLF:
 *.bat  text eol=crlf
 *.cmd  text eol=crlf
+# Mẫu cấu hình mở bằng Notepad trên Windows:
+*.mau  text eol=crlf
 
 # Tệp nhị phân — không bao giờ đụng vào:
 *.png  binary
