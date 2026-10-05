@@ -606,7 +606,10 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 .logo3d-canvas canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
 .logo3d-canvas canvas:active { cursor: grabbing; }
 .logo3d-flat { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-.logo3d-flat .logo { transform: scale(1.6); }
+.logo2d { max-width: 72%; max-height: 62%; }
+.logo2d-cosmos { display: none; }
+:root[data-look="cosmos"] .logo2d-paper { display: none; }
+:root[data-look="cosmos"] .logo2d-cosmos { display: block; }
 .logo3d-login { height: clamp(200px, 30vh, 300px); margin-bottom: 1.4rem; border: 1px solid var(--line); }
 .logo3d-dialog {
   width: min(960px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); padding: 0; overflow: hidden;

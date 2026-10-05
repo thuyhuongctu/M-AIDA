@@ -19,6 +19,8 @@ cả khi máy người xem không có phông Source Serif 4 hay JetBrains Mono.
 | `maida-lockup-academic.svg` | Bài báo, poster hội thảo, trang bảo vệ. |
 | `maida-lockup-dark.svg` | Nền console, ảnh chụp màn hình tối. |
 | `favicon.svg` · `/favicon.ico` | Trình duyệt. Bản rút gọn, chỉ khối đặc. |
+| `maida-vn-lockup-horizontal-paper.svg` · `maida-vn-lockup-stacked-paper.svg` | Logo 2D bản đồ Việt Nam (logo chọn ngày 03/10 để đăng ký nhãn hiệu) ghép chữ M-AIDA, chữ mực, nền trong suốt. Bản tương ứng của logo 3D. |
+| `maida-vn-lockup-horizontal-cosmos.svg` · `maida-vn-lockup-stacked-cosmos.svg` | Cùng logo, chữ trắng sao `#e8edf3`, bản đồ hổ phách `#f0b968`, nền trong suốt: cho giao diện Vũ trụ và nền tối (05/10/2026). |
 | `maida-orbit-cosmos.svg` | **Dấu phụ**, chỉ dùng với giao diện Vũ trụ (nền tối `#04060b`): tâm là ước lượng gộp, ba vòng là ba tầng của mô hình tổng hợp, hành tinh là một nghiên cứu. Màu đặc, không trong suốt. Không phải logo đăng ký nhãn hiệu; logo chính vẫn là hình thoi gộp. |
 | `/apple-touch-icon.png` | 180×180, màn hình chính iOS. |
 | `/icons/icon-maskable-512.png` | 512×512, Android. Nội dung nằm trong 60% giữa. |

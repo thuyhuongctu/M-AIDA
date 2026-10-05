@@ -3,15 +3,18 @@
  *
  * three.js is imported on demand (src/three/maidaLogo3d.ts), so the working
  * screens never download it. Without WebGL, or if the scene fails to load,
- * the flat wordmark is shown instead. Under prefers-reduced-motion the model
+ * the 2D version of the same logo (map of Vietnam + M-AIDA, ink letters on
+ * paper, star-white letters in the Cosmos look) is shown instead, and while
+ * the scene loads. Under prefers-reduced-motion the model
  * stands still (no turntable, no floating islands) but can still be turned by
  * dragging.
  */
 
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../i18n";
-import { Logo } from "./Logo";
 import figureHuong from "../assets/people/figure-huong.webp";
+import lockupPaper from "../assets/brand/maida-vn-lockup-horizontal-paper.svg";
+import lockupCosmos from "../assets/brand/maida-vn-lockup-horizontal-cosmos.svg";
 
 interface Logo3DProps {
   /** Wheel zoom (dialog) or not (sign-in page, where the wheel scrolls the page). */
@@ -91,7 +94,8 @@ export default function Logo3D({ zoom = false, framing, className = "" }: Logo3D
       <div ref={host} className="logo3d-canvas" />
       {state !== "ready" && (
         <div className="logo3d-flat" aria-hidden="true">
-          <Logo />
+          <img className="logo2d logo2d-paper" src={lockupPaper} alt="" />
+          <img className="logo2d logo2d-cosmos" src={lockupCosmos} alt="" />
         </div>
       )}
     </div>

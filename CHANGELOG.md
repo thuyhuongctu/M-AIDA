@@ -283,6 +283,11 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   forest plot và các chấm đảo màu trắng sao, lớp giữa xanh xám, lớp sau hổ
   phách, bệ xanh đêm. Giao diện giấy giữ bảng màu cũ (chữ mực trên nền kem). Mô
   hình tự dựng lại khi đổi giao diện.
+- **Logo 2D chữ sáng cho Vũ trụ** (05/10): logo bản đồ Việt Nam ghép chữ M-AIDA
+  có thêm bản chữ trắng sao, bản đồ hổ phách, nền trong suốt
+  (`assets/brand/maida-vn-lockup-*-cosmos.svg`), cạnh bản chữ mực
+  (`*-paper.svg`). Trong app, khi máy không có WebGL hoặc khi logo 3D đang tải,
+  ô logo hiện bản 2D tương ứng với giao diện đang dùng.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);
