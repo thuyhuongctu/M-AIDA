@@ -6,6 +6,11 @@
  * Plain 2D canvas, no library and nothing fetched. It draws one still frame
  * when the viewer prefers reduced motion, pauses while the tab is hidden, and
  * is only mounted while the Cosmos look is on.
+ *
+ * calm (the working screens, since Cosmos became the default look on
+ * 05/10/2026): about 15 frames a second instead of 60, slower and fainter
+ * twinkle, so a long verification session does not keep the CPU busy. The
+ * sign-in page uses the full animation.
  */
 
 import React, { useEffect, useRef } from "react";
@@ -31,7 +36,7 @@ function rng(seed: number): () => number {
   };
 }
 
-export default function CosmosBackdrop() {
+export default function CosmosBackdrop({ calm = false }: { calm?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -42,7 +47,11 @@ export default function CosmosBackdrop() {
     let w = 0;
     let h = 0;
     let raf = 0;
+    let last = -Infinity;
     let stars: Star[] = [];
+    const frameMs = calm ? 66 : 0;
+    const depth = calm ? 0.15 : 0.35;
+    const pace = calm ? 0.45 : 1;
 
     const resize = () => {
       const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -74,6 +83,11 @@ export default function CosmosBackdrop() {
     };
 
     const draw = (time: number) => {
+      if (!reduce && time - last < frameMs) {
+        if (!document.hidden) raf = window.requestAnimationFrame(draw);
+        return;
+      }
+      last = time;
       ctx.clearRect(0, 0, w, h);
       const span = Math.max(w, h);
       glow(w * 0.74, h * 0.26, span * 0.55, "84,182,198", 0.11);
@@ -90,7 +104,7 @@ export default function CosmosBackdrop() {
       ctx.beginPath();
       ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
       ctx.stroke();
-      const angle = reduce ? 0.9 : time * 0.00004;
+      const angle = reduce ? 0.9 : time * 0.00004 * pace;
       ctx.fillStyle = "rgba(240,185,104,0.9)";
       ctx.beginPath();
       ctx.arc(Math.cos(angle) * rx, Math.sin(angle) * ry, 3, 0, Math.PI * 2);
@@ -102,7 +116,7 @@ export default function CosmosBackdrop() {
       ctx.restore();
 
       for (const s of stars) {
-        const twinkle = reduce ? 1 : 0.65 + 0.35 * Math.sin(time * 0.001 * s.speed + s.phase);
+        const twinkle = reduce ? 1 : 1 - depth + depth * Math.sin(time * 0.001 * s.speed * pace + s.phase);
         ctx.fillStyle = `rgba(232,237,243,${(s.alpha * twinkle).toFixed(3)})`;
         ctx.fillRect(s.x, s.y, s.size, s.size);
       }
@@ -129,7 +143,7 @@ export default function CosmosBackdrop() {
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [calm]);
 
   return <canvas ref={ref} className="cosmos-backdrop" aria-hidden="true" data-testid="cosmos-backdrop" />;
 }

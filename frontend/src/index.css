@@ -13,7 +13,7 @@
   --ink: #1a1714;
   --ink-2: #3d3630;
   --muted: #6b6258;
-  --muted-2: #a9a397;
+  --muted-2: #736c5f; /* 4.6:1 on the page (was #a9a397, 2.2:1) */
   --accent: #c0862a;
   --accent-dark: #7a5212;
   --accent-bg: #fbf3e3;
@@ -46,7 +46,7 @@
   --ink: #e8edf3;
   --ink-2: #c7d1dd;
   --muted: #95a3b5;
-  --muted-2: #66748a;
+  --muted-2: #7a879c; /* 4.8:1 on raised cards (was #66748a, 3.7:1) */
   --accent: #f0b968;
   --accent-dark: #ffd27a;
   --accent-bg: rgba(240, 185, 104, 0.12);

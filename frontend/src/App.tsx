@@ -46,11 +46,12 @@ const workspaceKey = (userId: string) => `maida_workspace:${userId}`;
 
 type Look = "paper" | "cosmos";
 const LOOK_KEY = "maida_look";
+/** Cosmos is the default look (05/10/2026); a browser that chose paper keeps it. */
 function readLook(): Look {
   try {
-    return localStorage.getItem(LOOK_KEY) === "cosmos" ? "cosmos" : "paper";
+    return localStorage.getItem(LOOK_KEY) === "paper" ? "paper" : "cosmos";
   } catch {
-    return "paper";
+    return "cosmos";
   }
 }
 
@@ -69,7 +70,7 @@ export default function App() {
     [lang]
   );
 
-  // Look (8.0, design package 04/10): "paper" (default) or "cosmos" (night sky).
+  // Look (8.0, design package 04/10): "cosmos" (night sky, default since 05/10) or "paper".
   // Remembered per browser; applied on <html data-look> so every token follows.
   const [look, setLook] = useState<Look>(readLook);
   useEffect(() => {
@@ -450,7 +451,7 @@ export default function App() {
 
   return (
     <I18nContext.Provider value={i18n}>
-      {look === "cosmos" && <CosmosBackdrop />}
+      {look === "cosmos" && <CosmosBackdrop calm />}
       <div className="shell">
         <VnMark />
         {header}

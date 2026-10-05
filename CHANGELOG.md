@@ -269,6 +269,16 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   - Mặc định tắt: không tải gì cho tới khi bấm Phát, và không nhớ trạng thái
     đang phát; trình duyệt chỉ nhớ âm lượng.
   - Không có âm tần số hay tuyên bố sức khỏe.
+- **Giao diện Vũ trụ là mặc định** (05/10): lần đầu mở app là Vũ trụ, trình
+  duyệt đã chọn giấy vẫn được nhớ. Ở màn hình làm việc, nền sao chạy chế độ nhẹ
+  (khoảng 15 khung hình/giây, lấp lánh chậm và nhạt); trang đăng nhập giữ chuyển
+  động đầy đủ. Chữ mờ nhất đạt tương phản 4,5:1 ở cả hai giao diện (bản giấy
+  trước đó chỉ 2,2:1).
+- **Dấu quỹ đạo** (thiết kế 05/10): dấu phụ, chỉ hiện khi bật Vũ trụ; giao diện
+  giấy và favicon giữ dấu hai tam giác. Tệp riêng
+  `assets/brand/maida-orbit-cosmos.svg`, màu đặc, không dùng để đăng ký nhãn hiệu.
+- **Logo 3D chỉ còn hình Đỗ Thùy Hương** (05/10); hình PGS.TS. Phan Anh Tú vẫn ở
+  hộp Liên hệ và tranh đăng nhập.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);

@@ -82,6 +82,7 @@ def main() -> int:
             page.on("request", lambda req: audio_requests.append(req.url) if "/audio/" in req.url else None)
             page.goto(BASE)
             expect(page.get_by_test_id("login-card")).to_be_visible()
+            expect(page.locator("html")).to_have_attribute("data-look", "cosmos")  # default look
             # Time zones: Cần Thơ and Paris always, the viewer's clock when it differs
             from datetime import datetime as _dt, timedelta as _td
             from zoneinfo import ZoneInfo
@@ -358,8 +359,8 @@ def main() -> int:
             expect(page.get_by_test_id("tab-dashboard")).to_have_text("Bảng điều khiển")
             shot("10-vietnamese")
 
-            # 9b. Cosmos look: night-sky tokens + canvas backdrop, remembered after reload
-            page.get_by_test_id("look-toggle").click()
+            # 9b. Looks: Cosmos (night sky) is the default since 05/10; paper is one
+            #     click away and the choice is remembered after a reload.
             expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
             expect(page.get_by_test_id("cosmos-backdrop")).to_be_attached()
             # the orbit mark replaces the lock mark while the Cosmos look is on
@@ -367,12 +368,17 @@ def main() -> int:
             expect(page.locator(".shell-head .logo-mark")).to_be_hidden()
             page.get_by_test_id("tab-dataset").click()
             shot("10b-cosmos-reports")
-            page.reload()
-            expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
             page.get_by_test_id("look-toggle").click()
             expect(page.locator("html")).to_have_attribute("data-look", "paper")
             expect(page.get_by_test_id("cosmos-backdrop")).to_have_count(0)
             expect(page.locator(".shell-head .logo-orbit")).to_be_hidden()
+            expect(page.locator(".shell-head .logo-mark")).to_be_visible()
+            shot("10c-paper-reports")
+            page.reload()
+            expect(page.locator("html")).to_have_attribute("data-look", "paper")
+            page.get_by_test_id("look-toggle").click()
+            expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
+            expect(page.get_by_test_id("cosmos-backdrop")).to_be_attached()
 
             # 10. Legal pages are served next to the app (static, bilingual)
             page.goto(f"{BASE}/legal/terms.html")
