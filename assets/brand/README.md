@@ -19,6 +19,7 @@ cả khi máy người xem không có phông Source Serif 4 hay JetBrains Mono.
 | `maida-lockup-academic.svg` | Bài báo, poster hội thảo, trang bảo vệ. |
 | `maida-lockup-dark.svg` | Nền console, ảnh chụp màn hình tối. |
 | `favicon.svg` · `/favicon.ico` | Trình duyệt. Bản rút gọn, chỉ khối đặc. |
+| `maida-orbit-cosmos.svg` | **Dấu phụ**, chỉ dùng với giao diện Vũ trụ (nền tối `#04060b`): tâm là ước lượng gộp, ba vòng là ba tầng của mô hình tổng hợp, hành tinh là một nghiên cứu. Màu đặc, không trong suốt. Không phải logo đăng ký nhãn hiệu; logo chính vẫn là hình thoi gộp. |
 | `/apple-touch-icon.png` | 180×180, màn hình chính iOS. |
 | `/icons/icon-maskable-512.png` | 512×512, Android. Nội dung nằm trong 60% giữa. |
 | `/og-image.png` | 1200×630, ảnh chia sẻ mạng xã hội. |

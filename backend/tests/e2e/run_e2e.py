@@ -362,6 +362,9 @@ def main() -> int:
             page.get_by_test_id("look-toggle").click()
             expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
             expect(page.get_by_test_id("cosmos-backdrop")).to_be_attached()
+            # the orbit mark replaces the lock mark while the Cosmos look is on
+            expect(page.locator(".shell-head .logo-orbit")).to_be_visible()
+            expect(page.locator(".shell-head .logo-mark")).to_be_hidden()
             page.get_by_test_id("tab-dataset").click()
             shot("10b-cosmos-reports")
             page.reload()
@@ -369,6 +372,7 @@ def main() -> int:
             page.get_by_test_id("look-toggle").click()
             expect(page.locator("html")).to_have_attribute("data-look", "paper")
             expect(page.get_by_test_id("cosmos-backdrop")).to_have_count(0)
+            expect(page.locator(".shell-head .logo-orbit")).to_be_hidden()
 
             # 10. Legal pages are served next to the app (static, bilingual)
             page.goto(f"{BASE}/legal/terms.html")

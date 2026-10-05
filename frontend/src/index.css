@@ -25,6 +25,8 @@
   --ok-bg: #edf3ee;
   /* Text and icons on an ink-filled surface (active pills, primary buttons). */
   --on-ink: #fff;
+  /* Outer ring of the orbit mark (Cosmos look only). */
+  --orbit-ring: #8e80c9;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --mono: "JetBrains Mono", Menlo, Consolas, monospace;
   --radius: 4px;
@@ -55,6 +57,7 @@
   --ok-dark: #a9e3ec;
   --ok-bg: rgba(124, 201, 214, 0.12);
   --on-ink: #04060b;
+  --orbit-ring: #a596e0;
   color-scheme: dark;
 }
 :root[data-look="cosmos"] .shell { position: relative; z-index: 1; }
@@ -116,6 +119,10 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 .logo-text { font-size: 1.55rem; font-weight: 700; letter-spacing: 0.02em; line-height: 1; }
 .logo-dash { color: var(--accent); }
 .logo-mark { display: block; }
+/* Orbit mark: secondary mark, shown only with the Cosmos look (05/10/2026). */
+.logo-orbit { display: none; }
+:root[data-look="cosmos"] .logo-mark { display: none; }
+:root[data-look="cosmos"] .logo-orbit { display: block; }
 .shell-nav { display: flex; gap: 0.15rem; flex-wrap: wrap; }
 .nav-pill {
   border: 0; background: transparent; color: var(--ink-2); font-size: 0.98rem; padding: 0.4rem 0.8rem;

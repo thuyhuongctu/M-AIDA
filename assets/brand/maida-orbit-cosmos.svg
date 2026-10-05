@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="512" height="512">
+  <!-- M-AIDA orbit mark: secondary mark for the Cosmos (night-sky) look only.
+       For dark backgrounds (#04060b). Solid colours, no transparency. Proportions of the 05/10 design;
+       the in-app 28px version (Logo.tsx) uses heavier strokes to stay legible.
+       Not the registered logo: do not file as a trademark. -->
+  <title>M-AIDA (Cosmos)</title>
+  <defs>
+    <mask id="gap">
+      <rect width="32" height="32" fill="#fff"/>
+      <circle cx="23.07" cy="8.93" r="3.5" fill="#000"/>
+    </mask>
+  </defs>
+  <circle cx="16" cy="16" r="14.7" fill="none" stroke="#a596e0" stroke-width="0.6"/>
+  <circle cx="16" cy="16" r="10" fill="none" stroke="#ffd27a" stroke-width="0.9" mask="url(#gap)"/>
+  <circle cx="16" cy="16" r="5.4" fill="none" stroke="#7cc9d6" stroke-width="0.55"/>
+  <circle cx="16" cy="16" r="1.5" fill="#e8edf3"/>
+  <circle cx="23.07" cy="8.93" r="2.6" fill="#ffd27a"/>
+</svg>
