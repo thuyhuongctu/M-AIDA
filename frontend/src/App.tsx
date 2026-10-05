@@ -10,11 +10,12 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fetchHealth, fetchMe, getAdminKey, isNotInvited, isNotMember, setAdminKey, setWorkspace as setApiWorkspace } from "./api";
+import { fetchHealth, fetchMe, fetchStudies, getAdminKey, isNotInvited, isNotMember, setAdminKey, setWorkspace as setApiWorkspace } from "./api";
 import { AuthState, getAuthState, initAuth, signOut, subscribe } from "./auth";
 import AccountPanel from "./components/AccountPanel";
 import BillingPanel, { readPaymentReturn, type PaymentReturn } from "./components/BillingPanel";
-import CosmosBackdrop from "./components/CosmosBackdrop";
+import CosmosScene from "./components/CosmosScene";
+import type { CosmosEffect, CosmosPalette } from "./cosmos/scene";
 import ContactDialog from "./components/ContactDialog";
 import { stopDemo } from "./demo";
 import Logo3DDialog from "./components/Logo3DDialog";
@@ -37,6 +38,15 @@ import "@fontsource/source-serif-4/600.css";
 import "@fontsource/source-serif-4/700.css";
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
+import "@fontsource/jetbrains-mono/600.css";
+// Cosmos look (design package "M-AIDA Cloud Cosmos"): display and body faces.
+import "@fontsource/bricolage-grotesque/600.css";
+import "@fontsource/bricolage-grotesque/700.css";
+import "@fontsource/be-vietnam-pro/400.css";
+import "@fontsource/be-vietnam-pro/400-italic.css";
+import "@fontsource/be-vietnam-pro/500.css";
+import "@fontsource/be-vietnam-pro/600.css";
+import "@fontsource/be-vietnam-pro/700.css";
 import "./index.css";
 
 type Tab = "dashboard" | "extract" | "verify" | "dataset" | "team" | "billing" | "account";
@@ -52,6 +62,16 @@ function readLook(): Look {
     return localStorage.getItem(LOOK_KEY) === "paper" ? "paper" : "cosmos";
   } catch {
     return "cosmos";
+  }
+}
+
+/** Sky of the Cosmos look: "pastel" (the design's default) or "dark". */
+const PALETTE_KEY = "maida_cosmos_palette";
+function readPalette(): CosmosPalette {
+  try {
+    return localStorage.getItem(PALETTE_KEY) === "dark" ? "dark" : "pastel";
+  } catch {
+    return "pastel";
   }
 }
 
@@ -82,6 +102,16 @@ export default function App() {
     }
   }, [look]);
   const toggleLook = useCallback(() => setLook((l) => (l === "cosmos" ? "paper" : "cosmos")), []);
+  const [palette, setPalette] = useState<CosmosPalette>(readPalette);
+  useEffect(() => {
+    document.documentElement.dataset.sky = palette;
+    try {
+      localStorage.setItem(PALETTE_KEY, palette);
+    } catch {
+      /* storage unavailable: the choice lasts for this page only */
+    }
+  }, [palette]);
+  const togglePalette = useCallback(() => setPalette((p) => (p === "pastel" ? "dark" : "pastel")), []);
 
   // Identity (8.0): resolved once from /api/config, then kept in sync with auth.ts.
   const [config, setConfig] = useState<ClientConfig | null>(null);
@@ -198,6 +228,32 @@ export default function App() {
       });
   }, [cloud, auth.user, refreshKey, openWorkspace]);
   const member = me?.workspace?.role === "member";
+
+  // Cosmos look: the constellation of the 3D scene is the open workspace's own
+  // records (r and n; locked records shine gold). Reloaded with the panels.
+  const [effects, setEffects] = useState<CosmosEffect[]>([]);
+  useEffect(() => {
+    if (look !== "cosmos" || !signedIn || notInvited || !config) {
+      setEffects([]);
+      return;
+    }
+    let cancelled = false;
+    fetchStudies()
+      .then((rows) => {
+        if (cancelled) return;
+        setEffects(
+          rows
+            .filter((row) => typeof row.effect_r === "number" && Number.isFinite(row.effect_r))
+            .map((row) => ({ r: row.effect_r as number, n: row.sample_n, gold: !!row.pi_locked }))
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setEffects([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [look, signedIn, notInvited, config, refreshKey, workspace]);
 
   // Version label: read once from /api/health so the UI can never disagree
   // with the backend (7.2.1). Falls back to "?" while unreachable.
@@ -347,6 +403,20 @@ export default function App() {
         >
           ✦ {t("look_cosmos")}
         </button>
+        {look === "cosmos" && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm palette-toggle"
+            title={t("palette_hint")}
+            aria-label={`${t("palette_hint")}: ${palette === "pastel" ? t("palette_pastel") : t("palette_dark")}`}
+            onClick={togglePalette}
+            data-testid="palette-toggle"
+            data-palette={palette}
+          >
+            <span className="palette-dot" aria-hidden="true" />
+            <span className="palette-label">{palette === "pastel" ? t("palette_pastel") : t("palette_dark")}</span>
+          </button>
+        )}
         <div className="seg-group" role="group" aria-label="Language">
           <button type="button" className={`seg ${lang === "en" ? "seg-on" : ""}`} onClick={() => i18n.setLang("en")}>EN</button>
           <button type="button" className={`seg lang-toggle ${lang === "vi" ? "seg-on" : ""}`} onClick={() => i18n.setLang(lang === "vi" ? "en" : "vi")}>VI</button>
@@ -407,7 +477,7 @@ export default function App() {
   } else if (cloud && !auth.user) {
     return (
       <I18nContext.Provider value={i18n}>
-        {look === "cosmos" && <CosmosBackdrop />}
+        {look === "cosmos" && <CosmosScene station="login" palette={palette} lang={lang} effects={effects} calm={false} />}
         <LoginScreen mode={config.auth_mode as "supabase" | "mock"} version={version} />
       </I18nContext.Provider>
     );
@@ -451,7 +521,9 @@ export default function App() {
 
   return (
     <I18nContext.Provider value={i18n}>
-      {look === "cosmos" && <CosmosBackdrop calm />}
+      {look === "cosmos" && (
+        <CosmosScene station={signedIn && config ? activeTab : "login"} palette={palette} lang={lang} effects={effects} calm />
+      )}
       <div className="shell">
         <VnMark />
         {header}

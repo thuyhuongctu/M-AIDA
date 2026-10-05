@@ -6,8 +6,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: { port: 3000 },
-  // three.js (3D logo) is a separate ~560 kB chunk loaded only by the sign-in
-  // page and the logo dialog; the limit is raised so that known chunk does not
-  // warn on every build.
-  build: { outDir: "build", chunkSizeWarningLimit: 600 },
+  // Two known large chunks, both loaded with import() only when needed:
+  // three.js (~730 kB: 3D logo and the Cosmos sky) and the Natural Earth map
+  // of the Cosmos Earth (~760 kB, world-atlas countries-50m). The limit is
+  // raised so these do not warn on every build.
+  build: { outDir: "build", chunkSizeWarningLimit: 800 },
 });

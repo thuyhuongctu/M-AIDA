@@ -362,15 +362,33 @@ def main() -> int:
             # 9b. Looks: Cosmos (night sky) is the default since 05/10; paper is one
             #     click away and the choice is remembered after a reload.
             expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
-            expect(page.get_by_test_id("cosmos-backdrop")).to_be_attached()
+            # Cosmos look (design "M-AIDA Cloud Cosmos", 05/10): the 3D sky, or the
+            # 2D night sky when the browser has no WebGL.
+            sky = page.get_by_test_id("cosmos-scene")
+            expect(sky).to_be_attached()
+            expect(sky).to_have_attribute("data-state", re.compile("^(ready|fallback)$"), timeout=20000)
+            if sky.get_attribute("data-state") == "ready":
+                expect(sky.locator("canvas")).to_have_count(1)
+            else:
+                expect(page.get_by_test_id("cosmos-backdrop")).to_be_attached()
+            expect(page.locator("html")).to_have_attribute("data-sky", "pastel")  # the design's default
             # the orbit mark replaces the lock mark while the Cosmos look is on
             expect(page.locator(".shell-head .logo-orbit")).to_be_visible()
             expect(page.locator(".shell-head .logo-mark")).to_be_hidden()
+            # every screen is a station of the flight: Reports is the constellation
             page.get_by_test_id("tab-dataset").click()
+            expect(sky).to_have_attribute("data-station", "dataset")
+            page.wait_for_timeout(2500)  # the camera flies there
             shot("10b-cosmos-reports")
+            page.get_by_test_id("palette-toggle").click()
+            expect(page.locator("html")).to_have_attribute("data-sky", "dark")
+            page.wait_for_timeout(1500)
+            shot("10b2-cosmos-dark-reports")
             page.get_by_test_id("look-toggle").click()
             expect(page.locator("html")).to_have_attribute("data-look", "paper")
+            expect(page.get_by_test_id("cosmos-scene")).to_have_count(0)
             expect(page.get_by_test_id("cosmos-backdrop")).to_have_count(0)
+            expect(page.get_by_test_id("palette-toggle")).to_have_count(0)
             expect(page.locator(".shell-head .logo-orbit")).to_be_hidden()
             expect(page.locator(".shell-head .logo-mark")).to_be_visible()
             shot("10c-paper-reports")
@@ -378,7 +396,11 @@ def main() -> int:
             expect(page.locator("html")).to_have_attribute("data-look", "paper")
             page.get_by_test_id("look-toggle").click()
             expect(page.locator("html")).to_have_attribute("data-look", "cosmos")
-            expect(page.get_by_test_id("cosmos-backdrop")).to_be_attached()
+            expect(page.get_by_test_id("cosmos-scene")).to_be_attached()
+            # the dark sky was remembered; back to pastel for the rest of the run
+            expect(page.locator("html")).to_have_attribute("data-sky", "dark")
+            page.get_by_test_id("palette-toggle").click()
+            expect(page.locator("html")).to_have_attribute("data-sky", "pastel")
 
             # 10. Legal pages are served next to the app (static, bilingual)
             page.goto(f"{BASE}/legal/terms.html")

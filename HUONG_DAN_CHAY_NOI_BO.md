@@ -71,6 +71,9 @@ Cài xong, đóng PowerShell.
 - **Chi phí:** mục Công cụ vận hành có bảng chi phí ước tính; số tiền thật xem trên console Anthropic.
 
 ## D. Lưu ý
+- **Giao diện:** mặc định là Vũ trụ 3D. Nút tròn cạnh nút "✦ Vũ trụ" đổi trời Pastel và trời Tối. Bấm "✦ Vũ trụ" để về giao diện Giấy, nhẹ hơn cho máy yếu.
+  - Máy không có WebGL tự dùng nền 2D.
+  - Người bật "giảm chuyển động" trong hệ điều hành chỉ thấy khung tĩnh.
 - **Không đổi `MAIDA_AUTH_MODE` sang `mock`** khi đang mở link. Ở chế độ mock, ai nhập e-mail bất kỳ cũng vào được.
 - Nhắc người dùng thử **không tải tài liệu mật**: nội dung PDF được gửi tới Anthropic để trích xuất.
 - Đây là chạy thử nội bộ, không thu tiền. Việc bán vẫn chờ Giấy chứng nhận, văn bản đồng ý của ba bên và kết quả đánh giá độ chính xác.

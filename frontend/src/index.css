@@ -29,44 +29,54 @@
   --orbit-ring: #8e80c9;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --mono: "JetBrains Mono", Menlo, Consolas, monospace;
+  /* Headings; the paper look keeps the serif, Cosmos uses Bricolage Grotesque. */
+  --display: var(--serif);
   --radius: 4px;
   --radius-lg: 8px;
 }
 
-/* "Cosmos" look (design package 04/10/2026): night sky, star-white ink, amber
-   accent, cyan for "ok". Switched on <html data-look="cosmos"> from the header;
-   only tokens change here, so every component follows. */
+/* "Cosmos" look (design package "M-AIDA Cloud Cosmos", 04/10/2026; 3D scene
+   since 05/10/2026, see components/CosmosScene.tsx): the dark tokens of the
+   design, glass surfaces over the moving sky, Be Vietnam Pro for text and
+   Bricolage Grotesque for headings (both bundled, no Google Fonts), cyan for
+   actions and amber for the lock. Switched on <html data-look="cosmos">; the
+   sky colours follow <html data-sky="pastel|dark">. */
 :root[data-look="cosmos"] {
   --bg: #04060b;
-  --bg-2: #0b1220;
-  --card: rgba(11, 17, 29, 0.84);
-  --card-2: rgba(20, 29, 46, 0.88);
-  --line: rgba(232, 237, 243, 0.12);
-  --line-2: rgba(232, 237, 243, 0.26);
+  --bg-2: rgba(14, 20, 32, 0.78);
+  --card: rgba(8, 12, 20, 0.66);
+  --card-2: rgba(16, 23, 36, 0.72);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-2: rgba(255, 255, 255, 0.18);
   --ink: #e8edf3;
   --ink-2: #c7d1dd;
-  --muted: #95a3b5;
-  --muted-2: #7a879c; /* 4.8:1 on raised cards (was #66748a, 3.7:1) */
+  --muted: #a8b3c0;
+  --muted-2: #9da9b8; /* 4.5:1 on glass over the lightest pastel sky */
   --accent: #f0b968;
   --accent-dark: #ffd27a;
   --accent-bg: rgba(240, 185, 104, 0.12);
-  --danger: #ff917f;
-  --danger-dark: #ffb4a8;
-  --danger-bg: rgba(255, 145, 127, 0.12);
-  --ok: #7cc9d6;
-  --ok-dark: #a9e3ec;
-  --ok-bg: rgba(124, 201, 214, 0.12);
+  --danger: #e09a9a;
+  --danger-dark: #f0b8b8;
+  --danger-bg: rgba(224, 154, 154, 0.14);
+  --ok: #5fbd8e;
+  --ok-dark: #93d9b4;
+  --ok-bg: rgba(95, 189, 142, 0.14);
+  --brand: #7cc9d6;
+  --brand-strong: #a6dde6;
+  --brand-soft: rgba(124, 201, 214, 0.12);
+  --brand-line: rgba(124, 201, 214, 0.32);
   --on-ink: #04060b;
-  --orbit-ring: #a596e0;
+  --orbit-ring: #b9a6f0;
+  --serif: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --display: "Bricolage Grotesque", "Be Vietnam Pro", system-ui, sans-serif;
+  --radius: 9px;
+  --radius-lg: 14px;
   color-scheme: dark;
 }
-:root[data-look="cosmos"] .shell { position: relative; z-index: 1; }
-:root[data-look="cosmos"] .vnmark img { filter: invert(1) hue-rotate(180deg); opacity: 0.5; }
+:root[data-look="cosmos"] .shell,
+:root[data-look="cosmos"] .login { position: relative; z-index: 1; }
+:root[data-look="cosmos"] .vnmark img { filter: invert(1) hue-rotate(180deg); opacity: 0.22; }
 :root[data-look="cosmos"] .logo3d { --logo3d-bg: #0b1220; }
-:root[data-look="cosmos"] .panel,
-:root[data-look="cosmos"] .export-card,
-:root[data-look="cosmos"] .prisma,
-:root[data-look="cosmos"] .pack-card { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .cosmos-backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; display: block; }
 .look-toggle { white-space: nowrap; }
 .look-toggle-on { border-color: var(--accent); color: var(--accent-dark); }
@@ -697,3 +707,103 @@ input, textarea, select { font-family: inherit; font-size: inherit; color: inher
 .team-space-open { border-color: var(--ok); }
 .team-space-actions { display: flex; align-items: center; gap: 0.75rem; }
 .vp-owner-only { flex-basis: 100%; margin: 0.25rem 0 0; }
+
+/* --- Cosmos look: 3D sky and glass (design "M-AIDA Cloud Cosmos") ----------------- */
+.cosmos-scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.cosmos-scene canvas { display: block; position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+.cosmos-sky-dark { background: radial-gradient(ellipse at 50% 40%, #0b1424 0%, #04060b 70%); }
+.cosmos-sky-pastel { background: linear-gradient(180deg, #2b2748 0%, #5a4a78 55%, #b98aa6 100%); }
+/* Keeps text legible over the sky: the design's fade to the page colour, and
+   a light scrim over the brighter pastel sky. */
+.cosmos-vignette { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, transparent 55%, #04060b 140%); }
+:root[data-sky="pastel"] .cosmos-vignette { background: linear-gradient(180deg, rgba(4, 6, 11, 0.3) 0%, rgba(4, 6, 11, 0.36) 55%, rgba(4, 6, 11, 0.62) 100%); }
+
+.palette-toggle { width: 2rem; height: 2rem; padding: 0; border-radius: 999px; }
+.palette-dot { display: inline-block; width: 0.72rem; height: 0.72rem; border-radius: 50%; flex: none; background: linear-gradient(135deg, #f6b8c8, #cdbaf0 50%, #b6d8f2); }
+.palette-toggle[data-palette="dark"] .palette-dot { background: radial-gradient(circle at 35% 35%, #7cc9d6, #04060b 72%); box-shadow: 0 0 0 1px var(--line-2); }
+.palette-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.palette-toggle .palette-dot { width: 0.9rem; height: 0.9rem; }
+
+:root[data-look="cosmos"] body { letter-spacing: 0; }
+:root[data-look="cosmos"] :is(.page-title, .panel-title, .login-title, .login-claim, .summary-number, .result-title,
+  .export-card-title, .vp-title, .tour-title, .contact-head h2, .logo3d-dialog-head h2, .pack-credits,
+  .dataset-counts strong, .prisma-box-auto strong, .not-invited .page-title) {
+  font-family: var(--display); letter-spacing: -0.01em;
+}
+:root[data-look="cosmos"] .eyebrow { color: var(--brand); letter-spacing: 0.13em; font-size: 0.66rem; }
+:root[data-look="cosmos"] .lede { color: var(--ink-2); }
+
+/* header and footer: translucent bars */
+:root[data-look="cosmos"] .shell-head {
+  position: relative; z-index: 40; background: rgba(4, 6, 11, 0.55);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+/* the bar stays on top while scrolling, except on phones where it wraps to
+   several rows and would take a third of the screen */
+@media (min-width: 761px) { :root[data-look="cosmos"] .shell-head { position: sticky; top: 0; } }
+:root[data-look="cosmos"] .shell-foot { background: rgba(8, 12, 20, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+:root[data-look="cosmos"] .nav-pill { font-size: 0.9rem; font-weight: 600; border-radius: 8px; color: var(--muted); }
+:root[data-look="cosmos"] .nav-pill:hover { background: rgba(255, 255, 255, 0.06); color: var(--ink); }
+:root[data-look="cosmos"] .nav-pill-on,
+:root[data-look="cosmos"] .nav-pill-on:hover { background: var(--brand-soft); color: var(--brand); }
+:root[data-look="cosmos"] .nav-pill-on .nav-badge { color: var(--brand); }
+:root[data-look="cosmos"] .nav-pill:focus-visible,
+:root[data-look="cosmos"] .btn:focus-visible,
+:root[data-look="cosmos"] .seg:focus-visible,
+:root[data-look="cosmos"] .chip:focus-visible { outline-color: var(--brand); }
+:root[data-look="cosmos"] .seg-group { border-radius: 999px; background: var(--card); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+:root[data-look="cosmos"] .seg { background: transparent; color: var(--muted); }
+:root[data-look="cosmos"] .seg-on { background: var(--brand-soft); color: var(--brand); }
+:root[data-look="cosmos"] .avatar { background: var(--brand-soft); color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand-line); }
+:root[data-look="cosmos"] .pill,
+:root[data-look="cosmos"] .status-pill { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+/* buttons: cyan for actions, glass for the rest */
+:root[data-look="cosmos"] .btn-primary { background: var(--brand); color: var(--on-ink); }
+:root[data-look="cosmos"] .btn-primary:hover:not(:disabled) { background: var(--brand-strong); }
+:root[data-look="cosmos"] .btn-ghost { background: var(--card); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+:root[data-look="cosmos"] .btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.07); }
+:root[data-look="cosmos"] .btn-secondary { background: rgba(255, 255, 255, 0.06); }
+:root[data-look="cosmos"] .btn-link,
+:root[data-look="cosmos"] .link-btn { color: var(--brand); }
+:root[data-look="cosmos"] .chip-on { background: var(--brand-soft); color: var(--brand); border-color: var(--brand-line); }
+:root[data-look="cosmos"] .look-toggle-on { border-color: var(--accent); color: var(--accent-dark); }
+
+/* glass surfaces */
+:root[data-look="cosmos"] :is(.panel:not(.dashboard-panel), .export-card, .prisma, .pack-card, .result-card, .summary-grid, .next-up,
+  .drop-zone, .team-space, .not-invited, .clocks-card, .status-pop, .contact-card, .rv-panel, .tour-card,
+  .music-panel, .demo-banner, .demo-sample, .team-here, .note, .pay-notice) {
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+:root[data-look="cosmos"] .summary-grid { border-color: var(--line-2); }
+:root[data-look="cosmos"] .summary-card-credits { background: var(--brand-soft); }
+:root[data-look="cosmos"] .drop-zone:hover,
+:root[data-look="cosmos"] .drop-zone.drag-over { border-color: var(--brand); background: var(--brand-soft); }
+:root[data-look="cosmos"] .prisma-box { background: var(--card-2); }
+:root[data-look="cosmos"] .rv-queue { background: rgba(4, 6, 11, 0.42); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+:root[data-look="cosmos"] .rv-item-on { background: var(--brand-soft); box-shadow: inset 3px 0 0 var(--brand); }
+:root[data-look="cosmos"] .rv-quote-card { border-color: var(--brand-line); }
+:root[data-look="cosmos"] .tour-card { border-color: var(--brand-line); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); }
+:root[data-look="cosmos"] .status-pop { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); }
+:root[data-look="cosmos"] :is(.contact-dialog, .vp-dialog, .logo3d-dialog) { background: #0a0f19; }
+:root[data-look="cosmos"] :is(.contact-dialog, .vp-dialog, .logo3d-dialog)::backdrop { background: rgba(4, 6, 11, 0.6); backdrop-filter: blur(4px); }
+
+/* content that has no card of its own gets a glass sheet, so text never sits
+   straight on a planet */
+:root[data-look="cosmos"] :is(.extract-form, .extract-pipeline, .dashboard-panel .table-container) {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+:root[data-look="cosmos"] :is(.extract-form, .extract-pipeline) { padding: 1.2rem 1.3rem; }
+:root[data-look="cosmos"] .dashboard-panel .table-container { padding: 0.2rem 0.7rem; }
+:root[data-look="cosmos"] .pipeline { border-top-color: var(--line); }
+:root[data-look="cosmos"] .pipeline .step:last-child { border-bottom: 0; }
+
+/* forms */
+:root[data-look="cosmos"] :is(.form-input, .vp-input, .vp-textarea, .admin-key-field input) { background: rgba(4, 6, 11, 0.72); }
+:root[data-look="cosmos"] :is(.form-input, .vp-input, .vp-textarea):focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+
+/* sign-in: the sky on the left, a glass column on the right */
+:root[data-look="cosmos"] .login-brand { background: transparent; }
+:root[data-look="cosmos"] .login-side { background: rgba(8, 12, 20, 0.62); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+:root[data-look="cosmos"] .login-scene img { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45); }

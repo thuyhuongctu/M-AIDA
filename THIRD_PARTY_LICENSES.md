@@ -53,3 +53,21 @@ The file embeds the Archify viewer runtime and a JetBrains Mono subset (SIL OFL
 `assets/diagrams/maida-workflow.workflow.json` with
 `node bin/archify.mjs deliver workflow <json> <html> --quality showcase`;
 do not edit the HTML by hand.
+
+## Giao diện Vũ trụ 3D (thêm 05/10/2026)
+
+Các thành phần dưới đây được đóng gói vào bản build frontend (không tải từ CDN).
+Tất cả có giấy phép dễ dãi, tương thích với AGPL-3.0-only của M-AIDA.
+
+| Thành phần | Vai trò | Giấy phép |
+|---|---|---|
+| three.js 0.184 | Logo 3D và cảnh vũ trụ 3D | MIT |
+| d3-geo 3.1 | Phép chiếu bản đồ cho Trái Đất trong cảnh vũ trụ | ISC |
+| topojson-client 3.1 | Đọc dữ liệu bản đồ TopoJSON | ISC |
+| world-atlas 2.0 (countries-50m) | Đường biên quốc gia; dữ liệu gốc Natural Earth | ISC (dữ liệu Natural Earth: phạm vi công cộng) |
+| @fontsource/be-vietnam-pro | Phông chữ nội dung của giao diện Vũ trụ | SIL OFL 1.1 |
+| @fontsource/bricolage-grotesque | Phông chữ tiêu đề của giao diện Vũ trụ | SIL OFL 1.1 |
+| @fontsource/jetbrains-mono, @fontsource/source-serif-4 | Phông chữ số liệu và nội dung (giao diện Giấy) | SIL OFL 1.1 |
+
+Thiết kế cảnh vũ trụ, hành tinh và hoa văn là của gói thiết kế "M-AIDA Cloud
+Cosmos" (Đỗ Thùy Hương, 04/10/2026).

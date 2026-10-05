@@ -9,6 +9,27 @@ Lõi khoa học (trích xuất có cổng bằng chứng, dẫn xuất phương 
 xuất CSV đủ trường) giữ nguyên 7.2.3; không đổi công thức hay bản ghi đã khóa.
 Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một máy chủ.
 
+- **Giao diện Vũ trụ 3D** (05/10/2026, theo bản thiết kế "M-AIDA Cloud Cosmos"
+  của gói thiết kế 04/10): nền 2D của giao diện Vũ trụ được thay bằng cảnh 3D
+  của thiết kế (`frontend/src/cosmos/scene.ts`, `planets.ts`; thành phần
+  `CosmosScene.tsx`). Dải ngân hà xoắn, sáu hành tinh mang sáu bước quy trình
+  (Parse, Identify, Convert, Evidence, Verify, Lock; bề mặt khắc chín nhánh Cửu
+  Long, vành hoa văn trống đồng Đông Sơn và chữ ký tác giả), Trái Đất có ghim
+  Cần Thơ kèm ảnh hai tác giả, chín dòng sông vàng, sao chổi, và chòm sao cỡ
+  ảnh hưởng vẽ từ chính bản ghi của người dùng (r, n; bản ghi đã khóa là sao
+  vàng). Mỗi thẻ là một trạm trên đường bay (`cosmos/stations.ts`): chuyển thẻ
+  thì camera bay tới trạm đó, cuộn trang thì camera đi tiếp trong đoạn của thẻ.
+  Hai bảng màu trời, Pastel (mặc định của thiết kế) và Tối, chọn bằng nút tròn
+  cạnh nút Vũ trụ (`data-sky`, trình duyệt nhớ). Token màu, mặt kính mờ, phông Be
+  Vietnam Pro và Bricolage Grotesque theo thiết kế. three.js, d3-geo,
+  topojson-client, bản đồ Natural Earth (world-atlas) và phông chữ đều đóng gói
+  từ npm, không tải từ unpkg, jsdelivr hay Google Fonts (CSP chỉ cho 'self');
+  three.js và bản đồ chỉ tải khi giao diện Vũ trụ đang bật. Khác thiết kế: không
+  khóa tên miền cho hành tinh, vành hành tinh không in DOI Zenodo chưa đối
+  chiếu, không dùng dữ liệu P6 cho chòm sao. Giảm chuyển động: chỉ vẽ khung
+  tĩnh, camera nhảy thay vì bay; cảnh dừng khi thẻ trình duyệt bị ẩn và chạy 30
+  khung/giây ở màn hình làm việc khi camera đã tới trạm; máy không có WebGL
+  dùng lại nền 2D. Không đổi backend.
 - **Chạy thử nội bộ** (05/10/2026): `MAIDA_LOGIN_METHOD=password` cho chế độ
   `supabase` (đăng nhập e-mail + mật khẩu của tài khoản người vận hành tạo tay,
   không gửi thư nên không cần SMTP; `/api/config` báo `login_method`, trang
