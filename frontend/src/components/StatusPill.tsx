@@ -54,7 +54,10 @@ export default function StatusPill() {
     tone = "bad";
     label = t("status_backend_down");
   } else if (reachable && health) {
-    if (health.extraction_mode === "live") {
+    if (health.demo_mode) {
+      tone = "ok";
+      label = t("status_demo");
+    } else if (health.extraction_mode === "live") {
       tone = "ok";
       label = t("status_ok");
     } else {
@@ -68,7 +71,7 @@ export default function StatusPill() {
         `backend v${health.version}`,
         health.storage ?? "",
         health.auth_mode ?? "",
-        health.extraction_mode === "live" ? "llm ready" : "llm unavailable",
+        health.demo_mode ? "demo" : health.extraction_mode === "live" ? "llm ready" : "llm unavailable",
         online ? "online" : "offline",
       ].filter(Boolean)
     : [];

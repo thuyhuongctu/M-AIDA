@@ -90,7 +90,7 @@ def check_db(url: str) -> bool:
 def check_data_api_closed(url: str) -> bool:
     """On Supabase, the REST API serves the anon/authenticated roles to anyone
     holding the public anon key: no M-AIDA table may be granted to them, and
-    every table must have row level security on (migration 0002)."""
+    every table must have row level security on (migrations 0002 and 0005)."""
     from sqlalchemy import text
 
     from db import Base, make_engine
@@ -116,11 +116,11 @@ def check_data_api_closed(url: str) -> bool:
     exposed = sorted({t for _, t in grants if t in ours})
     foreign_owner = sorted(t for t, (_, owner) in present.items() if owner != me)
     if no_rls:
-        say(BAD, "Row level security đang TẮT trên: " + ", ".join(no_rls) + ". Chạy lại backend để áp migration 0002.")
+        say(BAD, "Row level security đang TẮT trên: " + ", ".join(no_rls) + ". Chạy lại backend để áp các migration khóa (0002, 0005).")
         ok = False
     if exposed:
         say(BAD, "REST API của Supabase (vai trò anon/authenticated) còn quyền trên: " + ", ".join(exposed)
-            + ". Bất kỳ ai có khóa anon đều đọc/sửa được. Áp migration 0002 trước khi mở dịch vụ.")
+            + ". Bất kỳ ai có khóa anon đều đọc/sửa được. Áp các migration khóa (0002, 0005) trước khi mở dịch vụ.")
         ok = False
     if foreign_owner:
         say(WARN, f"Bảng không thuộc vai trò kết nối ({me}): " + ", ".join(foreign_owner)

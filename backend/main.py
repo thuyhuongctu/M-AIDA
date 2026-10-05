@@ -24,6 +24,10 @@ DELETE /api/studies/{id}          Delete an unlocked study
 GET    /api/studies/export/csv    Export caller's locked studies as CSV
 GET    /api/studies/export/metafor.csv  Locked studies as yi/vi (Fisher z) for R metafor
 POST   /api/notion/sync           Push caller's locked studies to Notion
+GET    /api/team                  Team: the owner's members and the caller's memberships
+POST   /api/team/members          (owner) invite an e-mail into the workspace
+DELETE /api/team/members/{email}  (owner) remove a member or an invitation
+DELETE /api/team/memberships/{owner_id}  Leave another owner's workspace
 GET    /api/admin/users           (admin) accounts and balances
 POST   /api/admin/credits         (admin) grant credits
 GET    /api/admin/usage           (admin) model calls and estimated cost
@@ -41,6 +45,11 @@ Identity and data isolation (8.0)
 the 7.2 shared admin key (default, single operator), Supabase JWTs (cloud,
 many users) or locally minted mock tokens (tests). Every study, job and
 ledger entry carries the owner's id and every route filters by it.
+
+Teams (8.0, team.py): the ``X-MAIDA-Workspace`` header names the workspace a
+request acts on (an owner's account id). A team member works on the owner's
+records with the owner's credits; locking, deleting, exporting and the PRISMA
+counts stay with the owner.
 
 Data persistence
 ----------------
@@ -62,7 +71,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import BackgroundTasks, Depends, FastAPI, Form, HTTPException, Query, Request, UploadFile
+from fastapi import BackgroundTasks, Depends, FastAPI, Form, Header, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -80,6 +89,7 @@ from notion_sync import NotionSync
 from payments import PaymentError, WebhookInvalid, build_payment_service
 from settings import get_settings
 from store import StudyStore
+from team import MAX_MEMBERS, TeamService, Workspace
 
 #: Fields a Principal Investigator may correct through PATCH /verify (7.2.0).
 #: Primary statistics trigger a full re-derivation; the rest are coding
@@ -187,6 +197,26 @@ _verifier = TokenVerifier(settings) if settings.cloud_mode else None
 _directory = UserDirectory(_sessions, settings)
 current_user = build_current_user_dependency(settings, _verifier, _directory)
 CurrentUser = Annotated[Principal, Depends(current_user)]
+_team = TeamService(_sessions, settings)
+
+
+def current_workspace(
+    user: CurrentUser,
+    x_maida_workspace: Annotated[str | None, Header()] = None,
+) -> Workspace:
+    """The workspace a request acts on (8.0 teams, see team.py).
+
+    No header, or the caller's own id: the caller's own workspace. Another
+    account's id: that owner's workspace, if the caller is in its team
+    (otherwise 403 not_member). The single-operator mode has no teams.
+    """
+    target = (x_maida_workspace or "").strip()
+    if not target or target == user.id or not settings.cloud_mode:
+        return Workspace(owner_id=user.id, owner_email=user.email, actor_id=user.id, actor_email=user.email)
+    return _team.resolve(target, user.id, user.email)
+
+
+CurrentWorkspace = Annotated[Workspace, Depends(current_workspace)]
 
 
 def _get_extractor() -> StatisticalExtractor:
@@ -230,6 +260,13 @@ def _audit(owner_id: str, action: str, study_id: str | None = None, **detail: An
         s.add(AuditLog(owner_id=owner_id, action=action, study_id=study_id,
                        detail=detail, created_at=utcnow()))
         s.commit()
+
+
+def _audit_ws(ws: Workspace, action: str, study_id: str | None = None, **detail: Any) -> None:
+    """Audit in the workspace owner's log; a team member's actions name the member."""
+    if not ws.is_owner:
+        detail = {"by": ws.actor_id, "by_email": ws.actor_email, **detail}
+    _audit(ws.owner_id, action, study_id, **detail)
 
 
 # ---------------------------------------------------------------------------
@@ -316,7 +353,12 @@ def mock_login(body: MockLogin) -> dict[str, Any]:
 
 
 @app.get("/api/me", tags=["account"])
-def me(user: CurrentUser) -> dict[str, Any]:
+def me(user: CurrentUser, ws: CurrentWorkspace) -> dict[str, Any]:
+    """The caller, and the workspace this request acts on.
+
+    ``credits`` is the balance that pays for the next upload: the owner's in a
+    team workspace. ``own_credits`` is always the caller's own balance.
+    """
     with _sessions() as s:
         row = s.get(User, user.id)
     return {
@@ -325,10 +367,12 @@ def me(user: CurrentUser) -> dict[str, Any]:
         "name": user.name,
         "role": user.role,
         "beta": bool(row.beta) if row else False,
-        "credits": _credits.balance(user.id) if settings.cloud_mode else None,
-        "studies": _studies.count(user.id),
-        "locked": _studies.count(user.id, locked=True),
+        "credits": _credits.balance(ws.owner_id) if settings.cloud_mode else None,
+        "own_credits": _credits.balance(user.id) if settings.cloud_mode else None,
+        "studies": _studies.count(ws.owner_id),
+        "locked": _studies.count(ws.owner_id, locked=True),
         "auth_mode": settings.maida_auth_mode,
+        "workspace": {"owner_id": ws.owner_id, "owner_email": ws.owner_email, "role": ws.role},
     }
 
 
@@ -377,10 +421,10 @@ def _report_settings(row: User | None) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
-def _report_payload(user: Principal) -> dict[str, Any]:
+def _report_payload(owner_id: str) -> dict[str, Any]:
     with _sessions() as s:
-        data = _report_settings(s.get(User, user.id))
-    studies = _studies.values(user.id)
+        data = _report_settings(s.get(User, owner_id))
+    studies = _studies.values(owner_id)
     locked = sum(1 for e in studies if e.pi_locked)
     approved = sum(1 for e in studies if not e.pi_locked and e.pi_approved_at is not None)
     return {
@@ -392,13 +436,14 @@ def _report_payload(user: Principal) -> dict[str, Any]:
 
 
 @app.get("/api/me/report", tags=["account"])
-def my_report(user: CurrentUser) -> dict[str, Any]:
-    return _report_payload(user)
+def my_report(ws: CurrentWorkspace) -> dict[str, Any]:
+    return _report_payload(ws.owner_id)
 
 
 @app.put("/api/me/report/prisma", tags=["account"])
-def set_prisma(body: PrismaCounts, user: CurrentUser) -> dict[str, Any]:
+def set_prisma(body: PrismaCounts, user: CurrentUser, ws: CurrentWorkspace) -> dict[str, Any]:
     """Save the hand-entered PRISMA counts after checking they can follow one another."""
+    ws.require_owner("change the PRISMA counts")
     problems = []
     identified, removed = body.identified, body.duplicates_removed
     if identified is not None and removed is not None and removed > identified:
@@ -422,7 +467,7 @@ def set_prisma(body: PrismaCounts, user: CurrentUser) -> dict[str, Any]:
         row.report_settings = json.dumps(data)
         s.commit()
     _audit(user.id, "report", kind="prisma")
-    return _report_payload(user)
+    return _report_payload(user.id)
 
 
 # ---------------------------------------------------------------------------
@@ -571,7 +616,7 @@ def _metadata(title: str, authors: str, year: int, country: str, filename: str) 
 
 @app.post("/api/jobs", status_code=202, tags=["extraction"])
 async def create_job(
-    user: CurrentUser,
+    ws: CurrentWorkspace,
     background: BackgroundTasks,
     file: UploadFile,
     title: str = Form(""),
@@ -586,21 +631,22 @@ async def create_job(
     """
     pdf_bytes = await file.read()
     metadata = _metadata(title, authors, year, country, file.filename or "")
-    accepted = _jobs.accept(user.id, pdf_bytes, file.filename or "", metadata)
-    background.add_task(_jobs.run, accepted.id, user.id, accepted.text, metadata)
-    job = _jobs.get(accepted.id, user.id)
+    # In a team workspace the record is the owner's and the owner pays.
+    accepted = _jobs.accept(ws.owner_id, pdf_bytes, file.filename or "", metadata, submitted_by=ws.actor_id)
+    background.add_task(_jobs.run, accepted.id, ws.owner_id, accepted.text, metadata)
+    job = _jobs.get(accepted.id, ws.owner_id)
     assert job is not None
     return JobService.to_dict(job)
 
 
 @app.get("/api/jobs", tags=["extraction"])
-def list_jobs(user: CurrentUser, limit: int = Query(50, ge=1, le=500)) -> list[dict[str, Any]]:
-    return [JobService.to_dict(j) for j in _jobs.list(user.id, limit)]
+def list_jobs(ws: CurrentWorkspace, limit: int = Query(50, ge=1, le=500)) -> list[dict[str, Any]]:
+    return [JobService.to_dict(j) for j in _jobs.list(ws.owner_id, limit)]
 
 
 @app.get("/api/jobs/{job_id}", tags=["extraction"])
-def get_job(job_id: str, user: CurrentUser) -> dict[str, Any]:
-    job = _jobs.get(job_id, user.id)
+def get_job(job_id: str, ws: CurrentWorkspace) -> dict[str, Any]:
+    job = _jobs.get(job_id, ws.owner_id)
     if job is None:
         raise HTTPException(status_code=404, detail=f"Job {job_id!r} not found.")
     return JobService.to_dict(job)
@@ -668,7 +714,7 @@ async def extract_pdf_upload(
 
 @app.get("/api/studies", response_model=list[StudyDatabaseEntry], tags=["studies"])
 def list_studies(
-    user: CurrentUser,
+    ws: CurrentWorkspace,
     icrv: str | None = Query(None, description="Filter by icrv_regime"),
     dpl: str | None = Query(None, description="Filter by dpl_phase"),
     verified: bool | None = Query(None, description="Filter by !requires_verification"),
@@ -678,7 +724,7 @@ def list_studies(
 
     All filter parameters are ANDed together.
     """
-    results = _studies.values(user.id)
+    results = _studies.values(ws.owner_id)
 
     if icrv is not None:
         results = [s for s in results if s.icrv_regime == icrv]
@@ -697,13 +743,14 @@ def list_studies(
     response_class=StreamingResponse,
     tags=["studies"],
 )
-def export_csv(user: CurrentUser) -> StreamingResponse:
+def export_csv(ws: CurrentWorkspace) -> StreamingResponse:
     """Stream a CSV of the caller's PI-verified and locked studies.
 
     Only records with ``pi_locked=True`` are included to ensure the CSV
     represents the final, quality-controlled data set used in the meta-analysis.
     """
-    locked = [s for s in _studies.values(user.id) if s.pi_locked]
+    ws.require_owner("export records")
+    locked = [s for s in _studies.values(ws.owner_id) if s.pi_locked]
     if not locked:
         raise HTTPException(
             status_code=404, detail="No locked studies available for export."
@@ -725,7 +772,7 @@ def export_csv(user: CurrentUser) -> StreamingResponse:
         writer.writerow(row)
 
     buf.seek(0)
-    _audit(user.id, "export", kind="csv", rows=len(locked))
+    _audit(ws.owner_id, "export", kind="csv", rows=len(locked))
     return StreamingResponse(
         content=iter([buf.getvalue()]),
         media_type="text/csv",
@@ -740,7 +787,7 @@ METAFOR_COLUMNS = ("study_id", "authors", "year", "country", "ri", "ni", "yi", "
 
 
 @app.get("/api/studies/export/metafor.csv", response_class=StreamingResponse, tags=["studies"])
-def export_metafor_csv(user: CurrentUser) -> StreamingResponse:
+def export_metafor_csv(ws: CurrentWorkspace) -> StreamingResponse:
     """Locked studies as one row per effect, ready for R metafor.
 
     yi = atanh(r) (Fisher z) and vi = the record's variance_z, or 1/(n - 3)
@@ -749,7 +796,8 @@ def export_metafor_csv(user: CurrentUser) -> StreamingResponse:
     vi_source says which variance was used. Records without a usable
     variance are left out and counted in the X-MAIDA-Skipped header.
     """
-    locked = [e for e in _studies.values(user.id) if e.pi_locked and e.effect_r is not None]
+    ws.require_owner("export records")
+    locked = [e for e in _studies.values(ws.owner_id) if e.pi_locked and e.effect_r is not None]
     if not locked:
         raise HTTPException(status_code=404, detail="No locked studies available for export.")
     buf = io.StringIO()
@@ -774,7 +822,7 @@ def export_metafor_csv(user: CurrentUser) -> StreamingResponse:
             "cdai_score": "" if e.cdai_score is None else e.cdai_score,
             "dpl_phase": getattr(e.dpl_phase, "value", e.dpl_phase) or "",
         })
-    _audit(user.id, "export", kind="metafor_csv", rows=len(locked) - skipped, skipped=skipped)
+    _audit(ws.owner_id, "export", kind="metafor_csv", rows=len(locked) - skipped, skipped=skipped)
     return StreamingResponse(
         content=iter([buf.getvalue()]), media_type="text/csv",
         headers={"Content-Disposition": 'attachment; filename="maida_metafor_yi_vi.csv"',
@@ -782,29 +830,30 @@ def export_metafor_csv(user: CurrentUser) -> StreamingResponse:
     )
 
 
-def _own_study(study_id: str, user: Principal) -> StudyDatabaseEntry:
-    """The caller's study or 404 - never 403, so ids cannot be probed."""
-    entry = _studies.get(study_id, user.id)
+def _own_study(study_id: str, ws: Workspace) -> StudyDatabaseEntry:
+    """A study of the workspace or 404 - never 403, so ids cannot be probed."""
+    entry = _studies.get(study_id, ws.owner_id)
     if entry is None:
         raise HTTPException(status_code=404, detail=f"Study {study_id!r} not found.")
     return entry
 
 
 @app.get("/api/studies/{study_id}", response_model=StudyDatabaseEntry, tags=["studies"])
-def get_study(study_id: str, user: CurrentUser) -> StudyDatabaseEntry:
+def get_study(study_id: str, ws: CurrentWorkspace) -> StudyDatabaseEntry:
     """Return a single study by its UUID."""
-    return _own_study(study_id, user)
+    return _own_study(study_id, ws)
 
 
 @app.delete("/api/studies/{study_id}", status_code=204, tags=["studies"])
-def delete_study(study_id: str, user: CurrentUser) -> None:
+def delete_study(study_id: str, ws: CurrentWorkspace) -> None:
     """Delete one of the caller's studies. Locked records cannot be deleted:
     the lock is the promise that the final dataset is immutable."""
-    entry = _own_study(study_id, user)
+    entry = _own_study(study_id, ws)
+    ws.require_owner("delete records")
     if entry.pi_locked:
         raise HTTPException(status_code=409, detail="Locked studies cannot be deleted.")
-    _studies.delete(study_id, user.id)
-    _audit(user.id, "delete", study_id)
+    _studies.delete(study_id, ws.owner_id)
+    _audit_ws(ws, "delete", study_id)
 
 
 # ---------------------------------------------------------------------------
@@ -817,7 +866,7 @@ def delete_study(study_id: str, user: CurrentUser) -> None:
     response_model=StudyDatabaseEntry,
     tags=["verification"],
 )
-def verify_study(study_id: str, decision: VerificationDecision, user: CurrentUser) -> StudyDatabaseEntry:
+def verify_study(study_id: str, decision: VerificationDecision, ws: CurrentWorkspace) -> StudyDatabaseEntry:
     """Apply PI field overrides and approval status to a study.
 
     Field overrides in ``decision.field_overrides`` are applied to the stored
@@ -826,7 +875,7 @@ def verify_study(study_id: str, decision: VerificationDecision, user: CurrentUse
     The ``effect_r`` field will be recomputed automatically if the PI overrides
     ``effect_t``/``effect_df`` or ``effect_beta`` but not ``effect_r`` directly.
     """
-    entry = _own_study(study_id, user)
+    entry = _own_study(study_id, ws)
 
     if entry.pi_locked:
         raise HTTPException(
@@ -903,8 +952,8 @@ def verify_study(study_id: str, decision: VerificationDecision, user: CurrentUse
         data["pi_approved_at"] = None
 
     updated = StudyDatabaseEntry(**data)
-    _studies.put(updated, owner_id=user.id)
-    _audit(user.id, "verify", study_id, overrides=sorted(overrides), approved=decision.pi_approved)
+    _studies.put(updated, owner_id=ws.owner_id)
+    _audit_ws(ws, "verify", study_id, overrides=sorted(overrides), approved=decision.pi_approved)
     return updated
 
 
@@ -913,7 +962,7 @@ def verify_study(study_id: str, decision: VerificationDecision, user: CurrentUse
     response_model=StudyDatabaseEntry,
     tags=["verification"],
 )
-def lock_study(study_id: str, user: CurrentUser) -> StudyDatabaseEntry:
+def lock_study(study_id: str, ws: CurrentWorkspace) -> StudyDatabaseEntry:
     """Permanently lock a study record.
 
     This operation is IRREVERSIBLE.  Once locked:
@@ -924,7 +973,9 @@ def lock_study(study_id: str, user: CurrentUser) -> StudyDatabaseEntry:
     Only records that have been PI-approved (``requires_verification=False``)
     can be locked.
     """
-    entry = _own_study(study_id, user)
+    entry = _own_study(study_id, ws)
+    # Teams: members verify, the owner (the PI) locks.
+    ws.require_owner("lock records")
 
     if entry.pi_locked:
         return entry  # Idempotent - already locked
@@ -956,8 +1007,8 @@ def lock_study(study_id: str, user: CurrentUser) -> StudyDatabaseEntry:
     data["pi_locked"] = True
     data["locked_at"] = datetime.now(timezone.utc)
     locked = StudyDatabaseEntry(**data)
-    _studies.put(locked, owner_id=user.id)
-    _audit(user.id, "lock", study_id)
+    _studies.put(locked, owner_id=ws.owner_id)
+    _audit_ws(ws, "lock", study_id)
     return locked
 
 
@@ -967,14 +1018,15 @@ def lock_study(study_id: str, user: CurrentUser) -> StudyDatabaseEntry:
 
 
 @app.post("/api/notion/sync", tags=["notion"])
-def notion_sync(user: CurrentUser) -> dict[str, Any]:
+def notion_sync(ws: CurrentWorkspace) -> dict[str, Any]:
     """Push the caller's PI-locked studies to the configured Notion database.
 
     Returns a summary with counts of successfully synced and failed records.
     Studies that already have a ``notion_page_id`` are updated; new studies
     create a fresh Notion page.
     """
-    locked = [s for s in _studies.values(user.id) if s.pi_locked]
+    ws.require_owner("sync records to Notion")
+    locked = [s for s in _studies.values(ws.owner_id) if s.pi_locked]
     if not locked:
         return {"synced": 0, "failed": 0, "message": "No locked studies to sync."}
 
@@ -988,7 +1040,7 @@ def notion_sync(user: CurrentUser) -> dict[str, Any]:
             page_id = notion.push_study(study)
             data = study.model_dump()
             data["notion_page_id"] = page_id
-            _studies.put(StudyDatabaseEntry(**data), owner_id=user.id)
+            _studies.put(StudyDatabaseEntry(**data), owner_id=ws.owner_id)
             synced += 1
         except Exception as exc:
             logger.error("Notion sync failed for study %s: %s", study.study_id, exc)
@@ -1001,6 +1053,62 @@ def notion_sync(user: CurrentUser) -> dict[str, Any]:
         "errors": errors,
         "message": f"Sync complete: {synced} pushed, {failed} failed.",
     }
+
+
+# ---------------------------------------------------------------------------
+# Team: a shared workspace that belongs to one owner (team.py)
+# ---------------------------------------------------------------------------
+
+
+class TeamInvite(BaseModel):
+    email: str = Field(..., min_length=3, max_length=320)
+
+
+def _teams_available() -> None:
+    if not settings.cloud_mode:
+        raise HTTPException(status_code=404, detail="Teams need the multi-user mode (MAIDA_AUTH_MODE=supabase).")
+
+
+def _team_payload(user: Principal) -> dict[str, Any]:
+    """The caller's own team (as owner) and the workspaces they were invited into."""
+    return {
+        "enabled": settings.cloud_mode,
+        "max_members": MAX_MEMBERS,
+        "members": _team.members(user.id) if settings.cloud_mode else [],
+        "memberships": _team.memberships(user.id, user.email) if settings.cloud_mode else [],
+    }
+
+
+@app.get("/api/team", tags=["team"])
+def team_overview(user: CurrentUser) -> dict[str, Any]:
+    return _team_payload(user)
+
+
+@app.post("/api/team/members", status_code=201, tags=["team"])
+def team_invite(body: TeamInvite, user: CurrentUser) -> dict[str, Any]:
+    """Invite an address on the closed-beta list into the caller's workspace."""
+    _teams_available()
+    member = _team.invite(user.id, user.email, body.email)
+    _audit(user.id, "team", event="invite", email=member["email"])
+    return _team_payload(user)
+
+
+@app.delete("/api/team/members/{email}", tags=["team"])
+def team_remove(email: str, user: CurrentUser) -> dict[str, Any]:
+    """Remove a member (or withdraw an invitation). Their work stays in the workspace."""
+    _teams_available()
+    _team.remove(user.id, email)
+    _audit(user.id, "team", event="remove", email=email.strip().lower())
+    return _team_payload(user)
+
+
+@app.delete("/api/team/memberships/{owner_id}", tags=["team"])
+def team_leave(owner_id: str, user: CurrentUser) -> dict[str, Any]:
+    """Leave another owner's workspace (or decline the invitation)."""
+    _teams_available()
+    _team.leave(owner_id, user.id, user.email)
+    _audit(owner_id, "team", event="leave", by=user.id, by_email=user.email)
+    return _team_payload(user)
 
 
 # ---------------------------------------------------------------------------

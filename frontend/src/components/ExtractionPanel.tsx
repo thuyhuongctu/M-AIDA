@@ -7,6 +7,7 @@
 
 import React, { useCallback, useRef, useState } from "react";
 import { createJob, fetchStudy, waitForJob } from "../api";
+import { DEMO_META, DEMO_PDF_URL, sampleFile } from "../demo";
 import { useI18n } from "../i18n";
 import { getConfidenceTier, JobStatus, StudyDatabaseEntry } from "../types";
 
@@ -114,6 +115,8 @@ interface ExtractionPanelProps {
   onExtracted?: (entry: StudyDatabaseEntry) => void;
   /** True in the multi-user modes: show the credit note and job phases. */
   cloud?: boolean;
+  /** 8.0: the in-browser demo; only the synthetic sample paper can be extracted. */
+  demo?: boolean;
   credits?: number | null;
   onOpenReview?: (studyId: string) => void;
   /** Called when a job settles with any outcome (credits may have moved). */
@@ -132,7 +135,7 @@ function pipelineSteps(phase: JobStatus | null, outcome: JobStatus | null): Step
   return ["waiting", "waiting", "waiting", "waiting"];
 }
 
-export default function ExtractionPanel({ onExtracted, cloud = false, credits = null, onOpenReview, onSettled }: ExtractionPanelProps) {
+export default function ExtractionPanel({ onExtracted, cloud = false, demo = false, credits = null, onOpenReview, onSettled }: ExtractionPanelProps) {
   const { t } = useI18n();
   const [dragOver, setDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -161,6 +164,21 @@ export default function ExtractionPanel({ onExtracted, cloud = false, credits = 
     // Pre-fill title from filename if empty
     setTitle((prev) => prev || f.name.replace(/\.pdf$/i, ""));
   }, []);
+
+  const loadSample = useCallback(async () => {
+    try {
+      const f = await sampleFile();
+      setFile(f);
+      setError(null);
+      setResult(null);
+      setTitle(DEMO_META.title);
+      setAuthors(DEMO_META.authors);
+      setYear(DEMO_META.year);
+      setCountry(DEMO_META.country);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t("error_generic"));
+    }
+  }, [t]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -235,6 +253,23 @@ export default function ExtractionPanel({ onExtracted, cloud = false, credits = 
     <div className="extract-form">
       <h2 className="page-title">Extract an effect size</h2>
       <p className="lede">The model proposes; nothing enters the dataset until you verify and lock it.</p>
+
+      {demo && (
+        <div className="demo-sample" data-testid="demo-sample-card">
+          <div>
+            <strong>{t("demo_sample_title")}</strong>
+            <p className="hint-text">{t("demo_sample_desc")}</p>
+          </div>
+          <div className="demo-sample-actions">
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => void loadSample()} data-testid="demo-sample">
+              {t("demo_sample_use")}
+            </button>
+            <a className="btn-link" href={DEMO_PDF_URL} target="_blank" rel="noopener noreferrer">
+              {t("demo_sample_open")}
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Drop zone */}
       <div

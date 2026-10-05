@@ -28,6 +28,8 @@ export interface AuthState {
   mode: ClientConfig["auth_mode"];
   user: AuthUser | null;
   token: string | null;
+  /** 8.0: the in-browser demo is running (demo.ts); no real account. */
+  demo?: boolean;
 }
 
 type Listener = (state: AuthState) => void;
@@ -68,6 +70,28 @@ function userFromSession(session: Session | null): AuthUser | null {
   };
 }
 
+// 8.0 demo: the sign-in state before the demo started, and what to undo when it ends.
+let beforeDemo: AuthState | null = null;
+let onDemoExit: (() => void) | null = null;
+
+/** Start the in-browser demo as a signed-in visitor without an account (see demo.ts). */
+export function enterDemo(user: AuthUser, onExit: () => void): void {
+  if (!state.demo) beforeDemo = state;
+  onDemoExit = onExit;
+  emit({ mode: state.mode, user, token: null, demo: true });
+}
+
+/** End the demo: its workspace is dropped and the sign-in page comes back. */
+export function leaveDemo(): void {
+  if (!state.demo) return;
+  const exit = onDemoExit;
+  onDemoExit = null;
+  exit?.();
+  const back = beforeDemo ?? { mode: state.mode, user: null, token: null };
+  beforeDemo = null;
+  emit({ ...back, demo: false });
+}
+
 /** Load /api/config and restore any existing session. Call once at start-up. */
 export async function initAuth(): Promise<ClientConfig> {
   registerAuth(getAccessToken, handleUnauthorized);
@@ -80,7 +104,9 @@ export async function initAuth(): Promise<ClientConfig> {
     const { data } = await supabase.auth.getSession();
     emit({ mode: "supabase", user: userFromSession(data.session), token: data.session?.access_token ?? null });
     supabase.auth.onAuthStateChange((_event, session) => {
-      emit({ mode: "supabase", user: userFromSession(session), token: session?.access_token ?? null });
+      const next: AuthState = { mode: "supabase", user: userFromSession(session), token: session?.access_token ?? null };
+      if (state.demo) beforeDemo = next; // applied when the demo ends
+      else emit(next);
     });
   } else if (config.auth_mode === "mock") {
     let token: string | null = null;
@@ -133,6 +159,10 @@ export async function signInWithGoogle(): Promise<void> {
 }
 
 export async function signOut(): Promise<void> {
+  if (state.demo) {
+    leaveDemo();
+    return;
+  }
   if (state.mode === "supabase" && supabase) {
     await supabase.auth.signOut();
     emit({ mode: "supabase", user: null, token: null });

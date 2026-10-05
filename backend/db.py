@@ -11,8 +11,9 @@ both backends:
 Every table that holds user data carries ``owner_id`` so the backend can
 isolate accounts without Row Level Security: only the backend touches the
 database, with one service connection, and every query filters by owner.
-``workspace_id`` is written equal to ``owner_id`` for now; it exists so a
-future "research group" feature does not need a migration of existing rows.
+``workspace_id`` is written equal to ``owner_id``. A team (migration 0005,
+``team_members``) shares the owner's workspace: members act on rows whose
+``owner_id`` is the owner, so rows never move when a team forms or breaks up.
 
 Schema changes go through Alembic (backend/alembic/versions). ``init_schema``
 upgrades to head at startup, which also creates the tables of a fresh file.
@@ -120,6 +121,10 @@ class ExtractionJob(Base):
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
     started_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    #: Who uploaded the PDF (migration 0005). Equal to owner_id for a personal
+    #: workspace; a team member's id when they upload into the owner's
+    #: workspace (the owner still pays). NULL on rows written before 0005.
+    submitted_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     __table_args__ = (
         Index("ix_jobs_owner_created", "owner_id", "created_at"),
@@ -205,6 +210,32 @@ class Order(Base):
     __table_args__ = (
         Index("ux_orders_order_code", "order_code", unique=True),
         Index("ix_orders_owner_created", "owner_id", "created_at"),
+    )
+
+
+class TeamMember(Base):
+    """A person the owner invited into the owner's workspace (migration 0005).
+
+    The workspace is the owner's own: the owner's records, the owner's
+    credits. A member uploads PDFs (the owner pays) and verifies records;
+    only the owner locks and exports. The invitation is by e-mail and
+    becomes active the first time that address signs in (``member_id`` is
+    then filled in).
+    """
+
+    __tablename__ = "team_members"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), nullable=False)
+    email: Mapped[str] = mapped_column(String(320), nullable=False)
+    member_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    joined_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+
+    __table_args__ = (
+        Index("ux_team_owner_email", "owner_id", "email", unique=True),
+        Index("ix_team_member", "member_id"),
+        Index("ix_team_email", "email"),
     )
 
 

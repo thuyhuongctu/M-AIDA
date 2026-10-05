@@ -30,9 +30,11 @@ down_revision = "0001_v8_initial"
 branch_labels = None
 depends_on = None
 
-#: Every table this application owns. tests/test_803_postgres.py asserts
-#: that this list covers db.Base.metadata, so a table added later without
-#: being listed here fails the suite.
+#: Every table this application owned at 8.0. A later migration that adds a
+#: table locks it down itself and lists it in its own TABLES (0005:
+#: team_members); tests/test_803_postgres.py and test_806_team.py assert that
+#: these lists together cover db.Base.metadata, so a new table that nobody
+#: locked down fails the suite.
 TABLES = (
     "users",
     "studies",

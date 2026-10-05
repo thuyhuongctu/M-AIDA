@@ -70,10 +70,12 @@ interface VerificationPanelProps {
   study: StudyDatabaseEntry;
   onUpdated: (updated: StudyDatabaseEntry) => void;
   onDeleted?: (studyId: string) => void;
+  /** 8.0 teams: false for a member of someone else's workspace (no lock, no delete). */
+  ownerTools?: boolean;
 }
 
 const VerificationPanel = forwardRef<VerificationPanelHandle, VerificationPanelProps>(function VerificationPanel(
-  { study, onUpdated, onDeleted },
+  { study, onUpdated, onDeleted, ownerTools = true },
   ref
 ) {
   const { t } = useI18n();
@@ -156,10 +158,10 @@ const VerificationPanel = forwardRef<VerificationPanelHandle, VerificationPanelP
   }, [locked, busy, piNotes, study.study_id, onUpdated, t]);
 
   const openLock = useCallback(() => {
-    if (locked || !approved || busy) return;
+    if (locked || !approved || busy || !ownerTools) return;
     setLockText("");
     dialogRef.current?.showModal();
-  }, [locked, approved, busy]);
+  }, [locked, approved, busy, ownerTools]);
 
   const confirmLock = useCallback(async () => {
     if (lockText.trim() !== study.study_id) return;
@@ -345,7 +347,14 @@ const VerificationPanel = forwardRef<VerificationPanelHandle, VerificationPanelP
             <button type="button" className="btn btn-primary" onClick={() => void approve()} disabled={busy} data-testid="vp-approve">
               {busy ? t("rv_saving") : approved ? `${t("rv_approved_msg")} ✓` : t("rv_approve")}
             </button>
-            <button type="button" className="btn btn-accent" onClick={openLock} disabled={busy || !approved} data-testid="vp-lock">
+            <button
+              type="button"
+              className="btn btn-accent"
+              onClick={openLock}
+              disabled={busy || !approved || !ownerTools}
+              title={ownerTools ? undefined : t("team_owner_only")}
+              data-testid="vp-lock"
+            >
               {t("rv_lock")}
             </button>
           </span>
@@ -353,10 +362,15 @@ const VerificationPanel = forwardRef<VerificationPanelHandle, VerificationPanelP
             <button type="button" className="btn btn-link btn-danger-text" onClick={flag} disabled={busy}>
               {t("rv_flag")}
             </button>
-            <button type="button" className="btn btn-link" onClick={remove} disabled={busy} data-testid="vp-delete">
-              {deleteArmed ? `${t("rv_delete")}?` : t("rv_delete")}
-            </button>
+            {ownerTools && (
+              <button type="button" className="btn btn-link" onClick={remove} disabled={busy} data-testid="vp-delete">
+                {deleteArmed ? `${t("rv_delete")}?` : t("rv_delete")}
+              </button>
+            )}
           </span>
+          {!ownerTools && (
+            <p className="hint-text vp-owner-only" data-testid="vp-owner-only">{t("team_member_verify_hint")}</p>
+          )}
         </div>
       )}
 

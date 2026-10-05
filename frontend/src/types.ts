@@ -174,6 +174,16 @@ export interface MeResponse {
   studies: number;
   locked: number;
   auth_mode: ClientConfig["auth_mode"];
+  /** 8.0 teams: the caller's own balance (credits = the balance that pays here). */
+  own_credits?: number | null;
+  /** 8.0 teams: the workspace this request acted on. */
+  workspace?: WorkspaceInfo;
+}
+
+export interface WorkspaceInfo {
+  owner_id: string;
+  owner_email: string;
+  role: "owner" | "member";
 }
 
 export type JobStatus = "queued" | "running" | "succeeded" | "rejected" | "failed";
@@ -193,6 +203,8 @@ export interface ExtractionJob {
   created_at: string;
   started_at: string | null;
   finished_at: string | null;
+  /** 8.0 teams: the account that uploaded (the owner pays). */
+  submitted_by?: string;
 }
 
 export interface LedgerEntry {
@@ -325,4 +337,33 @@ export interface ReportPayload {
   prisma: PrismaCounts;
   prisma_updated_at: string | null;
   counts: { records: number; pending: number; approved: number; locked: number };
+}
+
+// ---------------------------------------------------------------------------
+// Team (8.0, backend/team.py): a shared workspace that belongs to one owner
+// ---------------------------------------------------------------------------
+
+export interface TeamMemberInfo {
+  email: string;
+  member_id: string | null;
+  name: string;
+  invited_at: string;
+  joined_at: string | null;
+  status: "invited" | "active";
+}
+
+export interface TeamMembership {
+  owner_id: string;
+  owner_email: string;
+  owner_name: string;
+  invited_at: string;
+  joined_at: string | null;
+  status: "invited" | "active";
+}
+
+export interface TeamPayload {
+  enabled: boolean;
+  max_members: number;
+  members: TeamMemberInfo[];
+  memberships: TeamMembership[];
 }

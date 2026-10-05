@@ -232,6 +232,43 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   khung tĩnh khi người xem chọn giảm chuyển động và dừng khi thẻ trình duyệt bị
   ẩn. Không đưa three.js/d3 từ unpkg và phông Google của bản thiết kế vào, vì CSP
   của Caddy chặn các nguồn đó.
+- **Thẻ Nhóm (Team)** (`backend/team.py`, migration `0005_team`): không gian
+  chung thuộc một chủ. Chủ mời bằng e-mail, chỉ địa chỉ có trong
+  `MAIDA_INVITED_EMAILS`, tối đa 10 người; lời mời thành thành viên khi địa chỉ
+  đó mở không gian lần đầu. Trình duyệt chọn không gian qua header
+  `X-MAIDA-Workspace`. Trong không gian của chủ:
+  - thành viên tải PDF lên và tín dụng của chủ bị trừ;
+  - giới hạn 1 lượt đang chạy và số lượt mỗi giờ tính theo từng người (cột mới
+    `extraction_jobs.submitted_by`);
+  - thành viên được duyệt và sửa bản ghi; nhật ký của chủ ghi rõ người làm;
+  - chỉ chủ được khóa, xóa, xuất CSV/metafor, đồng bộ Notion và sửa số liệu
+    PRISMA (thành viên nhận 403 `owner_only`).
+  Gỡ thành viên thì không gian đóng với họ ngay (403 `not_member`, giao diện tự
+  về không gian riêng); bản ghi họ đã làm vẫn ở lại với chủ. Bảng mới
+  `team_members` bị khóa Data API của Supabase như các bảng của 0002. Kiểm thử:
+  `test_806_team.py` (6 ca) và một bước trình duyệt (chủ mời, thành viên tải lên
+  và duyệt, chủ khóa rồi gỡ).
+- **Bản demo không cần đăng ký** (`frontend/src/demo.ts`): nút "Xem bản demo" ở
+  trang đăng nhập. Ứng dụng thật chạy trên một không gian giữ trong bộ nhớ của
+  tab, gồm 5 bản ghi tổng hợp và một bài mẫu tổng hợp
+  (`frontend/public/demo/maida-demo-paper.pdf`, tạo bằng
+  `demo/make_demo_paper.py`; hai câu trích được kiểm lại đúng từng chữ).
+  - Mọi yêu cầu được trả lời ngay trong trình duyệt (axios adapter), nên không có
+    yêu cầu nào tới `/api`, không gọi mô hình và không tốn phí.
+  - Chỉ đọc đúng bài mẫu: tệp khác bị từ chối, bản demo không bao giờ đọc PDF
+    của người dùng.
+  - Xuất tệp và thanh toán tắt; nhãn "Demo" luôn hiện trên mọi màn hình.
+  - Tải lại trang hoặc bấm "Thoát demo" là hết phiên.
+- **Đồng hồ múi giờ**: Cần Thơ, Paris và giờ máy người xem (ẩn khi trùng giờ một
+  trong hai thành phố), ở trang đăng nhập và trên Tổng quan. Chỉ dùng `Intl`,
+  cập nhật theo phút.
+- **Nhạc nền**: nút ♪ ở đầu trang và trang đăng nhập, phát hai bài của Đỗ Thùy
+  Hương ("The Heartbeat of M-AIDA", "M-AIDA · Que les preuves décident").
+  - Tệp đi kèm ứng dụng (`frontend/public/audio/`) vì album trên website chưa có
+    hai bài này, nên cùng nguồn và CSP không phải mở thêm.
+  - Mặc định tắt: không tải gì cho tới khi bấm Phát, và không nhớ trạng thái
+    đang phát; trình duyệt chỉ nhớ âm lượng.
+  - Không có âm tần số hay tuyên bố sức khỏe.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);

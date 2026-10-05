@@ -10,6 +10,7 @@ import { fetchJobs, fetchMe, fetchStudies } from "../api";
 import { useI18n } from "../i18n";
 import type { ExtractionJob, MeResponse, StudyDatabaseEntry } from "../types";
 import { JobStatusPill } from "./JobStatusPill";
+import WorldClocks from "./WorldClocks";
 
 interface DashboardProps {
   refreshKey: number;
@@ -69,6 +70,8 @@ export default function Dashboard({ refreshKey, onNewExtraction, onOpenStudy }: 
       </div>
 
       {error && <p className="error-message">{error}</p>}
+
+      <WorldClocks variant="card" />
 
       <div className="summary-grid">
         <div className="summary-card summary-card-credits" data-tour="credits">

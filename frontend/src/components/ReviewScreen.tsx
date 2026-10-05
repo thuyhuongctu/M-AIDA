@@ -54,9 +54,11 @@ interface ReviewScreenProps {
   initialStudyId?: string | null;
   refreshKey: number;
   onChanged?: () => void;
+  /** 8.0 teams: false for a member of someone else's workspace. */
+  ownerTools?: boolean;
 }
 
-export default function ReviewScreen({ initialStudyId, refreshKey, onChanged }: ReviewScreenProps) {
+export default function ReviewScreen({ initialStudyId, refreshKey, onChanged, ownerTools = true }: ReviewScreenProps) {
   const { t } = useI18n();
   const [studies, setStudies] = useState<StudyDatabaseEntry[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
@@ -272,6 +274,7 @@ export default function ReviewScreen({ initialStudyId, refreshKey, onChanged }: 
             study={selected}
             onUpdated={handleUpdated}
             onDeleted={handleDeleted}
+            ownerTools={ownerTools}
           />
         ) : null}
       </section>

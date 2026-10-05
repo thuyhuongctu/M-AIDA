@@ -33,7 +33,7 @@ from typing import Any, Callable
 
 import pypdfium2 as pdfium
 from fastapi import HTTPException
-from sqlalchemy import func, select, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import sessionmaker
 
 from credits import CreditService, InsufficientCredits
@@ -156,8 +156,15 @@ class JobService:
             return list(s.scalars(stmt).all())
 
     def _count(self, owner_id: str, *, statuses: tuple[str, ...] | None = None,
-               since: datetime | None = None) -> int:
+               since: datetime | None = None, submitted_by: str | None = None) -> int:
         stmt = select(func.count()).select_from(ExtractionJob).where(ExtractionJob.owner_id == owner_id)
+        if submitted_by is not None:
+            # One person's uploads (8.0 teams). Rows from before migration 0005
+            # carry no submitter: they count for the owner.
+            mine = ExtractionJob.submitted_by == submitted_by
+            if submitted_by == owner_id:
+                mine = or_(mine, ExtractionJob.submitted_by.is_(None))
+            stmt = stmt.where(mine)
         if statuses:
             stmt = stmt.where(ExtractionJob.status.in_(statuses))
         if since is not None:
@@ -167,8 +174,16 @@ class JobService:
 
     # -- accept -----------------------------------------------------------------
 
-    def accept(self, owner_id: str, pdf_bytes: bytes, filename: str, metadata: dict[str, Any]) -> AcceptedJob:
-        """Validate, apply limits, reserve the credit and queue the job."""
+    def accept(self, owner_id: str, pdf_bytes: bytes, filename: str, metadata: dict[str, Any],
+               submitted_by: str | None = None) -> AcceptedJob:
+        """Validate, apply limits, reserve the credit and queue the job.
+
+        ``owner_id`` is the workspace that owns the record and pays the credit;
+        ``submitted_by`` the person uploading (a team member in the owner's
+        workspace, else the owner). The running-job and hourly limits are per
+        person, so team members do not block one another.
+        """
+        submitter = submitted_by or owner_id
         s = self.settings
         # Probe the engine before charging anything: an unconfigured key is a
         # 503 with no job row, exactly as in 7.2.
@@ -183,10 +198,10 @@ class JobService:
             # and it costs one indexed read.
             if self.credits.balance(owner_id) < 1:
                 raise HTTPException(status_code=402, detail="No credits left. Ask the operator for more credits.")
-            if self._count(owner_id, statuses=ACTIVE_STATES) >= s.maida_max_running_jobs_per_user:
+            if self._count(owner_id, statuses=ACTIVE_STATES, submitted_by=submitter) >= s.maida_max_running_jobs_per_user:
                 raise HTTPException(status_code=429, detail="An extraction is already running for your account; wait for it to finish.")
             window = utcnow() - timedelta(hours=1)
-            if self._count(owner_id, since=window) >= s.maida_jobs_per_hour:
+            if self._count(owner_id, since=window, submitted_by=submitter) >= s.maida_jobs_per_hour:
                 raise HTTPException(status_code=429, detail=f"Rate limit: at most {s.maida_jobs_per_hour} extractions per hour.")
 
         job_id = str(uuid.uuid4())
@@ -194,7 +209,7 @@ class JobService:
             db.add(ExtractionJob(
                 id=job_id, owner_id=owner_id, status="queued", filename=(filename or "")[:300],
                 size_bytes=len(pdf_bytes), pages=pdf.pages, metadata_json=dict(metadata),
-                credits_charged=0, created_at=utcnow(),
+                credits_charged=0, created_at=utcnow(), submitted_by=submitter,
             ))
             db.commit()
         if s.cloud_mode:
@@ -356,4 +371,5 @@ class JobService:
             "created_at": _aware(job.created_at),
             "started_at": _aware(job.started_at),
             "finished_at": _aware(job.finished_at),
+            "submitted_by": job.submitted_by or job.owner_id,
         }

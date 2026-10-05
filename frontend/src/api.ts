@@ -6,7 +6,7 @@
  * to override the base URL.
  */
 
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosAdapter, AxiosInstance, AxiosResponse } from "axios";
 import type {
   AccountExport,
   AdminOrders,
@@ -25,6 +25,7 @@ import type {
   PrismaCounts,
   ReportPayload,
   StudyDatabaseEntry,
+  TeamPayload,
   StudyFilters,
   VerificationDecision,
 } from "./types";
@@ -39,6 +40,15 @@ const http: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
+
+// 8.0 demo: while the in-browser demo runs (demo.ts), its adapter answers
+// every request from memory and nothing reaches the network. null restores
+// the network adapter.
+const networkAdapter = http.defaults.adapter;
+
+export function setRequestAdapter(adapter: AxiosAdapter | null): void {
+  http.defaults.adapter = adapter ?? networkAdapter;
+}
 
 // 7.2.2: the backend rejects every mutating request (extract/verify/lock/
 // Notion-sync) without X-MAIDA-Admin-Key (main.py:admin_key_guard), since
@@ -79,11 +89,27 @@ export function registerAuth(provider: () => string | null, onUnauthorized: () =
   unauthorizedHandler = onUnauthorized;
 }
 
+// 8.0 teams: the workspace every request acts on (an owner's account id), or
+// null for the caller's own. Chosen on the Team tab; see backend/team.py.
+let workspaceId: string | null = null;
+
+export function setWorkspace(ownerId: string | null): void {
+  workspaceId = ownerId;
+}
+
+export function getWorkspace(): string | null {
+  return workspaceId;
+}
+
 http.interceptors.request.use((cfg) => {
   const token = tokenProvider();
   if (token) {
     cfg.headers = cfg.headers ?? {};
     cfg.headers.Authorization = `Bearer ${token}`;
+  }
+  if (workspaceId) {
+    cfg.headers = cfg.headers ?? {};
+    cfg.headers["X-MAIDA-Workspace"] = workspaceId;
   }
   return cfg;
 });
@@ -110,6 +136,11 @@ http.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+/** True when the chosen team workspace refused the caller (403 not_member: removed or left). */
+export function isNotMember(err: unknown): boolean {
+  return err instanceof Error && err.message.includes("not_member");
+}
 
 /** True when the backend refused the caller as not invited to the closed beta (403 not_invited). */
 export function isNotInvited(err: unknown): boolean {
@@ -435,5 +466,30 @@ export async function syncToNotion(): Promise<NotionSyncResponse> {
   const res: AxiosResponse<NotionSyncResponse> = await http.post(
     "/api/notion/sync"
   );
+  return res.data;
+}
+
+// ---------------------------------------------------------------------------
+// Team (8.0): the caller's own team and the workspaces they were invited into.
+// These calls are about the caller, whatever workspace is open.
+// ---------------------------------------------------------------------------
+
+export async function fetchTeam(): Promise<TeamPayload> {
+  const res: AxiosResponse<TeamPayload> = await http.get("/api/team");
+  return res.data;
+}
+
+export async function inviteMember(email: string): Promise<TeamPayload> {
+  const res: AxiosResponse<TeamPayload> = await http.post("/api/team/members", { email });
+  return res.data;
+}
+
+export async function removeMember(email: string): Promise<TeamPayload> {
+  const res: AxiosResponse<TeamPayload> = await http.delete(`/api/team/members/${encodeURIComponent(email)}`);
+  return res.data;
+}
+
+export async function leaveTeam(ownerId: string): Promise<TeamPayload> {
+  const res: AxiosResponse<TeamPayload> = await http.delete(`/api/team/memberships/${encodeURIComponent(ownerId)}`);
   return res.data;
 }

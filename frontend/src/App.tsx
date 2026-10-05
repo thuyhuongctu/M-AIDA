@@ -10,13 +10,15 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fetchHealth, fetchMe, getAdminKey, isNotInvited, setAdminKey } from "./api";
+import { fetchHealth, fetchMe, getAdminKey, isNotInvited, isNotMember, setAdminKey, setWorkspace as setApiWorkspace } from "./api";
 import { AuthState, getAuthState, initAuth, signOut, subscribe } from "./auth";
 import AccountPanel from "./components/AccountPanel";
 import BillingPanel, { readPaymentReturn, type PaymentReturn } from "./components/BillingPanel";
 import CosmosBackdrop from "./components/CosmosBackdrop";
 import ContactDialog from "./components/ContactDialog";
+import { stopDemo } from "./demo";
 import Logo3DDialog from "./components/Logo3DDialog";
+import MusicPlayer from "./components/MusicPlayer";
 import Dashboard from "./components/Dashboard";
 import DatasetPanel from "./components/DatasetPanel";
 import ExtractionPanel from "./components/ExtractionPanel";
@@ -25,6 +27,7 @@ import { Logo } from "./components/Logo";
 import VnMark from "./components/VnMark";
 import ReviewScreen from "./components/ReviewScreen";
 import StatusPill from "./components/StatusPill";
+import TeamPanel from "./components/TeamPanel";
 import Tour, { tourDone, type TourTab } from "./components/Tour";
 import { I18nContext, Lang, readLang, storeLang, translate } from "./i18n";
 import { ClientConfig, MeResponse, StudyDatabaseEntry } from "./types";
@@ -36,7 +39,10 @@ import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
 import "./index.css";
 
-type Tab = "dashboard" | "extract" | "verify" | "dataset" | "billing" | "account";
+type Tab = "dashboard" | "extract" | "verify" | "dataset" | "team" | "billing" | "account";
+
+/** 8.0 teams: the workspace a member opened last, per account and browser. */
+const workspaceKey = (userId: string) => `maida_workspace:${userId}`;
 
 type Look = "paper" | "cosmos";
 const LOOK_KEY = "maida_look";
@@ -93,6 +99,8 @@ export default function App() {
 
   const cloud = config?.auth_mode === "supabase" || config?.auth_mode === "mock";
   const signedIn = !cloud || !!auth.user;
+  // 8.0: the in-browser demo (demo.ts) - a visitor without an account.
+  const demo = !!auth.demo;
 
   // Count new extractions so the Verify tab can show an attention badge, and
   // bump a key so the dashboard/account panels reload after a change.
@@ -125,6 +133,45 @@ export default function App() {
     }
   }, [cloud, userId]);
 
+  // Teams (8.0): which workspace the requests act on - null is the caller's
+  // own; an owner's id opens that owner's workspace (X-MAIDA-Workspace, see
+  // api.ts). Restored per account; never in the demo.
+  const [workspace, setWorkspaceState] = useState<string | null>(null);
+  const [workspaceGone, setWorkspaceGone] = useState(false);
+  useEffect(() => {
+    let saved: string | null = null;
+    if (cloud && userId && !demo) {
+      try {
+        saved = localStorage.getItem(workspaceKey(userId));
+      } catch {
+        saved = null;
+      }
+    }
+    setApiWorkspace(saved);
+    setWorkspaceState(saved);
+    if (saved) setRefreshKey((k) => k + 1); // panels that loaded before this effect reload
+  }, [cloud, userId, demo]);
+  const openWorkspace = useCallback(
+    (ownerId: string | null) => {
+      const next = ownerId && ownerId !== userId ? ownerId : null;
+      setApiWorkspace(next);
+      setWorkspaceState(next);
+      setWorkspaceGone(false);
+      try {
+        if (userId) {
+          if (next) localStorage.setItem(workspaceKey(userId), next);
+          else localStorage.removeItem(workspaceKey(userId));
+        }
+      } catch {
+        /* storage unavailable: the choice lasts until the next reload */
+      }
+      setFocusStudyId(null);
+      setActiveTab("dashboard");
+      setRefreshKey((k) => k + 1);
+    },
+    [userId]
+  );
+
   // Account summary for the header pills (credits) - cloud modes only.
   const [me, setMe] = useState<MeResponse | null>(null);
   // Closed beta: a signed-in address that is not on MAIDA_INVITED_EMAILS gets
@@ -142,8 +189,14 @@ export default function App() {
       .catch((err: unknown) => {
         setMe(null);
         if (isNotInvited(err)) setNotInvited(true);
+        else if (isNotMember(err)) {
+          // Removed from the team (or left it elsewhere): back to the own workspace.
+          openWorkspace(null);
+          setWorkspaceGone(true);
+        }
       });
-  }, [cloud, auth.user, refreshKey]);
+  }, [cloud, auth.user, refreshKey, openWorkspace]);
+  const member = me?.workspace?.role === "member";
 
   // Version label: read once from /api/health so the UI can never disagree
   // with the backend (7.2.1). Falls back to "?" while unreachable.
@@ -179,19 +232,22 @@ export default function App() {
   // Guided tour (8.0): once per browser after the first sign-in, and on demand.
   const [tourOpen, setTourOpen] = useState(false);
   useEffect(() => {
-    if (cloud && auth.user && !tourDone()) setTourOpen(true);
-  }, [cloud, auth.user]);
+    // Not in the demo: its banner and sample card guide the visitor, and the
+    // tour is kept for the first real sign-in.
+    if (cloud && auth.user && !auth.demo && !tourDone()) setTourOpen(true);
+  }, [cloud, auth.user, auth.demo]);
   const tourTab = useCallback((tab: TourTab) => setActiveTab(tab), []);
 
   const t = i18n.t;
 
   const payments = !!config?.payments;
-  const tabs: { id: Tab; label: string; badge?: number; cloudOnly?: boolean; paymentsOnly?: boolean }[] = [
+  const tabs: { id: Tab; label: string; badge?: number; cloudOnly?: boolean; paymentsOnly?: boolean; noDemo?: boolean }[] = [
     { id: "dashboard", label: t("nav_dashboard"), cloudOnly: true },
     { id: "extract", label: t("nav_extract") },
     { id: "verify", label: t("nav_verify"), badge: extractionCount },
     { id: "dataset", label: t("nav_dataset") },
-    { id: "billing", label: t("nav_billing"), cloudOnly: true, paymentsOnly: true },
+    { id: "team", label: t("nav_team"), cloudOnly: true, noDemo: true },
+    { id: "billing", label: t("nav_billing"), cloudOnly: true, paymentsOnly: true, noDemo: true },
     { id: "account", label: t("nav_account"), cloudOnly: true },
   ];
 
@@ -219,7 +275,7 @@ export default function App() {
         {signedIn && config && (
           <nav className="shell-nav" role="tablist">
             {tabs
-              .filter((tab) => (!tab.cloudOnly || cloud) && (!tab.paymentsOnly || payments))
+              .filter((tab) => (!tab.cloudOnly || cloud) && (!tab.paymentsOnly || payments) && (!tab.noDemo || !demo))
               .map((tab) => (
                 <button
                   key={tab.id}
@@ -238,8 +294,19 @@ export default function App() {
       </div>
       <div className="shell-head-right">
         {signedIn && config && <StatusPill />}
+        {cloud && member && me?.workspace && (
+          <button
+            type="button"
+            className="pill pill-team"
+            onClick={() => setActiveTab("team")}
+            title={me.workspace.owner_email}
+            data-testid="workspace-chip"
+          >
+            ◇ {t("team_chip")} · {me.workspace.owner_email}
+          </button>
+        )}
         {cloud && me && me.credits !== null && (
-          <span className="pill pill-credits mono" data-testid="credits-pill">
+          <span className="pill pill-credits mono" data-testid="credits-pill" title={member ? t("team_pays") : undefined}>
             <span className="glyph glyph-locked" aria-hidden="true">◆</span> {me.credits} {t("credits")}
           </span>
         )}
@@ -268,6 +335,7 @@ export default function App() {
             {t("tour_btn")}
           </button>
         )}
+        <MusicPlayer />
         <button
           type="button"
           className={`btn btn-ghost btn-sm look-toggle ${look === "cosmos" ? "look-toggle-on" : ""}`}
@@ -345,17 +413,34 @@ export default function App() {
   } else {
     body = (
       <main className={`shell-main ${activeTab === "verify" ? "shell-main-wide" : ""}`}>
+        {demo && (
+          <div className="demo-banner" role="status" data-testid="demo-banner">
+            <span className="demo-badge mono">{t("demo_badge")}</span>
+            <span className="demo-banner-text">{t("demo_banner")}</span>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => stopDemo()} title={t("demo_signup")} data-testid="demo-exit">
+              {t("demo_exit")}
+            </button>
+          </div>
+        )}
         {activeTab === "dashboard" && cloud && (
           <Dashboard refreshKey={refreshKey} onNewExtraction={() => setActiveTab("extract")} onOpenStudy={openStudy} />
         )}
         {activeTab === "extract" && (
-          <ExtractionPanel onExtracted={handleExtracted} cloud={cloud} credits={me?.credits ?? null} onOpenReview={openStudy} onSettled={bump} />
+          <ExtractionPanel onExtracted={handleExtracted} cloud={cloud} demo={demo} credits={me?.credits ?? null} onOpenReview={openStudy} onSettled={bump} />
+        )}
+        {workspaceGone && (
+          <div className="note note-warn" role="status" data-testid="workspace-gone">
+            <p>{t("team_gone")}</p>
+          </div>
         )}
         {activeTab === "verify" && (
-          <ReviewScreen initialStudyId={focusStudyId} refreshKey={refreshKey} onChanged={bump} />
+          <ReviewScreen initialStudyId={focusStudyId} refreshKey={refreshKey} onChanged={bump} ownerTools={!member} />
         )}
-        {activeTab === "dataset" && <DatasetPanel refreshKey={refreshKey} />}
-        {activeTab === "billing" && cloud && (
+        {activeTab === "dataset" && <DatasetPanel refreshKey={refreshKey} ownerTools={!member} />}
+        {activeTab === "team" && cloud && !demo && (
+          <TeamPanel refreshKey={refreshKey} me={me} workspace={workspace} onOpenWorkspace={openWorkspace} />
+        )}
+        {activeTab === "billing" && cloud && !demo && (
           <BillingPanel refreshKey={refreshKey} paymentReturn={paymentReturn} onPaymentReturnHandled={paymentHandled} />
         )}
         {activeTab === "account" && cloud && <AccountPanel refreshKey={refreshKey} />}

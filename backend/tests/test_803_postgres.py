@@ -20,15 +20,21 @@ from conftest import PG_URL, fresh_database_url
 
 pytestmark = pytest.mark.skipif(not PG_URL, reason="MAIDA_TEST_PG_URL not set")
 
-MIGRATION = Path(__file__).resolve().parents[1] / "alembic" / "versions" / "0002_lock_down_data_api.py"
+VERSIONS = Path(__file__).resolve().parents[1] / "alembic" / "versions"
+#: Migrations that close tables to the Data API: 0002 (the 8.0 tables) and
+#: every later migration that adds a table (0005: team_members).
+LOCKDOWN_MIGRATIONS = ("0002_lock_down_data_api.py", "0005_team.py")
 
 
 def _locked_tables() -> set[str]:
-    spec = importlib.util.spec_from_file_location("m0002", MIGRATION)
-    mod = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(mod)
-    return set(mod.TABLES)
+    tables: set[str] = set()
+    for name in LOCKDOWN_MIGRATIONS:
+        spec = importlib.util.spec_from_file_location(name[:-3], VERSIONS / name)
+        mod = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(mod)
+        tables |= set(mod.TABLES)
+    return tables
 
 
 def test_every_table_in_the_schema_is_covered_by_the_lockdown():

@@ -105,12 +105,19 @@ Sửa danh sách xong thì khởi động lại backend:
 | Đổi mô hình | sửa `LLM_MODEL` trong `deploy/.env.cloud`, ghi CHANGELOG, restart; kết quả đánh giá độ chính xác chỉ có giá trị với mô hình đã đánh giá |
 | Sao lưu | Supabase sao lưu hằng ngày (gói Free giữ 7 ngày từ 2026); kiểm tra khôi phục mỗi quý |
 | Xuất dữ liệu một người dùng | người dùng tự bấm *Download all my data (JSON)* ở thẻ Account |
+| Nhóm nghiên cứu | người dùng tự làm ở thẻ Team; người được mời phải có trong `MAIDA_INVITED_EMAILS` trước |
 
 Quy tắc tín dụng (xem `backend/credits.py`): mỗi job trừ 1 tín dụng khi được
 nhận; job mà mô hình đã trả lời nhưng bị cổng bằng chứng hoặc kiểm tra định
 dạng từ chối (422) **không hoàn**; job lỗi phía hệ thống (nhà cung cấp,
 timeout, lỗi nội bộ, máy chủ khởi động lại) **hoàn tự động**. Số dư không bao
 giờ âm.
+
+Nhóm (thẻ Team, `backend/team.py`): chủ mời tối đa 10 người vào không gian
+của mình. Thành viên tải PDF lên bằng tín dụng của chủ và được duyệt, sửa bản
+ghi; chỉ chủ khóa, xóa, xuất và sửa PRISMA. Giới hạn job tính theo từng người.
+`audit_log` của chủ ghi `by_email` cho mọi việc thành viên làm. Gỡ một người ở
+thẻ Team là không gian đóng với họ ngay; bản ghi giữ nguyên.
 
 ### Bán gói tín dụng qua payOS (tắt mặc định)
 
@@ -221,6 +228,12 @@ kiểm tra tách dữ liệu, mua một gói qua trang thanh toán giả và cô
   và webhook payOS đều cần token (webhook được xác thực bằng chữ ký HMAC thay
   cho token); dữ liệu lọc theo `owner_id` ở tầng backend.
 - Caddy thêm HSTS, CSP (chỉ cho phép kết nối tới `*.supabase.co`), chặn nhúng iframe.
+  Nhạc nền (`frontend/public/audio/`), bài mẫu của bản demo
+  (`frontend/public/demo/`) và phông chữ đều đi kèm bản build nên CSP không
+  phải mở thêm nguồn nào. Nếu sau này phát nhạc từ website album, thêm
+  `media-src 'self' https://thuyhuongctu.github.io` vào CSP.
+- Bản demo không cần đăng ký chạy hoàn toàn trong trình duyệt: không gửi yêu
+  cầu nào tới `/api`, không gọi mô hình, chỉ đọc bài mẫu tổng hợp.
 - Giới hạn: 25 MB và 80 trang mỗi PDF, 1 job đang chạy mỗi người, 4 job toàn
   hệ thống, 10 job mỗi giờ mỗi người (đổi trong `.env.cloud`).
 - Nhật ký không ghi nội dung PDF; `audit_log` ghi ai làm gì (extract, verify,

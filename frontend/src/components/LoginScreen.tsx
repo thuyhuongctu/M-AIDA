@@ -12,10 +12,13 @@
 import React, { useState } from "react";
 import { isNotInvited } from "../api";
 import { signInWithEmail, signInWithGoogle } from "../auth";
+import { startDemo } from "../demo";
 import { useI18n } from "../i18n";
 import ContactDialog from "./ContactDialog";
 import { Logo } from "./Logo";
 import Logo3D from "./Logo3D";
+import MusicPlayer from "./MusicPlayer";
+import WorldClocks from "./WorldClocks";
 import VnMark from "./VnMark";
 import sceneLogin from "../assets/people/scene-login.webp";
 import sceneMagnifier from "../assets/people/scene-magnifier.webp";
@@ -100,6 +103,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
         {/* the map moved behind the form when the illustration took the brand column */}
         <VnMark variant="hero" />
         <div className="login-topbar">
+          <MusicPlayer />
           <button type="button" className={`seg ${lang === "en" ? "seg-on" : ""}`} onClick={() => setLang("en")}>EN</button>
           <button type="button" className={`seg ${lang === "vi" ? "seg-on" : ""}`} onClick={() => setLang("vi")}>VI</button>
         </div>
@@ -142,6 +146,14 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
           )}
 
           {error && <p className="error-message">{error}</p>}
+
+          <div className="login-demo">
+            <button type="button" className="btn btn-secondary login-btn" onClick={() => startDemo(version)} data-testid="demo-start">
+              {t("demo_try")}
+            </button>
+            <p className="hint-text">{t("demo_try_hint")}</p>
+          </div>
+
           <p className="login-legal">
             {t("login_legal_prefix")}{" "}
             <a href="/legal/terms.html" target="_blank" rel="noopener noreferrer">{t("legal_terms")}</a>
@@ -153,6 +165,7 @@ export default function LoginScreen({ mode, version }: LoginScreenProps) {
               : "No password. The first sign-in creates your account with 10 beta credits."}
           </p>
         </div>
+        <WorldClocks variant="strip" />
       </section>
     </div>
   );

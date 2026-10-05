@@ -38,7 +38,7 @@ function fromDraft(d: PrismaDraft): PrismaCounts {
   return out;
 }
 
-export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
+export default function DatasetPanel({ refreshKey, ownerTools = true }: { refreshKey: number; ownerTools?: boolean }) {
   const { t } = useI18n();
   const [studies, setStudies] = useState<StudyDatabaseEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
   const [prismaMsg, setPrismaMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [prismaBusy, setPrismaBusy] = useState(false);
 
-  const errorText = useCallback((err: unknown) => (err instanceof Error ? err.message : t("error_generic")), [t]);
+  const errorText = useCallback((err: unknown) => (err instanceof Error ? err.message.replace(/^\d{3}: /, "") : t("error_generic")), [t]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -157,6 +157,7 @@ export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
       </div>
 
       {error && <p className="error-message">{error}</p>}
+      {!ownerTools && <p className="note note-warn" data-testid="report-owner-only">{t("team_member_report_hint")}</p>}
 
       <section className="prisma" data-testid="prisma">
         <div className="prisma-head">
@@ -175,6 +176,7 @@ export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
                 max={10000000}
                 inputMode="numeric"
                 value={draft[f]}
+                readOnly={!ownerTools}
                 onChange={(e) => setDraft((d) => ({ ...d, [f]: e.target.value }))}
                 placeholder="–"
               />
@@ -189,7 +191,7 @@ export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
             <strong className="mono">{report?.counts.locked ?? counts.locked}</strong>
           </div>
           <div className="prisma-actions">
-            <button className="btn btn-secondary btn-sm" type="submit" disabled={prismaBusy} data-testid="prisma-save">
+            <button className="btn btn-secondary btn-sm" type="submit" disabled={prismaBusy || !ownerTools} data-testid="prisma-save">
               {prismaBusy ? "…" : t("rp_prisma_save")}
             </button>
             {report?.prisma_updated_at && !prismaMsg && (
@@ -242,10 +244,10 @@ export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
           <h3 className="export-card-title">{t("ds_csv_title")}</h3>
           <p className="export-card-desc">{t("ds_csv_desc")}</p>
           <div className="export-row">
-            <button className="btn btn-primary" onClick={() => void exportCsv("full")} disabled={csvLoading !== "" || counts.locked === 0} data-testid="export-csv">
+            <button className="btn btn-primary" onClick={() => void exportCsv("full")} disabled={csvLoading !== "" || counts.locked === 0 || !ownerTools} data-testid="export-csv">
               {csvLoading === "full" ? "…" : t("ds_csv_btn")}
             </button>
-            <button className="btn btn-secondary" onClick={() => void exportCsv("metafor")} disabled={csvLoading !== "" || counts.locked === 0} data-testid="export-metafor">
+            <button className="btn btn-secondary" onClick={() => void exportCsv("metafor")} disabled={csvLoading !== "" || counts.locked === 0 || !ownerTools} data-testid="export-metafor">
               {csvLoading === "metafor" ? "…" : t("rp_metafor_btn")}
             </button>
           </div>
@@ -256,7 +258,7 @@ export default function DatasetPanel({ refreshKey }: { refreshKey: number }) {
         <div className="export-card">
           <h3 className="export-card-title">{t("ds_notion_title")}</h3>
           <p className="export-card-desc">{t("ds_notion_desc")}</p>
-          <button className="btn btn-ghost" onClick={sync} disabled={syncLoading || counts.locked === 0}>
+          <button className="btn btn-ghost" onClick={sync} disabled={syncLoading || counts.locked === 0 || !ownerTools}>
             {syncLoading ? "…" : t("ds_notion_btn")}
           </button>
           {syncResult && (

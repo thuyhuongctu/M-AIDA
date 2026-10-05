@@ -191,9 +191,9 @@ export default function BillingPanel({
     <div className="panel account-panel billing-panel" data-testid="billing-panel">
       <div className="panel-header">
         <h2 className="panel-title">{t("pay_tab_title")}</h2>
-        {me && me.credits !== null && (
+        {me && (me.own_credits ?? me.credits) !== null && (
           <span className="billing-balance mono" data-testid="billing-credits">
-            {me.credits} {t("credits")}
+            {me.own_credits ?? me.credits} {t("credits")}
           </span>
         )}
       </div>

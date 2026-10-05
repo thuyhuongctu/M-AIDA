@@ -1,9 +1,12 @@
 """Browser end-to-end run for M-AIDA 8.0 (Playwright, Chromium).
 
-Flow: sign in (mock) -> dashboard shows 3 credits -> upload a PDF -> job
-settles -> record shown -> credits 2 -> second user cannot see it ->
-verify -> lock -> CSV export -> account ledger -> credit pack bought through
-the mock checkout -> operator tools -> sign out.
+Flow: sign-in page (time-zone clocks, background music off until played) ->
+sign in (mock) -> dashboard shows 3 credits -> upload a PDF -> job settles ->
+record shown -> credits 2 -> second user cannot see it -> verify -> lock ->
+CSV export -> account ledger -> credit pack bought through the mock checkout
+-> team (a member uploads into the owner's workspace, the owner pays and
+locks) -> operator tools -> sign out -> the in-browser demo (no request
+reaches /api).
 
 Prerequisites: `npm run build` in frontend/, `pip install playwright` in the
 backend venv and a Chromium Playwright can find. Starts serve_mock.py itself.
@@ -75,8 +78,35 @@ def main() -> int:
                     page.screenshot(path=str(shots / f"{name}.png"), full_page=True)
 
             # 1. Sign in
+            audio_requests: list[str] = []
+            page.on("request", lambda req: audio_requests.append(req.url) if "/audio/" in req.url else None)
             page.goto(BASE)
             expect(page.get_by_test_id("login-card")).to_be_visible()
+            # Time zones: Cần Thơ and Paris always, the viewer's clock when it differs
+            from datetime import datetime as _dt, timedelta as _td
+            from zoneinfo import ZoneInfo
+
+            clocks = page.get_by_test_id("world-clocks")
+            expect(clocks).to_be_visible()
+            ct = page.get_by_test_id("clock-can-tho-time").inner_text().strip()
+            now_ct = _dt.now(ZoneInfo("Asia/Ho_Chi_Minh"))
+            assert ct in {now_ct.strftime("%H:%M"), (now_ct - _td(minutes=1)).strftime("%H:%M"),
+                          (now_ct + _td(minutes=1)).strftime("%H:%M")}, ct
+            expect(page.get_by_test_id("clock-paris")).to_contain_text("Paris")
+            # Background music: nothing is fetched until Play; then the bundled song plays
+            page.wait_for_timeout(500)
+            assert audio_requests == [], audio_requests
+            page.get_by_test_id("music-open").click()
+            expect(page.get_by_test_id("music-panel")).to_contain_text("The Heartbeat of M-AIDA")
+            expect(page.get_by_test_id("music-panel")).to_contain_text("Que les preuves décident")
+            page.get_by_test_id("music-toggle").click()
+            expect(page.get_by_test_id("music-open")).to_have_attribute("data-playing", "true", timeout=15_000)
+            assert any(u.endswith("/audio/heartbeat-of-maida.mp3") for u in audio_requests), audio_requests
+            shot("00-login-music")
+            page.get_by_test_id("music-toggle").click()
+            expect(page.get_by_test_id("music-open")).to_have_attribute("data-playing", "false")
+            page.keyboard.press("Escape")
+            expect(page.get_by_test_id("music-panel")).to_have_count(0)
             # 3D logo: WebGL scene when the browser has WebGL, flat wordmark otherwise
             expect(page.get_by_test_id("logo3d")).to_have_attribute("data-state", re.compile("ready|fallback"), timeout=20000)
             print("[e2e] login 3D logo:", page.get_by_test_id("logo3d").get_attribute("data-state"))
@@ -246,6 +276,68 @@ def main() -> int:
             expect(page.get_by_test_id("account-credits")).to_have_text("33")
             expect(page.locator(".ledger-table")).to_contain_text("Purchase")
 
+            # 7c. Team: Bob invites Carol; Carol works in Bob's workspace on Bob's
+            #     credits, may approve but not lock or export; Bob locks.
+            page.get_by_test_id("tab-team").click()
+            page.fill("#team-email", "outsider@gmail.com")
+            page.get_by_test_id("team-invite").click()
+            expect(page.get_by_test_id("team-error")).to_contain_text("closed-beta list")
+            page.fill("#team-email", "carol@example.org")
+            page.get_by_test_id("team-invite").click()
+            expect(page.get_by_test_id("team-members")).to_contain_text("carol@example.org")
+            expect(page.get_by_test_id("team-members")).to_contain_text("invited")
+            shot("08d-team-owner")
+            page.get_by_test_id("tab-account").click()
+            page.get_by_test_id("sign-out").click()
+            page.fill("#login-email", "carol@example.org")
+            page.click("text=Sign in (test mode)")
+            expect(page.get_by_test_id("dashboard")).to_be_visible()  # tour already seen in this browser
+            page.get_by_test_id("tab-team").click()
+            expect(page.get_by_test_id("team-memberships")).to_contain_text("bob@example.org")
+            page.get_by_test_id("team-open-bob@example.org").click()
+            expect(page.get_by_test_id("workspace-chip")).to_contain_text("bob@example.org")
+            expect(page.get_by_test_id("credits-pill")).to_contain_text("33")
+            page.get_by_test_id("tab-extract").click()
+            page.set_input_files("input[type=file]", {"name": "team-paper.pdf", "mimeType": "application/pdf",
+                                                      "buffer": make_minimal_pdf("Team paper. r = 0.22 (n = 150).")})
+            page.get_by_test_id("extract-submit").click()
+            expect(page.get_by_test_id("result-card")).to_contain_text("0.2200", timeout=20_000)
+            expect(page.get_by_test_id("credits-pill")).to_contain_text("32")
+            page.get_by_test_id("tab-verify").click()
+            page.get_by_test_id("rv-item").first.click()
+            expect(page.get_by_test_id("verification-panel")).to_be_visible()
+            page.get_by_test_id("vp-notes").fill("Checked by Carol against the PDF.")
+            page.get_by_test_id("vp-approve").click()
+            expect(page.get_by_test_id("vp-approve")).to_contain_text("Approved", timeout=10_000)
+            expect(page.get_by_test_id("vp-lock")).to_be_disabled()
+            expect(page.get_by_test_id("vp-owner-only")).to_be_visible()
+            expect(page.get_by_test_id("vp-delete")).to_have_count(0)
+            shot("08e-team-member-review")
+            page.get_by_test_id("tab-dataset").click()
+            expect(page.get_by_test_id("report-owner-only")).to_be_visible()
+            expect(page.get_by_test_id("export-csv")).to_be_disabled()
+            page.get_by_test_id("tab-team").click()
+            page.get_by_test_id("team-back").click()
+            expect(page.get_by_test_id("workspace-chip")).to_have_count(0)
+            expect(page.get_by_test_id("credits-balance")).to_have_text("3")  # Carol's own credits untouched
+            page.get_by_test_id("tab-account").click()
+            page.get_by_test_id("sign-out").click()
+            page.fill("#login-email", "bob@example.org")
+            page.click("text=Sign in (test mode)")
+            expect(page.get_by_test_id("credits-balance")).to_have_text("32")
+            page.get_by_test_id("tab-verify").click()
+            expect(page.get_by_test_id("rv-item").first).to_have_attribute("data-state", "approved")
+            page.get_by_test_id("rv-item").first.click()
+            page.get_by_test_id("vp-lock").click()
+            team_study = page.get_by_test_id("lock-dialog").locator("code").inner_text().strip()
+            page.get_by_test_id("lock-id-input").fill(team_study)
+            page.get_by_test_id("lock-confirm").click()
+            expect(page.get_by_test_id("locked-banner")).to_be_visible(timeout=10_000)
+            page.get_by_test_id("tab-team").click()
+            expect(page.get_by_test_id("team-members")).to_contain_text("member")
+            page.get_by_test_id("team-remove-carol@example.org").click()
+            expect(page.get_by_test_id("team-members")).to_have_count(0)
+
             # 8. Operator: grant credits, see usage
             page.get_by_test_id("tab-account").click()
             page.get_by_test_id("sign-out").click()
@@ -257,7 +349,7 @@ def main() -> int:
             page.fill("#grant-amount", "5")
             page.get_by_role("button", name="Grant").click()
             expect(page.locator(".grant-form .hint-text")).to_contain_text("6 credits", timeout=10_000)
-            expect(page.locator(".usage-line")).to_contain_text("2 calls")
+            expect(page.locator(".usage-line")).to_contain_text("3 calls")  # Alice x2, Carol for Bob x1
             expect(page.get_by_test_id("admin-paid-total")).to_contain_text("149,000")
             shot("09-operator")
 
@@ -309,6 +401,49 @@ def main() -> int:
             shot("13-not-invited")
             page.get_by_test_id("not-invited").get_by_role("button").click()
             expect(page.get_by_test_id("login-card")).to_be_visible()
+
+            # 12. In-browser demo: no account, synthetic data, nothing reaches /api
+            api_calls: list[str] = []
+            page.on("request", lambda req: api_calls.append(req.url) if "/api/" in req.url else None)
+            page.locator(".login-topbar .seg", has_text="EN").click()  # step 9 left the browser in Vietnamese
+            page.get_by_test_id("demo-start").click()
+            expect(page.get_by_test_id("demo-banner")).to_be_visible()
+            expect(page.get_by_test_id("tour")).to_have_count(0)
+            expect(page.get_by_test_id("credits-balance")).to_have_text("3")
+            expect(page.get_by_test_id("tab-billing")).to_have_count(0)
+            expect(page.get_by_test_id("tab-team")).to_have_count(0)
+            page.get_by_test_id("tab-extract").click()
+            page.set_input_files("input[type=file]", {"name": "mine.pdf", "mimeType": "application/pdf", "buffer": good_pdf})
+            page.get_by_test_id("extract-submit").click()
+            expect(page.get_by_test_id("extract-error")).to_contain_text("only the sample paper", timeout=10_000)
+            page.get_by_test_id("demo-sample").click()
+            expect(page.locator(".drop-zone")).to_contain_text("maida-demo-paper.pdf")
+            page.get_by_test_id("extract-submit").click()
+            expect(page.get_by_test_id("result-card")).to_contain_text("0.1800", timeout=15_000)
+            shot("14-demo-extracted")
+            page.get_by_test_id("tab-verify").click()
+            expect(page.get_by_test_id("rv-item")).to_have_count(6)
+            page.get_by_test_id("rv-item").first.click()
+            expect(page.get_by_test_id("evidence-card")).to_contain_text("r = 0.18, p = 0.005, N = 240")
+            page.get_by_test_id("vp-notes").fill("Compared r and N with the sample paper.")
+            page.get_by_test_id("vp-approve").click()
+            expect(page.get_by_test_id("vp-approve")).to_contain_text("Approved", timeout=10_000)
+            page.get_by_test_id("vp-lock").click()
+            demo_id = page.get_by_test_id("lock-dialog").locator("code").inner_text().strip()
+            page.get_by_test_id("lock-id-input").fill(demo_id)
+            page.get_by_test_id("lock-confirm").click()
+            expect(page.get_by_test_id("locked-banner")).to_be_visible(timeout=10_000)
+            page.get_by_test_id("tab-dataset").click()
+            forest = page.get_by_test_id("forest-plot")
+            expect(forest).to_contain_text("Demo B")
+            expect(forest).to_contain_text("Pooled (preview)")
+            page.get_by_test_id("export-csv").click()
+            expect(page.locator(".dataset .error-message")).to_contain_text("Exports are off in the demo")
+            shot("15-demo-forest")
+            page.get_by_test_id("demo-exit").click()
+            expect(page.get_by_test_id("login-card")).to_be_visible()
+            assert api_calls == [], api_calls
+            print("[e2e] demo: no request reached /api")
 
             browser.close()
         print("E2E passed.")

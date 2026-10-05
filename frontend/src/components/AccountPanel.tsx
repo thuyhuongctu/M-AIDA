@@ -94,7 +94,7 @@ export default function AccountPanel({ refreshKey }: { refreshKey: number }) {
           <dt>{t("acc_role")}</dt>
           <dd>{me.role}</dd>
           <dt>{t("acc_balance")}</dt>
-          <dd data-testid="account-credits">{me.credits === null ? "∞" : me.credits}</dd>
+          <dd data-testid="account-credits">{(me.own_credits ?? me.credits) === null ? "∞" : me.own_credits ?? me.credits}</dd>
         </dl>
       )}
 
@@ -104,7 +104,7 @@ export default function AccountPanel({ refreshKey }: { refreshKey: number }) {
         </button>
       </div>
 
-      {me && me.credits !== null && (
+      {me && (me.own_credits ?? me.credits) !== null && (
         <>
           <h3 className="panel-subtitle">{t("acc_ledger")}</h3>
           {ledger.length === 0 ? (
