@@ -31,7 +31,7 @@ const STEPS: Record<Lang, Step[]> = {
     { tab: "verify", target: "stats", title: "Compare and correct", body: "The Machine column never changes. Edit the Current column when the paper says otherwise; the row is highlighted so the change stays visible, and the server re-derives the variance from what you entered." },
     { tab: "verify", target: "mods", title: "Assign the moderators", body: "ICRV, DPL, DOI and performance measures are assigned by you, not extracted. Click once to select, again to clear." },
     { tab: "verify", target: "actions", title: "Approve, then lock", body: "Write what you checked, approve, then lock. Locking asks you to type the study ID and cannot be undone; a locked record is what the export contains." },
-    { tab: "dataset", target: "export", title: "Export", body: "Only locked records go into the CSV for R (metafor) or Stata, and to Notion. The forest plot above is a fixed-effect preview; the three-level model runs in metafor. Your data stays separate from other accounts; download all of it under Account." },
+    { tab: "dataset", target: "export", title: "Export", body: "Only locked records go into the CSV for R (metafor) or Stata, and to Notion. The forest plot above is a preview (fixed or random effects); the three-level model runs in metafor. Type your PRISMA search and screening counts here too. Your data stays separate from other accounts; download all of it under Account." },
     { tab: null, target: null, title: "That is all", body: "Open this guide again any time from the Guide button in the header." },
   ],
   vi: [
@@ -44,7 +44,7 @@ const STEPS: Record<Lang, Step[]> = {
     { tab: "verify", target: "stats", title: "Đối chiếu và sửa", body: "Cột Máy đề xuất không bao giờ thay đổi. Sửa cột Hiện tại khi bài báo nói khác; dòng được tô màu để thấy rõ chỗ đã chỉnh, và máy chủ dẫn xuất lại phương sai từ giá trị quý vị nhập." },
     { tab: "verify", target: "mods", title: "Gán biến điều tiết", body: "ICRV, DPL, đo DOI và đo hiệu quả do nhà nghiên cứu gán, máy không tự điền. Bấm một lần để chọn, bấm lại để bỏ." },
     { tab: "verify", target: "actions", title: "Duyệt, rồi khóa", body: "Ghi lại đã đối chiếu gì, bấm Duyệt, sau đó Khóa. Khi khóa phải gõ lại mã nghiên cứu và không thể hoàn tác; bản ghi đã khóa là thứ được xuất ra." },
-    { tab: "dataset", target: "export", title: "Xuất dữ liệu", body: "Chỉ bản ghi đã khóa vào CSV cho R (metafor) hoặc Stata và lên Notion. Forest plot ở trên là xem trước theo hiệu ứng cố định; mô hình ba cấp chạy ở metafor. Dữ liệu của quý vị tách riêng với tài khoản khác; tải toàn bộ ở mục Tài khoản." },
+    { tab: "dataset", target: "export", title: "Xuất dữ liệu", body: "Chỉ bản ghi đã khóa vào CSV cho R (metafor) hoặc Stata và lên Notion. Forest plot ở trên là xem trước (hiệu ứng cố định hoặc ngẫu nhiên); mô hình ba cấp chạy ở metafor. Số liệu tìm kiếm và sàng lọc PRISMA cũng nhập ở đây. Dữ liệu của quý vị tách riêng với tài khoản khác; tải toàn bộ ở mục Tài khoản." },
     { tab: null, target: null, title: "Vậy là xong", body: "Mở lại hướng dẫn này bất cứ lúc nào bằng nút Hướng dẫn ở thanh đầu." },
   ],
 };

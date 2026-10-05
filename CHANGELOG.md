@@ -209,6 +209,21 @@ Bản này bọc lõi đó để nhiều nhà nghiên cứu dùng chung một m�
   `check_cloud.py` kiểm cấu hình thanh toán và in URL webhook cần đăng ký.
   15 test mới (`test_804_payments.py`), 2 test cho `check_cloud.py`. Chưa có:
   hạn dùng tín dụng 12 tháng, điều khoản mua gói trong `TERMS.md`, hóa đơn.
+- **Thẻ Thanh toán và thẻ Báo cáo** (theo gói thiết kế Cloud 04/10): phần mua
+  gói và lịch sử thanh toán chuyển từ Account sang thẻ **Billing / Thanh toán**
+  (chỉ hiện khi máy chủ bật `MAIDA_PAYMENTS`; quay về từ trang thanh toán mở thẻ
+  này). Thẻ Dataset đổi tên **Reports / Báo cáo** và thêm: lưu đồ **PRISMA 2020**
+  (bốn ô tìm kiếm và sàng lọc do người dùng nhập, lưu theo tài khoản ở
+  `users.report_settings`, migration `0004_report_settings`, kiểm tra các số nối
+  tiếp được; hai ô cuối đếm từ bản ghi), forest plot chọn tập bản ghi (đã khóa;
+  đã duyệt và đã khóa; tất cả, bản ghi chưa khóa vẽ dấu rỗng kèm cảnh báo) và
+  mô hình gộp (hiệu ứng cố định hoặc ngẫu nhiên DerSimonian–Laird, có τ² và I²;
+  vẫn chỉ là xem trước, mô hình ba cấp chạy ở metafor), và tệp **CSV cho
+  metafor** (`GET /api/studies/export/metafor.csv`: yi = Fisher z, vi = phương
+  sai của bản ghi hoặc 1/(n − 3), cột `vi_source`, các biến điều tiết). Tuyến mới
+  `GET /api/me/report`, `PUT /api/me/report/prisma`. 3 test mới
+  (`test_805_reports.py`); kiểm thử trình duyệt thêm bước PRISMA, tệp metafor,
+  hiệu ứng ngẫu nhiên và thẻ Thanh toán.
 - Phụ thuộc mới: `sqlalchemy`, `psycopg[binary]`, `alembic`, `PyJWT[crypto]`
   (backend); `openpyxl` (chỉ cho `validation/`, `validation/requirements.txt`);
   `three` 0.184.0 (frontend, logo 3D, chỉ tải ở đăng nhập và hộp logo);

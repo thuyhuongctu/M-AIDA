@@ -71,6 +71,9 @@ class User(Base):
     credits_balance: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
     last_seen_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    #: Per-account report settings as JSON text (migration 0004), e.g. the
+    #: PRISMA 2020 counts the researcher enters by hand on the Reports tab.
+    report_settings: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
 
 
 class StudyRow(Base):

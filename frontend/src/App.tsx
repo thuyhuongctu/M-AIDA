@@ -12,7 +12,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchHealth, fetchMe, getAdminKey, isNotInvited, setAdminKey } from "./api";
 import { AuthState, getAuthState, initAuth, signOut, subscribe } from "./auth";
-import AccountPanel, { readPaymentReturn, type PaymentReturn } from "./components/AccountPanel";
+import AccountPanel from "./components/AccountPanel";
+import BillingPanel, { readPaymentReturn, type PaymentReturn } from "./components/BillingPanel";
 import ContactDialog from "./components/ContactDialog";
 import Logo3DDialog from "./components/Logo3DDialog";
 import Dashboard from "./components/Dashboard";
@@ -34,7 +35,7 @@ import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
 import "./index.css";
 
-type Tab = "dashboard" | "extract" | "verify" | "dataset" | "account";
+type Tab = "dashboard" | "extract" | "verify" | "dataset" | "billing" | "account";
 
 export default function App() {
   // Language (8.0): English by default, Vietnamese on request; remembered per browser.
@@ -80,7 +81,7 @@ export default function App() {
   const [contactOpen, setContactOpen] = useState(false);
   const [logo3dOpen, setLogo3dOpen] = useState(false);
   // Back from a payment page (/?payment=return|cancel&order=…): open the
-  // Account tab once, where the order is settled and the address cleaned.
+  // Billing tab once, where the order is settled and the address cleaned.
   const [paymentReturn, setPaymentReturn] = useState<PaymentReturn | null>(readPaymentReturn);
   const paymentTabPending = useRef(paymentReturn !== null);
   const paymentHandled = useCallback(() => {
@@ -88,14 +89,14 @@ export default function App() {
     setRefreshKey((k) => k + 1);
   }, []);
 
-  // Every (re-)sign-in lands on the dashboard (or on Account after a payment);
+  // Every (re-)sign-in lands on the dashboard (or on Billing after a payment);
   // the per-session counters reset too.
   const userId = auth.user?.id ?? null;
   useEffect(() => {
     if (cloud) {
       const toAccount = paymentTabPending.current && userId !== null;
       if (toAccount) paymentTabPending.current = false;
-      setActiveTab(toAccount ? "account" : "dashboard");
+      setActiveTab(toAccount ? "billing" : "dashboard");
       setExtractionCount(0);
     }
   }, [cloud, userId]);
@@ -160,11 +161,13 @@ export default function App() {
 
   const t = i18n.t;
 
-  const tabs: { id: Tab; label: string; badge?: number; cloudOnly?: boolean }[] = [
+  const payments = !!config?.payments;
+  const tabs: { id: Tab; label: string; badge?: number; cloudOnly?: boolean; paymentsOnly?: boolean }[] = [
     { id: "dashboard", label: t("nav_dashboard"), cloudOnly: true },
     { id: "extract", label: t("nav_extract") },
     { id: "verify", label: t("nav_verify"), badge: extractionCount },
     { id: "dataset", label: t("nav_dataset") },
+    { id: "billing", label: t("nav_billing"), cloudOnly: true, paymentsOnly: true },
     { id: "account", label: t("nav_account"), cloudOnly: true },
   ];
 
@@ -192,7 +195,7 @@ export default function App() {
         {signedIn && config && (
           <nav className="shell-nav" role="tablist">
             {tabs
-              .filter((tab) => !tab.cloudOnly || cloud)
+              .filter((tab) => (!tab.cloudOnly || cloud) && (!tab.paymentsOnly || payments))
               .map((tab) => (
                 <button
                   key={tab.id}
@@ -317,9 +320,10 @@ export default function App() {
           <ReviewScreen initialStudyId={focusStudyId} refreshKey={refreshKey} onChanged={bump} />
         )}
         {activeTab === "dataset" && <DatasetPanel refreshKey={refreshKey} />}
-        {activeTab === "account" && cloud && (
-          <AccountPanel refreshKey={refreshKey} paymentReturn={paymentReturn} onPaymentReturnHandled={paymentHandled} />
+        {activeTab === "billing" && cloud && (
+          <BillingPanel refreshKey={refreshKey} paymentReturn={paymentReturn} onPaymentReturnHandled={paymentHandled} />
         )}
+        {activeTab === "account" && cloud && <AccountPanel refreshKey={refreshKey} />}
       </main>
     );
   }

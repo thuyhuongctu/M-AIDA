@@ -22,6 +22,8 @@ import type {
   NotionSyncResponse,
   PacksResponse,
   PaymentOrder,
+  PrismaCounts,
+  ReportPayload,
   StudyDatabaseEntry,
   StudyFilters,
   VerificationDecision,
@@ -389,6 +391,27 @@ export async function lockStudy(
 /**
  * Download all locked studies as a CSV file and trigger browser download.
  */
+/** Locked records as yi (Fisher z) and vi for R metafor. */
+export async function downloadMetaforCsv(): Promise<void> {
+  const res = await http.get("/api/studies/export/metafor.csv", { responseType: "blob" });
+  const url = URL.createObjectURL(new Blob([res.data], { type: "text/csv" }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "maida_metafor_yi_vi.csv";
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function fetchReport(): Promise<ReportPayload> {
+  const res: AxiosResponse<ReportPayload> = await http.get("/api/me/report");
+  return res.data;
+}
+
+export async function savePrisma(counts: PrismaCounts): Promise<ReportPayload> {
+  const res: AxiosResponse<ReportPayload> = await http.put("/api/me/report/prisma", counts);
+  return res.data;
+}
+
 export async function downloadCsv(): Promise<void> {
   const res = await http.get("/api/studies/export/csv", {
     responseType: "blob",

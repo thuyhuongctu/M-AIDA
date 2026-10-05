@@ -9,6 +9,8 @@ POST   /api/auth/mock-login       Mint a test token (auth mode "mock" only)
 GET    /api/me                    Caller's account, credit balance, counts
 GET    /api/me/ledger             Caller's credit ledger
 GET    /api/me/export             Everything the caller owns, as JSON
+GET    /api/me/report             Reports tab: PRISMA counts entered by hand + record counts
+PUT    /api/me/report/prisma      Save the PRISMA 2020 counts the researcher types in
 POST   /api/jobs                  Upload PDF → queued extraction job (202)
 GET    /api/jobs                  Caller's jobs, newest first
 GET    /api/jobs/{id}             One job (poll until succeeded/rejected/failed)
@@ -20,6 +22,7 @@ PATCH  /api/studies/{id}/verify   PI verification + field overrides
 POST   /api/studies/{id}/lock     PI permanent data lock (irreversible)
 DELETE /api/studies/{id}          Delete an unlocked study
 GET    /api/studies/export/csv    Export caller's locked studies as CSV
+GET    /api/studies/export/metafor.csv  Locked studies as yi/vi (Fisher z) for R metafor
 POST   /api/notion/sync           Push caller's locked studies to Notion
 GET    /api/admin/users           (admin) accounts and balances
 POST   /api/admin/credits         (admin) grant credits
@@ -53,6 +56,7 @@ import csv
 import io
 import json
 import logging
+import math
 import secrets
 from datetime import datetime, timezone
 from pathlib import Path
@@ -67,7 +71,7 @@ from sqlalchemy import func, select
 
 from auth import Principal, TokenVerifier, UserDirectory, build_current_user_dependency, require_admin
 from credits import CreditService
-from db import AuditLog, LLMCall, User, utcnow
+from db import LOCAL_OWNER_ID, AuditLog, LLMCall, User, utcnow
 from engines import make_engine
 from extractor import PRIMARY_STAT_FIELDS, StatisticalExtractor
 from jobs import JobService, machine_proposal_snapshot
@@ -347,6 +351,78 @@ def my_export(user: CurrentUser) -> dict[str, Any]:
         "jobs": [JobService.to_dict(j) for j in _jobs.list(user.id, limit=1000)],
         "ledger": [e.__dict__ for e in _credits.history(user.id, limit=1000)],
     }
+
+
+# ---------------------------------------------------------------------------
+# Reports: PRISMA 2020 counts (typed in) and record counts (computed)
+# ---------------------------------------------------------------------------
+
+
+class PrismaCounts(BaseModel):
+    """The PRISMA boxes M-AIDA cannot know: it does not run the search or the screening."""
+
+    identified: int | None = Field(None, ge=0, le=10_000_000)
+    duplicates_removed: int | None = Field(None, ge=0, le=10_000_000)
+    screened: int | None = Field(None, ge=0, le=10_000_000)
+    assessed: int | None = Field(None, ge=0, le=10_000_000)
+
+
+def _report_settings(row: User | None) -> dict[str, Any]:
+    if row is None or not row.report_settings:
+        return {}
+    try:
+        data = json.loads(row.report_settings)
+    except ValueError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _report_payload(user: Principal) -> dict[str, Any]:
+    with _sessions() as s:
+        data = _report_settings(s.get(User, user.id))
+    studies = _studies.values(user.id)
+    locked = sum(1 for e in studies if e.pi_locked)
+    approved = sum(1 for e in studies if not e.pi_locked and e.pi_approved_at is not None)
+    return {
+        "prisma": data.get("prisma") or {},
+        "prisma_updated_at": data.get("prisma_updated_at"),
+        "counts": {"records": len(studies), "pending": len(studies) - locked - approved,
+                   "approved": approved, "locked": locked},
+    }
+
+
+@app.get("/api/me/report", tags=["account"])
+def my_report(user: CurrentUser) -> dict[str, Any]:
+    return _report_payload(user)
+
+
+@app.put("/api/me/report/prisma", tags=["account"])
+def set_prisma(body: PrismaCounts, user: CurrentUser) -> dict[str, Any]:
+    """Save the hand-entered PRISMA counts after checking they can follow one another."""
+    problems = []
+    identified, removed = body.identified, body.duplicates_removed
+    if identified is not None and removed is not None and removed > identified:
+        problems.append("duplicates removed exceed records identified")
+    available = identified - (removed or 0) if identified is not None else None
+    if body.screened is not None and available is not None and body.screened > available:
+        problems.append("records screened exceed records left after removing duplicates")
+    if body.assessed is not None and body.screened is not None and body.assessed > body.screened:
+        problems.append("reports assessed exceed records screened")
+    if problems:
+        raise HTTPException(status_code=422, detail="PRISMA counts do not add up: " + "; ".join(problems) + ".")
+    with _sessions() as s:
+        row = s.get(User, user.id)
+        if row is None:  # single-operator mode before the store created "local"
+            row = User(id=user.id or LOCAL_OWNER_ID, email=user.email or "", name=user.name or "",
+                       role=user.role, beta=False, credits_balance=0, created_at=utcnow())
+            s.add(row)
+        data = _report_settings(row)
+        data["prisma"] = body.model_dump()
+        data["prisma_updated_at"] = utcnow().isoformat()
+        row.report_settings = json.dumps(data)
+        s.commit()
+    _audit(user.id, "report", kind="prisma")
+    return _report_payload(user)
 
 
 # ---------------------------------------------------------------------------
@@ -656,6 +732,53 @@ def export_csv(user: CurrentUser) -> StreamingResponse:
         headers={
             "Content-Disposition": 'attachment; filename="maida_locked_studies.csv"'
         },
+    )
+
+
+METAFOR_COLUMNS = ("study_id", "authors", "year", "country", "ri", "ni", "yi", "vi", "vi_source",
+                   "metric_type", "icrv_regime", "cdai_score", "dpl_phase")
+
+
+@app.get("/api/studies/export/metafor.csv", response_class=StreamingResponse, tags=["studies"])
+def export_metafor_csv(user: CurrentUser) -> StreamingResponse:
+    """Locked studies as one row per effect, ready for R metafor.
+
+    yi = atanh(r) (Fisher z) and vi = the record's variance_z, or 1/(n - 3)
+    when the record has none, so ``rma(yi, vi, data = d)`` or
+    ``rma.mv(yi, vi, random = ~ 1 | study_id/...)`` runs on the file as is.
+    vi_source says which variance was used. Records without a usable
+    variance are left out and counted in the X-MAIDA-Skipped header.
+    """
+    locked = [e for e in _studies.values(user.id) if e.pi_locked and e.effect_r is not None]
+    if not locked:
+        raise HTTPException(status_code=404, detail="No locked studies available for export.")
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=list(METAFOR_COLUMNS))
+    writer.writeheader()
+    skipped = 0
+    for e in locked:
+        r = max(-0.999999, min(0.999999, float(e.effect_r)))
+        if e.variance_z is not None and e.variance_z > 0:
+            vi, source = float(e.variance_z), "variance_z"
+        elif e.sample_n is not None and e.sample_n > 3:
+            vi, source = 1.0 / (e.sample_n - 3), "1/(n-3)"
+        else:
+            skipped += 1
+            continue
+        writer.writerow({
+            "study_id": e.study_id, "authors": e.authors, "year": e.year, "country": e.country,
+            "ri": round(float(e.effect_r), 6), "ni": e.sample_n, "yi": round(math.atanh(r), 6),
+            "vi": round(vi, 8), "vi_source": source,
+            "metric_type": getattr(e.metric_type, "value", e.metric_type) or "",
+            "icrv_regime": getattr(e.icrv_regime, "value", e.icrv_regime) or "",
+            "cdai_score": "" if e.cdai_score is None else e.cdai_score,
+            "dpl_phase": getattr(e.dpl_phase, "value", e.dpl_phase) or "",
+        })
+    _audit(user.id, "export", kind="metafor_csv", rows=len(locked) - skipped, skipped=skipped)
+    return StreamingResponse(
+        content=iter([buf.getvalue()]), media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="maida_metafor_yi_vi.csv"',
+                 "X-MAIDA-Skipped": str(skipped)},
     )
 
 

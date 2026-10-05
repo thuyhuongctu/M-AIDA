@@ -309,3 +309,20 @@ export interface AdminOrders {
   paid_amount_vnd: number;
   paid_credits: number;
 }
+
+// ---------------------------------------------------------------------------
+// Reports tab (8.0): PRISMA counts typed in by the researcher + record counts
+// ---------------------------------------------------------------------------
+
+export interface PrismaCounts {
+  identified?: number | null;
+  duplicates_removed?: number | null;
+  screened?: number | null;
+  assessed?: number | null;
+}
+
+export interface ReportPayload {
+  prisma: PrismaCounts;
+  prisma_updated_at: string | null;
+  counts: { records: number; pending: number; approved: number; locked: number };
+}

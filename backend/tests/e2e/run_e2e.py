@@ -191,6 +191,25 @@ def main() -> int:
             csv_path = dl.value.path()
             text = Path(csv_path).read_text(encoding="utf-8")
             assert "paper-240" in text or "0.31" in text, text[:200]
+            # Reports: metafor file (yi = atanh 0.31), random effects, PRISMA counts
+            with page.expect_download(timeout=10_000) as dl2:
+                page.get_by_test_id("export-metafor").click()
+            mf = Path(dl2.value.path()).read_text(encoding="utf-8").splitlines()
+            assert mf[0].startswith("study_id,authors,year,country,ri,ni,yi,vi"), mf[0]
+            assert ",0.320545," in mf[1], mf[1]  # atanh(0.31) to 6 places
+            page.get_by_test_id("forest-est-random").click()
+            expect(forest).to_contain_text("random (DL)")
+            expect(forest).to_contain_text("0.310 [0.191, 0.420]")  # k = 1: random = fixed
+            page.fill("#prisma-identified", "412")
+            page.fill("#prisma-duplicates_removed", "40")
+            page.fill("#prisma-screened", "372")
+            page.fill("#prisma-assessed", "238")
+            page.get_by_test_id("prisma-save").click()
+            expect(page.get_by_test_id("prisma")).to_contain_text("Counts saved.")
+            page.fill("#prisma-assessed", "999")
+            page.get_by_test_id("prisma-save").click()
+            expect(page.get_by_test_id("prisma")).to_contain_text("do not add up")
+            page.fill("#prisma-assessed", "238")
             shot("06b-dataset")
 
             # 6. Account tab: ledger shows grant / extraction x2
@@ -212,18 +231,20 @@ def main() -> int:
 
             # 7b. Credit pack through the mock checkout: pay, come back to
             #     /?payment=return&order=..., credits added once, address cleaned.
-            page.get_by_test_id("tab-account").click()
+            page.get_by_test_id("tab-billing").click()
             expect(page.get_by_test_id("pay-shop")).to_be_visible()
             page.get_by_test_id("buy-thu").click()
             page.wait_for_url(re.compile(r"/api/payments/mock/checkout/\d+$"))
             shot("08b-mock-checkout")
             page.get_by_test_id("mock-pay").click()
             expect(page.get_by_test_id("pay-notice")).to_contain_text("30 credits added", timeout=15_000)
-            expect(page.get_by_test_id("account-credits")).to_have_text("33")
+            expect(page.get_by_test_id("billing-credits")).to_have_text("33 credits")
             expect(page.get_by_test_id("orders-table")).to_contain_text("paid")
-            expect(page.locator(".ledger-table")).to_contain_text("Purchase")
             assert "payment=" not in page.url, page.url
             shot("08c-paid")
+            page.get_by_test_id("tab-account").click()
+            expect(page.get_by_test_id("account-credits")).to_have_text("33")
+            expect(page.locator(".ledger-table")).to_contain_text("Purchase")
 
             # 8. Operator: grant credits, see usage
             page.get_by_test_id("tab-account").click()
