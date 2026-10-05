@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": true
+  },
+  "permissions": {
+    "deny": [
+      "Read(//**/.env)",
+      "Read(//**/*.env)",
+      "Read(.env.*)",
+      "Read(!*.example)",
+      "Read(//**/env.cloud*)",
+      "Read(//**/MAIDA_API_KEY*)",
+      "Bash(git push *)",
+      "PowerShell(git push *)"
+    ],
+    "additionalDirectories": [
+      "../thiet-ke-M-AIDA-cloud-cosmos"
+    ]
+  }
+}

@@ -35,3 +35,7 @@ deploy/.env.cloud
 # 8.0 chay thu noi bo (cau hinh rieng tren may, cong cu duong ham)
 noi_bo.env
 cloudflared.exe
+
+# Claude Code: personal settings and notes stay on this computer
+.claude/settings.local.json
+CLAUDE.local.md
