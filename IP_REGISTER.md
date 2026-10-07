@@ -168,21 +168,3 @@ sai sót đã tồn tại:
   thái: sau khi thay tag, Release chuyển về bản nháp theo cơ chế của GitHub; bước còn
   lại là chủ sở hữu bấm Publish (Edit, chọn tag `v7.1.1`, Publish release) và đính kèm
   gói `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.zip` vào mục Assets.
-
-### Cập nhật 01/10/2026: viết lại lịch sử kho và dời tag lần hai
-
-- Ngày 01/10/2026, lịch sử Git của kho được viết lại (git filter-repo) để gộp mọi danh
-  tính tác giả về `Do Thuy Huong <thuyhuongctu@gmail.com>`, loại bỏ các trailer công cụ
-  khỏi thông điệp commit, và gỡ khỏi lịch sử các trang web giới thiệu/sáng tạo cùng tệp
-  đa phương tiện không thuộc chương trình máy tính. Vì vậy **mọi mã commit đổi**.
-- Commit tương ứng với `24dac0219b8020bd8f0b1c7d048f7a9ee9340dfe` sau khi viết lại là
-  **`26dc90f24b7ec0a5748748d6d37af0a061290c8f`**; 30 tệp mã nguồn và cấu hình của bản 7.1.1 đã được
-  đối chiếu SHA-256 từng tệp: **trùng khớp 100%** với bản trước khi viết lại.
-- Phát hiện khi rà soát: tag `v7.1.1` đã bị dời nhầm (13/08/2026) sang một commit chứa mã
-  7.1.2 trở lên (`store.py`, `StatusBanner.tsx`, bộ kiểm thử 7.1.2). Tag **đã được trỏ lại**
-  về commit tham chiếu `26dc90f24b7e` cùng ngày 01/10/2026.
-- Các tag khác (`v7.1.2`, `v7.2.0`, `v7.2.1`, `v7.2.2`) giữ nguyên nội dung cây, chỉ đổi mã
-  commit theo lịch sử mới. Bản ghi Zenodo không bị ảnh hưởng (Zenodo lưu bản chụp tại
-  thời điểm phát hành).
-- Nhánh: chỉ còn `main`; toàn bộ nhánh cũ và lịch sử gốc được lưu trong gói sao lưu
-  `BACKUP_M-AIDA_goc_truoc_khi_sua_2026-10-01.bundle` do chủ sở hữu giữ ngoài kho.
