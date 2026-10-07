@@ -23,7 +23,7 @@ internal release line used during the doctoral meta-analysis (P6).
   `backend/main.py`, `backend/pyproject.toml`, `CITATION.cff`, `.zenodo.json`.
 - Không đổi công thức, lược đồ dữ liệu hay bản ghi đã khóa.
 
-## Chưa phát hành: dọn kho và viết lại lịch sử (01/10/2026)
+## Chưa phát hành: dọn kho (01/10/2026)
 
 - Kho chỉ còn phần chương trình máy tính và tài liệu kỹ thuật: gỡ các trang web
   giới thiệu/sáng tạo (`*.html` ở gốc kho), `assets/` đa phương tiện (ảnh, bài hát,
@@ -31,10 +31,6 @@ internal release line used during the doctoral meta-analysis (P6).
   liệu làm việc cũ (`CODE_REVIEW_2026-08-31.md`, `TRUOC-CONG-BO.md`,
   `PUBLISHING.md`, `docs/BRANCH-POLICY.md`, `HUONG_DAN_TIENG_VIET.docx`). Giữ
   `assets/brand/` và `assets/diagrams/`.
-- Lịch sử Git được viết lại: mọi commit đứng tên `Do Thuy Huong
-  <thuyhuongctu@gmail.com>`, bỏ trailer công cụ trong thông điệp commit; mọi mã
-  commit thay đổi. Tag `v7.1.1` trỏ lại đúng commit tham chiếu của hồ sơ đăng ký
-  quyền tác giả (xem `IP_REGISTER.md`). Chỉ giữ nhánh `main`.
 - Không thay đổi mã nguồn backend/frontend/analysis/validation/demo.
 
 ## Chưa phát hành: gỡ PyMuPDF (AGPL-3.0) khỏi phụ thuộc runtime (29/09/2026)
