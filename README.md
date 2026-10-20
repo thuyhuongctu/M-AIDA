@@ -261,11 +261,13 @@ It holds the same commit `8af4881`, so its content is correct, but cite
 
 ## Authorship, license, and research-integrity note
 
-**Authors and copyright holders:** Do Thuy Huong and Phan Anh Tu, School of Economics,
-Can Tho University. Copyright subsists automatically under Vietnamese law and the Berne
-Convention from the moment of creation; a Copyright Office of Viet Nam registration is
-being prepared with Can Tho University as a co-owner under the university's
-intellectual-property regulations.
+**Authors:** Do Thuy Huong and Phan Anh Tu, School of Economics, Can Tho University.
+**Copyright owner:** Can Tho University. The authors retain their moral rights
+(attribution and integrity of the work), which arise automatically under Vietnamese law
+and the Berne Convention from the moment of creation; the economic rights belong to the
+university under its intellectual-property regulations. A Copyright Office of Viet Nam
+registration naming Can Tho University as owner and both authors as co-authors is in
+progress.
 
 **Role of computational assistance:** M-AIDA uses a configurable language-model provider
 only to *propose* candidate effect sizes and statistical conversions from study text. It
@@ -300,10 +302,10 @@ version's source.
 Using M-AIDA under the AGPL requires no contact and no fee.
 
 **Commercial licensing is not currently available.** Granting terms other than
-the AGPL requires holding, or being authorised by all co-holders to grant, the
-economic rights in the work. Those rights are not yet formally settled (see the
-next section), so no such grant can be made today. The position is stated in
-full in [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md).
+the AGPL requires holding the economic rights in the work. Those rights belong to
+Can Tho University (see the next section), so any such grant is the university's
+decision, not the authors'. The position is stated in full in
+[`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md).
 
 AGPL-3.0-only supersedes the earlier "M-AIDA Academic Source-Available License
 v1.0", retired on 4 August 2026. Any document still carrying that name is out of
@@ -311,10 +313,13 @@ date; `LICENSE` in this repository is the operative text.
 
 ### Ownership, and why the Zenodo files are restricted
 
-Economic rights in M-AIDA are held **jointly by Can Tho University and the two
-authors**, under Article 71 of the university's science and technology management
-regulation (Decision 5152/QD-DHCT of 6 October 2023). The copyright registration
-is filed through the university and is still in process.
+Economic rights in M-AIDA are held by **Can Tho University**, the sole copyright
+owner, under point a, clause 1, Article 67 of the university's science and technology
+management regulation (issued with Decision 2616/QD-DHCT) and Article 2.2 of the
+agreement recording co-authorship and copyright ownership in the registration dossier
+(adjusted version of 13 October 2026). The authors remain the named co-authors and
+retain their moral rights. The copyright registration is filed through the university
+and is still in process.
 
 Because of that, the Zenodo deposits (the GitHub-archived series at
 [10.5281/zenodo.21850575](https://doi.org/10.5281/zenodo.21850575) and the

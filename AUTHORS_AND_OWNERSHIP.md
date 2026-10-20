@@ -32,12 +32,16 @@
 - **Quyền nhân thân** (đứng tên tác giả, bảo vệ sự toàn vẹn tác phẩm) thuộc về
   hai tác giả nêu trên theo pháp luật Việt Nam và Công ước Berne; quyền này
   phát sinh tự động từ thời điểm sáng tạo.
-- **Quyền tài sản** dự kiến xác lập theo hình thức **đồng sở hữu giữa Trường
-  Đại học Cần Thơ và hai tác giả**, theo hồ sơ đăng ký quyền tác giả nộp qua
-  Trường (căn cứ Điều 71 Quy chế 5152/QĐ-ĐHCT ngày 06/10/2023, do quá trình
-  hình thành tác phẩm có sử dụng nguồn lực và môi trường nghiên cứu của Nhà
-  trường). Tỷ lệ quyền tài sản cụ thể xác định trong văn bản thỏa thuận đồng
-  sở hữu thuộc bộ hồ sơ đã nộp.
+- **Quyền tài sản** thuộc về **Đại học Cần Thơ**, là chủ sở hữu quyền tác giả
+  duy nhất đối với Chương trình M-AIDA. Căn cứ: điểm a khoản 1 Điều 67 Quy chế
+  Quản lý hoạt động khoa học và công nghệ ban hành kèm Quyết định số
+  2616/QĐ-ĐHCT, và Điều 2.2 Văn bản thỏa thuận xác nhận đồng tác giả và chủ sở
+  hữu quyền tác giả trong hồ sơ đăng ký (bản điều chỉnh 13/10/2026, đề ngày
+  01/10/2026). Không còn hình thức đồng sở hữu giữa Nhà trường và hai tác giả,
+  nên không có tỷ lệ quyền tài sản nào phải phân chia.
+- Theo Điều 3 khoản 2 của Văn bản thỏa thuận, Nhà trường có nghĩa vụ **bảo đảm
+  ghi nhận tên hai đồng tác giả** trong hồ sơ đăng ký và khi công bố, sử dụng
+  Chương trình M-AIDA.
 - Trạng thái pháp lý cập nhật và ghi chú đối chiếu phiên bản: xem
   `IP_REGISTER.md`.
 
