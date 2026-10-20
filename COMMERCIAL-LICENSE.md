@@ -24,28 +24,26 @@ practical burden.
 Dual licensing requires the licensor to hold, or to be authorised by all
 co-holders to grant, the economic rights in the work.
 
-For M-AIDA that condition is **not yet satisfied**:
+For M-AIDA the authors are **not** the holders of those rights:
 
 - **Moral rights** (attribution, integrity of the work) belong to Đỗ Thùy Hương
   and Phan Anh Tú, arising automatically under Vietnamese law and the Berne
   Convention.
-- **Economic rights** are expected to be established as **co-ownership between
-  Can Tho University (CTU) and the two authors**, pursuant to Article 71 of
-  Regulation 5152/QĐ-ĐHCT dated 06/10/2023, because the work was created using
-  CTU research resources. See [`AUTHORS_AND_OWNERSHIP.md`](AUTHORS_AND_OWNERSHIP.md).
-- The specific allocation of economic rights is to be fixed in a written
-  co-ownership agreement. **That agreement is not yet executed.** A formal
-  request for written determination has been submitted to CTU's research
-  management office; no determination has been received.
+- **Economic rights** belong to **Can Tho University (CTU)**, the sole copyright
+  owner, pursuant to point a, clause 1, Article 67 of the science and technology
+  management regulation issued with Decision 2616/QĐ-ĐHCT, and Article 2.2 of the
+  agreement recording co-authorship and copyright ownership in the registration
+  dossier (adjusted version of 13/10/2026, dated 01/10/2026).
+  See [`AUTHORS_AND_OWNERSHIP.md`](AUTHORS_AND_OWNERSHIP.md).
+- There is therefore no co-ownership share to allocate between CTU and the
+  authors, and the authors cannot grant terms other than the AGPL-3.0.
 
-Institutional silence does not constitute a waiver of institutional rights.
-Accordingly, no party, including the authors, is currently in a position to
-offer M-AIDA on terms other than the AGPL-3.0.
+Any grant of economic rights, including commercial licensing, is decided by CTU.
 
-## 3. What happens when the position is settled
+## 3. What happens if CTU permits commercial licensing
 
-If and when the co-ownership agreement is executed and it permits commercial
-licensing, this file will be replaced with actual commercial terms, and the
+If and when CTU decides to allow commercial licensing of M-AIDA, this file will
+be replaced with actual commercial terms, and the
 change will be recorded in [`CHANGELOG.md`](CHANGELOG.md), in the OSF deviation
 log, and in [`IP_REGISTER.md`](IP_REGISTER.md).
 
@@ -96,27 +94,26 @@ không tạo ra gánh nặng thực tế nào.
 Cấp phép kép (dual licensing) đòi hỏi bên cấp phép phải nắm quyền tài sản, hoặc
 được tất cả các đồng chủ sở hữu ủy quyền cấp phép.
 
-Với M-AIDA, điều kiện đó **chưa được đáp ứng**:
+Với M-AIDA, nhóm tác giả **không** nắm quyền tài sản:
 
 - **Quyền nhân thân** (đứng tên tác giả, bảo vệ sự toàn vẹn tác phẩm) thuộc về
   Đỗ Thùy Hương và Phan Anh Tú, phát sinh tự động theo pháp luật Việt Nam và
-  Công ước Berne.
-- **Quyền tài sản** dự kiến xác lập theo hình thức **đồng sở hữu giữa Trường Đại
-  học Cần Thơ và hai tác giả**, căn cứ Điều 71 Quy chế 5152/QĐ-ĐHCT ngày
-  06/10/2023, do quá trình hình thành tác phẩm có sử dụng nguồn lực nghiên cứu
-  của Nhà trường. Xem [`AUTHORS_AND_OWNERSHIP.md`](AUTHORS_AND_OWNERSHIP.md).
-- Tỷ lệ quyền tài sản cụ thể phải được ấn định trong văn bản thỏa thuận đồng sở
-  hữu. **Văn bản đó chưa được ký.** Công văn đề nghị xác định quyền sở hữu bằng
-  văn bản đã gửi Phòng Khoa học, Công nghệ và Đổi mới Sáng tạo; chưa có văn bản
-  trả lời.
+  Công ước Berne, theo khoản 1, khoản 2 và khoản 4 Điều 19 Luật Sở hữu trí tuệ.
+- **Quyền tài sản** thuộc về **Đại học Cần Thơ**, là chủ sở hữu quyền tác giả
+  duy nhất, căn cứ điểm a khoản 1 Điều 67 Quy chế Quản lý hoạt động khoa học và
+  công nghệ ban hành kèm Quyết định số 2616/QĐ-ĐHCT, và Điều 2.2 Văn bản thỏa
+  thuận trong hồ sơ đăng ký (bản điều chỉnh 13/10/2026, đề ngày 01/10/2026).
+  Xem [`AUTHORS_AND_OWNERSHIP.md`](AUTHORS_AND_OWNERSHIP.md).
+- Do không còn hình thức đồng sở hữu, không có tỷ lệ quyền tài sản nào phải
+  phân chia, và nhóm tác giả không thể cấp phép M-AIDA theo điều khoản khác
+  ngoài AGPL-3.0.
 
-Việc Nhà trường chưa trả lời **không** đồng nghĩa với việc từ bỏ quyền của Nhà
-trường. Do đó, hiện không bên nào, kể cả nhóm tác giả, ở vị thế có thể cấp
-phép M-AIDA theo điều khoản khác ngoài AGPL-3.0.
+Mọi việc cấp quyền tài sản, kể cả cấp phép thương mại, do Đại học Cần Thơ
+quyết định.
 
-## 3. Khi quyền sở hữu được xác lập
+## 3. Nếu Nhà trường cho phép cấp phép thương mại
 
-Nếu và khi thỏa thuận đồng sở hữu được ký và cho phép cấp phép thương mại, tệp
+Nếu và khi Đại học Cần Thơ quyết định cho phép cấp phép thương mại M-AIDA, tệp
 này sẽ được thay bằng điều khoản thương mại thực tế; thay đổi được ghi vào
 [`CHANGELOG.md`](CHANGELOG.md), nhật ký sai lệch trên OSF và
 [`IP_REGISTER.md`](IP_REGISTER.md).

@@ -29,9 +29,11 @@ Phân công vai trò chi tiết: xem `AUTHORS_AND_OWNERSHIP.md`.
 
 ## 3. Hồ sơ đăng ký quyền tác giả (Copyright registration)
 
-- Hình thức: **đồng sở hữu** giữa Trường Đại học Cần Thơ và hai tác giả, theo
-  Điều 71 Quy chế quản lý hoạt động khoa học và công nghệ (Quyết định số
-  5152/QĐ-ĐHCT ngày 06/10/2023).
+- Hình thức: **Đại học Cần Thơ là chủ sở hữu quyền tác giả duy nhất**; Đỗ Thùy
+  Hương và Phan Anh Tú là hai đồng tác giả, giữ quyền nhân thân. Căn cứ: điểm a
+  khoản 1 Điều 67 Quy chế Quản lý hoạt động khoa học và công nghệ (Quyết định số
+  2616/QĐ-ĐHCT), và Điều 2.2 Văn bản thỏa thuận trong hồ sơ đăng ký (bản điều
+  chỉnh 13/10/2026).
 - Kênh nộp: hồ sơ nộp qua Trường Đại học Cần Thơ; đầu mối là Phòng Khoa học,
   Công nghệ và Đổi mới Sáng tạo (Phòng KHCN); nơi tiếp nhận cuối là Cục Bản
   quyền tác giả (Bộ Văn hóa, Thể thao và Du lịch).
@@ -49,7 +51,7 @@ Phân công vai trò chi tiết: xem `AUTHORS_AND_OWNERSHIP.md`.
 | Nội dung | 41 tệp, trong đó 17 tệp mã nguồn; đã loại bỏ mọi khóa bí mật (sanitized) |
 | Tệp mã băm | `MAIDA_SOURCE_DEPOSIT_v7.1.1_SANITIZED.sha256.txt` (cùng thư mục hồ sơ) |
 
-Gói dựng lại ngày 01/10/2026 (nộp kèm đợt hoàn thiện hồ sơ đồng sở hữu với Đại học Cần Thơ;
+Gói dựng lại ngày 01/10/2026 (nộp kèm đợt hoàn thiện hồ sơ đăng ký qua Đại học Cần Thơ;
 gói cũ không còn trên máy tác giả):
 
 | Khóa (Key) | Giá trị |
@@ -71,8 +73,8 @@ mâu thuẫn:
 3. Quan hệ giữa hai phiên bản: **7.1.1 là bản vá hoàn thiện của 7.1.0**, bổ
    sung một tệp giao diện còn thiếu để chương trình biên dịch đầy đủ; kiến
    trúc, chức năng và mục đích của tác phẩm không thay đổi.
-4. Các văn bản khác trong hồ sơ (đơn đề nghị, tờ khai, văn bản đồng ý đồng
-   tác giả, thỏa thuận đồng sở hữu) **giữ nguyên**, không phải nộp lại.
+4. Các văn bản khác trong hồ sơ (đơn đề nghị, tờ khai, văn bản thỏa thuận
+   tác giả và chủ sở hữu quyền tác giả) **giữ nguyên**, không phải nộp lại.
 
 
 4. **Bản vá 7.1.2 (15/07/2026):** bản vá sửa lỗi quản trị theo semver, KHÔNG
@@ -100,15 +102,15 @@ sai sót đã tồn tại:
    4 dưới đây); sửa hai trang HTML trong đợt gộp PR #86.
 4. **`COMMERCIAL-LICENSE.md`:** bản trước khẳng định *"the authors hold the full
    copyright in M-AIDA"* và mời liên hệ để cấp phép thương mại. Khẳng định này
-   **mâu thuẫn với `AUTHORS_AND_OWNERSHIP.md`** (quyền tài sản dự kiến đồng sở
-   hữu với Nhà trường theo Điều 71 Quy chế 5152/QĐ-ĐHCT) và **không có căn cứ**
-   khi thỏa thuận đồng sở hữu chưa ký. Đã thay bằng bản khai đúng hiện trạng:
-   chưa cấp phép thương mại.
+   **mâu thuẫn với `AUTHORS_AND_OWNERSHIP.md`** và **không có căn cứ**. Đã thay
+   bằng bản khai đúng hiện trạng: quyền tài sản thuộc Đại học Cần Thơ, chưa cấp
+   phép thương mại.
 5. **Không hồi tố:** giấy phép AGPL-3.0 đã cấp cho bất kỳ bên nào vẫn giữ nguyên
    hiệu lực. Đính chính này chỉ sửa **khai báo**, không thu hồi quyền đã trao.
-6. **Chưa giải quyết:** việc xác định quyền sở hữu bằng văn bản từ Nhà trường.
-   Chừng nào chưa có, mọi hoạt động thương mại hóa, kể cả phát hành trên chợ
-   ứng dụng: vẫn bị chặn.
+6. **Đã giải quyết (13/10/2026):** quyền sở hữu đã được xác định bằng văn bản
+   trong hồ sơ đăng ký: Đại học Cần Thơ là chủ sở hữu quyền tác giả duy nhất.
+   Mọi hoạt động thương mại hóa, kể cả phát hành trên chợ ứng dụng, do Nhà
+   trường quyết định, không còn do nhóm tác giả quyết định.
 
    **Cơ chế chặn, mô tả theo nhánh (rà ngày 13/08/2026, quét toàn bộ ref):**
 

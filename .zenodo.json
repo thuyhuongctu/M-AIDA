@@ -18,7 +18,7 @@
   ],
   "access_right": "restricted",
   "license": "AGPL-3.0-only",
-  "notes": "License: GNU Affero General Public License v3.0 (AGPL-3.0-only); see the LICENSE file. Commercial licensing is NOT currently available: economic rights are not yet formally settled (expected co-ownership between Can Tho University and the two authors); see COMMERCIAL-LICENSE.md.",
+  "notes": "License: GNU Affero General Public License v3.0 (AGPL-3.0-only); see the LICENSE file. Copyright in this software is owned by Can Tho University; Do Thuy Huong and Phan Anh Tu are the co-authors and retain their moral rights. Commercial licensing and any other grant of economic rights are decided by Can Tho University; see COMMERCIAL-LICENSE.md.",
   "related_identifiers": [
     {
       "identifier": "10.5281/zenodo.21282516",
@@ -39,5 +39,5 @@
     "reproducible research",
     "PRISMA"
   ],
-  "access_conditions": "Source files are under controlled access while the joint copyright registration with Can Tho University completes. The software itself is licensed AGPL-3.0-only and the full source is public at https://github.com/thuyhuongctu/M-AIDA"
+  "access_conditions": "Source files are under controlled access while the copyright registration by Can Tho University completes. The software itself is licensed AGPL-3.0-only and the full source is public at https://github.com/thuyhuongctu/M-AIDA"
 }
