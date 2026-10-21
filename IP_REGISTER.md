@@ -107,8 +107,11 @@ sai sót đã tồn tại:
    phép thương mại.
 5. **Không hồi tố:** giấy phép AGPL-3.0 đã cấp cho bất kỳ bên nào vẫn giữ nguyên
    hiệu lực. Đính chính này chỉ sửa **khai báo**, không thu hồi quyền đã trao.
-6. **Đã giải quyết (13/10/2026):** quyền sở hữu đã được xác định bằng văn bản
-   trong hồ sơ đăng ký: Đại học Cần Thơ là chủ sở hữu quyền tác giả duy nhất.
+6. **Đang hoàn tất:** hồ sơ đăng ký (bản điều chỉnh 13/10/2026) và Văn bản
+   thỏa thuận đề ngày 01/10/2026 xác định Đại học Cần Thơ là chủ sở hữu quyền
+   tác giả duy nhất; các văn bản đang chờ các bên ký. Theo Điều 4 khoản 2 Văn
+   bản thỏa thuận, khi văn bản có hiệu lực, hai tác giả không tự cấp quyền sử
+   dụng khi chưa có văn bản chấp thuận của Nhà trường.
    Mọi hoạt động thương mại hóa, kể cả phát hành trên chợ ứng dụng, do Nhà
    trường quyết định, không còn do nhóm tác giả quyết định.
 
@@ -151,6 +154,8 @@ sai sót đã tồn tại:
 | 13/08/2026 | Đợt 2: đính chính chính điểm 6 của mục 5bis. Bản đợt 1 khẳng định biến `MAIDA_RIGHTS_STATUS` và tệp `frontend/.env.store.example` "không tồn tại" và "chưa có cổng kỹ thuật nào cưỡng chế". Khẳng định đó sai: cả hai đều tồn tại trên nhánh `feat/app-store-readiness-v1`, và cổng có cưỡng chế thật, fail-closed. Nguyên nhân: đợt rà chỉ quét `main`, không quét nhánh, nên kết luận "không tồn tại" được rút ra từ một phạm vi hẹp hơn phạm vi mà câu văn tuyên bố. Đã thay bằng mô tả theo từng nhánh. |
 | 13/08/2026 | Bổ sung khi kiểm chứng đợt 2 bằng `git for-each-ref` trên mọi ref: cổng còn tồn tại trên nhánh thứ hai `feat/ui-integration-v1`, hai tệp cổng trùng khớp từng byte với `feat/app-store-readiness-v1`. Bảng theo nhánh đã ghi cả hai; cả hai đều chưa gộp vào `main`. |
 | 01/10/2026 | Viết lại lịch sử kho (gộp danh tính tác giả, gỡ trailer công cụ, gỡ trang web/đa phương tiện khỏi lịch sử); dời tag `v7.1.1` về commit tham chiếu `26dc90f24b7e`; bổ sung gói lưu chiểu dựng lại 01/10/2026 (mục 4); xóa nhánh cũ, chỉ giữ `main` |
+| 20/10/2026 | Đại học Cần Thơ là chủ sở hữu quyền tác giả duy nhất, không còn đồng sở hữu (PR #126): sửa `AUTHORS_AND_OWNERSHIP.md`, `COMMERCIAL-LICENSE.md`, `IP_REGISTER.md`, `README.md`, `.zenodo.json`; căn cứ điểm a khoản 1 Điều 67 Quy chế 2616/QĐ-ĐHCT |
+| 21/10/2026 | `LICENSE`: dòng bản quyền ghi Đại học Cần Thơ; thay mục "DUAL LICENSING" (mời liên hệ cấp phép thương mại, trái với `COMMERCIAL-LICENSE.md`) bằng mục nói rõ chỉ Nhà trường cấp được giấy phép khác AGPL. Mục 5bis điểm 6 ghi đúng trạng thái: văn bản thỏa thuận chưa ký. `README.md`: các bản phát hành sau theo AGPL cần Nhà trường chấp thuận bằng văn bản |
 | 13/08/2026 | Sửa `commercial.html`: gỡ ba lời mời liên hệ mua gói (Pro, Team/Lab, Enterprise), đổi gói "Free" thành "Open source / tự triển khai AGPL-3.0" (bản cũ mô tả hạn mức theo tháng và tài khoản, dịch vụ chưa tồn tại), bổ sung khối cảnh báo trạng thái quyền ở đầu mục bảng giá, viết lại ghi chú minh bạch cho khớp `COMMERCIAL-LICENSE.md`. Lý do: trang đang chào bán dịch vụ trong khi văn bản cấp phép khai chưa thể cấp phép thương mại. |
 
 ## Định danh commit của bản chuẩn tham chiếu (bổ sung 13/07/2026)

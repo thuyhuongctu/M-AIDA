@@ -290,7 +290,10 @@ decision, not the authors'. The position is stated in full in
 
 AGPL-3.0-only supersedes the earlier "M-AIDA Academic Source-Available License
 v1.0", retired on 4 August 2026. Any document still carrying that name is out of
-date; `LICENSE` in this repository is the operative text.
+date; `LICENSE` in this repository is the operative text. Licenses already
+granted for earlier releases remain in force. Once the agreement with Can Tho
+University takes effect, further releases under the AGPL are made with the
+university's written approval, which the authors are requesting.
 
 ### Ownership, and why the Zenodo files are restricted
 

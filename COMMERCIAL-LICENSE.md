@@ -55,7 +55,8 @@ choose them instead of the AGPL.
 ## 4. Enquiries
 
 Parties interested in future commercial terms may register interest with
-**Đỗ Thùy Hương: thuyhuongctu@gmail.com**. Please note that:
+**Đỗ Thùy Hương: thuyhuongctu@gmail.com**, who forwards it to Can Tho
+University's Office of Science, Technology and Innovation. Please note that:
 
 - registering interest creates **no** licence, option, or commitment of any kind;
 - no timeline can be given, because the determination rests with CTU;
@@ -126,7 +127,8 @@ cho AGPL.
 ## 4. Liên hệ
 
 Bên quan tâm đến điều khoản thương mại trong tương lai có thể đăng ký quan tâm
-với **Đỗ Thùy Hương: thuyhuongctu@gmail.com**. Lưu ý:
+với **Đỗ Thùy Hương: thuyhuongctu@gmail.com**; tác giả chuyển thông tin này
+cho Phòng Khoa học, Công nghệ và Đổi mới sáng tạo, Đại học Cần Thơ. Lưu ý:
 
 - việc đăng ký quan tâm **không** tạo ra bất kỳ giấy phép, quyền chọn hay cam
   kết nào;
