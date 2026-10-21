@@ -127,7 +127,8 @@ mua gói và các tuyến `/api/payments/*` trả 503 hoặc 404.
 
 Trước khi bật:
 
-1. Các đồng sở hữu duyệt giá gói, rồi đặt `MAIDA_CREDIT_PACKS`
+1. Đại học Cần Thơ (chủ sở hữu quyền tác giả) chấp thuận bằng văn bản việc
+   khai thác thương mại và duyệt giá gói, rồi đặt `MAIDA_CREDIT_PACKS`
    (`mã:số tín dụng:giá VND`, cách nhau bởi dấu phẩy). Nếu để trống, backend
    dùng giá **nháp** của kế hoạch 03/10/2026:
    `thu:30:149000,tongquan:100:399000,nhom:300:990000`.

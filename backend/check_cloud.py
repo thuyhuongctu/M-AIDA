@@ -228,7 +228,7 @@ def check_payments(settings) -> bool:
 
     if settings.maida_credit_packs.strip() == Settings.model_fields["maida_credit_packs"].default:
         say(WARN, "MAIDA_CREDIT_PACKS chưa đặt: đang dùng giá NHÁP của kế hoạch 03/10/2026; "
-                  "đặt giá đã được các đồng sở hữu duyệt trước khi bán.")
+                  "chỉ bán khi Đại học Cần Thơ (chủ sở hữu) đã chấp thuận bằng văn bản và duyệt giá.")
     if provider == "payos":
         webhook = f"{settings.maida_public_url.rstrip('/')}/api/payments/payos/webhook"
         say(OK, f"payOS: client id ...{settings.payos_client_id[-4:]}; trang quay về {settings.maida_public_url.rstrip('/')}/")

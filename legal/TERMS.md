@@ -6,7 +6,7 @@ Vietnamese version below (Bản tiếng Việt ở phần sau). In case of incon
 
 ## 1. Who provides the service
 
-M-AIDA (Meta-Analysis Intelligent Data Assistant) is a web service for extracting effect-size statistics from research papers, with verbatim evidence, for human verification. During the closed beta the service is operated by Đỗ Thùy Hương, an individual based in Vietnam ("the Operator", "we"), contact: thuyhuongctu@gmail.com. The M-AIDA software is a computer program jointly owned by Can Tho University, Đỗ Thùy Hương and Phan Anh Tú; its source code is published under the GNU AGPL-3.0 licence at https://github.com/thuyhuongctu/M-AIDA. These Terms govern the hosted service only, not the source code.
+M-AIDA (Meta-Analysis Intelligent Data Assistant) is a web service for extracting effect-size statistics from research papers, with verbatim evidence, for human verification. During the closed beta the service is operated by Đỗ Thùy Hương, an individual based in Vietnam ("the Operator", "we"), contact: thuyhuongctu@gmail.com. The M-AIDA software is a computer program owned by Can Tho University, with Đỗ Thùy Hương and Phan Anh Tú as its authors; operating it as a service for outside users requires the university's written approval, and the beta opens only after that approval. Its source code is published under the GNU AGPL-3.0 licence at https://github.com/thuyhuongctu/M-AIDA. These Terms govern the hosted service only, not the source code.
 
 ## 2. The closed beta
 
@@ -62,7 +62,7 @@ Nếu hai bản ngôn ngữ khác nhau, bản tiếng Việt được ưu tiên 
 
 ## 1. Bên cung cấp dịch vụ
 
-M-AIDA (Meta-Analysis Intelligent Data Assistant) là dịch vụ web trích xuất số liệu thống kê về hệ số hiệu ứng từ bài báo khoa học, kèm câu trích nguyên văn, để con người kiểm tra. Trong giai đoạn beta kín, dịch vụ do bà Đỗ Thùy Hương, cá nhân cư trú tại Việt Nam ("Bên vận hành", "chúng tôi"), vận hành; liên hệ: thuyhuongctu@gmail.com. Phần mềm M-AIDA là chương trình máy tính thuộc đồng sở hữu của Trường Đại học Cần Thơ, Đỗ Thùy Hương và Phan Anh Tú; mã nguồn công bố theo giấy phép GNU AGPL-3.0 tại https://github.com/thuyhuongctu/M-AIDA. Điều khoản này chỉ điều chỉnh dịch vụ được lưu trữ, không điều chỉnh mã nguồn.
+M-AIDA (Meta-Analysis Intelligent Data Assistant) là dịch vụ web trích xuất số liệu thống kê về hệ số hiệu ứng từ bài báo khoa học, kèm câu trích nguyên văn, để con người kiểm tra. Trong giai đoạn beta kín, dịch vụ do bà Đỗ Thùy Hương, cá nhân cư trú tại Việt Nam ("Bên vận hành", "chúng tôi"), vận hành; liên hệ: thuyhuongctu@gmail.com. Phần mềm M-AIDA là chương trình máy tính thuộc sở hữu của Đại học Cần Thơ, với Đỗ Thùy Hương và Phan Anh Tú là đồng tác giả; việc vận hành thành dịch vụ cho người dùng bên ngoài cần văn bản chấp thuận của Nhà trường, và giai đoạn beta chỉ mở sau khi có văn bản đó. Mã nguồn công bố theo giấy phép GNU AGPL-3.0 tại https://github.com/thuyhuongctu/M-AIDA. Điều khoản này chỉ điều chỉnh dịch vụ được lưu trữ, không điều chỉnh mã nguồn.
 
 ## 2. Giai đoạn beta kín
 

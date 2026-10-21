@@ -162,7 +162,8 @@ class Settings(BaseSettings):
 
     # Credit packs on sale: "id:credits:price_vnd" entries separated by commas.
     # The defaults are the DRAFT prices of the 03/10/2026 commercial plan
-    # (still to be approved by the co-owners); set the variable to change them.
+    # (sales require the written approval of Can Tho University, the copyright
+    # owner); set the variable to change them.
     maida_credit_packs: str = "thu:30:149000,tongquan:100:399000,nhom:300:990000"
 
     # Minutes before an unpaid payment link expires.
