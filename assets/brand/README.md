@@ -29,7 +29,7 @@ cả khi máy người xem không có phông Source Serif 4 hay JetBrains Mono.
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta property="og:image" content="https://thuyhuongctu.github.io/M-AIDA/og-image.png">
+<meta property="og:image" content="https://maida.jemappellehuong.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 ```
